@@ -1,0 +1,60 @@
+[0;1;32m●[0m lshttpd.service - OpenLiteSpeed HTTP Server
+     Loaded: loaded (/etc/systemd/system/lshttpd.service; enabled; vendor preset: enabled)
+     Active: [0;1;32mactive (running)[0m since Wed 2025-11-05 09:16:40 WAT; 2min 49s ago
+    Process: 96623 ExecStart=/usr/local/lsws/bin/lswsctrl start (code=exited, status=0/SUCCESS)
+   Main PID: 96637 (litespeed)
+     CGroup: /system.slice/lshttpd.service
+             ├─95057 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─95075 lsphp:/home/wpmi.org/public_html/wp-login.php
+             ├─95081 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─95125 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─95127 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─95141 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─95358 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─95359 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─95483 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─95629 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─95982 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─95983 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─95997 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96057 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96058 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96360 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96491 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96492 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96493 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96494 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96507 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96508 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96509 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96510 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96514 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96599 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96600 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96602 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96637 "openlitespeed (lshttpd - main)"
+             ├─96638 "openlitespeed (lscgid)"
+             ├─96639 "openlitespeed (lshttpd - #01)"
+             ├─96640 "openlitespeed (lshttpd - #02)"
+             ├─96641 "openlitespeed (lshttpd - #03)"
+             ├─96642 "openlitespeed (lshttpd - #04)"
+             ├─96647 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96679 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96698 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96845 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96846 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96851 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96872 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             ├─96873 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+             └─96875 lsphp "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+
+Nov 05 09:16:37 o2.cp.service.edubeta.net.ng systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mThis usually indicates unclean termination of a previous run, or service implementation deficiencies.[0m
+Nov 05 09:16:37 o2.cp.service.edubeta.net.ng systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mlshttpd.service: Found left-over process 96599 (lsphp) in control group while starting unit. Ignoring.[0m
+Nov 05 09:16:37 o2.cp.service.edubeta.net.ng systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mThis usually indicates unclean termination of a previous run, or service implementation deficiencies.[0m
+Nov 05 09:16:37 o2.cp.service.edubeta.net.ng systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mlshttpd.service: Found left-over process 96600 (lsphp) in control group while starting unit. Ignoring.[0m
+Nov 05 09:16:37 o2.cp.service.edubeta.net.ng systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mThis usually indicates unclean termination of a previous run, or service implementation deficiencies.[0m
+Nov 05 09:16:37 o2.cp.service.edubeta.net.ng systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mlshttpd.service: Found left-over process 96602 (lsphp) in control group while starting unit. Ignoring.[0m
+Nov 05 09:16:37 o2.cp.service.edubeta.net.ng systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mThis usually indicates unclean termination of a previous run, or service implementation deficiencies.[0m
+Nov 05 09:16:37 o2.cp.service.edubeta.net.ng systemd[1]: Starting OpenLiteSpeed HTTP Server...
+Nov 05 09:16:37 o2.cp.service.edubeta.net.ng lswsctrl[96623]: [OK] Send SIGUSR1 to 95678
+Nov 05 09:16:40 o2.cp.service.edubeta.net.ng systemd[1]: Started OpenLiteSpeed HTTP Server.
