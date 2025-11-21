@@ -4,8 +4,9 @@
             <h2 class="font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                 {{ __('Director Dashboard') }}
             </h2>
-            <div class="text-sm text-gray-600">
-                {{ now()->format('l, F j, Y') }}
+            <div class="text-right">
+                <div class="text-sm text-gray-600 dark:text-gray-400">{{ now()->format('l, F j, Y') }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-500">{{ now()->format('g:i A') }}</div>
             </div>
         </div>
     </x-slot>
