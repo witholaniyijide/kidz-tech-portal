@@ -39,9 +39,8 @@ class="relative">
 
     <!-- Sidebar -->
     <aside :class="sidebarOpen ? 'w-64' : 'w-20'"
-           x-show="mobileMenuOpen || window.innerWidth >= 1024"
-           @resize.window="if (window.innerWidth >= 1024) mobileMenuOpen = false"
-           class="fixed left-0 top-0 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-30 transition-all duration-300 ease-in-out overflow-hidden">
+           class="fixed left-0 top-0 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-30 transition-all duration-300 ease-in-out overflow-hidden hidden lg:block"
+           x-cloak>
 
         <!-- Logo Section -->
         <div class="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
