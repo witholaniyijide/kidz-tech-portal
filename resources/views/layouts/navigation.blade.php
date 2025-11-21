@@ -16,22 +16,21 @@ x-init="
         document.documentElement.classList.add('dark');
     }
 "
-class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="flex items-center space-x-2">
+                    <a href="{{ route('dashboard') }}">
                         <img src="{{ asset('images/logo_light.png') }}"
-                             alt="Logo"
+                             alt="Kidz Tech Logo"
                              class="h-10 w-auto dark:hidden object-contain"
                              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%234F46E5%22 width=%22100%22 height=%22100%22 rx=%2220%22/%3E%3Ctext x=%2250%22 y=%2265%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22%3EK%3C/text%3E%3C/svg%3E'">
                         <img src="{{ asset('images/logo_dark.png') }}"
-                             alt="Logo"
+                             alt="Kidz Tech Logo"
                              class="h-10 w-auto hidden dark:block object-contain"
                              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%234F46E5%22 width=%22100%22 height=%22100%22 rx=%2220%22/%3E%3Ctext x=%2250%22 y=%2265%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22%3EK%3C/text%3E%3C/svg%3E'">
-                        <span class="font-bold text-lg text-gray-900 dark:text-white">Kidz Tech</span>
                     </a>
                 </div>
 
