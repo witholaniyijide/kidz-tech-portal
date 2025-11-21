@@ -34,45 +34,25 @@
             <div class="absolute -bottom-8 left-1/4 w-96 h-96 bg-gradient-to-br from-green-400 to-green-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 dark:opacity-20 animate-float" style="animation-delay: 4s;"></div>
             <div class="absolute -bottom-8 right-1/4 w-96 h-96 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 dark:opacity-20 animate-float" style="animation-delay: 6s;"></div>
 
-            <!-- Floating Coding Symbols with Glass Effect -->
-            <!-- Code Brackets </> -->
-            <div class="absolute top-20 left-[10%] glass-icon text-4xl text-blue-600 dark:text-blue-400 animate-float-slow" style="animation-delay: 0s;">
+            <!-- Floating Coding Symbols with Glass Effect (Hidden on Mobile, Selected Icons on Desktop) -->
+            <!-- Code Brackets </> - Show on Desktop Only -->
+            <div class="hidden md:block absolute top-20 left-[10%] glass-icon text-4xl text-blue-600 dark:text-blue-400 animate-float-slow" style="animation-delay: 0s;">
                 &lt;/&gt;
             </div>
 
-            <!-- Rocket -->
-            <div class="absolute top-32 right-[15%] glass-icon text-5xl animate-float-slow" style="animation-delay: 1s;">
+            <!-- Rocket - Show on Desktop Only -->
+            <div class="hidden md:block absolute top-32 right-[15%] glass-icon text-5xl animate-float-slow" style="animation-delay: 1s;">
                 🚀
             </div>
 
-            <!-- Android Robot -->
-            <div class="absolute bottom-32 left-[12%] glass-icon text-5xl animate-float-slow" style="animation-delay: 2s;">
-                🤖
-            </div>
-
-            <!-- Laptop/Computer -->
-            <div class="absolute top-1/2 right-[8%] glass-icon text-4xl animate-float-slow" style="animation-delay: 3s;">
+            <!-- Laptop/Computer - Show on Desktop Only -->
+            <div class="hidden md:block absolute top-1/2 right-[8%] glass-icon text-4xl animate-float-slow" style="animation-delay: 3s;">
                 💻
             </div>
 
-            <!-- Light Bulb (Ideas) -->
-            <div class="absolute bottom-20 right-[20%] glass-icon text-4xl animate-float-slow" style="animation-delay: 4s;">
+            <!-- Light Bulb (Ideas) - Show on Desktop Only -->
+            <div class="hidden md:block absolute bottom-20 right-[20%] glass-icon text-4xl animate-float-slow" style="animation-delay: 4s;">
                 💡
-            </div>
-
-            <!-- Code Symbol {} -->
-            <div class="absolute top-1/3 left-[8%] glass-icon text-3xl text-purple-600 dark:text-purple-400 animate-float-slow" style="animation-delay: 5s;">
-                &#123;&#125;
-            </div>
-
-            <!-- Gear/Settings -->
-            <div class="absolute bottom-1/3 right-[10%] glass-icon text-4xl animate-float-slow" style="animation-delay: 6s;">
-                ⚙️
-            </div>
-
-            <!-- Star (Achievement) -->
-            <div class="absolute top-[60%] left-[15%] glass-icon text-3xl animate-float-slow" style="animation-delay: 7s;">
-                ⭐
             </div>
 
             <!-- Content Container -->

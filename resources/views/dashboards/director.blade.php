@@ -5,8 +5,8 @@
                 {{ __('Director Dashboard') }}
             </h2>
             <div class="text-right">
-                <div class="text-sm text-gray-600 dark:text-gray-400">{{ now()->format('l, F j, Y') }}</div>
-                <div class="text-xs text-gray-500 dark:text-gray-500">{{ now()->format('g:i A') }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">{{ now()->timezone('Africa/Lagos')->format('l, F j, Y') }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-500">{{ now()->timezone('Africa/Lagos')->format('g:i A') }}</div>
             </div>
         </div>
     </x-slot>
