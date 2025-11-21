@@ -46,7 +46,7 @@
             </div>
 
             <!-- Laptop/Computer - Show on Desktop Only -->
-            <div class="hidden md:block absolute top-1/2 right-[8%] glass-icon text-4xl animate-float-slow" style="animation-delay: 3s;">
+            <div class="hidden md:block absolute bottom-20 left-[20%] glass-icon text-4xl animate-float-slow" style="animation-delay: 3s;">
                 💻
             </div>
 
