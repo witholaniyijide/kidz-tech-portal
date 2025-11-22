@@ -22,8 +22,14 @@ class Tutor extends Model
         'address',
         'state',
         'location',
-        'specializations',
+        'occupation',
         'hire_date',
+        'contact_person_name',
+        'contact_person_relationship',
+        'contact_person_phone',
+        'bank_name',
+        'account_number',
+        'account_name',
         'status',
         'hourly_rate',
         'qualifications',
@@ -34,13 +40,22 @@ class Tutor extends Model
     protected $casts = [
         'date_of_birth' => 'date',
         'hire_date' => 'date',
-        'specializations' => 'array',
         'hourly_rate' => 'decimal:2',
     ];
 
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
+
+    public function attendanceRecords()
+    {
+        return $this->hasMany(AttendanceRecord::class);
+    }
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOne(User::class, 'email', 'email');
     }
 
     public function getFullNameAttribute()
