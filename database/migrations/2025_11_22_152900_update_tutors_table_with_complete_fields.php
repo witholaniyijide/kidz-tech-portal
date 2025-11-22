@@ -49,6 +49,11 @@ return new class extends Migration
             if (!Schema::hasColumn('tutors', 'profile_photo')) {
                 $table->string('profile_photo')->nullable()->comment('Path to profile photo');
             }
+
+            // Status
+            if (!Schema::hasColumn('tutors', 'status')) {
+                $table->enum('status', ['active', 'inactive', 'on_leave'])->default('active');
+            }
         });
 
         // Drop specializations column if it exists
@@ -68,7 +73,7 @@ return new class extends Migration
             $columns = [
                 'occupation', 'location', 'date_of_birth',
                 'contact_person_name', 'contact_person_relationship', 'contact_person_phone',
-                'bank_name', 'account_number', 'account_name', 'profile_photo'
+                'bank_name', 'account_number', 'account_name', 'profile_photo', 'status'
             ];
 
             foreach ($columns as $column) {

@@ -82,6 +82,11 @@ return new class extends Migration
             if (!Schema::hasColumn('students', 'mother_location')) {
                 $table->string('mother_location')->nullable();
             }
+
+            // Status
+            if (!Schema::hasColumn('students', 'status')) {
+                $table->enum('status', ['active', 'inactive'])->default('active');
+            }
         });
     }
 
@@ -97,6 +102,7 @@ return new class extends Migration
                 'classes_per_week', 'total_periods', 'completed_periods',
                 'father_name', 'father_phone', 'father_email', 'father_occupation', 'father_location',
                 'mother_name', 'mother_phone', 'mother_email', 'mother_occupation', 'mother_location',
+                'status',
             ];
 
             foreach ($columns as $column) {
