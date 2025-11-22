@@ -15,14 +15,14 @@ class AttendanceController extends Controller
         $query = AttendanceRecord::with(['student', 'submittedBy']);
 
         if ($request->has('date') && $request->date) {
-            $query->whereDate('attendance_date', $request->date);
+            $query->whereDate('class_date', $request->date);
         }
 
         if ($request->has('status') && $request->status) {
             $query->where('approval_status', $request->status);
         }
 
-        $records = $query->orderBy('attendance_date', 'desc')
+        $records = $query->orderBy('class_date', 'desc')
                         ->orderBy('created_at', 'desc')
                         ->paginate(20);
 
@@ -33,8 +33,8 @@ class AttendanceController extends Controller
     {
         $selectedDate = $request->date ?? Carbon::today()->format('Y-m-d');
         $students = Student::active()->orderBy('first_name')->get();
-        
-        $existingAttendance = AttendanceRecord::whereDate('attendance_date', $selectedDate)
+
+        $existingAttendance = AttendanceRecord::whereDate('class_date', $selectedDate)
                                               ->pluck('student_id')
                                               ->toArray();
 
@@ -44,7 +44,7 @@ class AttendanceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'attendance_date' => 'required|date',
+            'class_date' => 'required|date',
             'session' => 'nullable|string|max:255',
             'attendance' => 'required|array',
             'attendance.*.student_id' => 'required|exists:students,id',
@@ -57,7 +57,7 @@ class AttendanceController extends Controller
             AttendanceRecord::updateOrCreate(
                 [
                     'student_id' => $record['student_id'],
-                    'attendance_date' => $request->attendance_date,
+                    'class_date' => $request->class_date,
                     'session' => $request->session,
                 ],
                 [

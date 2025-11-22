@@ -37,13 +37,13 @@ class ParentDashboardController extends Controller
         $currentYear = Carbon::now()->format('Y');
         
         $totalAttendance = AttendanceRecord::whereIn('student_id', $studentIds)
-                                          ->whereMonth('attendance_date', Carbon::now()->month)
-                                          ->whereYear('attendance_date', Carbon::now()->year)
+                                          ->whereMonth('class_date', Carbon::now()->month)
+                                          ->whereYear('class_date', Carbon::now()->year)
                                           ->count();
-        
+
         $presentCount = AttendanceRecord::whereIn('student_id', $studentIds)
-                                       ->whereMonth('attendance_date', Carbon::now()->month)
-                                       ->whereYear('attendance_date', Carbon::now()->year)
+                                       ->whereMonth('class_date', Carbon::now()->month)
+                                       ->whereYear('class_date', Carbon::now()->year)
                                        ->where('status', 'present')
                                        ->count();
         
@@ -108,7 +108,7 @@ class ParentDashboardController extends Controller
         }
         
         $attendance = AttendanceRecord::where('student_id', $student->id)
-                                     ->orderBy('attendance_date', 'desc')
+                                     ->orderBy('class_date', 'desc')
                                      ->paginate(20);
         
         return view('parent.child-attendance', compact('student', 'attendance'));

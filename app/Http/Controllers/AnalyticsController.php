@@ -52,12 +52,12 @@ class AnalyticsController extends Controller
         }
 
         // Attendance by Month (Last 6 months) - FIXED
-        $attendanceByMonth = AttendanceRecord::where('attendance_date', '>=', Carbon::now()->subMonths(6))
-            ->selectRaw('MONTH(attendance_date) as month, YEAR(attendance_date) as year, 
+        $attendanceByMonth = AttendanceRecord::where('class_date', '>=', Carbon::now()->subMonths(6))
+            ->selectRaw('MONTH(class_date) as month, YEAR(class_date) as year,
                          COUNT(*) as total,
                          SUM(CASE WHEN status = "present" THEN 1 ELSE 0 END) as present')
-            ->groupByRaw('YEAR(attendance_date), MONTH(attendance_date)')
-            ->orderByRaw('YEAR(attendance_date) ASC, MONTH(attendance_date) ASC')
+            ->groupByRaw('YEAR(class_date), MONTH(class_date)')
+            ->orderByRaw('YEAR(class_date) ASC, MONTH(class_date) ASC')
             ->get();
 
         $attendanceMonths = [];

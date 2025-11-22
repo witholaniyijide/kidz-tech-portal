@@ -48,11 +48,11 @@ class DashboardController extends Controller
         
         $pendingApprovals = Report::where('status', 'submitted')->count();
         
-        $todayAttendance = AttendanceRecord::whereDate('attendance_date', Carbon::today())
+        $todayAttendance = AttendanceRecord::whereDate('class_date', Carbon::today())
                                           ->where('status', 'present')
                                           ->count();
-        
-        $totalAttendanceToday = AttendanceRecord::whereDate('attendance_date', Carbon::today())->count();
+
+        $totalAttendanceToday = AttendanceRecord::whereDate('class_date', Carbon::today())->count();
         
         $attendanceRate = $totalAttendanceToday > 0 
             ? round(($todayAttendance / $totalAttendanceToday) * 100, 1) 
@@ -130,8 +130,8 @@ class DashboardController extends Controller
                                  ->whereMonth('created_at', Carbon::now()->month)
                                  ->count();
 
-        $todayAttendance = AttendanceRecord::whereDate('attendance_date', Carbon::today())->count();
-        $presentToday = AttendanceRecord::whereDate('attendance_date', Carbon::today())
+        $todayAttendance = AttendanceRecord::whereDate('class_date', Carbon::today())->count();
+        $presentToday = AttendanceRecord::whereDate('class_date', Carbon::today())
                                        ->where('status', 'present')
                                        ->count();
 
@@ -176,11 +176,11 @@ class DashboardController extends Controller
                                 ->count();
 
         // Get today's attendance records submitted by this tutor
-        $todayAttendance = AttendanceRecord::whereDate('attendance_date', Carbon::today())
+        $todayAttendance = AttendanceRecord::whereDate('class_date', Carbon::today())
                                           ->where('submitted_by', $user->id)
                                           ->count();
 
-        $presentToday = AttendanceRecord::whereDate('attendance_date', Carbon::today())
+        $presentToday = AttendanceRecord::whereDate('class_date', Carbon::today())
                                        ->where('submitted_by', $user->id)
                                        ->where('status', 'present')
                                        ->count();
