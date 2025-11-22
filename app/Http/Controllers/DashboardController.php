@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
+use App\Models\Tutor;
 use App\Models\AttendanceRecord;
 use App\Models\Report;
+use App\Models\DailyClassSchedule;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -28,7 +30,21 @@ class DashboardController extends Controller
     }
     
     return view('dashboard');
-}    
+}
+
+    /**
+     * Public admin dashboard method for direct access
+     */
+    public function admin()
+    {
+        return view('dashboards.admin', [
+            'studentCount' => Student::count(),
+            'tutorCount' => Tutor::count(),
+            'pendingAttendance' => AttendanceRecord::where('status', 'pending')->count(),
+            'todaySchedule' => DailyClassSchedule::where('schedule_date', today())->first(),
+        ]);
+    }
+
     private function directorDashboard()
     {
         $totalStudents = Student::count();
