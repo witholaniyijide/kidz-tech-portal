@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class AttendanceRecord extends Model
 {
@@ -11,18 +11,20 @@ class AttendanceRecord extends Model
 
     protected $fillable = [
         'student_id',
-        'submitted_by',
-        'attendance_date',
-        'status',
-        'session',
+        'tutor_id',
+        'class_date',
+        'class_time',
+        'duration_minutes',
+        'topic',
         'notes',
-        'approval_status',
+        'status',
         'approved_by',
         'approved_at',
     ];
 
     protected $casts = [
-        'attendance_date' => 'date',
+        'class_date' => 'date',
+        'class_time' => 'datetime',
         'approved_at' => 'datetime',
     ];
 
@@ -31,28 +33,13 @@ class AttendanceRecord extends Model
         return $this->belongsTo(Student::class);
     }
 
-    public function submittedBy()
+    public function tutor()
     {
-        return $this->belongsTo(User::class, 'submitted_by');
+        return $this->belongsTo(Tutor::class);
     }
 
-    public function approvedBy()
+    public function approver()
     {
         return $this->belongsTo(User::class, 'approved_by');
-    }
-
-    public function scopePending($query)
-    {
-        return $query->where('approval_status', 'pending');
-    }
-
-    public function scopeApproved($query)
-    {
-        return $query->where('approval_status', 'approved');
-    }
-
-    public function scopeForDate($query, $date)
-    {
-        return $query->whereDate('attendance_date', $date);
     }
 }

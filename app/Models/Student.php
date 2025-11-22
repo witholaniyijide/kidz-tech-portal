@@ -14,9 +14,11 @@ class Student extends Model
         'student_id',
         'first_name',
         'last_name',
+        'other_name',
         'email',
         'phone',
         'date_of_birth',
+        'age',
         'gender',
         'address',
         'state',
@@ -26,6 +28,25 @@ class Student extends Model
         'parent_phone',
         'parent_relationship',
         'enrollment_date',
+        'coding_experience',
+        'career_interest',
+        'class_link',
+        'google_classroom_link',
+        'tutor_id',
+        'class_schedule',
+        'classes_per_week',
+        'total_periods',
+        'completed_periods',
+        'father_name',
+        'father_phone',
+        'father_email',
+        'father_occupation',
+        'father_location',
+        'mother_name',
+        'mother_phone',
+        'mother_email',
+        'mother_occupation',
+        'mother_location',
         'status',
         'location',
         'notes',
@@ -36,6 +57,7 @@ class Student extends Model
     protected $casts = [
         'date_of_birth' => 'date',
         'enrollment_date' => 'date',
+        'class_schedule' => 'array',
     ];
 
     /**
@@ -43,7 +65,12 @@ class Student extends Model
      */
     public function getFullNameAttribute()
     {
-        return $this->first_name . ' ' . $this->last_name;
+        $name = $this->first_name;
+        if ($this->other_name) {
+            $name .= ' ' . $this->other_name;
+        }
+        $name .= ' ' . $this->last_name;
+        return $name;
     }
 
     /**
@@ -70,7 +97,22 @@ class Student extends Model
         return $query->where('location', $location);
     }
     public function parent()
-{
-    return $this->belongsTo(User::class, 'parent_id');
-}
+    {
+        return $this->belongsTo(User::class, 'parent_id');
+    }
+
+    public function tutor()
+    {
+        return $this->belongsTo(Tutor::class);
+    }
+
+    public function attendanceRecords()
+    {
+        return $this->hasMany(AttendanceRecord::class);
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
+    }
 }
