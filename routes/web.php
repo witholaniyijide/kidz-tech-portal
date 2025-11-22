@@ -51,11 +51,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('payments', App\Http\Controllers\PaymentController::class);
 });
 
+// Admin Dashboard Route
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    Route::get('/dashboard/admin', [App\Http\Controllers\DashboardController::class, 'admin'])->name('dashboard.admin');
+});
+
+// Schedule Routes
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    Route::get('/schedule/today', [App\Http\Controllers\ScheduleController::class, 'showToday'])->name('schedule.today');
+    Route::post('/schedule/post', [App\Http\Controllers\ScheduleController::class, 'postSchedule'])->name('schedule.post');
+    Route::get('/schedule/generate', [App\Http\Controllers\ScheduleController::class, 'generateTodaySchedule'])->name('schedule.generate');
+});
+
+// Attendance Approval Routes
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    Route::get('/attendance/pending', [App\Http\Controllers\AttendanceController::class, 'pending'])->name('attendance.pending');
+    Route::post('/attendance/approve/{id}', [App\Http\Controllers\AttendanceController::class, 'approve'])->name('attendance.approve');
+    Route::post('/attendance/reject/{id}', [App\Http\Controllers\AttendanceController::class, 'reject'])->name('attendance.reject');
+    Route::post('/attendance/bulk-approve', [App\Http\Controllers\AttendanceController::class, 'bulkApprove'])->name('attendance.bulk.approve');
+    Route::post('/attendance/bulk-reject', [App\Http\Controllers\AttendanceController::class, 'bulkReject'])->name('attendance.bulk.reject');
+});
+
 // Notice Board Routes
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/noticeboard', function() {
-        return view('noticeboard.index');
-    })->name('noticeboard.index');
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    Route::resource('noticeboard', App\Http\Controllers\NoticeController::class);
 });
 
 // Parent Portal Routes

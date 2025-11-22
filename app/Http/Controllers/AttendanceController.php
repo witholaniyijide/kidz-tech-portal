@@ -83,10 +83,15 @@ class AttendanceController extends Controller
     public function approve(AttendanceRecord $attendance)
     {
         $attendance->update([
-            'approval_status' => 'approved',
+            'status' => 'approved',
             'approved_by' => Auth::id(),
             'approved_at' => now(),
         ]);
+
+        // Increment student's completed_periods
+        if ($attendance->student) {
+            $attendance->student->increment('completed_periods');
+        }
 
         return back()->with('success', 'Attendance approved successfully!');
     }
@@ -94,7 +99,7 @@ class AttendanceController extends Controller
     public function reject(AttendanceRecord $attendance)
     {
         $attendance->update([
-            'approval_status' => 'rejected',
+            'status' => 'rejected',
             'approved_by' => Auth::id(),
             'approved_at' => now(),
         ]);
@@ -107,5 +112,78 @@ class AttendanceController extends Controller
         $attendance->delete();
         return redirect()->route('attendance.index')
             ->with('success', 'Attendance record deleted successfully!');
+    }
+
+    /**
+     * Show pending attendance records for approval
+     */
+    public function pending()
+    {
+        $records = AttendanceRecord::with(['student', 'tutor'])
+            ->where('status', 'pending')
+            ->orderBy('class_date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('attendance.pending', compact('records'));
+    }
+
+    /**
+     * Bulk approve attendance records
+     */
+    public function bulkApprove(Request $request)
+    {
+        $validated = $request->validate([
+            'record_ids' => 'required|array',
+            'record_ids.*' => 'exists:attendance_records,id',
+        ]);
+
+        $count = 0;
+        foreach ($validated['record_ids'] as $id) {
+            $attendance = AttendanceRecord::find($id);
+            if ($attendance && $attendance->status === 'pending') {
+                $attendance->update([
+                    'status' => 'approved',
+                    'approved_by' => Auth::id(),
+                    'approved_at' => now(),
+                ]);
+
+                // Increment student's completed_periods
+                $student = $attendance->student;
+                if ($student) {
+                    $student->increment('completed_periods');
+                }
+
+                $count++;
+            }
+        }
+
+        return back()->with('success', "Successfully approved {$count} attendance records!");
+    }
+
+    /**
+     * Bulk reject attendance records
+     */
+    public function bulkReject(Request $request)
+    {
+        $validated = $request->validate([
+            'record_ids' => 'required|array',
+            'record_ids.*' => 'exists:attendance_records,id',
+        ]);
+
+        $count = 0;
+        foreach ($validated['record_ids'] as $id) {
+            $attendance = AttendanceRecord::find($id);
+            if ($attendance && $attendance->status === 'pending') {
+                $attendance->update([
+                    'status' => 'rejected',
+                    'approved_by' => Auth::id(),
+                    'approved_at' => now(),
+                ]);
+                $count++;
+            }
+        }
+
+        return back()->with('success', "Successfully rejected {$count} attendance records!");
     }
 }
