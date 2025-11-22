@@ -51,6 +51,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('payments', App\Http\Controllers\PaymentController::class);
 });
 
+// Notice Board Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/noticeboard', function() {
+        return view('noticeboard.index');
+    })->name('noticeboard.index');
+});
+
 // Parent Portal Routes
 Route::middleware(['auth', 'verified'])->prefix('parent')->name('parent.')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\ParentDashboardController::class, 'index'])->name('dashboard');
