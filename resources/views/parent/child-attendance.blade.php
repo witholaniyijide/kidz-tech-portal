@@ -31,10 +31,10 @@
                                     @foreach($attendance as $record)
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ $record->attendance_date->format('M d, Y') }}
+                                                {{ $record->class_date->format('M d, Y') }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ $record->attendance_date->format('l') }}
+                                                {{ $record->class_date->format('l') }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 @if($record->status == 'present')

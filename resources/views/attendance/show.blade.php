@@ -30,7 +30,7 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-medium text-gray-500">Date</h3>
-                            <p class="mt-1 text-lg font-semibold text-gray-900">{{ $attendance->attendance_date->format('M d, Y') }}</p>
+                            <p class="mt-1 text-lg font-semibold text-gray-900">{{ $attendance->class_date->format('M d, Y') }}</p>
                         </div>
                         <div>
                             <h3 class="text-sm font-medium text-gray-500">Status</h3>
