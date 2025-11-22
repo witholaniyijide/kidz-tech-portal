@@ -14,19 +14,21 @@ class UsersSeeder extends Seeder
         // Get roles
         $directorRole = Role::where('name', 'director')->first();
         $managerRole = Role::where('name', 'manager')->first();
+        $adminRole = Role::where('name', 'admin')->first();
         $tutorRole = Role::where('name', 'tutor')->first();
         $parentRole = Role::where('name', 'parent')->first();
 
-        // Create Director (if not exists)
+        // Create Director (YOUR REAL CREDENTIALS)
         $director = User::firstOrCreate(
-            ['email' => 'director@kidztech.com'],
+            ['email' => 'olaniyi@edubeta.net.ng'],
             [
-                'name' => 'John Director',
-                'password' => Hash::make('password'),
-                'phone' => '08012345678',
-                'address' => '123 Tech Street, Lagos',
-                'date_of_birth' => '1980-01-15',
+                'name' => 'Olaniyi Olajide',
+                'password' => Hash::make('password'), // Change this to your real password if different
+                'phone' => '08138433544',
+                'address' => 'Lagos, Nigeria',
+                'date_of_birth' => '1990-01-01', // Update if you want
                 'gender' => 'male',
+                'email_verified_at' => now(),
             ]
         );
         if ($directorRole) {
@@ -56,10 +58,46 @@ class UsersSeeder extends Seeder
         foreach ($managers as $managerData) {
             $manager = User::firstOrCreate(
                 ['email' => $managerData['email']],
-                array_merge($managerData, ['password' => Hash::make('password')])
+                array_merge($managerData, [
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ])
             );
             if ($managerRole) {
                 $manager->roles()->sync([$managerRole->id]);
+            }
+        }
+
+        // Create Admins
+        $admins = [
+            [
+                'name' => 'Alice Admin',
+                'email' => 'alice.admin@kidztech.com',
+                'phone' => '08045678901',
+                'address' => '101 Admin Street, Lagos',
+                'date_of_birth' => '1987-05-14',
+                'gender' => 'female',
+            ],
+            [
+                'name' => 'Bob Admin',
+                'email' => 'bob.admin@kidztech.com',
+                'phone' => '08056789012',
+                'address' => '202 Admin Avenue, Abuja',
+                'date_of_birth' => '1989-08-25',
+                'gender' => 'male',
+            ],
+        ];
+
+        foreach ($admins as $adminData) {
+            $admin = User::firstOrCreate(
+                ['email' => $adminData['email']],
+                array_merge($adminData, [
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ])
+            );
+            if ($adminRole) {
+                $admin->roles()->sync([$adminRole->id]);
             }
         }
 
@@ -110,7 +148,10 @@ class UsersSeeder extends Seeder
         foreach ($tutors as $tutorData) {
             $tutor = User::firstOrCreate(
                 ['email' => $tutorData['email']],
-                array_merge($tutorData, ['password' => Hash::make('password')])
+                array_merge($tutorData, [
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ])
             );
             if ($tutorRole) {
                 $tutor->roles()->sync([$tutorRole->id]);
@@ -204,7 +245,10 @@ class UsersSeeder extends Seeder
         foreach ($parents as $parentData) {
             $parent = User::firstOrCreate(
                 ['email' => $parentData['email']],
-                array_merge($parentData, ['password' => Hash::make('password')])
+                array_merge($parentData, [
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ])
             );
             if ($parentRole) {
                 $parent->roles()->sync([$parentRole->id]);
