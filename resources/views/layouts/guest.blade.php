@@ -28,11 +28,11 @@
             <!-- Gradient Background -->
             <div class="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900"></div>
 
-            <!-- Floating Orbs with Brand Colors (More Visible) -->
-            <div class="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-red-400 to-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 dark:opacity-20 animate-float"></div>
-            <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 dark:opacity-20 animate-float" style="animation-delay: 2s;"></div>
-            <div class="absolute -bottom-8 left-1/4 w-96 h-96 bg-gradient-to-br from-green-400 to-green-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 dark:opacity-20 animate-float" style="animation-delay: 4s;"></div>
-            <div class="absolute -bottom-8 right-1/4 w-96 h-96 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 dark:opacity-20 animate-float" style="animation-delay: 6s;"></div>
+            <!-- Floating Orbs with Brand Colors (Toned Down) -->
+            <div class="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-red-300 to-red-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 animate-float"></div>
+            <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-300 to-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 animate-float" style="animation-delay: 2s;"></div>
+            <div class="absolute -bottom-8 left-1/4 w-96 h-96 bg-gradient-to-br from-green-300 to-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 animate-float" style="animation-delay: 4s;"></div>
+            <div class="absolute -bottom-8 right-1/4 w-96 h-96 bg-gradient-to-br from-yellow-300 to-yellow-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 animate-float" style="animation-delay: 6s;"></div>
 
             <!-- Floating Coding Symbols with Glass Effect (Hidden on Mobile, Selected Icons on Desktop) -->
             <!-- Code Brackets </> - Show on Desktop Only -->
@@ -62,11 +62,11 @@
                     <a href="/">
                         <img src="{{ asset('images/logo_light.png') }}"
                              alt="Kidz Tech Logo"
-                             class="h-24 w-auto dark:hidden drop-shadow-lg"
+                             class="h-16 w-auto dark:hidden drop-shadow-lg"
                              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%234F46E5%22 width=%22100%22 height=%22100%22 rx=%2220%22/%3E%3Ctext x=%2250%22 y=%2265%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22%3EK%3C/text%3E%3C/svg%3E'">
                         <img src="{{ asset('images/logo_dark.png') }}"
                              alt="Kidz Tech Logo"
-                             class="h-24 w-auto hidden dark:block drop-shadow-lg"
+                             class="h-16 w-auto hidden dark:block drop-shadow-lg"
                              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%234F46E5%22 width=%22100%22 height=%22100%22 rx=%2220%22/%3E%3Ctext x=%2250%22 y=%2265%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22%3EK%3C/text%3E%3C/svg%3E'">
                     </a>
                 </div>
