@@ -18,6 +18,7 @@ class UsersSeeder extends Seeder
         $tutorRole = Role::where('name', 'tutor')->first();
         $parentRole = Role::where('name', 'parent')->first();
 
+<<<<<<< HEAD
         // Create Director (YOUR REAL CREDENTIALS)
         $director = User::firstOrCreate(
             ['email' => 'olaniyi@edubeta.net.ng'],
@@ -28,6 +29,14 @@ class UsersSeeder extends Seeder
                 'address' => 'Lagos, Nigeria',
                 'date_of_birth' => '1990-01-01', // Update if you want
                 'gender' => 'male',
+=======
+        // Create Director
+        $director = User::firstOrCreate(
+            ['email' => 'olaniyi@edubeta.net.ng'],
+            [
+                'name' => 'Olaniyi Jide',
+                'password' => Hash::make('Motherslove100%'),
+>>>>>>> d968725e447fdd7a736ae82a7908a05ea96bae2e
                 'email_verified_at' => now(),
             ]
         );
@@ -36,32 +45,22 @@ class UsersSeeder extends Seeder
         }
 
         // Create Managers
-        $managers = [
-            [
-                'name' => 'Sarah Manager',
-                'email' => 'sarah.manager@kidztech.com',
-                'phone' => '08023456789',
-                'address' => '456 Manager Ave, Lagos',
-                'date_of_birth' => '1985-03-22',
-                'gender' => 'female',
-            ],
-            [
-                'name' => 'Michael Admin',
-                'email' => 'michael.admin@kidztech.com',
-                'phone' => '08034567890',
-                'address' => '789 Admin Road, Abuja',
-                'date_of_birth' => '1983-07-10',
-                'gender' => 'male',
-            ],
-        ];
-
-        foreach ($managers as $managerData) {
+        for ($i = 1; $i <= 2; $i++) {
             $manager = User::firstOrCreate(
+<<<<<<< HEAD
                 ['email' => $managerData['email']],
                 array_merge($managerData, [
                     'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ])
+=======
+                ['email' => "manager{$i}@kidztech.com"],
+                [
+                    'name' => "Manager {$i}",
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ]
+>>>>>>> d968725e447fdd7a736ae82a7908a05ea96bae2e
             );
             if ($managerRole) {
                 $manager->roles()->sync([$managerRole->id]);
@@ -69,6 +68,7 @@ class UsersSeeder extends Seeder
         }
 
         // Create Admins
+<<<<<<< HEAD
         $admins = [
             [
                 'name' => 'Alice Admin',
@@ -95,11 +95,22 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ])
+=======
+        for ($i = 1; $i <= 2; $i++) {
+            $admin = User::firstOrCreate(
+                ['email' => "admin{$i}@kidztech.com"],
+                [
+                    'name' => "Admin {$i}",
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ]
+>>>>>>> d968725e447fdd7a736ae82a7908a05ea96bae2e
             );
             if ($adminRole) {
                 $admin->roles()->sync([$adminRole->id]);
             }
         }
+<<<<<<< HEAD
 
         // Create Tutors (as users)
         $tutors = [
@@ -144,14 +155,26 @@ class UsersSeeder extends Seeder
                 'gender' => 'male',
             ],
         ];
+=======
+>>>>>>> d968725e447fdd7a736ae82a7908a05ea96bae2e
 
-        foreach ($tutors as $tutorData) {
+        // Create Tutors
+        for ($i = 1; $i <= 5; $i++) {
             $tutor = User::firstOrCreate(
+<<<<<<< HEAD
                 ['email' => $tutorData['email']],
                 array_merge($tutorData, [
                     'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ])
+=======
+                ['email' => "tutor{$i}@kidztech.com"],
+                [
+                    'name' => "Tutor {$i}",
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ]
+>>>>>>> d968725e447fdd7a736ae82a7908a05ea96bae2e
             );
             if ($tutorRole) {
                 $tutor->roles()->sync([$tutorRole->id]);
@@ -159,96 +182,22 @@ class UsersSeeder extends Seeder
         }
 
         // Create Parents
-        $parents = [
-            [
-                'name' => 'Mr. Ade Williams',
-                'email' => 'ade.williams@example.com',
-                'phone' => '08011111111',
-                'address' => '1 Parent Street, Ikeja, Lagos',
-                'date_of_birth' => '1975-01-20',
-                'gender' => 'male',
-            ],
-            [
-                'name' => 'Mrs. Funmi Balogun',
-                'email' => 'funmi.balogun@example.com',
-                'phone' => '08022222222',
-                'address' => '2 Family Road, Victoria Island, Lagos',
-                'date_of_birth' => '1978-04-15',
-                'gender' => 'female',
-            ],
-            [
-                'name' => 'Mr. Chidi Okafor',
-                'email' => 'chidi.okafor@example.com',
-                'phone' => '08033333333',
-                'address' => '3 Guardian Avenue, Lekki, Lagos',
-                'date_of_birth' => '1980-07-22',
-                'gender' => 'male',
-            ],
-            [
-                'name' => 'Mrs. Amina Abdullahi',
-                'email' => 'amina.abdullahi@example.com',
-                'phone' => '08044444444',
-                'address' => '4 Caretaker Close, Garki, Abuja',
-                'date_of_birth' => '1982-10-08',
-                'gender' => 'female',
-            ],
-            [
-                'name' => 'Mr. Emeka Nwosu',
-                'email' => 'emeka.nwosu@example.com',
-                'phone' => '08055555555',
-                'address' => '5 Parent Plaza, GRA, Port Harcourt',
-                'date_of_birth' => '1977-03-12',
-                'gender' => 'male',
-            ],
-            [
-                'name' => 'Mrs. Kemi Adeyemi',
-                'email' => 'kemi.adeyemi@example.com',
-                'phone' => '08066666666',
-                'address' => '6 Family Street, Bodija, Ibadan',
-                'date_of_birth' => '1981-06-30',
-                'gender' => 'female',
-            ],
-            [
-                'name' => 'Mr. Tunde Bakare',
-                'email' => 'tunde.bakare@example.com',
-                'phone' => '08077777777',
-                'address' => '7 Guardian Way, Ogba, Lagos',
-                'date_of_birth' => '1979-09-18',
-                'gender' => 'male',
-            ],
-            [
-                'name' => 'Mrs. Ngozi Eze',
-                'email' => 'ngozi.eze@example.com',
-                'phone' => '08088888888',
-                'address' => '8 Parent Drive, Enugu',
-                'date_of_birth' => '1983-12-05',
-                'gender' => 'female',
-            ],
-            [
-                'name' => 'Mr. Yusuf Hassan',
-                'email' => 'yusuf.hassan@example.com',
-                'phone' => '08099999999',
-                'address' => '9 Caretaker Court, Kaduna',
-                'date_of_birth' => '1976-11-25',
-                'gender' => 'male',
-            ],
-            [
-                'name' => 'Mrs. Grace Obi',
-                'email' => 'grace.obi@example.com',
-                'phone' => '08010101010',
-                'address' => '10 Family Lane, Owerri',
-                'date_of_birth' => '1984-02-14',
-                'gender' => 'female',
-            ],
-        ];
-
-        foreach ($parents as $parentData) {
+        for ($i = 1; $i <= 10; $i++) {
             $parent = User::firstOrCreate(
+<<<<<<< HEAD
                 ['email' => $parentData['email']],
                 array_merge($parentData, [
                     'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ])
+=======
+                ['email' => "parent{$i}@kidztech.com"],
+                [
+                    'name' => "Parent {$i}",
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ]
+>>>>>>> d968725e447fdd7a736ae82a7908a05ea96bae2e
             );
             if ($parentRole) {
                 $parent->roles()->sync([$parentRole->id]);
