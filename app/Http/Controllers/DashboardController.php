@@ -74,7 +74,40 @@ class DashboardController extends Controller
     
     private function adminDashboard()
     {
-        return view('dashboards.admin');
+        $totalUsers = \App\Models\User::count();
+        $totalStudents = Student::count();
+        $totalTutors = \App\Models\Tutor::count();
+        $totalReports = Report::count();
+        $totalPayments = \App\Models\Payment::count();
+        $totalAttendance = AttendanceRecord::count();
+
+        // This month counts
+        $thisMonth = now()->month;
+        $thisYear = now()->year;
+
+        $studentsThisMonth = Student::whereMonth('created_at', $thisMonth)
+                                   ->whereYear('created_at', $thisYear)
+                                   ->count();
+
+        $reportsThisMonth = Report::whereMonth('created_at', $thisMonth)
+                                 ->whereYear('created_at', $thisYear)
+                                 ->count();
+
+        $paymentsThisMonth = \App\Models\Payment::whereMonth('created_at', $thisMonth)
+                                               ->whereYear('created_at', $thisYear)
+                                               ->count();
+
+        return view('dashboards.admin', compact(
+            'totalUsers',
+            'totalStudents',
+            'totalTutors',
+            'totalReports',
+            'totalPayments',
+            'totalAttendance',
+            'studentsThisMonth',
+            'reportsThisMonth',
+            'paymentsThisMonth'
+        ));
     }
     
     private function managerDashboard()
