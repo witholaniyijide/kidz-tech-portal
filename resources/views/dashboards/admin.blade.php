@@ -1,7 +1,5 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+<x-app-layout>
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto space-y-8">
 
         {{-- Welcome Banner --}}
@@ -520,5 +518,5 @@
         </div>
 
     </div>
-</div>
-@endsection
+    </div>
+</x-app-layout>
