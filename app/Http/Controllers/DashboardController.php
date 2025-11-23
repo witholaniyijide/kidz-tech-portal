@@ -37,11 +37,138 @@ class DashboardController extends Controller
      */
     public function admin()
     {
+        // Stats
+        $totalStudents = Student::count();
+        $activeStudents = Student::where('status', 'active')->count();
+        $totalTutors = Tutor::count();
+        $activeTutors = Tutor::where('status', 'active')->count();
+        $inactiveTutors = Tutor::where('status', 'inactive')->count();
+        $onLeaveTutors = Tutor::where('status', 'on_leave')->count();
+
+        // Classes
+        $todayClasses = DailyClassSchedule::where('schedule_date', today())->count();
+        $completedClasses = AttendanceRecord::whereDate('class_date', today())->where('status', 'completed')->count();
+        $upcomingClasses = $todayClasses - $completedClasses;
+
+        // Attendance
+        $pendingAttendance = AttendanceRecord::where('status', 'pending')->count();
+
+        // Schedule (convert to array format for component)
+        $todaySchedule = DailyClassSchedule::where('schedule_date', today())->first();
+        $classes = [];
+        if ($todaySchedule && isset($todaySchedule->classes)) {
+            foreach ($todaySchedule->classes as $index => $class) {
+                $classes[] = [
+                    'time' => $class['time'] ?? '',
+                    'name' => $class['name'] ?? '',
+                    'tutor' => $class['tutor'] ?? '',
+                    'students' => $class['students'] ?? 0,
+                ];
+            }
+        }
+
+        // TODO list
+        $todos = [
+            ['text' => 'Post today\'s schedule', 'completed' => false],
+            ['text' => 'Review pending attendance', 'completed' => false],
+            ['text' => 'Follow up inactive students', 'completed' => false],
+            ['text' => 'Approve tutor submissions', 'completed' => false],
+        ];
+
+        // Recent notices
+        $notices = [
+            [
+                'type' => 'Important',
+                'color' => 'blue',
+                'title' => 'New Class Time Updates',
+                'content' => 'Please note the revised schedule for Wednesday classes...',
+                'dateHuman' => '2 days ago',
+                'date' => now()->subDays(2)->toDateString(),
+            ],
+            [
+                'type' => 'General',
+                'color' => 'purple',
+                'title' => 'Tutor Training Session',
+                'content' => 'Join us for the monthly tutor development workshop...',
+                'dateHuman' => '5 days ago',
+                'date' => now()->subDays(5)->toDateString(),
+            ],
+            [
+                'type' => 'Reminder',
+                'color' => 'green',
+                'title' => 'Monthly Reports Due',
+                'content' => 'Submit your monthly progress reports by the 25th...',
+                'dateHuman' => '1 week ago',
+                'date' => now()->subWeek()->toDateString(),
+            ],
+        ];
+
+        // Recent students with eager loading
+        $recentStudentsData = Student::with(['tutor'])
+            ->latest()
+            ->take(3)
+            ->get()
+            ->map(function ($student) {
+                $initials = collect(explode(' ', $student->first_name . ' ' . $student->last_name))
+                    ->map(fn($word) => strtoupper(substr($word, 0, 1)))
+                    ->join('');
+
+                return [
+                    'id' => $student->id,
+                    'name' => $student->first_name . ' ' . $student->last_name,
+                    'email' => $student->email ?? 'N/A',
+                    'tutor' => $student->tutor->name ?? 'Unassigned',
+                    'lastClass' => $student->updated_at ? $student->updated_at->diffForHumans() : 'N/A',
+                    'lastClassDate' => $student->updated_at ? $student->updated_at->toDateString() : '',
+                    'status' => $student->status ?? 'inactive',
+                    'initials' => $initials,
+                    'avatarGradient' => collect(['from-blue-400 to-cyan-400', 'from-purple-400 to-pink-400', 'from-green-400 to-emerald-400'])->random(),
+                ];
+            })
+            ->toArray();
+
+        // Recent tutors with student count
+        $recentTutorsData = Tutor::withCount('students')
+            ->latest()
+            ->take(3)
+            ->get()
+            ->map(function ($tutor) {
+                $initials = collect(explode(' ', $tutor->name))
+                    ->map(fn($word) => strtoupper(substr($word, 0, 1)))
+                    ->join('');
+
+                return [
+                    'id' => $tutor->id,
+                    'name' => $tutor->name,
+                    'email' => $tutor->email ?? 'N/A',
+                    'studentsCount' => $tutor->students_count ?? 0,
+                    'lastActive' => $tutor->updated_at ? $tutor->updated_at->diffForHumans() : 'N/A',
+                    'lastActiveDate' => $tutor->updated_at ? $tutor->updated_at->toDateString() : '',
+                    'status' => $tutor->status ?? 'inactive',
+                    'initials' => $initials,
+                    'avatarGradient' => collect(['from-indigo-400 to-purple-400', 'from-pink-400 to-rose-400', 'from-orange-400 to-red-400'])->random(),
+                ];
+            })
+            ->toArray();
+
         return view('dashboards.admin', [
-            'studentCount' => Student::count(),
-            'tutorCount' => Tutor::count(),
-            'pendingAttendance' => AttendanceRecord::where('status', 'pending')->count(),
-            'todaySchedule' => DailyClassSchedule::where('schedule_date', today())->first(),
+            'stats' => [
+                'totalStudents' => $totalStudents,
+                'activeStudents' => $activeStudents,
+                'totalTutors' => $totalTutors,
+                'activeTutors' => $activeTutors,
+                'inactiveTutors' => $inactiveTutors,
+                'onLeaveTutors' => $onLeaveTutors,
+                'todayClasses' => $todayClasses,
+                'completedClasses' => $completedClasses,
+                'upcomingClasses' => $upcomingClasses,
+                'pendingAttendance' => $pendingAttendance,
+            ],
+            'classes' => $classes,
+            'todos' => $todos,
+            'notices' => $notices,
+            'students' => $recentStudentsData,
+            'tutors' => $recentTutorsData,
         ]);
     }
 
