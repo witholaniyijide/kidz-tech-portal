@@ -24,7 +24,15 @@
     </head>
     <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900">
         <div class="min-h-screen flex flex-col">
-            @include('layouts.navigation')
+            @auth
+                @if(Auth::user()->hasRole('admin'))
+                    <x-admin.navigation />
+                @else
+                    @include('layouts.navigation')
+                @endif
+            @else
+                @include('layouts.navigation')
+            @endauth
 
             <!-- Page Heading -->
             @if (isset($header))
@@ -42,5 +50,9 @@
 
             @include('layouts.footer')
         </div>
+
+        {{-- Stack for scripts and styles --}}
+        @stack('styles')
+        @stack('scripts')
     </body>
 </html>
