@@ -35,35 +35,42 @@ class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 s
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                @if(Auth::check() && Auth::user()->hasRole('admin'))
+                    {{-- Admin-specific navigation (hidden, will use custom admin nav instead) --}}
+                @else
+                    {{-- Default navigation for other roles --}}
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('students.index')" :active="request()->routeIs('students.*')">
-                        {{ __('Students') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('students.index')" :active="request()->routeIs('students.*')">
+                            {{ __('Students') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('tutors.index')" :active="request()->routeIs('tutors.*')">
-                        {{ __('Tutors') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('tutors.index')" :active="request()->routeIs('tutors.*')">
+                            {{ __('Tutors') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
-                        {{ __('Finance') }}
-                    </x-nav-link>
+                        @if(!Auth::user()->hasRole('admin'))
+                            <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
+                                {{ __('Finance') }}
+                            </x-nav-link>
+                        @endif
 
-                    <x-nav-link :href="route('analytics')" :active="request()->routeIs('analytics')">
-                        {{ __('Analytics') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('analytics')" :active="request()->routeIs('analytics')">
+                            {{ __('Analytics') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('attendance.index')" :active="request()->routeIs('attendance.*')">
-                        {{ __('Attendance') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('attendance.index')" :active="request()->routeIs('attendance.*')">
+                            {{ __('Attendance') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
-                        {{ __('Reports') }}
-                    </x-nav-link>
-                </div>
+                        <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                            {{ __('Reports') }}
+                        </x-nav-link>
+                    </div>
+                @endif
             </div>
 
             <!-- Right Side: Dark Mode, Notifications, User -->
