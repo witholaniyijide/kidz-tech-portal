@@ -37,14 +37,14 @@
 >
     <x-slot:emptyAction>
         <a
-            href="{{ route('schedule.create') }}"
+            href="{{ route('schedule.generate') }}"
             class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-            aria-label="Create new schedule"
+            aria-label="Generate today's schedule"
         >
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            Create Schedule
+            Generate Today's Schedule
         </a>
     </x-slot:emptyAction>
 
@@ -80,13 +80,16 @@
 
         {{-- Action Buttons --}}
         <div class="mt-6 flex flex-wrap gap-3" role="group" aria-label="Schedule actions">
-            <button
-                type="button"
-                class="px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500"
-                aria-label="Post schedule"
-            >
-                📝 Post Schedule
-            </button>
+            <form method="POST" action="{{ route('schedule.post') }}" class="inline">
+                @csrf
+                <button
+                    type="submit"
+                    class="px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500"
+                    aria-label="Post schedule to WhatsApp groups"
+                >
+                    📝 Post Schedule
+                </button>
+            </form>
             <button
                 type="button"
                 @click="copyToWhatsApp"
@@ -95,13 +98,13 @@
             >
                 📋 Copy for WhatsApp
             </button>
-            <button
-                type="button"
-                class="px-6 py-3 text-teal-600 dark:text-teal-400 font-semibold rounded-xl hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500"
+            <a
+                href="{{ route('schedule.generate') }}"
+                class="px-6 py-3 text-teal-600 dark:text-teal-400 font-semibold rounded-xl hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500 inline-flex items-center"
                 aria-label="Generate tomorrow's schedule"
             >
                 ⏭️ Generate Tomorrow's Schedule
-            </button>
+            </a>
         </div>
     </div>
 
