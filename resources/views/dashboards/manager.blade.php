@@ -14,136 +14,460 @@
         <div class="absolute top-0 right-0 w-72 h-72 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
         <div class="absolute -bottom-8 left-20 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 4s;"></div>
 
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
             {{-- Welcome Banner --}}
-            <x-ui.glass-card padding="p-8" class="mb-32">
-                <div class="flex items-center justify-between flex-wrap">
-                    <div>
-                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                            Welcome back, <span class="text-transparent bg-clip-text bg-gradient-manager">{{ auth()->user()->name ?? 'Manager' }}</span>!
-                        </h3>
-                        <p class="text-gray-600 dark:text-gray-300 text-lg">Here's what's happening with your organization today.</p>
+            <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-8 mb-10">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-gradient-to-r from-sky-500 to-cyan-400 p-4 rounded-2xl shadow-lg">
+                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                                Welcome back, <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-cyan-400">{{ auth()->user()->name ?? 'Manager' }}</span>!
+                            </h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-lg">Operations & Tutor Performance Coordination Hub</p>
+                        </div>
                     </div>
-                    <div class="text-right mt-4 md:mt-0">
-                        <div class="text-gray-600 dark:text-gray-300">{{ now()->format('l, F j, Y') }}</div>
+                    <div class="text-right">
+                        <div class="text-gray-700 dark:text-gray-300 font-semibold">{{ now()->format('l, F j, Y') }}</div>
                         <div class="text-gray-500 dark:text-gray-400 text-sm">{{ now()->format('g:i A') }}</div>
                     </div>
                 </div>
-            </x-ui.glass-card>
+            </div>
 
-            {{-- Main Statistics --}}
-            @include('components.manager._stat-cards', [
-                'studentCount' => $stats['totalStudents'] ?? 0,
-                'tutorCount' => $stats['totalTutors'] ?? 0,
-                'todayClassesCount' => $stats['todayClasses'] ?? 0,
-                'pendingAssessmentsCount' => $stats['pendingAssessments'] ?? 0
-            ])
+            {{-- Main Statistics Cards --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                {{-- Active Students Card --}}
+                <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6 hover:-translate-y-1 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-gradient-to-r from-sky-500 to-cyan-400 p-3 rounded-xl">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">13</div>
+                    <div class="text-gray-600 dark:text-gray-300 font-medium">Active Students</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-2">13 active • 0 inactive</div>
+                </div>
 
-            {{-- Schedule View & To-Do List --}}
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-12">
-                {{-- Schedule View (60% / 3 columns) --}}
+                {{-- Active Tutors Card --}}
+                <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6 hover:-translate-y-1 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-gradient-to-r from-cyan-500 to-blue-500 p-3 rounded-xl">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">6</div>
+                    <div class="text-gray-600 dark:text-gray-300 font-medium">Active Tutors</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-2">5 active • 1 on leave</div>
+                </div>
+
+                {{-- Today's Classes Card --}}
+                <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6 hover:-translate-y-1 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-gradient-to-r from-amber-500 to-orange-400 p-3 rounded-xl">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">8</div>
+                    <div class="text-gray-600 dark:text-gray-300 font-medium">Today's Classes</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-2">5 completed • 3 upcoming</div>
+                </div>
+
+                {{-- Pending Assessments Card --}}
+                <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6 hover:-translate-y-1 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-gradient-to-r from-rose-500 to-pink-500 p-3 rounded-xl">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">4</div>
+                    <div class="text-gray-600 dark:text-gray-300 font-medium">Pending Assessments</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-2">Awaiting approval</div>
+                </div>
+            </div>
+
+            {{-- Main Content Grid: Schedule (60%) + To-Do & Notices (40%) --}}
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-10">
+                {{-- LEFT: Daily Class Schedule (60% = 3 columns) --}}
                 <div class="lg:col-span-3">
-                    @include('components.manager._schedule-view-card', [
-                        'schedule' => $todaySchedule ?? []
-                    ])
+                    <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6 h-full">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-gradient-to-r from-sky-500 to-cyan-400 p-2 rounded-lg">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Today's Class Schedule</h3>
+                            </div>
+                            <span class="px-3 py-1 bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 rounded-full text-sm font-semibold">
+                                {{ now()->format('l') }}
+                            </span>
+                        </div>
+
+                        <div class="space-y-3 max-h-96 overflow-y-auto">
+                            {{-- Dummy Schedule Items --}}
+                            @php
+                                $scheduleItems = [
+                                    ['student' => 'Tolu Williams', 'time' => '10:00 AM', 'tutor' => 'David Okoronkwo', 'status' => 'completed'],
+                                    ['student' => 'Chiamaka Williams', 'time' => '11:30 AM', 'tutor' => 'Chioma Adebayo', 'status' => 'completed'],
+                                    ['student' => 'Ayo Balogun', 'time' => '1:00 PM', 'tutor' => 'Emmanuel Johnson', 'status' => 'completed'],
+                                    ['student' => 'Funke Adeyemi', 'time' => '2:30 PM', 'tutor' => 'David Okoronkwo', 'status' => 'in_progress'],
+                                    ['student' => 'Emeka Obi', 'time' => '4:00 PM', 'tutor' => 'Chioma Adebayo', 'status' => 'upcoming'],
+                                    ['student' => 'Blessing Nnamdi', 'time' => '5:30 PM', 'tutor' => 'Emmanuel Johnson', 'status' => 'upcoming'],
+                                ];
+                            @endphp
+
+                            @forelse($scheduleItems as $item)
+                                <div class="bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/40 dark:hover:bg-gray-800/40 transition-all">
+                                    <div class="flex items-center justify-between flex-wrap gap-2">
+                                        <div class="flex items-center gap-3 flex-1">
+                                            <div class="bg-gradient-to-r from-sky-500 to-cyan-400 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                                {{ substr($item['student'], 0, 1) }}
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold text-gray-900 dark:text-white">{{ $item['student'] }}</div>
+                                                <div class="text-sm text-gray-600 dark:text-gray-400">Tutor: {{ $item['tutor'] }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="text-right">
+                                                <div class="font-semibold text-gray-700 dark:text-gray-300">{{ $item['time'] }}</div>
+                                                @if($item['status'] === 'completed')
+                                                    <span class="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full">Completed</span>
+                                                @elseif($item['status'] === 'in_progress')
+                                                    <span class="text-xs px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-full">In Progress</span>
+                                                @else
+                                                    <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700/30 text-gray-700 dark:text-gray-300 rounded-full">Upcoming</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-12">
+                                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <p class="text-gray-500 dark:text-gray-400">No classes scheduled for today</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
                 </div>
 
-                {{-- To-Do List (40% / 2 columns) --}}
-                <div class="lg:col-span-2">
-                    @include('components.manager._todo-card', [
-                        'defaultTasks' => [
-                            'Join today\'s classes',
-                            'Assess tutor performance',
-                            'Create assessment reports',
-                            'Follow-up with inactive students'
-                        ]
-                    ])
+                {{-- RIGHT: To-Do List & Notice Board (40% = 2 columns) --}}
+                <div class="lg:col-span-2 space-y-6">
+                    {{-- To-Do List --}}
+                    <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="bg-gradient-to-r from-sky-500 to-cyan-400 p-2 rounded-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Today's To-Do List</h3>
+                        </div>
+
+                        <div class="space-y-3 mb-4">
+                            @php
+                                $tasks = [
+                                    'Join today\'s classes',
+                                    'Assess tutor performance',
+                                    'Create assessment report',
+                                    'Follow up with inactive students',
+                                    'View pending assessments'
+                                ];
+                            @endphp
+
+                            @foreach($tasks as $task)
+                                <label class="flex items-center gap-3 p-3 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-lg border border-white/10 hover:bg-white/40 dark:hover:bg-gray-800/40 transition-all cursor-pointer">
+                                    <input type="checkbox" class="w-5 h-5 text-sky-500 border-gray-300 rounded focus:ring-sky-500 focus:ring-2">
+                                    <span class="text-gray-700 dark:text-gray-300 flex-1">{{ $task }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+
+                        <div class="pt-4 border-t border-white/10">
+                            <div class="flex gap-2">
+                                <input type="text" placeholder="Add a new task..." class="flex-1 px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                <button class="px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Tasks are saved automatically in your browser</p>
+                        </div>
+                    </div>
+
+                    {{-- Notice Board Preview --}}
+                    <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-gradient-to-r from-amber-500 to-orange-400 p-2 rounded-lg">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Notice Board</h3>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 mb-4">
+                            @php
+                                $notices = [
+                                    ['title' => 'New Class Time Updates', 'priority' => 'important', 'time' => '2 days ago'],
+                                    ['title' => 'Tutor Training Session', 'priority' => 'general', 'time' => '5 days ago'],
+                                    ['title' => 'Monthly Reports Due', 'priority' => 'reminder', 'time' => '1 week ago'],
+                                ];
+                            @endphp
+
+                            @foreach($notices as $notice)
+                                <div class="bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-lg p-3 border border-white/10 hover:bg-white/40 dark:hover:bg-gray-800/40 transition-all">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="flex-1">
+                                            <div class="font-semibold text-gray-900 dark:text-white text-sm">{{ $notice['title'] }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $notice['time'] }}</div>
+                                        </div>
+                                        @if($notice['priority'] === 'important')
+                                            <span class="px-2 py-1 bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 text-xs rounded-full font-semibold whitespace-nowrap">Important</span>
+                                        @elseif($notice['priority'] === 'reminder')
+                                            <span class="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs rounded-full font-semibold whitespace-nowrap">Reminder</span>
+                                        @else
+                                            <span class="px-2 py-1 bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 text-xs rounded-full font-semibold whitespace-nowrap">General</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button class="flex-1 px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md font-semibold text-sm">
+                                Create Notice
+                            </button>
+                            <button class="px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-white/40 dark:hover:bg-gray-800/40 transition-all font-semibold text-sm">
+                                View All
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {{-- Notice Board Preview --}}
-            <div class="mb-12">
-                @include('components.manager._notice-board-preview', [
-                    'notices' => $notices ?? []
-                ])
-            </div>
+            {{-- Recent Students & Tutors Tables --}}
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-10">
+                {{-- Recent Students Table --}}
+                <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-gradient-to-r from-sky-500 to-cyan-400 p-2 rounded-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Recent Students</h3>
+                        </div>
+                    </div>
 
-            {{-- Recent Students & Tutors --}}
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-12">
-                {{-- Recent Students --}}
-                <div>
-                    @include('components.manager._recent-students', [
-                        'students' => $recentStudents ?? []
-                    ])
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-white/10">
+                                    <th class="text-left py-3 px-2 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Name</th>
+                                    <th class="text-left py-3 px-2 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Tutor</th>
+                                    <th class="text-left py-3 px-2 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Last Class</th>
+                                    <th class="text-center py-3 px-2 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/10">
+                                @php
+                                    $recentStudents = [
+                                        ['name' => 'Tolu Williams', 'email' => 'tolu.williams@student.com', 'tutor' => 'Unassigned', 'lastClass' => '1 day ago'],
+                                        ['name' => 'Chiamaka Williams', 'email' => 'chiamaka.williams@student.com', 'tutor' => 'Unassigned', 'lastClass' => '1 day ago'],
+                                        ['name' => 'Ayo Balogun', 'email' => 'ayo.balogun@student.com', 'tutor' => 'Unassigned', 'lastClass' => '1 day ago'],
+                                    ];
+                                @endphp
+
+                                @foreach($recentStudents as $student)
+                                    <tr class="hover:bg-white/10 dark:hover:bg-gray-800/20 transition-colors">
+                                        <td class="py-4 px-2">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 bg-gradient-to-r from-sky-500 to-cyan-400 rounded-full flex items-center justify-center text-white font-bold">
+                                                    {{ substr($student['name'], 0, 1) }}
+                                                </div>
+                                                <div>
+                                                    <div class="font-semibold text-gray-900 dark:text-white text-sm">{{ $student['name'] }}</div>
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ $student['email'] }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ $student['tutor'] }}</span>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">{{ $student['lastClass'] }}</span>
+                                        </td>
+                                        <td class="py-4 px-2 text-center">
+                                            <button class="px-3 py-1 bg-sky-500/20 text-sky-600 dark:text-sky-400 rounded-lg hover:bg-sky-500/30 transition-all text-sm font-semibold">
+                                                View
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button class="text-sky-600 dark:text-sky-400 hover:underline font-semibold text-sm">
+                            View All Students →
+                        </button>
+                    </div>
                 </div>
 
-                {{-- Recent Tutors --}}
-                <div>
-                    @include('components.manager._recent-tutors', [
-                        'tutors' => $recentTutors ?? []
-                    ])
+                {{-- Recent Tutors Table --}}
+                <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-gradient-to-r from-cyan-500 to-blue-500 p-2 rounded-lg">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Recent Tutors</h3>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-white/10">
+                                    <th class="text-left py-3 px-2 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Name</th>
+                                    <th class="text-left py-3 px-2 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Students</th>
+                                    <th class="text-left py-3 px-2 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Last Active</th>
+                                    <th class="text-center py-3 px-2 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/10">
+                                @php
+                                    $recentTutors = [
+                                        ['name' => 'David Okoronkwo', 'email' => 'david.okoronkwo@kidstech.com', 'students' => '0 students', 'lastActive' => '1 day ago'],
+                                        ['name' => 'Chioma Adebayo', 'email' => 'chioma.adebayo@kidstech.com', 'students' => '0 students', 'lastActive' => '1 day ago'],
+                                        ['name' => 'Emmanuel Johnson', 'email' => 'emmanuel.johnson@kidstech.com', 'students' => '0 students', 'lastActive' => '1 day ago'],
+                                    ];
+                                @endphp
+
+                                @foreach($recentTutors as $tutor)
+                                    <tr class="hover:bg-white/10 dark:hover:bg-gray-800/20 transition-colors">
+                                        <td class="py-4 px-2">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                                                    {{ substr($tutor['name'], 0, 1) }}
+                                                </div>
+                                                <div>
+                                                    <div class="font-semibold text-gray-900 dark:text-white text-sm">{{ $tutor['name'] }}</div>
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ $tutor['email'] }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ $tutor['students'] }}</span>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">{{ $tutor['lastActive'] }}</span>
+                                        </td>
+                                        <td class="py-4 px-2 text-center">
+                                            <button class="px-3 py-1 bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-all text-sm font-semibold">
+                                                View Profile
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button class="text-cyan-600 dark:text-cyan-400 hover:underline font-semibold text-sm">
+                            View All Tutors →
+                        </button>
+                    </div>
                 </div>
             </div>
 
             {{-- Quick Actions --}}
-            @include('components.manager._quick-actions', [
-                'pendingAssessmentsCount' => $stats['pendingAssessments'] ?? 0
-            ])
-
-            {{-- Footer Note & CTA Links --}}
-            <div class="mt-12">
-                <x-ui.glass-card padding="p-6">
-                    <div class="text-center">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                            Need Help Managing Your Team?
-                        </h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                            Access our comprehensive guides and resources to help you manage classes, tutors, and students effectively.
-                        </p>
-                        <div class="flex flex-wrap justify-center gap-4">
-                            <x-ui.gradient-button
-                                href="{{ route('help.index') }}"
-                                gradient="bg-gradient-manager"
-                                aria-label="View Help Center"
-                            >
-                                <svg class="w-5 h-5 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Help Center
-                            </x-ui.gradient-button>
-
-                            <x-ui.gradient-button
-                                href="{{ route('reports.index') }}"
-                                gradient="bg-gradient-to-r from-sky-600 to-blue-600"
-                                aria-label="View All Reports"
-                            >
-                                <svg class="w-5 h-5 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </svg>
-                                View All Reports
-                            </x-ui.gradient-button>
-
-                            <x-ui.gradient-button
-                                href="{{ route('settings.index') }}"
-                                gradient="bg-gradient-to-r from-blue-600 to-cyan-600"
-                                aria-label="Dashboard Settings"
-                            >
-                                <svg class="w-5 h-5 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                Settings
-                            </x-ui.gradient-button>
-                        </div>
+            <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6 mb-10">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="bg-gradient-to-r from-sky-500 to-cyan-400 p-2 rounded-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
                     </div>
-                </x-ui.glass-card>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Quick Actions</h3>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    {{-- View All Students --}}
+                    <button class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
+                        <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span class="font-semibold text-center">View All Students</span>
+                    </button>
+
+                    {{-- View All Tutors --}}
+                    <button class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
+                        <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span class="font-semibold text-center">View All Tutors</span>
+                    </button>
+
+                    {{-- View Class Schedules --}}
+                    <button class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-amber-500 to-orange-400 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
+                        <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span class="font-semibold text-center">View Schedules</span>
+                    </button>
+
+                    {{-- Create Assessment --}}
+                    <button class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
+                        <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <span class="font-semibold text-center">Create Assessment</span>
+                    </button>
+
+                    {{-- Pending Assessments --}}
+                    <button class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-rose-500 to-red-500 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all relative">
+                        <div class="absolute -top-2 -right-2 bg-white text-rose-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm shadow-lg">
+                            4
+                        </div>
+                        <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                        <span class="font-semibold text-center">Pending Assessments</span>
+                    </button>
+                </div>
             </div>
 
-            {{-- Footer Info --}}
-            <div class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                <p>Last updated: {{ now()->format('F j, Y g:i A') }}</p>
-                <p class="mt-1">Kidz Tech Portal &copy; {{ date('Y') }} - Manager Dashboard</p>
+            {{-- Footer --}}
+            <div class="text-center py-6">
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-2">Made with ❤️ from Kidz Tech Coding Club</p>
+                <p class="text-gray-500 dark:text-gray-500 text-xs">© {{ date('Y') }} Kidz Tech Portal - Manager Dashboard</p>
             </div>
 
         </div>
@@ -164,19 +488,23 @@
             animation: float 6s ease-in-out infinite;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Smooth scrollbar for schedule */
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .animate-fadeIn {
-            animation: fadeIn 0.6s ease-out;
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: rgba(14, 165, 233, 0.5);
+            border-radius: 10px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: rgba(14, 165, 233, 0.7);
         }
 
         /* Focus visible styles for accessibility */
