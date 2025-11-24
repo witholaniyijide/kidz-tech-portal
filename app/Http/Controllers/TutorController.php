@@ -3,7 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tutor;
+use App\Models\User;
+use App\Http\Requests\StoreTutorRequest;
+use App\Http\Requests\UpdateTutorRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TutorController extends Controller
 {
@@ -39,32 +45,50 @@ class TutorController extends Controller
         return view('tutors.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreTutorRequest $request)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:tutors,email',
-            'phone' => 'required|string|max:20',
-            'date_of_birth' => 'required|date',
-            'gender' => 'required|in:male,female',
-            'address' => 'nullable|string',
-            'state' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'specializations' => 'required|array|min:1',
-            'hire_date' => 'required|date',
-            'hourly_rate' => 'nullable|numeric|min:0',
-            'qualifications' => 'nullable|string',
-            'notes' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
-        $validated['tutor_id'] = $this->generateTutorId();
-        $validated['status'] = 'active';
+        // Generate tutor ID
+        $data['tutor_id'] = $this->generateTutorId();
 
-        Tutor::create($validated);
+        // Set default status if not provided
+        $data['status'] = $data['status'] ?? 'active';
 
-        return redirect()->route('tutors.index')
-            ->with('success', 'Tutor added successfully!');
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            $file = $request->file('profile_photo');
+            $filename = 'tutor_' . Str::slug($data['email']) . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('profile_photos', $filename, 'public');
+            $data['profile_photo'] = $path;
+        }
+
+        $tutor = Tutor::create($data);
+
+        // Optional: create user account when checkbox is checked
+        $tempPassword = null;
+        if ($request->boolean('create_user_account')) {
+            $tempPassword = 'KidzTech2025';
+
+            $user = User::create([
+                'name' => $data['first_name'] . ' ' . $data['last_name'],
+                'email' => $data['email'],
+                'password' => Hash::make($tempPassword),
+                'profile_photo' => $data['profile_photo'] ?? null,
+            ]);
+
+            // Assign tutor role (requires spatie/laravel-permission package)
+            if (method_exists($user, 'assignRole')) {
+                $user->assignRole('tutor');
+            }
+
+            // Flash temp password for one-time display
+            session()->flash('temp_password', $tempPassword);
+            session()->flash('temp_password_email', $data['email']);
+        }
+
+        return redirect()->route('tutors.show', $tutor)
+            ->with('success', 'Tutor added successfully!' . ($tempPassword ? ' User account created with temporary password.' : ''));
     }
 
     public function show(Tutor $tutor)
@@ -77,27 +101,24 @@ class TutorController extends Controller
         return view('tutors.edit', compact('tutor'));
     }
 
-    public function update(Request $request, Tutor $tutor)
+    public function update(UpdateTutorRequest $request, Tutor $tutor)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:tutors,email,' . $tutor->id,
-            'phone' => 'required|string|max:20',
-            'date_of_birth' => 'required|date',
-            'gender' => 'required|in:male,female',
-            'address' => 'nullable|string',
-            'state' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'specializations' => 'required|array|min:1',
-            'hire_date' => 'required|date',
-            'status' => 'required|in:active,inactive,on_leave',
-            'hourly_rate' => 'nullable|numeric|min:0',
-            'qualifications' => 'nullable|string',
-            'notes' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
-        $tutor->update($validated);
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            // Delete old photo if exists
+            if ($tutor->profile_photo && Storage::disk('public')->exists($tutor->profile_photo)) {
+                Storage::disk('public')->delete($tutor->profile_photo);
+            }
+
+            $file = $request->file('profile_photo');
+            $filename = 'tutor_' . Str::slug($data['email']) . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('profile_photos', $filename, 'public');
+            $data['profile_photo'] = $path;
+        }
+
+        $tutor->update($data);
 
         return redirect()->route('tutors.show', $tutor)
             ->with('success', 'Tutor updated successfully!');
