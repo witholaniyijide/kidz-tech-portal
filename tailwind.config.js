@@ -47,8 +47,8 @@ export default {
                         end: '#06B6D4'
                     },
                     manager: {
-                        start: '#10B981',
-                        end: '#34D399'
+                        start: '#0ea5e9',
+                        end: '#38bdf8'
                     },
                     tutor: {
                         start: '#8B5CF6',
@@ -63,7 +63,7 @@ export default {
             backgroundImage: {
                 'gradient-director': 'linear-gradient(to right, #3B82F6, #6366F1)',
                 'gradient-admin': 'linear-gradient(to right, #14B8A6, #06B6D4)',
-                'gradient-manager': 'linear-gradient(to right, #10B981, #34D399)',
+                'gradient-manager': 'linear-gradient(to right, #0ea5e9, #38bdf8)',
                 'gradient-tutor': 'linear-gradient(to right, #8B5CF6, #EC4899)',
                 'gradient-parent': 'linear-gradient(to right, #F43F5E, #FB7185)',
             }
