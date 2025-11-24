@@ -19,7 +19,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative z-10">
 
             <!-- Welcome Section -->
-            <x-ui.glass-card padding="p-8" class="mb-24">
+            <x-ui.glass-card padding="p-8" class="mb-32">
                 <div class="flex items-center justify-between flex-wrap">
                     <div>
                         <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -225,7 +225,7 @@
             <x-ui.glass-card padding="p-8">
                 <x-ui.section-title>Quick Actions</x-ui.section-title>
 
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mt-6">
 
                     <a href="{{ route('students.create') }}" class="group">
                         <div class="rounded-xl bg-white/10 dark:bg-gray-900/10 p-6 text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
@@ -284,6 +284,29 @@
                                 </svg>
                             </div>
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-indigo-600">View Analytics</span>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('settings.index') }}" class="group">
+                        <div class="rounded-xl bg-white/10 dark:bg-gray-900/10 p-6 text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
+                            <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-gradient-to-br from-gray-500 to-slate-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-gray-600">Settings</span>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('help.index') }}" class="group">
+                        <div class="rounded-xl bg-white/10 dark:bg-gray-900/10 p-6 text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
+                            <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-teal-600">Help Center</span>
                         </div>
                     </a>
 

@@ -1,4 +1,6 @@
 <x-app-layout>
+    <x-slot name="title">{{ __('Payments & Finance') }}</x-slot>
+
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
             <h2 class="font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400">
