@@ -17,9 +17,20 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative z-10">
 
             {{-- Welcome Banner --}}
-            @include('components.manager._banner', [
-                'userName' => auth()->user()->name ?? 'Manager'
-            ])
+            <x-ui.glass-card padding="p-8" class="mb-12">
+                <div class="flex items-center justify-between flex-wrap">
+                    <div>
+                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                            Welcome back, <span class="text-transparent bg-clip-text bg-gradient-manager">{{ auth()->user()->name ?? 'Manager' }}</span>!
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-lg">Here's what's happening with your organization today.</p>
+                    </div>
+                    <div class="text-right mt-4 md:mt-0">
+                        <div class="text-gray-600 dark:text-gray-300">{{ now()->format('l, F j, Y') }}</div>
+                        <div class="text-gray-500 dark:text-gray-400 text-sm">{{ now()->format('g:i A') }}</div>
+                    </div>
+                </div>
+            </x-ui.glass-card>
 
             {{-- Main Statistics --}}
             @include('components.manager._stat-cards', [
@@ -30,7 +41,7 @@
             ])
 
             {{-- Schedule View & To-Do List --}}
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-12">
                 {{-- Schedule View (60% / 3 columns) --}}
                 <div class="lg:col-span-3">
                     @include('components.manager._schedule-view-card', [
@@ -52,14 +63,14 @@
             </div>
 
             {{-- Notice Board Preview --}}
-            <div class="mb-8">
+            <div class="mb-12">
                 @include('components.manager._notice-board-preview', [
                     'notices' => $notices ?? []
                 ])
             </div>
 
             {{-- Recent Students & Tutors --}}
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-12">
                 {{-- Recent Students --}}
                 <div>
                     @include('components.manager._recent-students', [

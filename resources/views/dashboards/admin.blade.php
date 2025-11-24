@@ -17,40 +17,52 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative z-10">
 
             {{-- Welcome Banner --}}
-            <x-ui.glass-card padding="p-8" class="mb-8">
-                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                    Welcome back, <span class="text-transparent bg-clip-text bg-gradient-admin">{{ auth()->user()->name }}</span>!
-                </h3>
-                <p class="text-gray-600 dark:text-gray-300 text-lg">Manage your platform efficiently from here.</p>
+            <x-ui.glass-card padding="p-8" class="mb-12">
+                <div class="flex items-center justify-between flex-wrap">
+                    <div>
+                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                            Welcome back, <span class="text-transparent bg-clip-text bg-gradient-admin">{{ auth()->user()->name }}</span>!
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-lg">Here's what's happening with your organization today.</p>
+                    </div>
+                    <div class="text-right mt-4 md:mt-0">
+                        <div class="text-gray-600 dark:text-gray-300">{{ now()->format('l, F j, Y') }}</div>
+                        <div class="text-gray-500 dark:text-gray-400 text-sm">{{ now()->format('g:i A') }}</div>
+                    </div>
+                </div>
             </x-ui.glass-card>
 
             {{-- Main Statistics --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                 <x-ui.stat-card
                     title="Total Students"
-                    value="{{ $stats['total_students'] ?? 0 }}"
+                    value="{{ $stats['totalStudents'] ?? 0 }}"
+                    subtitle="{{ ($stats['activeStudents'] ?? 0) }} active • {{ (($stats['totalStudents'] ?? 0) - ($stats['activeStudents'] ?? 0)) }} inactive"
                     icon='<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>'
                     gradient="bg-gradient-admin"
                 />
 
                 <x-ui.stat-card
                     title="Total Tutors"
-                    value="{{ $stats['total_tutors'] ?? 0 }}"
-                    icon='<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>'
+                    value="{{ $stats['totalTutors'] ?? 0 }}"
+                    subtitle="{{ ($stats['activeTutors'] ?? 0) }} active • {{ ($stats['inactiveTutors'] ?? 0) }} inactive • {{ ($stats['onLeaveTutors'] ?? 0) }} on leave"
+                    icon='<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>'
                     gradient="bg-gradient-to-br from-teal-500 to-cyan-600"
                 />
 
                 <x-ui.stat-card
-                    title="Active Classes"
-                    value="{{ $stats['active_classes'] ?? 0 }}"
-                    icon='<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>'
+                    title="Today's Classes"
+                    value="{{ $stats['todayClasses'] ?? 0 }}"
+                    subtitle="{{ ($stats['completedClasses'] ?? 0) }} completed • {{ ($stats['upcomingClasses'] ?? 0) }} upcoming"
+                    icon='<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>'
                     gradient="bg-gradient-to-br from-blue-500 to-indigo-600"
                 />
 
                 <x-ui.stat-card
-                    title="Pending Tasks"
-                    value="{{ $stats['pending_tasks'] ?? 0 }}"
-                    icon='<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+                    title="Pending Attendance"
+                    value="{{ $stats['pendingAttendance'] ?? 0 }}"
+                    subtitle="Awaiting approval"
+                    icon='<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>'
                     gradient="bg-gradient-to-br from-orange-500 to-red-600"
                 />
             </div>
