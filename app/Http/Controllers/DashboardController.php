@@ -109,19 +109,32 @@ class DashboardController extends Controller
             ->take(3)
             ->get()
             ->map(function ($student) {
-                $initials = collect(explode(' ', $student->first_name . ' ' . $student->last_name))
+                $fullName = trim(($student->first_name ?? '') . ' ' . ($student->last_name ?? ''));
+
+                $initials = collect(explode(' ', $fullName))
+                    ->filter()
                     ->map(fn($word) => strtoupper(substr($word, 0, 1)))
+                    ->take(2)
                     ->join('');
+
+                // Get tutor name properly
+                $tutorName = 'Unassigned';
+                if ($student->tutor) {
+                    $tutorName = trim(($student->tutor->first_name ?? '') . ' ' . ($student->tutor->last_name ?? ''));
+                    if (empty($tutorName)) {
+                        $tutorName = $student->tutor->email ?? 'Unassigned';
+                    }
+                }
 
                 return [
                     'id' => $student->id,
-                    'name' => $student->first_name . ' ' . $student->last_name,
+                    'name' => $fullName,
                     'email' => $student->email ?? 'N/A',
-                    'tutor' => $student->tutor->name ?? 'Unassigned',
+                    'tutor' => $tutorName,
                     'lastClass' => $student->updated_at ? $student->updated_at->diffForHumans() : 'N/A',
                     'lastClassDate' => $student->updated_at ? $student->updated_at->toDateString() : '',
                     'status' => $student->status ?? 'inactive',
-                    'initials' => $initials,
+                    'initials' => $initials ?: 'NA',
                     'avatarGradient' => collect([
                         'bg-gradient-to-br from-blue-500 to-cyan-600',
                         'bg-gradient-to-br from-purple-500 to-pink-600',
@@ -139,19 +152,29 @@ class DashboardController extends Controller
             ->take(3)
             ->get()
             ->map(function ($tutor) {
-                $initials = collect(explode(' ', $tutor->name))
+                $fullName = trim(($tutor->first_name ?? '') . ' ' . ($tutor->last_name ?? ''));
+
+                // If no name, fall back to email username
+                if (empty($fullName)) {
+                    $fullName = explode('@', $tutor->email ?? 'Unknown')[0];
+                    $fullName = ucwords(str_replace(['.', '_', '-'], ' ', $fullName));
+                }
+
+                $initials = collect(explode(' ', $fullName))
+                    ->filter()
                     ->map(fn($word) => strtoupper(substr($word, 0, 1)))
+                    ->take(2)
                     ->join('');
 
                 return [
                     'id' => $tutor->id,
-                    'name' => $tutor->name,
+                    'name' => $fullName,
                     'email' => $tutor->email ?? 'N/A',
                     'studentsCount' => $tutor->students_count ?? 0,
                     'lastActive' => $tutor->updated_at ? $tutor->updated_at->diffForHumans() : 'N/A',
                     'lastActiveDate' => $tutor->updated_at ? $tutor->updated_at->toDateString() : '',
                     'status' => $tutor->status ?? 'inactive',
-                    'initials' => $initials,
+                    'initials' => $initials ?: 'NA',
                     'avatarGradient' => collect([
                         'bg-gradient-to-br from-indigo-500 to-purple-600',
                         'bg-gradient-to-br from-pink-500 to-rose-600',
