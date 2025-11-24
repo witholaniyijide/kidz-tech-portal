@@ -92,6 +92,72 @@ Route::middleware(['auth', 'verified'])->prefix('parent')->name('parent.')->grou
     Route::get('/child/{student}/attendance', [App\Http\Controllers\ParentDashboardController::class, 'childAttendance'])->name('child.attendance');
 });
 
+// Manager Portal Routes
+Route::prefix('manager')
+    ->middleware(['auth', 'verified', 'role:manager'])
+    ->name('manager.')
+    ->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [App\Http\Controllers\Manager\ManagerDashboardController::class, 'index'])
+            ->name('dashboard');
+
+        // Students (read only)
+        Route::get('/students', [App\Http\Controllers\Manager\ManagerStudentController::class, 'index'])
+            ->name('students.index');
+        Route::get('/students/{student}', [App\Http\Controllers\Manager\ManagerStudentController::class, 'show'])
+            ->name('students.show');
+        Route::get('/students/{student}/progress', [App\Http\Controllers\Manager\ManagerStudentController::class, 'progress'])
+            ->name('students.progress');
+        Route::get('/students/{student}/attendance', [App\Http\Controllers\Manager\ManagerStudentController::class, 'attendance'])
+            ->name('students.attendance');
+        Route::get('/students/{student}/reports', [App\Http\Controllers\Manager\ManagerStudentController::class, 'reports'])
+            ->name('students.reports');
+
+        // Tutors (read only)
+        Route::get('/tutors', [App\Http\Controllers\Manager\ManagerTutorController::class, 'index'])
+            ->name('tutors.index');
+        Route::get('/tutors/{tutor}', [App\Http\Controllers\Manager\ManagerTutorController::class, 'show'])
+            ->name('tutors.show');
+        Route::get('/tutors/{tutor}/performance', [App\Http\Controllers\Manager\ManagerTutorController::class, 'performance'])
+            ->name('tutors.performance');
+
+        // Attendance (read only)
+        Route::get('/attendance', [App\Http\Controllers\Manager\ManagerAttendanceController::class, 'index'])
+            ->name('attendance.index');
+        Route::get('/attendance/{record}', [App\Http\Controllers\Manager\ManagerAttendanceController::class, 'show'])
+            ->name('attendance.show');
+        Route::get('/attendance/calendar/view', [App\Http\Controllers\Manager\ManagerAttendanceController::class, 'calendar'])
+            ->name('attendance.calendar');
+
+        // Tutor Reports (with approval capability)
+        Route::get('/reports', [App\Http\Controllers\Manager\ManagerReportsController::class, 'index'])
+            ->name('reports.index');
+        Route::get('/reports/{report}', [App\Http\Controllers\Manager\ManagerReportsController::class, 'show'])
+            ->name('reports.show');
+        Route::post('/reports/{report}/comment', [App\Http\Controllers\Manager\ManagerReportsController::class, 'comment'])
+            ->name('reports.comment');
+        Route::post('/reports/{report}/approve', [App\Http\Controllers\Manager\ManagerReportsController::class, 'approve'])
+            ->name('reports.approve');
+        Route::post('/reports/{report}/request-changes', [App\Http\Controllers\Manager\ManagerReportsController::class, 'requestChanges'])
+            ->name('reports.requestChanges');
+
+        // Notice Board (can create, with restrictions)
+        Route::get('/notices', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'index'])
+            ->name('notices.index');
+        Route::get('/notices/create', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'create'])
+            ->name('notices.create');
+        Route::post('/notices', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'store'])
+            ->name('notices.store');
+        Route::get('/notices/{notice}', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'show'])
+            ->name('notices.show');
+        Route::get('/notices/{notice}/edit', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'edit'])
+            ->name('notices.edit');
+        Route::put('/notices/{notice}', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'update'])
+            ->name('notices.update');
+        Route::delete('/notices/{notice}', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'destroy'])
+            ->name('notices.destroy');
+    });
+
 // Analytics Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/analytics', [App\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics');
