@@ -1,16 +1,18 @@
 @props(['user' => null])
 
-<div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-teal-500 via-cyan-500 to-teal-400 p-8 shadow-2xl">
-    <div class="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-    <div class="relative z-10">
-        <h1 class="text-4xl font-bold text-white mb-2 font-inter">
-            Welcome back, {{ $user ? $user->name : auth()->user()->name }}! 🛠️
-        </h1>
-        <p class="text-xl text-white/90 mb-3 font-inter">Student & Tutor Coordination Hub</p>
-        <p class="text-white/80 text-sm font-inter">
-            {{ now()->format('l, F j, Y') }}
-        </p>
+<div class="mb-8 glass-card rounded-2xl p-8 shadow-xl animate-slide-in">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Welcome back, <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#14B8A6] to-[#06B6D4]">{{ $user ? $user->name : auth()->user()->name }}</span>!
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400 text-lg">Here's what's happening with your organization today.</p>
+        </div>
+        <div class="hidden md:block">
+            <div class="text-right">
+                <div class="text-sm text-gray-600 dark:text-gray-400">{{ now()->timezone('Africa/Lagos')->format('l, F j, Y') }}</div>
+                <div class="text-xs text-gray-500">{{ now()->timezone('Africa/Lagos')->format('g:i A') }}</div>
+            </div>
+        </div>
     </div>
-    <div class="absolute top-0 right-0 -mt-4 -mr-4 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
-    <div class="absolute bottom-0 left-0 -mb-4 -ml-4 h-32 w-32 rounded-full bg-cyan-300/20 blur-2xl"></div>
 </div>

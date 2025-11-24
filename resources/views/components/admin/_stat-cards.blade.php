@@ -2,15 +2,17 @@
     'stats' => []
 ])
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" role="region" aria-label="Statistics Overview">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" role="region" aria-label="Statistics Overview">
     {{-- Total Students --}}
     <x-ui.stat-card
         title="Total Students"
         :number="$stats['totalStudents'] ?? '0'"
         :subtitle="($stats['activeStudents'] ?? 0) . ' active • ' . (($stats['totalStudents'] ?? 0) - ($stats['activeStudents'] ?? 0)) . ' inactive'"
-        gradient="from-blue-500 to-cyan-500"
+        gradient="from-[#14B8A6] to-[#06B6D4]"
+        textGradient="from-[#0D9488] to-[#0891B2]"
         role="article"
         aria-label="Total Students Statistics"
+        style="animation-delay: 0.1s;"
     >
         <x-slot:icon>
             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -24,9 +26,11 @@
         title="Total Tutors"
         :number="$stats['totalTutors'] ?? '0'"
         :subtitle="($stats['activeTutors'] ?? 0) . ' active • ' . ($stats['inactiveTutors'] ?? 0) . ' inactive • ' . ($stats['onLeaveTutors'] ?? 0) . ' on leave'"
-        gradient="from-purple-500 to-pink-500"
+        gradient="from-[#06B6D4] to-[#0EA5E9]"
+        textGradient="from-[#0891B2] to-[#0284C7]"
         role="article"
         aria-label="Total Tutors Statistics"
+        style="animation-delay: 0.2s;"
     >
         <x-slot:icon>
             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -40,9 +44,11 @@
         title="Today's Classes"
         :number="$stats['todayClasses'] ?? '0'"
         :subtitle="($stats['completedClasses'] ?? 0) . ' completed • ' . ($stats['upcomingClasses'] ?? 0) . ' upcoming'"
-        gradient="from-green-500 to-emerald-500"
+        gradient="from-[#10B981] to-[#059669]"
+        textGradient="from-[#059669] to-[#047857]"
         role="article"
         aria-label="Today's Classes Statistics"
+        style="animation-delay: 0.3s;"
     >
         <x-slot:icon>
             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -56,9 +62,11 @@
         title="Pending Attendance"
         :number="$stats['pendingAttendance'] ?? '0'"
         subtitle="Awaiting approval"
-        gradient="from-orange-500 to-red-500"
+        gradient="from-[#F59E0B] to-[#EF4444]"
+        textGradient="from-[#D97706] to-[#DC2626]"
         role="article"
         aria-label="Pending Attendance Statistics"
+        style="animation-delay: 0.4s;"
     >
         <x-slot:icon>
             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
