@@ -63,7 +63,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 });
 
 // Schedule Routes
-Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/schedule/today', [App\Http\Controllers\ScheduleController::class, 'showToday'])->name('schedule.today');
     Route::post('/schedule/post', [App\Http\Controllers\ScheduleController::class, 'postSchedule'])->name('schedule.post');
     Route::get('/schedule/generate', [App\Http\Controllers\ScheduleController::class, 'generateTodaySchedule'])->name('schedule.generate');
@@ -81,7 +81,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 });
 
 // Notice Board Routes
-Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('noticeboard', App\Http\Controllers\NoticeController::class);
 });
 
@@ -114,6 +114,46 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Auth::user()->notifications()->where('id', $id)->first()->markAsRead();
         return response()->json(['success' => true]);
     })->name('notifications.markRead');
+});
+
+// Classes Routes (Placeholder)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/classes', function() {
+        return redirect()->route('dashboard')->with('info', 'Classes module coming soon');
+    })->name('classes.index');
+
+    Route::get('/classes/create', function() {
+        return redirect()->route('dashboard')->with('info', 'Classes module coming soon');
+    })->name('classes.create');
+});
+
+// Assessments Routes (Placeholder)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/assessments', function() {
+        return redirect()->route('dashboard')->with('info', 'Assessments module coming soon');
+    })->name('assessments.index');
+
+    Route::get('/assessments/pending', function() {
+        return redirect()->route('dashboard')->with('info', 'Assessments module coming soon');
+    })->name('assessments.pending');
+
+    Route::get('/assessments/create', function() {
+        return redirect()->route('dashboard')->with('info', 'Assessments module coming soon');
+    })->name('assessments.create');
+});
+
+// Help Center Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/help', function() {
+        return view('help.index');
+    })->name('help.index');
+});
+
+// Settings Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/settings', function() {
+        return view('settings.index');
+    })->name('settings.index');
 });
 
 // Dashboard Route
