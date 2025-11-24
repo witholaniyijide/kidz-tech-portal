@@ -63,7 +63,7 @@
                                 loading="lazy"
                             >
                             @else
-                            <div class="h-10 w-10 rounded-full bg-gradient-to-br {{ $tutor['avatarGradient'] ?? 'from-indigo-400 to-purple-400' }} flex items-center justify-center text-white font-semibold" aria-label="Avatar for {{ $tutor['name'] ?? '' }}">
+                            <div class="h-10 w-10 rounded-full {{ $tutor['avatarGradient'] ?? 'bg-gradient-to-br from-indigo-500 to-purple-600' }} flex items-center justify-center text-white font-semibold text-sm shadow-md" aria-label="Avatar for {{ $tutor['name'] ?? '' }}">
                                 {{ $tutor['initials'] ?? 'NA' }}
                             </div>
                             @endif
