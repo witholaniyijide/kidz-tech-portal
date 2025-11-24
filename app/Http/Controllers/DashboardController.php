@@ -122,7 +122,13 @@ class DashboardController extends Controller
                     'lastClassDate' => $student->updated_at ? $student->updated_at->toDateString() : '',
                     'status' => $student->status ?? 'inactive',
                     'initials' => $initials,
-                    'avatarGradient' => collect(['from-blue-400 to-cyan-400', 'from-purple-400 to-pink-400', 'from-green-400 to-emerald-400'])->random(),
+                    'avatarGradient' => collect([
+                        'bg-gradient-to-br from-blue-500 to-cyan-600',
+                        'bg-gradient-to-br from-purple-500 to-pink-600',
+                        'bg-gradient-to-br from-green-500 to-emerald-600',
+                        'bg-gradient-to-br from-teal-500 to-blue-600',
+                        'bg-gradient-to-br from-violet-500 to-fuchsia-600'
+                    ])->random(),
                 ];
             })
             ->toArray();
@@ -146,7 +152,13 @@ class DashboardController extends Controller
                     'lastActiveDate' => $tutor->updated_at ? $tutor->updated_at->toDateString() : '',
                     'status' => $tutor->status ?? 'inactive',
                     'initials' => $initials,
-                    'avatarGradient' => collect(['from-indigo-400 to-purple-400', 'from-pink-400 to-rose-400', 'from-orange-400 to-red-400'])->random(),
+                    'avatarGradient' => collect([
+                        'bg-gradient-to-br from-indigo-500 to-purple-600',
+                        'bg-gradient-to-br from-pink-500 to-rose-600',
+                        'bg-gradient-to-br from-orange-500 to-amber-600',
+                        'bg-gradient-to-br from-rose-500 to-red-600',
+                        'bg-gradient-to-br from-fuchsia-500 to-purple-600'
+                    ])->random(),
                 ];
             })
             ->toArray();

@@ -63,7 +63,7 @@
                                 loading="lazy"
                             >
                             @else
-                            <div class="h-10 w-10 rounded-full bg-gradient-to-br {{ $student['avatarGradient'] ?? 'from-blue-400 to-cyan-400' }} flex items-center justify-center text-white font-semibold" aria-label="Avatar for {{ $student['name'] ?? '' }}">
+                            <div class="h-10 w-10 rounded-full {{ $student['avatarGradient'] ?? 'bg-gradient-to-br from-blue-500 to-cyan-600' }} flex items-center justify-center text-white font-semibold text-sm shadow-md" aria-label="Avatar for {{ $student['name'] ?? '' }}">
                                 {{ $student['initials'] ?? 'NA' }}
                             </div>
                             @endif
