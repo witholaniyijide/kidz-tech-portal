@@ -140,12 +140,6 @@
                 </x-ui.glass-card>
             </div>
 
-            {{-- Footer Info --}}
-            <div class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                <p>Last updated: {{ now()->format('F j, Y g:i A') }}</p>
-                <p class="mt-1">Kidz Tech Portal &copy; {{ date('Y') }} - Manager Dashboard</p>
-            </div>
-
         </div>
     </div>
 
