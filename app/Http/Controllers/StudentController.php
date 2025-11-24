@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Http\Requests\StoreStudentRequest;
+use App\Http\Requests\UpdateStudentRequest;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -51,33 +53,33 @@ class StudentController extends Controller
     /**
      * Store a newly created student
      */
-    public function store(Request $request)
+    public function store(StoreStudentRequest $request)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:students,email',
-            'phone' => 'nullable|string|max:20',
-            'date_of_birth' => 'required|date',
-            'gender' => 'required|in:male,female',
-            'address' => 'nullable|string',
-            'state' => 'nullable|string|max:255',
-            'parent_name' => 'required|string|max:255',
-            'parent_email' => 'nullable|email',
-            'parent_phone' => 'required|string|max:20',
-            'parent_relationship' => 'required|string|max:255',
-            'enrollment_date' => 'required|date',
-            'location' => 'nullable|string|max:255',
-            'notes' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
         // Generate student ID
-        $validated['student_id'] = $this->generateStudentId();
-        $validated['status'] = 'active';
+        $data['student_id'] = $this->generateStudentId();
 
-        Student::create($validated);
+        // Set default status if not provided
+        $data['status'] = $data['status'] ?? 'active';
 
-        return redirect()->route('students.index')
+        // Handle class_schedule - encode as JSON
+        if (isset($data['class_schedule']) && is_array($data['class_schedule'])) {
+            $data['class_schedule'] = json_encode($data['class_schedule']);
+        }
+
+        // Set default completed_periods
+        $data['completed_periods'] = $data['completed_periods'] ?? 0;
+
+        $student = Student::create($data);
+
+        // Check if "Save & Add Another" was clicked
+        if ($request->input('action') === 'save_and_add') {
+            return redirect()->route('students.create')
+                ->with('success', 'Student added successfully! You can add another one.');
+        }
+
+        return redirect()->route('students.show', $student)
             ->with('success', 'Student added successfully!');
     }
 
@@ -100,28 +102,16 @@ class StudentController extends Controller
     /**
      * Update the specified student
      */
-    public function update(Request $request, Student $student)
+    public function update(UpdateStudentRequest $request, Student $student)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:students,email,' . $student->id,
-            'phone' => 'nullable|string|max:20',
-            'date_of_birth' => 'required|date',
-            'gender' => 'required|in:male,female',
-            'address' => 'nullable|string',
-            'state' => 'nullable|string|max:255',
-            'parent_name' => 'required|string|max:255',
-            'parent_email' => 'nullable|email',
-            'parent_phone' => 'required|string|max:20',
-            'parent_relationship' => 'required|string|max:255',
-            'enrollment_date' => 'required|date',
-            'status' => 'required|in:active,inactive,graduated,withdrawn',
-            'location' => 'nullable|string|max:255',
-            'notes' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
-        $student->update($validated);
+        // Handle class_schedule - encode as JSON
+        if (isset($data['class_schedule']) && is_array($data['class_schedule'])) {
+            $data['class_schedule'] = json_encode($data['class_schedule']);
+        }
+
+        $student->update($data);
 
         return redirect()->route('students.show', $student)
             ->with('success', 'Student updated successfully!');

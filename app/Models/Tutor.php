@@ -23,6 +23,7 @@ class Tutor extends Model
         'state',
         'location',
         'occupation',
+        'bio',
         'hire_date',
         'contact_person_name',
         'contact_person_relationship',
