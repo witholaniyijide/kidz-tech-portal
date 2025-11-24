@@ -16,15 +16,23 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative z-10">
 
             <!-- Welcome Section -->
-            <x-ui.glass-card padding="p-8" class="mb-8">
-                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                    Welcome back, <span class="text-transparent bg-clip-text bg-gradient-tutor">{{ $tutor ? $tutor->first_name . ' ' . $tutor->last_name : Auth::user()->name }}</span>!
-                </h3>
-                <p class="text-gray-600 dark:text-gray-300 text-lg">Inspire and educate your students today.</p>
+            <x-ui.glass-card padding="p-8" class="mb-12">
+                <div class="flex items-center justify-between flex-wrap">
+                    <div>
+                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                            Welcome back, <span class="text-transparent bg-clip-text bg-gradient-tutor">{{ $tutor ? $tutor->first_name . ' ' . $tutor->last_name : Auth::user()->name }}</span>!
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-lg">Inspire and educate your students today.</p>
+                    </div>
+                    <div class="text-right mt-4 md:mt-0">
+                        <div class="text-gray-600 dark:text-gray-300">{{ now()->format('l, F j, Y') }}</div>
+                        <div class="text-gray-500 dark:text-gray-400 text-sm">{{ now()->format('g:i A') }}</div>
+                    </div>
+                </div>
             </x-ui.glass-card>
 
             <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                 <x-ui.stat-card
                     title="My Students"
                     value="{{ $totalStudents ?? 0 }}"
@@ -55,7 +63,7 @@
             </div>
 
             <!-- Content Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
 
                 <!-- Today's Classes -->
                 <x-ui.glass-card>

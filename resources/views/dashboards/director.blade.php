@@ -19,27 +19,23 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative z-10">
 
             <!-- Welcome Section -->
-            <x-ui.glass-card padding="p-8">
-                <div class="flex items-center justify-between">
+            <x-ui.glass-card padding="p-8" class="mb-12">
+                <div class="flex items-center justify-between flex-wrap">
                     <div>
                         <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                             Welcome back, <span class="text-transparent bg-clip-text bg-gradient-director">{{ Auth::user()->name }}</span>!
                         </h3>
                         <p class="text-gray-600 dark:text-gray-300 text-lg">Here's what's happening with your organization today.</p>
                     </div>
-                    <div class="hidden md:block">
-                        <div class="text-right">
-                            <div class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600">
-                                {{ $activeStudents }}
-                            </div>
-                            <div class="text-sm text-gray-600 dark:text-gray-300">Students Active</div>
-                        </div>
+                    <div class="text-right mt-4 md:mt-0">
+                        <div class="text-gray-600 dark:text-gray-300">{{ now()->format('l, F j, Y') }}</div>
+                        <div class="text-gray-500 dark:text-gray-400 text-sm">{{ now()->format('g:i A') }}</div>
                     </div>
                 </div>
             </x-ui.glass-card>
 
             <!-- Main Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                 <x-ui.stat-card
                     title="Total Students"
                     value="{{ $totalStudents }}"
@@ -70,7 +66,7 @@
             </div>
 
             <!-- Charts and Analytics Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
 
                 <!-- Revenue Trend Chart -->
                 <div class="lg:col-span-2">
@@ -95,7 +91,7 @@
             </div>
 
             <!-- Attendance & Activity Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
 
                 <!-- Weekly Attendance Chart -->
                 <x-ui.glass-card>
@@ -172,7 +168,7 @@
             </div>
 
             <!-- Secondary Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
 
                 <x-ui.glass-card>
                     <div class="flex items-center justify-between mb-4">
