@@ -71,11 +71,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/schedule/weekly', [App\Http\Controllers\ScheduleController::class, 'weekly'])->name('schedule.weekly');
 });
 
-// Attendance Approval Routes
+// Attendance Approval Routes (Admin Only)
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/attendance/pending', [App\Http\Controllers\AttendanceController::class, 'pending'])->name('attendance.pending');
-    Route::post('/attendance/approve/{id}', [App\Http\Controllers\AttendanceController::class, 'approve'])->name('attendance.approve');
-    Route::post('/attendance/reject/{id}', [App\Http\Controllers\AttendanceController::class, 'reject'])->name('attendance.reject');
     Route::post('/attendance/bulk-approve', [App\Http\Controllers\AttendanceController::class, 'bulkApprove'])->name('attendance.bulk.approve');
     Route::post('/attendance/bulk-reject', [App\Http\Controllers\AttendanceController::class, 'bulkReject'])->name('attendance.bulk.reject');
 });
