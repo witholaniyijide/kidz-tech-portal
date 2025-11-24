@@ -19,7 +19,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 relative z-10">
 
             <!-- Welcome Section -->
-            <x-ui.glass-card padding="p-8" class="mb-16">
+            <x-ui.glass-card padding="p-8" class="mb-24">
                 <div class="flex items-center justify-between flex-wrap">
                     <div>
                         <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
