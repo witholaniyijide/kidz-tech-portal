@@ -166,7 +166,12 @@ Route::prefix('manager')
             ->name('notices.destroy');
 
         // Assessments
-        Route::resource('assessments', App\Http\Controllers\Manager\AssessmentController::class)->except(['destroy']);
+        Route::get('/assessments', [App\Http\Controllers\Manager\AssessmentController::class, 'index'])
+            ->name('assessments.index');
+        Route::get('/assessments/{assessment}', [App\Http\Controllers\Manager\AssessmentController::class, 'show'])
+            ->name('assessments.show');
+        Route::post('/assessments/{assessment}/comment', [App\Http\Controllers\Manager\AssessmentController::class, 'comment'])
+            ->name('assessments.comment');
     });
 
 // Analytics Routes
