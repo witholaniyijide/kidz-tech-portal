@@ -27,7 +27,7 @@ class ReportController extends Controller
 
         // Get all reports for this tutor
         $reports = TutorReport::where('tutor_id', $tutor->id)
-            ->with(['student', 'author'])
+            ->with(['student'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
@@ -75,15 +75,14 @@ class ReportController extends Controller
         $report = TutorReport::create([
             'tutor_id' => $tutor->id,
             'student_id' => $request->student_id,
-            'title' => $request->title,
             'month' => $request->month,
-            'period_from' => $request->period_from,
-            'period_to' => $request->period_to,
-            'content' => $request->content,
-            'summary' => $request->summary,
-            'rating' => $request->rating,
+            'progress_summary' => $request->progress_summary,
+            'strengths' => $request->strengths,
+            'weaknesses' => $request->weaknesses,
+            'next_steps' => $request->next_steps,
+            'attendance_score' => $request->attendance_score ?? 0,
+            'performance_rating' => $request->performance_rating,
             'status' => $request->status ?? 'draft',
-            'created_by' => Auth::id(),
         ]);
 
         // If submitted immediately, send notification
@@ -95,7 +94,7 @@ class ReportController extends Controller
             TutorNotification::create([
                 'tutor_id' => $tutor->id,
                 'title' => 'Report Submitted',
-                'body' => "Report '{$report->title}' has been submitted for review.",
+                'body' => "Report for {$student->fullName()} ({$report->month}) has been submitted for review.",
                 'type' => 'system',
                 'is_read' => false,
                 'meta' => ['report_id' => $report->id],
@@ -198,13 +197,13 @@ class ReportController extends Controller
         // Update report
         $report->update([
             'student_id' => $request->student_id,
-            'title' => $request->title,
             'month' => $request->month,
-            'period_from' => $request->period_from,
-            'period_to' => $request->period_to,
-            'content' => $request->content,
-            'summary' => $request->summary,
-            'rating' => $request->rating,
+            'progress_summary' => $request->progress_summary,
+            'strengths' => $request->strengths,
+            'weaknesses' => $request->weaknesses,
+            'next_steps' => $request->next_steps,
+            'attendance_score' => $request->attendance_score ?? 0,
+            'performance_rating' => $request->performance_rating,
         ]);
 
         return redirect()
@@ -277,7 +276,7 @@ class ReportController extends Controller
         TutorNotification::create([
             'tutor_id' => $tutor->id,
             'title' => 'Report Submitted',
-            'body' => "Report '{$report->title}' has been submitted for review.",
+            'body' => "Report for {$report->student->fullName()} ({$report->month}) has been submitted for review.",
             'type' => 'system',
             'is_read' => false,
             'meta' => ['report_id' => $report->id],
