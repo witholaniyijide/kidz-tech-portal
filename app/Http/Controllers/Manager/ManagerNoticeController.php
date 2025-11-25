@@ -7,6 +7,8 @@ use App\Models\Notice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Http\Requests\StoreNoticeRequest;
+use App\Http\Requests\UpdateNoticeRequest;
 
 class ManagerNoticeController extends Controller
 {
@@ -61,7 +63,7 @@ class ManagerNoticeController extends Controller
     /**
      * Store a newly created notice in storage.
      */
-    public function store(Request $request)
+    public function store(StoreNoticeRequest $request)
     {
         $request->validate([
             'title' => 'required|string|max:255',
@@ -140,7 +142,7 @@ class ManagerNoticeController extends Controller
      * Update the specified notice in storage.
      * Only allow editing if the manager created it.
      */
-    public function update(Request $request, Notice $notice)
+    public function update(UpdateNoticeRequest $request, Notice $notice)
     {
         // Check if current user is the author
         if ($notice->posted_by !== Auth::id()) {

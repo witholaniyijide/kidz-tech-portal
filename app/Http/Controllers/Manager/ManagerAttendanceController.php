@@ -99,4 +99,108 @@ class ManagerAttendanceController extends Controller
             'year'
         ));
     }
+
+    /**
+     * Display pending attendance records for approval.
+     */
+    public function pending(Request $request)
+    {
+        $query = AttendanceRecord::where('status', 'pending')
+            ->with(['student', 'tutor']);
+
+        // Filter by tutor
+        if ($request->filled('tutor_id')) {
+            $query->where('tutor_id', $request->tutor_id);
+        }
+
+        // Filter by date range
+        if ($request->filled('date_from')) {
+            $query->whereDate('class_date', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('class_date', '<=', $request->date_to);
+        }
+
+        // Filter by student
+        if ($request->filled('student_id')) {
+            $query->where('student_id', $request->student_id);
+        }
+
+        $records = $query->orderBy('class_date', 'desc')
+            ->orderBy('class_time', 'desc')
+            ->paginate(20);
+
+        // Get tutors and students for filters
+        $tutors = Tutor::orderBy('first_name')->get();
+        $students = Student::orderBy('first_name')->get();
+
+        return view('attendance.pending', compact('records', 'tutors', 'students'));
+    }
+
+    /**
+     * Approve a single attendance record.
+     */
+    public function approve(AttendanceRecord $attendance)
+    {
+        \DB::transaction(function () use ($attendance) {
+            $attendance->status = 'approved';
+            $attendance->approved_by = auth()->id();
+            $attendance->approved_at = now();
+            $attendance->save();
+
+            // Increment student's completed_periods
+            if ($attendance->student) {
+                $attendance->student->increment('completed_periods', 1);
+            }
+        });
+
+        return redirect()->back()->with('success', 'Attendance approved successfully.');
+    }
+
+    /**
+     * Reject a single attendance record.
+     */
+    public function reject(AttendanceRecord $attendance)
+    {
+        $attendance->update([
+            'status' => 'rejected',
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Attendance rejected.');
+    }
+
+    /**
+     * Bulk approve attendance records.
+     */
+    public function bulkApprove(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'No records selected.');
+        }
+
+        \DB::transaction(function () use ($ids) {
+            $records = AttendanceRecord::whereIn('id', $ids)
+                ->where('status', 'pending')
+                ->get();
+
+            foreach ($records as $attendance) {
+                $attendance->update([
+                    'status' => 'approved',
+                    'approved_by' => auth()->id(),
+                    'approved_at' => now(),
+                ]);
+
+                if ($attendance->student) {
+                    $attendance->student->increment('completed_periods', 1);
+                }
+            }
+        });
+
+        return redirect()->back()->with('success', 'Selected attendance records approved successfully.');
+    }
 }

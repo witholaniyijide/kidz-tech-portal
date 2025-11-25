@@ -121,11 +121,19 @@ Route::prefix('manager')
         Route::get('/tutors/{tutor}/performance', [App\Http\Controllers\Manager\ManagerTutorController::class, 'performance'])
             ->name('tutors.performance');
 
-        // Attendance (read only)
+        // Attendance (with approval capability)
         Route::get('/attendance', [App\Http\Controllers\Manager\ManagerAttendanceController::class, 'index'])
             ->name('attendance.index');
+        Route::get('/attendance/pending', [App\Http\Controllers\Manager\ManagerAttendanceController::class, 'pending'])
+            ->name('attendance.pending');
         Route::get('/attendance/{record}', [App\Http\Controllers\Manager\ManagerAttendanceController::class, 'show'])
             ->name('attendance.show');
+        Route::post('/attendance/{attendance}/approve', [App\Http\Controllers\Manager\ManagerAttendanceController::class, 'approve'])
+            ->name('attendance.approve');
+        Route::post('/attendance/{attendance}/reject', [App\Http\Controllers\Manager\ManagerAttendanceController::class, 'reject'])
+            ->name('attendance.reject');
+        Route::post('/attendance/bulk-approve', [App\Http\Controllers\Manager\ManagerAttendanceController::class, 'bulkApprove'])
+            ->name('attendance.bulkApprove');
         Route::get('/attendance/calendar/view', [App\Http\Controllers\Manager\ManagerAttendanceController::class, 'calendar'])
             ->name('attendance.calendar');
 
@@ -156,6 +164,9 @@ Route::prefix('manager')
             ->name('notices.update');
         Route::delete('/notices/{notice}', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'destroy'])
             ->name('notices.destroy');
+
+        // Assessments
+        Route::resource('assessments', App\Http\Controllers\Manager\AssessmentController::class)->except(['destroy']);
     });
 
 // Analytics Routes
