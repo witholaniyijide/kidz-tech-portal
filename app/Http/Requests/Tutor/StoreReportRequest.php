@@ -23,12 +23,18 @@ class StoreReportRequest extends FormRequest
     {
         return [
             'student_id' => 'required|exists:students,id',
-            'title' => 'required|string|max:255',
-            'month' => 'required|string|max:50',
+            'title' => 'nullable|string|max:255',
+            'month' => 'required|date_format:Y-m',
             'period_from' => 'nullable|date',
             'period_to' => 'nullable|date|after_or_equal:period_from',
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'summary' => 'nullable|string|max:1000',
+            'progress_summary' => 'required|string',
+            'strengths' => 'required|string',
+            'weaknesses' => 'required|string',
+            'next_steps' => 'required|string',
+            'attendance_score' => 'required|integer|min:0|max:100',
+            'performance_rating' => 'required|in:excellent,good,average,poor',
             'rating' => 'nullable|integer|min:1|max:10',
             'status' => 'nullable|in:draft,submitted',
         ];
