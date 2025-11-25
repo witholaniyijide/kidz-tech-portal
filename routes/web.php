@@ -198,6 +198,16 @@ Route::prefix('tutor')
         Route::post('reports/{report}/comments', [App\Http\Controllers\Tutor\CommentController::class, 'store'])
             ->name('reports.comments.store');
 
+        // Students (view-only)
+        Route::get('/students', [App\Http\Controllers\Tutor\StudentController::class, 'index'])
+            ->name('students.index');
+        Route::get('/students/{student}', [App\Http\Controllers\Tutor\StudentController::class, 'show'])
+            ->name('students.show');
+
+        // Schedule (view-only)
+        Route::get('/schedule/today', [App\Http\Controllers\Tutor\ScheduleController::class, 'today'])
+            ->name('schedule.today');
+
         // Availability
         Route::get('/availability', [App\Http\Controllers\Tutor\AvailabilityController::class, 'index'])
             ->name('availability.index');

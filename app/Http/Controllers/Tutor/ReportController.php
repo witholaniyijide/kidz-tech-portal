@@ -114,7 +114,7 @@ class ReportController extends Controller
             TutorNotification::create([
                 'tutor_id' => $tutor->id,
                 'title' => 'Report Submitted',
-                'body' => "Report '{$report->title}' has been submitted for review.",
+                'body' => "Report for {$student->fullName()} ({$report->month}) has been submitted for review.",
                 'type' => 'system',
                 'is_read' => false,
                 'meta' => ['report_id' => $report->id],
@@ -295,7 +295,7 @@ class ReportController extends Controller
         TutorNotification::create([
             'tutor_id' => $tutor->id,
             'title' => 'Report Submitted',
-            'body' => "Report '{$report->title}' has been submitted for review.",
+            'body' => "Report for {$report->student->fullName()} ({$report->month}) has been submitted for review.",
             'type' => 'system',
             'is_read' => false,
             'meta' => ['report_id' => $report->id],

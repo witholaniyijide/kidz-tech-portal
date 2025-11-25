@@ -10,9 +10,8 @@ class TutorReport extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tutor_id',
         'student_id',
-        'title',
+        'tutor_id',
         'month',
         'period_from',
         'period_to',
@@ -26,15 +25,18 @@ class TutorReport extends Model
         'performance_rating',
         'rating',
         'status',
+        'manager_comment',
+        'director_comment',
         'submitted_at',
-        'created_by',
+        'approved_by_manager_at',
+        'approved_by_director_at',
     ];
 
     protected $casts = [
-        'period_from' => 'date',
-        'period_to' => 'date',
         'submitted_at' => 'datetime',
-        'rating' => 'integer',
+        'approved_by_manager_at' => 'datetime',
+        'approved_by_director_at' => 'datetime',
+        'attendance_score' => 'integer',
     ];
 
     /**
@@ -51,14 +53,6 @@ class TutorReport extends Model
     public function student()
     {
         return $this->belongsTo(Student::class);
-    }
-
-    /**
-     * Get the user who created the report.
-     */
-    public function author()
-    {
-        return $this->belongsTo(User::class, 'created_by');
     }
 
     /**
@@ -94,18 +88,26 @@ class TutorReport extends Model
     }
 
     /**
+     * Scope to get reports approved by manager.
+     */
+    public function scopeApprovedByManager($query)
+    {
+        return $query->where('status', 'approved-by-manager');
+    }
+
+    /**
+     * Scope to get reports approved by director.
+     */
+    public function scopeApprovedByDirector($query)
+    {
+        return $query->where('status', 'approved-by-director');
+    }
+
+    /**
      * Scope to get reports pending manager review.
      */
     public function scopePendingManagerReview($query)
     {
-        return $query->where('status', 'manager_review');
-    }
-
-    /**
-     * Scope to get director-approved reports.
-     */
-    public function scopeApproved($query)
-    {
-        return $query->where('status', 'director_approved');
+        return $query->where('status', 'submitted');
     }
 }
