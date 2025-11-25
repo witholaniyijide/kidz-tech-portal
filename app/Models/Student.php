@@ -115,4 +115,19 @@ class Student extends Model
     {
         return $this->hasMany(Report::class);
     }
+
+    public function tutorReports()
+    {
+        return $this->hasMany(TutorReport::class);
+    }
+
+    public function fullName()
+    {
+        $name = $this->first_name;
+        if ($this->other_name) {
+            $name .= ' ' . $this->other_name;
+        }
+        $name .= ' ' . $this->last_name;
+        return $name;
+    }
 }
