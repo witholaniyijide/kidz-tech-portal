@@ -98,10 +98,10 @@
                 </div>
             </div>
 
-            {{-- Main Content Grid: Schedule (60%) + To-Do & Notices (40%) --}}
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-10">
-                {{-- LEFT: Daily Class Schedule (60% = 3 columns) --}}
-                <div class="lg:col-span-3">
+            {{-- Main Content Grid: Schedule (Full Width) + To-Do & Notices (Below) --}}
+            <div class="space-y-6 mb-10">
+                {{-- Daily Class Schedule (Full Width) --}}
+                <div>
                     <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6 h-full">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center gap-3">
@@ -168,8 +168,8 @@
                     </div>
                 </div>
 
-                {{-- RIGHT: To-Do List & Notice Board (40% = 2 columns) --}}
-                <div class="lg:col-span-2 space-y-6">
+                {{-- To-Do List & Notice Board (Below Schedule) --}}
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {{-- To-Do List --}}
                     <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6">
                         <div class="flex items-center gap-3 mb-6">
@@ -181,29 +181,14 @@
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white">Today's To-Do List</h3>
                         </div>
 
-                        <div class="space-y-3 mb-4">
-                            @php
-                                $tasks = [
-                                    'Join today\'s classes',
-                                    'Assess tutor performance',
-                                    'Create assessment report',
-                                    'Follow up with inactive students',
-                                    'View pending assessments'
-                                ];
-                            @endphp
-
-                            @foreach($tasks as $task)
-                                <label class="flex items-center gap-3 p-3 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-lg border border-white/10 hover:bg-white/40 dark:hover:bg-gray-800/40 transition-all cursor-pointer">
-                                    <input type="checkbox" class="w-5 h-5 text-sky-500 border-gray-300 rounded focus:ring-sky-500 focus:ring-2">
-                                    <span class="text-gray-700 dark:text-gray-300 flex-1">{{ $task }}</span>
-                                </label>
-                            @endforeach
+                        <div id="todoList" class="space-y-3 mb-4">
+                            {{-- Tasks will be loaded by JavaScript --}}
                         </div>
 
                         <div class="pt-4 border-t border-white/10">
                             <div class="flex gap-2">
-                                <input type="text" placeholder="Add a new task..." class="flex-1 px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                                <button class="px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md">
+                                <input type="text" id="newTaskInput" placeholder="Add a new task..." class="flex-1 px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                <button id="addTaskBtn" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                     </svg>
@@ -255,12 +240,12 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <button class="flex-1 px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md font-semibold text-sm">
+                            <a href="{{ route('manager.notices.create') }}" class="flex-1 px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md font-semibold text-sm text-center">
                                 Create Notice
-                            </button>
-                            <button class="px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-white/40 dark:hover:bg-gray-800/40 transition-all font-semibold text-sm">
+                            </a>
+                            <a href="{{ route('manager.notices.index') }}" class="px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-white/40 dark:hover:bg-gray-800/40 transition-all font-semibold text-sm">
                                 View All
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -331,9 +316,9 @@
                     </div>
 
                     <div class="mt-4 text-center">
-                        <button class="text-sky-600 dark:text-sky-400 hover:underline font-semibold text-sm">
+                        <a href="{{ route('manager.students.index') }}" class="text-sky-600 dark:text-sky-400 hover:underline font-semibold text-sm">
                             View All Students →
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -400,9 +385,9 @@
                     </div>
 
                     <div class="mt-4 text-center">
-                        <button class="text-cyan-600 dark:text-cyan-400 hover:underline font-semibold text-sm">
+                        <a href="{{ route('manager.tutors.index') }}" class="text-cyan-600 dark:text-cyan-400 hover:underline font-semibold text-sm">
                             View All Tutors →
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -420,58 +405,173 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     {{-- View All Students --}}
-                    <button class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
+                    <a href="{{ route('manager.students.index') }}" class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
                         <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                         <span class="font-semibold text-center">View All Students</span>
-                    </button>
+                    </a>
 
                     {{-- View All Tutors --}}
-                    <button class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
+                    <a href="{{ route('manager.tutors.index') }}" class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
                         <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                         <span class="font-semibold text-center">View All Tutors</span>
-                    </button>
+                    </a>
 
-                    {{-- View Class Schedules --}}
-                    <button class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-amber-500 to-orange-400 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
+                    {{-- View Attendance --}}
+                    <a href="{{ route('manager.attendance.index') }}" class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-amber-500 to-orange-400 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
                         <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <span class="font-semibold text-center">View Schedules</span>
-                    </button>
+                        <span class="font-semibold text-center">View Attendance</span>
+                    </a>
 
-                    {{-- Create Assessment --}}
-                    <button class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
+                    {{-- View Reports --}}
+                    <a href="{{ route('manager.reports.index') }}" class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all">
                         <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <span class="font-semibold text-center">Create Assessment</span>
-                    </button>
+                        <span class="font-semibold text-center">View Reports</span>
+                    </a>
 
-                    {{-- Pending Assessments --}}
-                    <button class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-rose-500 to-red-500 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all relative">
+                    {{-- Pending Attendance --}}
+                    <a href="{{ route('manager.attendance.pending') }}" class="flex flex-col items-center justify-center p-6 bg-gradient-to-r from-rose-500 to-red-500 text-white rounded-xl shadow-lg hover:-translate-y-1 transition-all relative">
+                        @php
+                            $pendingCount = \App\Models\AttendanceRecord::where('status', 'pending')->count();
+                        @endphp
+                        @if($pendingCount > 0)
                         <div class="absolute -top-2 -right-2 bg-white text-rose-600 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm shadow-lg">
-                            4
+                            {{ $pendingCount }}
                         </div>
+                        @endif
                         <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                         </svg>
-                        <span class="font-semibold text-center">Pending Assessments</span>
-                    </button>
+                        <span class="font-semibold text-center">Pending Attendance</span>
+                    </a>
                 </div>
-            </div>
-
-            {{-- Footer --}}
-            <div class="text-center py-6">
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-2">Made with ❤️ from Kidz Tech Coding Club</p>
-                <p class="text-gray-500 dark:text-gray-500 text-xs">© {{ date('Y') }} Kidz Tech Portal - Manager Dashboard</p>
             </div>
 
         </div>
     </div>
+
+    {{-- Todo List JavaScript --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const todoList = document.getElementById('todoList');
+            const newTaskInput = document.getElementById('newTaskInput');
+            const addTaskBtn = document.getElementById('addTaskBtn');
+
+            // Default tasks
+            const defaultTasks = [
+                'Join today\'s classes',
+                'Assess tutor performance',
+                'Create assessment report',
+                'Follow up with inactive students',
+                'View pending assessments'
+            ];
+
+            // Load tasks from localStorage or use defaults
+            function loadTasks() {
+                const savedTasks = localStorage.getItem('managerTodos');
+                return savedTasks ? JSON.parse(savedTasks) : defaultTasks.map((text, index) => ({
+                    id: Date.now() + index,
+                    text: text,
+                    checked: false
+                }));
+            }
+
+            // Save tasks to localStorage
+            function saveTasks(tasks) {
+                localStorage.setItem('managerTodos', JSON.stringify(tasks));
+            }
+
+            // Render tasks
+            function renderTasks() {
+                const tasks = loadTasks();
+                todoList.innerHTML = '';
+
+                tasks.forEach(task => {
+                    const taskEl = document.createElement('label');
+                    taskEl.className = 'flex items-center gap-3 p-3 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-lg border border-white/10 hover:bg-white/40 dark:hover:bg-gray-800/40 transition-all cursor-pointer group';
+
+                    taskEl.innerHTML = `
+                        <input type="checkbox" ${task.checked ? 'checked' : ''}
+                            data-id="${task.id}"
+                            class="task-checkbox w-5 h-5 text-sky-500 border-gray-300 rounded focus:ring-sky-500 focus:ring-2">
+                        <span class="text-gray-700 dark:text-gray-300 flex-1 ${task.checked ? 'line-through opacity-60' : ''}">${task.text}</span>
+                        <button class="remove-task opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 p-1" data-id="${task.id}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    `;
+
+                    todoList.appendChild(taskEl);
+                });
+
+                // Add event listeners
+                document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', toggleTask);
+                });
+
+                document.querySelectorAll('.remove-task').forEach(btn => {
+                    btn.addEventListener('click', removeTask);
+                });
+            }
+
+            // Toggle task checked status
+            function toggleTask(e) {
+                const taskId = parseInt(e.target.dataset.id);
+                const tasks = loadTasks();
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.checked = e.target.checked;
+                    saveTasks(tasks);
+                    renderTasks();
+                }
+            }
+
+            // Remove task
+            function removeTask(e) {
+                e.preventDefault();
+                const taskId = parseInt(e.currentTarget.dataset.id);
+                let tasks = loadTasks();
+                tasks = tasks.filter(t => t.id !== taskId);
+                saveTasks(tasks);
+                renderTasks();
+            }
+
+            // Add new task
+            function addTask() {
+                const taskText = newTaskInput.value.trim();
+                if (taskText) {
+                    const tasks = loadTasks();
+                    tasks.push({
+                        id: Date.now(),
+                        text: taskText,
+                        checked: false
+                    });
+                    saveTasks(tasks);
+                    newTaskInput.value = '';
+                    renderTasks();
+                }
+            }
+
+            // Event listeners
+            addTaskBtn.addEventListener('click', addTask);
+            newTaskInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTask();
+                }
+            });
+
+            // Initial render
+            renderTasks();
+        });
+    </script>
 
     {{-- Custom Animations --}}
     <style>
