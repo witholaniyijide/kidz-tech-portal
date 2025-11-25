@@ -155,7 +155,7 @@
         </div>
 
         <!-- My Students -->
-        <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-lg">
+        <div id="students" class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-lg">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">My Students</h2>
             @if($students->isEmpty())
                 <p class="text-gray-600 dark:text-gray-400">No students assigned yet.</p>

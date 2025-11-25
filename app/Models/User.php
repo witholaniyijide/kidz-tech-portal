@@ -84,4 +84,12 @@ class User extends Authenticatable
         }
         return false;
     }
+
+    /**
+     * Get the tutor profile associated with this user
+     */
+    public function tutor()
+    {
+        return $this->hasOne(Tutor::class, 'email', 'email');
+    }
 }
