@@ -44,6 +44,13 @@ class DashboardController extends Controller
         $reportsCount = $tutor->reports()->count();
         $draftReportsCount = $tutor->reports()->where('status', 'draft')->count();
         $submittedReportsCount = $tutor->reports()->where('status', 'submitted')->count();
+
+        // Get reports submitted this month (for Phase 2 dashboard)
+        $submittedThisMonth = $tutor->reports()
+            ->where('status', 'submitted')
+            ->where('month', now()->format('Y-m'))
+            ->count();
+
         $pendingReportsCount = $tutor->reports()
             ->whereIn('status', ['draft', 'returned'])
             ->count();
@@ -105,6 +112,9 @@ class DashboardController extends Controller
             }
         }
 
+        // Classes today count
+        $classesTodayCount = $todayClasses->count();
+
         return view('tutor.dashboard', compact(
             'tutor',
             'students',
@@ -114,13 +124,15 @@ class DashboardController extends Controller
             'reportsCount',
             'draftReportsCount',
             'submittedReportsCount',
+            'submittedThisMonth',
             'pendingReportsCount',
             'recentReports',
             'unreadNotifications',
             'unreadNotificationsCount',
             'upcomingAvailability',
             'todayClasses',
-            'weekClasses'
+            'weekClasses',
+            'classesTodayCount'
         ));
     }
 }

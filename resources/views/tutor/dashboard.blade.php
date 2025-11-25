@@ -26,13 +26,13 @@
             </div>
         </div>
 
-        <!-- Reports Count -->
+        <!-- Reports Submitted This Month -->
         <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Reports</p>
-                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $reportsCount }}</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">{{ $draftReportsCount }} drafts</p>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Submitted This Month</p>
+                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $submittedThisMonth }}</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">{{ date('F Y') }}</p>
                 </div>
                 <div class="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,31 +42,33 @@
             </div>
         </div>
 
-        <!-- Pending Attendance -->
+        <!-- Reports Pending (Draft) -->
         <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Attendance</p>
-                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $pendingAttendanceCount }}</h3>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Reports</p>
+                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $pendingReportsCount }}</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">Draft reports</p>
                 </div>
                 <div class="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                 </div>
             </div>
         </div>
 
-        <!-- Notifications -->
+        <!-- Classes Today -->
         <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Notifications</p>
-                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $unreadNotificationsCount }}</h3>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Classes Today</p>
+                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $classesTodayCount }}</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">{{ now()->format('M d, Y') }}</p>
                 </div>
                 <div class="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
             </div>

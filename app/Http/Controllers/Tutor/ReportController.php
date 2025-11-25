@@ -16,7 +16,7 @@ class ReportController extends Controller
     /**
      * Display a listing of the tutor's reports.
      */
-    public function index()
+    public function index(Request $request)
     {
         // Get the authenticated tutor
         $tutor = Auth::user()->tutor;
@@ -25,13 +25,33 @@ class ReportController extends Controller
             abort(403, 'You do not have a tutor profile.');
         }
 
-        // Get all reports for this tutor
-        $reports = TutorReport::where('tutor_id', $tutor->id)
-            ->with(['student'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        // Build query
+        $query = TutorReport::where('tutor_id', $tutor->id)
+            ->with(['student', 'author']);
 
-        return view('tutor.reports.index', compact('reports'));
+        // Apply filters
+        if ($request->filled('month')) {
+            $query->where('month', $request->month);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Get all reports for this tutor
+        $reports = $query->orderBy('month', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(15)
+            ->appends($request->except('page'));
+
+        // Get unique months for filter dropdown
+        $months = TutorReport::where('tutor_id', $tutor->id)
+            ->select('month')
+            ->distinct()
+            ->orderBy('month', 'desc')
+            ->pluck('month');
+
+        return view('tutor.reports.index', compact('reports', 'months'));
     }
 
     /**
@@ -72,18 +92,18 @@ class ReportController extends Controller
         }
 
         // Create report
-        $report = TutorReport::create([
-            'tutor_id' => $tutor->id,
-            'student_id' => $request->student_id,
-            'month' => $request->month,
-            'progress_summary' => $request->progress_summary,
-            'strengths' => $request->strengths,
-            'weaknesses' => $request->weaknesses,
-            'next_steps' => $request->next_steps,
-            'attendance_score' => $request->attendance_score ?? 0,
-            'performance_rating' => $request->performance_rating,
-            'status' => $request->status ?? 'draft',
-        ]);
+        $data = $request->validated();
+        $data['tutor_id'] = $tutor->id;
+        $data['created_by'] = Auth::id();
+        $data['status'] = $request->status ?? 'draft';
+
+        // Auto-generate title if not provided
+        if (empty($data['title'])) {
+            $student = Student::find($request->student_id);
+            $data['title'] = $student->fullName() . ' - ' . date('F Y', strtotime($request->month . '-01'));
+        }
+
+        $report = TutorReport::create($data);
 
         // If submitted immediately, send notification
         if ($report->status === 'submitted') {
@@ -195,16 +215,15 @@ class ReportController extends Controller
         }
 
         // Update report
-        $report->update([
-            'student_id' => $request->student_id,
-            'month' => $request->month,
-            'progress_summary' => $request->progress_summary,
-            'strengths' => $request->strengths,
-            'weaknesses' => $request->weaknesses,
-            'next_steps' => $request->next_steps,
-            'attendance_score' => $request->attendance_score ?? 0,
-            'performance_rating' => $request->performance_rating,
-        ]);
+        $data = $request->validated();
+
+        // Auto-generate title if not provided
+        if (empty($data['title'])) {
+            $student = Student::find($request->student_id);
+            $data['title'] = $student->fullName() . ' - ' . date('F Y', strtotime($request->month . '-01'));
+        }
+
+        $report->update($data);
 
         return redirect()
             ->route('tutor.reports.edit', $report)
