@@ -35,10 +35,10 @@
             @endauth
 
             <!-- Page Heading -->
-            @if (isset($header))
+            @if (isset($header) || isset($title))
                 <header class="w-full h-40 {{ themeGradient() }} text-white rounded-b-3xl shadow-xl p-10">
                     <h1 class="text-3xl font-bold">
-                        {{ $title ?? 'Dashboard' }}
+                        {{ $title ?? ($header ?? 'Dashboard') }}
                     </h1>
                     <p class="text-white/80 mt-2">{{ now()->format('l, F j, Y') }}</p>
                 </header>
