@@ -54,6 +54,21 @@ class Tutor extends Model
         return $this->hasMany(AttendanceRecord::class);
     }
 
+    public function reports()
+    {
+        return $this->hasMany(TutorReport::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(TutorNotification::class);
+    }
+
+    public function availabilities()
+    {
+        return $this->hasMany(TutorAvailability::class);
+    }
+
     public function user()
     {
         return $this->hasOne(User::class, 'email', 'email');
@@ -64,8 +79,23 @@ class Tutor extends Model
         return $this->first_name . ' ' . $this->last_name;
     }
 
+    public function fullName()
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+    public function studentCount()
+    {
+        return $this->students()->count();
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+
+    public function scopeOnLeave($query)
+    {
+        return $query->where('status', 'on_leave');
     }
 }
