@@ -174,6 +174,47 @@ Route::prefix('manager')
             ->name('assessments.comment');
     });
 
+// Tutor Portal Routes
+Route::prefix('tutor')
+    ->middleware(['auth', 'verified', 'role:tutor'])
+    ->name('tutor.')
+    ->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [App\Http\Controllers\Tutor\DashboardController::class, 'index'])
+            ->name('dashboard');
+
+        // Attendance
+        Route::get('/attendance/create', [App\Http\Controllers\Tutor\AttendanceController::class, 'create'])
+            ->name('attendance.create');
+        Route::post('/attendance', [App\Http\Controllers\Tutor\AttendanceController::class, 'store'])
+            ->name('attendance.store');
+        Route::get('/attendance/{attendance}', [App\Http\Controllers\Tutor\AttendanceController::class, 'show'])
+            ->name('attendance.show');
+
+        // Reports
+        Route::resource('reports', App\Http\Controllers\Tutor\ReportController::class);
+        Route::post('reports/{report}/submit', [App\Http\Controllers\Tutor\ReportController::class, 'submit'])
+            ->name('reports.submit');
+        Route::post('reports/{report}/comments', [App\Http\Controllers\Tutor\CommentController::class, 'store'])
+            ->name('reports.comments.store');
+
+        // Availability
+        Route::get('/availability', [App\Http\Controllers\Tutor\AvailabilityController::class, 'index'])
+            ->name('availability.index');
+        Route::post('/availability', [App\Http\Controllers\Tutor\AvailabilityController::class, 'store'])
+            ->name('availability.store');
+        Route::put('/availability/{availability}', [App\Http\Controllers\Tutor\AvailabilityController::class, 'update'])
+            ->name('availability.update');
+        Route::delete('/availability/{availability}', [App\Http\Controllers\Tutor\AvailabilityController::class, 'destroy'])
+            ->name('availability.destroy');
+
+        // Profile
+        Route::get('/profile/edit', [App\Http\Controllers\Tutor\ProfileController::class, 'edit'])
+            ->name('profile.edit');
+        Route::put('/profile', [App\Http\Controllers\Tutor\ProfileController::class, 'update'])
+            ->name('profile.update');
+    });
+
 // Analytics Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/analytics', [App\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics');
