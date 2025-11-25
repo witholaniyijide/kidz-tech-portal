@@ -86,4 +86,20 @@ class TutorReport extends Model
     {
         return $query->where('tutor_id', $tutorId);
     }
+
+    /**
+     * Scope to get reports pending manager review.
+     */
+    public function scopePendingManagerReview($query)
+    {
+        return $query->where('status', 'manager_review');
+    }
+
+    /**
+     * Scope to get director-approved reports.
+     */
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'director_approved');
+    }
 }
