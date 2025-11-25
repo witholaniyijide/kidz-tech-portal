@@ -37,6 +37,37 @@ class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 s
                 <!-- Navigation Links -->
                 @if(Auth::check() && Auth::user()->hasRole('admin'))
                     {{-- Admin-specific navigation (hidden, will use custom admin nav instead) --}}
+                @elseif(Auth::check() && Auth::user()->hasRole('manager'))
+                    {{-- Manager-specific navigation --}}
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link :href="route('manager.dashboard')" :active="request()->routeIs('manager.dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('manager.students.index')" :active="request()->routeIs('manager.students.*')">
+                            {{ __('Students') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('manager.tutors.index')" :active="request()->routeIs('manager.tutors.*')">
+                            {{ __('Tutors') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('manager.assessments.index')" :active="request()->routeIs('manager.assessments.*')">
+                            {{ __('Assessment') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('analytics')" :active="request()->routeIs('analytics')">
+                            {{ __('Analytics') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('manager.attendance.index')" :active="request()->routeIs('manager.attendance.*')">
+                            {{ __('Attendance') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('manager.reports.index')" :active="request()->routeIs('manager.reports.*')">
+                            {{ __('Reports') }}
+                        </x-nav-link>
+                    </div>
                 @else
                     {{-- Default navigation for other roles --}}
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
