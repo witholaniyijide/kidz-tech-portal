@@ -13,12 +13,17 @@ class TutorReport extends Model
         'student_id',
         'tutor_id',
         'month',
+        'period_from',
+        'period_to',
+        'content',
+        'summary',
         'progress_summary',
         'strengths',
         'weaknesses',
         'next_steps',
         'attendance_score',
         'performance_rating',
+        'rating',
         'status',
         'manager_comment',
         'director_comment',
@@ -104,5 +109,37 @@ class TutorReport extends Model
     public function scopePendingManagerReview($query)
     {
         return $query->where('status', 'submitted');
+    }
+
+    /**
+     * Check if report is submitted.
+     */
+    public function isSubmitted()
+    {
+        return $this->status === 'submitted';
+    }
+
+    /**
+     * Check if report is approved by manager.
+     */
+    public function isManagerApproved()
+    {
+        return $this->status === 'approved-by-manager';
+    }
+
+    /**
+     * Check if report is approved by director.
+     */
+    public function isDirectorApproved()
+    {
+        return $this->status === 'approved-by-director';
+    }
+
+    /**
+     * Check if report is in draft status.
+     */
+    public function isDraft()
+    {
+        return $this->status === 'draft';
     }
 }

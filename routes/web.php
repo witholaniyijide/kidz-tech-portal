@@ -149,6 +149,16 @@ Route::prefix('manager')
         Route::post('/reports/{report}/request-changes', [App\Http\Controllers\Manager\ManagerReportsController::class, 'requestChanges'])
             ->name('reports.requestChanges');
 
+        // Tutor Portal Reports Review (New Tutor Portal)
+        Route::get('/tutor-reports', [App\Http\Controllers\Manager\ReportReviewController::class, 'index'])
+            ->name('tutor-reports.index');
+        Route::get('/tutor-reports/{report}', [App\Http\Controllers\Manager\ReportReviewController::class, 'show'])
+            ->name('tutor-reports.show');
+        Route::post('/tutor-reports/{report}/approve', [App\Http\Controllers\Manager\ReportReviewController::class, 'approve'])
+            ->name('tutor-reports.approve');
+        Route::post('/tutor-reports/{report}/correction', [App\Http\Controllers\Manager\ReportReviewController::class, 'sendBackForCorrection'])
+            ->name('tutor-reports.correction');
+
         // Notice Board (can create, with restrictions)
         Route::get('/notices', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'index'])
             ->name('notices.index');

@@ -79,13 +79,41 @@ class TutorReportPolicy
      */
     public function approve(User $user, TutorReport $report): bool
     {
-        // Managers can move to manager_review
+        // Managers can approve submitted reports
         if ($user->hasRole('manager') && $report->status === 'submitted') {
             return true;
         }
 
-        // Directors can give final approval
-        if ($user->hasRole('director') && $report->status === 'manager_review') {
+        // Directors can give final approval to manager-approved reports
+        if ($user->hasRole('director') && $report->status === 'approved-by-manager') {
+            return true;
+        }
+
+        // Admins can approve at any stage
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the user can send the report back for correction.
+     */
+    public function sendBackForCorrection(User $user, TutorReport $report): bool
+    {
+        // Managers can send back submitted reports
+        if ($user->hasRole('manager') && $report->status === 'submitted') {
+            return true;
+        }
+
+        // Directors can send back manager-approved reports
+        if ($user->hasRole('director') && $report->status === 'approved-by-manager') {
+            return true;
+        }
+
+        // Admins can send back at any stage
+        if ($user->hasRole('admin')) {
             return true;
         }
 
