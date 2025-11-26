@@ -239,6 +239,22 @@ Route::prefix('director')
         // Director Activity Logs
         Route::get('/activity-logs', [App\Http\Controllers\Director\DirectorActivityController::class, 'index'])
             ->name('activity-logs.index');
+
+        // Director Analytics & Dashboard
+        Route::get('/analytics', [App\Http\Controllers\Director\AnalyticsController::class, 'index'])
+            ->name('analytics.index');
+        Route::get('/analytics/enrollments', [App\Http\Controllers\Director\AnalyticsController::class, 'getEnrollmentsData'])
+            ->name('analytics.enrollments');
+        Route::get('/analytics/reports', [App\Http\Controllers\Director\AnalyticsController::class, 'getReportsData'])
+            ->name('analytics.reports');
+        Route::get('/analytics/tutors', [App\Http\Controllers\Director\AnalyticsController::class, 'getTutorPerformanceData'])
+            ->name('analytics.tutors');
+        Route::get('/analytics/assessments', [App\Http\Controllers\Director\AnalyticsController::class, 'getAssessmentData'])
+            ->name('analytics.assessments');
+        Route::get('/analytics/reports/export', [App\Http\Controllers\Director\AnalyticsController::class, 'exportReportsCsv'])
+            ->name('analytics.reports.export');
+        Route::get('/analytics/tutors/export', [App\Http\Controllers\Director\AnalyticsController::class, 'exportTutorsCsv'])
+            ->name('analytics.tutors.export');
     });
 
 // Tutor Portal Routes
