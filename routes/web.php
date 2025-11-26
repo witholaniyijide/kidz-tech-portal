@@ -84,18 +84,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Parent Portal Routes
-Route::middleware(['auth', 'verified'])->prefix('parent')->name('parent.')->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\ParentDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/child/{student}', [App\Http\Controllers\ParentDashboardController::class, 'showChild'])->name('child.show');
-    Route::get('/child/{student}/reports', [App\Http\Controllers\ParentDashboardController::class, 'childReports'])->name('child.reports');
-    Route::get('/child/{student}/reports/{report}', [App\Http\Controllers\ParentDashboardController::class, 'viewReport'])->name('child.report.view');
-    Route::get('/child/{student}/attendance', [App\Http\Controllers\ParentDashboardController::class, 'childAttendance'])->name('child.attendance');
+Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('parent.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [App\Http\Controllers\Student\StudentPortalHomeController::class, 'parentDashboard'])
+        ->name('dashboard');
 
-    // Tutor Reports (Director-Approved) for Parents
-    Route::get('/reports/{student}', [App\Http\Controllers\Parent\ParentReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/{student}/{report}', [App\Http\Controllers\Parent\ParentReportController::class, 'show'])->name('reports.show');
-    Route::get('/reports/{student}/{report}/pdf', [App\Http\Controllers\Parent\ParentReportController::class, 'exportPdf'])->name('reports.pdf');
-    Route::get('/reports/{student}/{report}/print', [App\Http\Controllers\Parent\ParentReportController::class, 'print'])->name('reports.print');
+    // Students
+    Route::get('/students', [App\Http\Controllers\Student\StudentProfileController::class, 'index'])
+        ->name('students.index');
+    Route::get('/students/{student}', [App\Http\Controllers\Student\StudentProfileController::class, 'show'])
+        ->name('students.show');
+
+    // Student Progress
+    Route::get('/students/{student}/progress', [App\Http\Controllers\Student\StudentProgressController::class, 'index'])
+        ->name('students.progress');
+
+    // Student Reports (Director-Approved)
+    Route::get('/students/{student}/reports', [App\Http\Controllers\Parent\ParentReportController::class, 'index'])
+        ->name('students.reports');
+    Route::get('/students/{student}/reports/{report}', [App\Http\Controllers\Parent\ParentReportController::class, 'show'])
+        ->name('students.reports.show');
+
+    // Notifications
+    Route::get('/notifications', [App\Http\Controllers\Parent\ParentNotificationController::class, 'index'])
+        ->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [App\Http\Controllers\Parent\ParentNotificationController::class, 'markAsRead'])
+        ->name('notifications.read');
 });
 
 // Student Portal Routes
@@ -103,6 +117,20 @@ Route::prefix('student')
     ->middleware(['auth', 'verified', 'role:student'])
     ->name('student.')
     ->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [App\Http\Controllers\Student\StudentPortalHomeController::class, 'studentDashboard'])
+            ->name('dashboard');
+
+        // Profile
+        Route::get('/profile', [App\Http\Controllers\Student\StudentProfileController::class, 'index'])
+            ->name('profile');
+
+        // Progress
+        Route::get('/progress', [App\Http\Controllers\Student\StudentProgressController::class, 'index'])
+            ->name('progress.index');
+        Route::get('/progress/{milestone}', [App\Http\Controllers\Student\StudentProgressController::class, 'show'])
+            ->name('progress.show');
+
         // Student Reports (Director-Approved Reports for Students)
         Route::get('/reports', [App\Http\Controllers\Student\StudentReportController::class, 'index'])
             ->name('reports.index');

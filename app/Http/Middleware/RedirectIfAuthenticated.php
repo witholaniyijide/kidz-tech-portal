@@ -21,6 +21,19 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
+                $user = Auth::guard($guard)->user();
+
+                // Redirect parent to parent dashboard
+                if ($user->isParent()) {
+                    return redirect('/parent/dashboard');
+                }
+
+                // Redirect student to student dashboard
+                if ($user->isStudent()) {
+                    return redirect('/student/dashboard');
+                }
+
+                // Default redirect for other users
                 return redirect(RouteServiceProvider::HOME);
             }
         }

@@ -116,4 +116,28 @@ class User extends Authenticatable
     {
         return $this->hasRole('parent');
     }
+
+    /**
+     * Check if this user is a student
+     */
+    public function isStudent(): bool
+    {
+        return $this->hasRole('student');
+    }
+
+    /**
+     * Check if this user is a guardian of the given student
+     */
+    public function isGuardianOf(Student $student): bool
+    {
+        return $this->guardiansOf->contains($student);
+    }
+
+    /**
+     * Alias for guardiansOf() - get students this user is guardian for
+     */
+    public function students()
+    {
+        return $this->guardiansOf();
+    }
 }
