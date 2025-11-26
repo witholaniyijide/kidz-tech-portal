@@ -211,9 +211,8 @@ class AnalyticsControllerTest extends TestCase
             ->get(route('director.analytics.reports.export', ['month' => $month]));
 
         $this->assertDatabaseHas('director_activity_logs', [
-            'user_id' => $this->director->id,
-            'action' => 'export_reports_csv',
-            'model_type' => 'TutorReport'
+            'director_id' => $this->director->id,
+            'action_type' => 'exported_reports_csv'
         ]);
     }
 
@@ -237,9 +236,8 @@ class AnalyticsControllerTest extends TestCase
             ->get(route('director.analytics.tutors.export'));
 
         $this->assertDatabaseHas('director_activity_logs', [
-            'user_id' => $this->director->id,
-            'action' => 'export_tutors_csv',
-            'model_type' => 'Tutor'
+            'director_id' => $this->director->id,
+            'action_type' => 'exported_tutors_csv'
         ]);
     }
 

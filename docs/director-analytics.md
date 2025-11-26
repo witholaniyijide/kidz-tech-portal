@@ -375,14 +375,14 @@ return response()->stream($callback, 200, $headers);
 All exports are logged to `director_activity_logs`:
 
 ```php
-DirectorActivityLog::create([
-    'user_id' => auth()->id(),
-    'action' => 'export_reports_csv',
-    'model_type' => 'TutorReport',
-    'model_id' => null,
-    'ip_address' => request()->ip(),
-    'user_agent' => request()->userAgent(),
-]);
+DirectorActivityLog::logAction(
+    auth()->id(),
+    'exported_reports_csv',
+    null,
+    null,
+    request()->ip(),
+    request()->userAgent()
+);
 ```
 
 ---
@@ -396,25 +396,24 @@ Migration: `2025_11_26_010300_add_indexes_for_director_analytics.php`
 - `students_status_index` — Active student filtering
 
 ### Tutor Reports Table
-- `tutor_reports_status_index` — Status filtering
-- `tutor_reports_month_index` — Monthly grouping
-- `tutor_reports_tutor_id_index` — Performance queries
-- `tutor_reports_director_approved_at_index` — Approval tracking
+- Existing indexes (from create migration): `status`, `month`, `tutor_id`, `student_id`
+- New index added: `tutor_reports_director_approved_at_index` — Approval tracking
 
 ### Tutor Assessments Table
-- `tutor_assessments_status_index` — Status filtering
-- `tutor_assessments_tutor_id_index` — Performance analytics
-- `tutor_assessments_created_at_index` — Time-based queries
-- `tutor_assessments_director_approved_at_index` — Approval tracking
+- Existing indexes (from create migration): `status`, `tutor_id`, `manager_id`, `director_id`, `assessment_month`
+- New indexes added:
+  - `tutor_assessments_created_at_index` — Time-based queries
+  - `tutor_assessments_director_approved_at_index` — Approval tracking
 
 ### Tutors Table
 - `tutors_status_index` — Active tutor filtering
 
 ### Director Activity Logs Table
-- `director_activity_logs_model_type_index` — Model filtering
-- `director_activity_logs_action_index` — Action filtering
-- `director_activity_logs_created_at_index` — Date filtering
-- `director_activity_logs_user_id_index` — User tracking
+- All necessary indexes already exist from the create migration:
+  - `director_id` — Director tracking
+  - `action_type` — Action filtering
+  - `[model_type, model_id]` — Composite index for polymorphic relationships
+  - `created_at` — Date filtering
 
 ### Running Migrations
 
