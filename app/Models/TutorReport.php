@@ -162,6 +162,31 @@ class TutorReport extends Model
     }
 
     /**
+     * Check if report is pending director approval.
+     */
+    public function isPendingDirector()
+    {
+        return $this->status === 'approved-by-manager';
+    }
+
+    /**
+     * Check if report is approved by director.
+     */
+    public function isApprovedByDirector()
+    {
+        return $this->status === 'approved-by-director';
+    }
+
+    /**
+     * Check if director can approve this report.
+     */
+    public function canDirectorApprove()
+    {
+        // Director can only approve reports that have been approved by manager
+        return $this->status === 'approved-by-manager';
+    }
+
+    /**
      * Get all audit logs for this report.
      */
     public function audits()
