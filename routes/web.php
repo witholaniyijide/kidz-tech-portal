@@ -199,17 +199,46 @@ Route::prefix('director')
     ->middleware(['auth', 'verified', 'role:director'])
     ->name('director.')
     ->group(function () {
-        // Director Final Approval for Tutor Reports
-        Route::get('/reports', [App\Http\Controllers\Director\ReportApprovalController::class, 'index'])
+        // Director Final Approval for Tutor Reports (Legacy - ReportApprovalController)
+        // Keeping these routes for backward compatibility
+        Route::get('/reports-legacy', [App\Http\Controllers\Director\ReportApprovalController::class, 'index'])
+            ->name('reports-legacy.index');
+        Route::get('/reports-legacy/{report}', [App\Http\Controllers\Director\ReportApprovalController::class, 'show'])
+            ->name('reports-legacy.show');
+        Route::post('/reports-legacy/{report}/approve', [App\Http\Controllers\Director\ReportApprovalController::class, 'approve'])
+            ->name('reports-legacy.approve');
+        Route::post('/reports-legacy/{report}/reject', [App\Http\Controllers\Director\ReportApprovalController::class, 'reject'])
+            ->name('reports-legacy.reject');
+        Route::get('/reports-legacy/{report}/export', [App\Http\Controllers\Director\ReportApprovalController::class, 'export'])
+            ->name('reports-legacy.export');
+
+        // Director Reports (New - DirectorReportController)
+        Route::get('/reports', [App\Http\Controllers\Director\DirectorReportController::class, 'index'])
             ->name('reports.index');
-        Route::get('/reports/{report}', [App\Http\Controllers\Director\ReportApprovalController::class, 'show'])
+        Route::get('/reports/{report}', [App\Http\Controllers\Director\DirectorReportController::class, 'show'])
             ->name('reports.show');
-        Route::post('/reports/{report}/approve', [App\Http\Controllers\Director\ReportApprovalController::class, 'approve'])
+        Route::post('/reports/{report}/approve', [App\Http\Controllers\Director\DirectorReportController::class, 'approve'])
             ->name('reports.approve');
-        Route::post('/reports/{report}/reject', [App\Http\Controllers\Director\ReportApprovalController::class, 'reject'])
-            ->name('reports.reject');
-        Route::get('/reports/{report}/export', [App\Http\Controllers\Director\ReportApprovalController::class, 'export'])
-            ->name('reports.export');
+        Route::post('/reports/{report}/comment', [App\Http\Controllers\Director\DirectorReportController::class, 'comment'])
+            ->name('reports.comment');
+        Route::get('/reports/{report}/pdf', [App\Http\Controllers\Director\DirectorReportController::class, 'exportPdf'])
+            ->name('reports.pdf');
+        Route::get('/reports/{report}/print', [App\Http\Controllers\Director\DirectorReportController::class, 'print'])
+            ->name('reports.print');
+
+        // Director Assessments
+        Route::get('/assessments', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'index'])
+            ->name('assessments.index');
+        Route::get('/assessments/{assessment}', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'show'])
+            ->name('assessments.show');
+        Route::post('/assessments/{assessment}/approve', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'approve'])
+            ->name('assessments.approve');
+        Route::post('/assessments/{assessment}/comment', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'comment'])
+            ->name('assessments.comment');
+
+        // Director Activity Logs
+        Route::get('/activity-logs', [App\Http\Controllers\Director\DirectorActivityController::class, 'index'])
+            ->name('activity-logs.index');
     });
 
 // Tutor Portal Routes

@@ -4,8 +4,12 @@ namespace App\Providers;
 
 use App\Models\TutorReport;
 use App\Models\TutorAvailability;
+use App\Models\TutorAssessment;
+use App\Models\DirectorActivityLog;
 use App\Policies\TutorReportPolicy;
 use App\Policies\TutorAvailabilityPolicy;
+use App\Policies\TutorAssessmentPolicy;
+use App\Policies\DirectorActivityLogPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -19,6 +23,8 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         TutorReport::class => TutorReportPolicy::class,
         TutorAvailability::class => TutorAvailabilityPolicy::class,
+        TutorAssessment::class => TutorAssessmentPolicy::class,
+        DirectorActivityLog::class => DirectorActivityLogPolicy::class,
     ];
 
     /**
@@ -40,6 +46,22 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('director-approve-report', function ($user) {
+            return $user->hasRole('director') || $user->hasRole('admin');
+        });
+
+        Gate::define('director-approve-assessment', function ($user) {
+            return $user->hasRole('director') || $user->hasRole('admin');
+        });
+
+        Gate::define('director-view-analytics', function ($user) {
+            return $user->hasRole('director') || $user->hasRole('admin');
+        });
+
+        Gate::define('director-view-activity-logs', function ($user) {
+            return $user->hasRole('director') || $user->hasRole('admin');
+        });
+
+        Gate::define('director-export-data', function ($user) {
             return $user->hasRole('director') || $user->hasRole('admin');
         });
     }

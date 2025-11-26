@@ -133,4 +133,40 @@ class TutorReportPolicy
         // Admins can delete any report
         return $user->hasRole('admin');
     }
+
+    /**
+     * Determine if the user can view any reports.
+     */
+    public function viewAny(User $user): bool
+    {
+        // Managers, Directors, and Admins can view all reports
+        return $user->hasRole('manager') || $user->hasRole('director') || $user->hasRole('admin');
+    }
+
+    /**
+     * Determine if the user can export the report as PDF.
+     */
+    public function export(User $user, TutorReport $report): bool
+    {
+        // Managers, Directors, and Admins can export reports
+        return $user->hasRole('manager') || $user->hasRole('director') || $user->hasRole('admin');
+    }
+
+    /**
+     * Determine if the user can print the report.
+     */
+    public function print(User $user, TutorReport $report): bool
+    {
+        // Managers, Directors, and Admins can print reports
+        return $user->hasRole('manager') || $user->hasRole('director') || $user->hasRole('admin');
+    }
+
+    /**
+     * Determine if the user can add a comment to the report.
+     */
+    public function addComment(User $user, TutorReport $report): bool
+    {
+        // Same as comment() ability
+        return $this->comment($user, $report);
+    }
 }

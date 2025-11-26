@@ -145,4 +145,21 @@ class TutorAssessment extends Model
     {
         return $this->status === 'approved-by-director';
     }
+
+    /**
+     * Check if assessment is pending director approval.
+     */
+    public function isPendingDirector()
+    {
+        return $this->status === 'approved-by-manager';
+    }
+
+    /**
+     * Check if director can approve this assessment.
+     */
+    public function canDirectorApprove()
+    {
+        // Director can approve assessments that are submitted or approved by manager
+        return in_array($this->status, ['submitted', 'approved-by-manager']);
+    }
 }
