@@ -90,6 +90,12 @@ Route::middleware(['auth', 'verified'])->prefix('parent')->name('parent.')->grou
     Route::get('/child/{student}/reports', [App\Http\Controllers\ParentDashboardController::class, 'childReports'])->name('child.reports');
     Route::get('/child/{student}/reports/{report}', [App\Http\Controllers\ParentDashboardController::class, 'viewReport'])->name('child.report.view');
     Route::get('/child/{student}/attendance', [App\Http\Controllers\ParentDashboardController::class, 'childAttendance'])->name('child.attendance');
+
+    // Tutor Reports (Director-Approved) for Parents
+    Route::get('/reports/{student}', [App\Http\Controllers\Parent\ParentReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{student}/{report}', [App\Http\Controllers\Parent\ParentReportController::class, 'show'])->name('reports.show');
+    Route::get('/reports/{student}/{report}/pdf', [App\Http\Controllers\Parent\ParentReportController::class, 'exportPdf'])->name('reports.pdf');
+    Route::get('/reports/{student}/{report}/print', [App\Http\Controllers\Parent\ParentReportController::class, 'print'])->name('reports.print');
 });
 
 // Manager Portal Routes
