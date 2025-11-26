@@ -15,11 +15,8 @@ return new class extends Migration
             // Add director_id foreign key
             $table->foreignId('director_id')->nullable()->after('tutor_id')->constrained('users')->onDelete('set null');
 
-            // Add director_signature field
-            $table->string('director_signature')->nullable()->after('director_comment');
-
-            // Add index for director_id for better query performance
-            $table->index('director_id');
+            // Add director_signature field after approved_by_director_at
+            $table->string('director_signature')->nullable()->after('approved_by_director_at');
         });
     }
 
