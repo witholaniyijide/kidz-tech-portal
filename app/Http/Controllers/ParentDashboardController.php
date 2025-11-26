@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
 use App\Models\Report;
+use App\Models\TutorReport;
 use App\Models\AttendanceRecord;
 use Carbon\Carbon;
 
@@ -24,11 +25,12 @@ class ParentDashboardController extends Controller
         
         // Get student IDs
         $studentIds = $children->pluck('id');
-        
-        // Get recent reports for all children
-        $recentReports = Report::whereIn('student_id', $studentIds)
-                              ->with('student')
-                              ->orderBy('created_at', 'desc')
+
+        // Get recent director-approved tutor reports for all children
+        $recentReports = TutorReport::whereIn('student_id', $studentIds)
+                              ->where('status', 'approved-by-director')
+                              ->with(['student', 'tutor'])
+                              ->orderBy('approved_by_director_at', 'desc')
                               ->take(5)
                               ->get();
         
