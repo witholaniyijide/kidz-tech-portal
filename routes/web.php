@@ -98,6 +98,22 @@ Route::middleware(['auth', 'verified'])->prefix('parent')->name('parent.')->grou
     Route::get('/reports/{student}/{report}/print', [App\Http\Controllers\Parent\ParentReportController::class, 'print'])->name('reports.print');
 });
 
+// Student Portal Routes
+Route::prefix('student')
+    ->middleware(['auth', 'verified', 'role:student'])
+    ->name('student.')
+    ->group(function () {
+        // Student Reports (Director-Approved Reports for Students)
+        Route::get('/reports', [App\Http\Controllers\Student\StudentReportController::class, 'index'])
+            ->name('reports.index');
+        Route::get('/reports/{report}', [App\Http\Controllers\Student\StudentReportController::class, 'show'])
+            ->name('reports.show');
+        Route::get('/reports/{report}/pdf', [App\Http\Controllers\Student\StudentReportController::class, 'exportPdf'])
+            ->name('reports.pdf');
+        Route::get('/reports/{report}/print', [App\Http\Controllers\Student\StudentReportController::class, 'print'])
+            ->name('reports.print');
+    });
+
 // Manager Portal Routes
 Route::prefix('manager')
     ->middleware(['auth', 'verified', 'role:manager'])
@@ -255,6 +271,16 @@ Route::prefix('director')
             ->name('analytics.reports.export');
         Route::get('/analytics/tutors/export', [App\Http\Controllers\Director\AnalyticsController::class, 'exportTutorsCsv'])
             ->name('analytics.tutors.export');
+
+        // Director Settings
+        Route::get('/settings', [App\Http\Controllers\Director\DirectorSettingsController::class, 'index'])
+            ->name('settings.index');
+        Route::put('/settings/notifications', [App\Http\Controllers\Director\DirectorSettingsController::class, 'updateNotificationPreferences'])
+            ->name('settings.notifications.update');
+        Route::put('/settings/profile', [App\Http\Controllers\Director\DirectorSettingsController::class, 'updateProfile'])
+            ->name('settings.profile.update');
+        Route::put('/settings/password', [App\Http\Controllers\Director\DirectorSettingsController::class, 'updatePassword'])
+            ->name('settings.password.update');
     });
 
 // Tutor Portal Routes

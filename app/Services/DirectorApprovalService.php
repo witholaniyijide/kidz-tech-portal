@@ -11,6 +11,13 @@ use App\Models\ManagerNotification;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\TutorReportApprovedNotification;
+use App\Notifications\AssessmentApprovedNotification;
+use App\Notifications\ParentReportAvailableNotification;
+use App\Mail\DirectorFinalApprovalMail;
+use App\Mail\ParentReportReadyMail;
 
 class DirectorApprovalService
 {
@@ -99,8 +106,19 @@ class DirectorApprovalService
                     ]);
                 }
 
-                // TODO: Send email notifications
-                // Mail::to($report->tutor->email)->send(new ReportApprovedByDirector($report));
+                // Send Laravel Notification to Tutor (queued)
+                $report->tutor->notify(new TutorReportApprovedNotification($report));
+
+                // Send email to tutor with PDF attachment
+                Mail::to($report->tutor->email)->send(new DirectorFinalApprovalMail($report));
+
+                // Notify and email all managers
+                foreach ($managers as $manager) {
+                    $manager->notify(new TutorReportApprovedNotification($report));
+                }
+
+                // Send notification and email to parents
+                $this->notifyParentsOfApprovedReport($report);
 
                 Log::info('Director approved tutor report', [
                     'report_id' => $report->id,
@@ -202,8 +220,13 @@ class DirectorApprovalService
                     ]);
                 }
 
-                // TODO: Send email notifications
-                // Mail::to($assessment->tutor->email)->send(new AssessmentApprovedByDirector($assessment));
+                // Send Laravel Notification to Tutor (queued)
+                $assessment->tutor->notify(new AssessmentApprovedNotification($assessment));
+
+                // Notify all managers
+                foreach ($managers as $manager) {
+                    $manager->notify(new AssessmentApprovedNotification($assessment));
+                }
 
                 Log::info('Director approved tutor assessment', [
                     'assessment_id' => $assessment->id,
@@ -244,5 +267,64 @@ class DirectorApprovalService
             $modelType,
             $modelId
         );
+    }
+
+    /**
+     * Notify parents when a report is approved.
+     *
+     * @param TutorReport $report
+     * @return void
+     */
+    protected function notifyParentsOfApprovedReport(TutorReport $report): void
+    {
+        try {
+            $student = $report->student;
+
+            // Get parent user (if exists and has email)
+            if ($student->parent && $student->parent->email) {
+                $student->parent->notify(new ParentReportAvailableNotification($report));
+                Mail::to($student->parent->email)->send(new ParentReportReadyMail($report));
+
+                Log::info('Notified parent via user account', [
+                    'report_id' => $report->id,
+                    'parent_id' => $student->parent->id,
+                    'parent_email' => $student->parent->email,
+                ]);
+            }
+
+            // Also send to direct email addresses if available (father/mother)
+            $parentEmails = [];
+
+            if (!empty($student->father_email) && filter_var($student->father_email, FILTER_VALIDATE_EMAIL)) {
+                $parentEmails[] = $student->father_email;
+            }
+
+            if (!empty($student->mother_email) && filter_var($student->mother_email, FILTER_VALIDATE_EMAIL)) {
+                $parentEmails[] = $student->mother_email;
+            }
+
+            // Remove duplicates and parent's registered email (already sent above)
+            $parentEmails = array_unique($parentEmails);
+            if ($student->parent && $student->parent->email) {
+                $parentEmails = array_filter($parentEmails, fn($email) => $email !== $student->parent->email);
+            }
+
+            // Send to additional parent emails
+            foreach ($parentEmails as $email) {
+                Mail::to($email)->send(new ParentReportReadyMail($report));
+
+                Log::info('Sent parent report email', [
+                    'report_id' => $report->id,
+                    'parent_email' => $email,
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Failed to notify parents of approved report', [
+                'report_id' => $report->id,
+                'error' => $e->getMessage(),
+            ]);
+            // Don't throw - parent notification failure shouldn't fail the approval
+        }
     }
 }

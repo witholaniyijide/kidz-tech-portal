@@ -25,6 +25,9 @@ class User extends Authenticatable
         'status',
         'last_login',
         'profile_photo',
+        'notify_email',
+        'notify_in_app',
+        'notify_daily_summary',
     ];
 
     /**
@@ -45,6 +48,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'notify_email' => 'boolean',
+        'notify_in_app' => 'boolean',
+        'notify_daily_summary' => 'boolean',
     ];
 
 /**
