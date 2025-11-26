@@ -1,4 +1,9 @@
 <x-tutor-layout>
+    <!-- Breadcrumbs -->
+    <x-tutor.breadcrumbs :items="[
+        ['label' => 'My Students']
+    ]" />
+
     <!-- Page Header -->
     <div class="mb-8">
         <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
@@ -43,8 +48,16 @@
                 </div>
             </a>
         @empty
-            <div class="col-span-full text-center py-12">
-                <p class="text-gray-600 dark:text-gray-400">No students assigned yet.</p>
+            <div class="col-span-full bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-12 text-center shadow-lg">
+                <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    No Students Assigned Yet
+                </h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Your assigned students will appear here once they are allocated to you by the admin.
+                </p>
             </div>
         @endforelse
     </div>
