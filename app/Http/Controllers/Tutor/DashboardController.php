@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tutor;
 use App\Http\Controllers\Controller;
 use App\Models\DailyClassSchedule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -21,39 +22,48 @@ class DashboardController extends Controller
             abort(403, 'You do not have a tutor profile.');
         }
 
-        // Get students assigned to this tutor
+        // Cache dashboard stats for 5 minutes
+        $cacheKey = 'tutor_dashboard_' . $tutor->id;
+
+        $stats = Cache::remember($cacheKey, 300, function () use ($tutor) {
+            $students = $tutor->students()->active()->get();
+
+            return [
+                'studentsCount' => $students->count(),
+                'studentIds' => $students->pluck('id')->toArray(),
+                'pendingAttendanceCount' => $tutor->attendanceRecords()
+                    ->where('status', 'pending')
+                    ->count(),
+                'reportsCount' => $tutor->reports()->count(),
+                'draftReportsCount' => $tutor->reports()->where('status', 'draft')->count(),
+                'submittedReportsCount' => $tutor->reports()->where('status', 'submitted')->count(),
+                'submittedThisMonth' => $tutor->reports()
+                    ->where('status', 'submitted')
+                    ->where('month', now()->format('Y-m'))
+                    ->count(),
+                'pendingReportsCount' => $tutor->reports()
+                    ->whereIn('status', ['draft', 'returned'])
+                    ->count(),
+            ];
+        });
+
+        // Get students with eager loading
         $students = $tutor->students()->active()->get();
-        $studentsCount = $students->count();
+        $studentsCount = $stats['studentsCount'];
+        $studentIds = $stats['studentIds'];
+        $pendingAttendanceCount = $stats['pendingAttendanceCount'];
+        $reportsCount = $stats['reportsCount'];
+        $draftReportsCount = $stats['draftReportsCount'];
+        $submittedReportsCount = $stats['submittedReportsCount'];
+        $submittedThisMonth = $stats['submittedThisMonth'];
+        $pendingReportsCount = $stats['pendingReportsCount'];
 
-        // Get student IDs for filtering classes
-        $studentIds = $students->pluck('id')->toArray();
-
-        // Get recent attendance records
+        // Get recent attendance records with eager loading
         $recentAttendance = $tutor->attendanceRecords()
             ->with('student')
             ->orderBy('class_date', 'desc')
             ->take(5)
             ->get();
-
-        // Get pending attendance count
-        $pendingAttendanceCount = $tutor->attendanceRecords()
-            ->where('status', 'pending')
-            ->count();
-
-        // Get reports stats
-        $reportsCount = $tutor->reports()->count();
-        $draftReportsCount = $tutor->reports()->where('status', 'draft')->count();
-        $submittedReportsCount = $tutor->reports()->where('status', 'submitted')->count();
-
-        // Get reports submitted this month (for Phase 2 dashboard)
-        $submittedThisMonth = $tutor->reports()
-            ->where('status', 'submitted')
-            ->where('month', now()->format('Y-m'))
-            ->count();
-
-        $pendingReportsCount = $tutor->reports()
-            ->whereIn('status', ['draft', 'returned'])
-            ->count();
 
         // Get recent reports
         $recentReports = $tutor->reports()

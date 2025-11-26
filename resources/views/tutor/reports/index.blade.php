@@ -1,4 +1,9 @@
 <x-tutor-layout>
+    <!-- Breadcrumbs -->
+    <x-tutor.breadcrumbs :items="[
+        ['label' => 'My Reports']
+    ]" />
+
     <!-- Page Header -->
     <div class="mb-8 flex justify-between items-center">
         <div>
