@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tutor_reports', function (Blueprint $table) {
-            // Add director_id foreign key
+            // Add director_id foreign key after tutor_id
             $table->foreignId('director_id')->nullable()->after('tutor_id')->constrained('users')->onDelete('set null');
 
-            // Add director_signature field after approved_by_director_at
-            $table->string('director_signature')->nullable()->after('approved_by_director_at');
+            // Add director_signature field at the end (no position specified for safety)
+            $table->string('director_signature')->nullable();
         });
     }
 
