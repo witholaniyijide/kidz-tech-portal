@@ -12,7 +12,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Add 'rejected' to the status enum
+        // First, check if there are any invalid status values and update them
+        $invalidStatuses = DB::table('tutor_reports')
+            ->whereNotIn('status', ['draft', 'submitted', 'approved-by-manager', 'approved-by-director'])
+            ->get();
+
+        if ($invalidStatuses->count() > 0) {
+            // Update any invalid statuses to 'draft' as a safe default
+            DB::table('tutor_reports')
+                ->whereNotIn('status', ['draft', 'submitted', 'approved-by-manager', 'approved-by-director'])
+                ->update(['status' => 'draft']);
+        }
+
+        // Now safely add 'rejected' to the status enum
         DB::statement("ALTER TABLE tutor_reports MODIFY COLUMN status ENUM('draft', 'submitted', 'approved-by-manager', 'approved-by-director', 'rejected') DEFAULT 'draft'");
     }
 
@@ -21,6 +33,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Before removing 'rejected', update any rejected reports to 'draft'
+        DB::table('tutor_reports')
+            ->where('status', 'rejected')
+            ->update(['status' => 'draft']);
+
         // Remove 'rejected' from the status enum
         DB::statement("ALTER TABLE tutor_reports MODIFY COLUMN status ENUM('draft', 'submitted', 'approved-by-manager', 'approved-by-director') DEFAULT 'draft'");
     }
