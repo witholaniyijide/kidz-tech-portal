@@ -10,6 +10,7 @@ use App\Models\TutorNotification;
 use App\Models\TutorReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
@@ -304,5 +305,58 @@ class ReportController extends Controller
         return redirect()
             ->route('tutor.reports.show', $report)
             ->with('success', 'Report submitted successfully! Awaiting manager review.');
+    }
+
+    /**
+     * Export report as PDF.
+     */
+    public function exportPdf(TutorReport $report)
+    {
+        // Get the authenticated tutor
+        $tutor = Auth::user()->tutor;
+
+        if (!$tutor) {
+            abort(403, 'You do not have a tutor profile.');
+        }
+
+        // Verify report belongs to this tutor
+        if ($report->tutor_id !== $tutor->id) {
+            abort(403, 'Unauthorized access to this report.');
+        }
+
+        // Load relationships
+        $report->load(['student', 'tutor']);
+
+        // Generate PDF
+        $pdf = Pdf::loadView('tutor.reports.pdf', compact('report'));
+
+        // Generate filename
+        $filename = 'report_' . $report->student->first_name . '_' . $report->student->last_name . '_' . $report->month . '.pdf';
+
+        // Return PDF download
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Display printable view of report.
+     */
+    public function print(TutorReport $report)
+    {
+        // Get the authenticated tutor
+        $tutor = Auth::user()->tutor;
+
+        if (!$tutor) {
+            abort(403, 'You do not have a tutor profile.');
+        }
+
+        // Verify report belongs to this tutor
+        if ($report->tutor_id !== $tutor->id) {
+            abort(403, 'Unauthorized access to this report.');
+        }
+
+        // Load relationships
+        $report->load(['student', 'tutor']);
+
+        return view('tutor.reports.print', compact('report'));
     }
 }
