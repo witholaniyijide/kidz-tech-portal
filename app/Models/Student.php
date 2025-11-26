@@ -52,12 +52,21 @@ class Student extends Model
         'notes',
         'profile_photo',
         'parent_id',
+        'roadmap_stage',
+        'roadmap_progress',
+        'roadmap_next_milestone',
+        'learning_notes',
+        'allow_parent_notifications',
+        'preferred_contact_method',
+        'visible_to_parent',
     ];
 
     protected $casts = [
         'date_of_birth' => 'date',
         'enrollment_date' => 'date',
         'class_schedule' => 'array',
+        'allow_parent_notifications' => 'boolean',
+        'visible_to_parent' => 'boolean',
     ];
 
     /**
@@ -140,5 +149,58 @@ class Student extends Model
         }
         $name .= ' ' . $this->last_name;
         return $name;
+    }
+
+    /**
+     * Get the guardians (parents) associated with this student
+     */
+    public function guardians()
+    {
+        return $this->belongsToMany(User::class, 'guardian_student', 'student_id', 'user_id')
+                    ->withPivot('relationship', 'primary_contact')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get all progress items for this student
+     */
+    public function progress()
+    {
+        return $this->hasMany(StudentProgress::class);
+    }
+
+    /**
+     * Get portal settings for this student
+     */
+    public function portalSettings()
+    {
+        return $this->hasOne(StudentPortalSetting::class);
+    }
+
+    /**
+     * Get the primary guardian for this student
+     */
+    public function primaryGuardian()
+    {
+        return $this->guardians()->wherePivot('primary_contact', true)->first();
+    }
+
+    /**
+     * Get the student's progress percentage
+     */
+    public function progressPercentage()
+    {
+        // Return roadmap_progress if set, otherwise calculate from progress items
+        if ($this->roadmap_progress !== null) {
+            return $this->roadmap_progress;
+        }
+
+        $total = $this->progress()->count();
+        if ($total === 0) {
+            return 0;
+        }
+
+        $completed = $this->progress()->where('completed', true)->count();
+        return (int) (($completed / $total) * 100);
     }
 }
