@@ -19,24 +19,15 @@ return new class extends Migration
         });
 
         Schema::table('tutor_reports', function (Blueprint $table) {
-            // Index for report status filtering in analytics
-            $table->index('status', 'tutor_reports_status_index');
-            // Index for monthly report grouping
-            $table->index('month', 'tutor_reports_month_index');
-            // Index for tutor performance queries
-            $table->index('tutor_id', 'tutor_reports_tutor_id_index');
-            // Index for director approval tracking
+            // Note: status, month, and tutor_id indexes already exist from create migration
+            // Only add new index for director approval tracking
             $table->index('approved_by_director_at', 'tutor_reports_director_approved_at_index');
         });
 
         Schema::table('tutor_assessments', function (Blueprint $table) {
-            // Index for assessment status filtering
-            $table->index('status', 'tutor_assessments_status_index');
-            // Index for tutor performance analytics
-            $table->index('tutor_id', 'tutor_assessments_tutor_id_index');
-            // Index for time-based queries
+            // Note: status and tutor_id indexes already exist from create migration
+            // Add new indexes for time-based queries and director approval tracking
             $table->index('created_at', 'tutor_assessments_created_at_index');
-            // Index for director approval tracking
             $table->index('approved_by_director_at', 'tutor_assessments_director_approved_at_index');
         });
 
@@ -45,16 +36,8 @@ return new class extends Migration
             $table->index('status', 'tutors_status_index');
         });
 
-        Schema::table('director_activity_logs', function (Blueprint $table) {
-            // Index for activity log filtering by model type
-            $table->index('model_type', 'director_activity_logs_model_type_index');
-            // Index for activity log filtering by action
-            $table->index('action', 'director_activity_logs_action_index');
-            // Index for date-based filtering
-            $table->index('created_at', 'director_activity_logs_created_at_index');
-            // Index for user tracking
-            $table->index('user_id', 'director_activity_logs_user_id_index');
-        });
+        // Note: director_activity_logs already has all necessary indexes from create migration
+        // (director_id, action_type, [model_type, model_id], created_at)
     }
 
     /**
@@ -68,28 +51,16 @@ return new class extends Migration
         });
 
         Schema::table('tutor_reports', function (Blueprint $table) {
-            $table->dropIndex('tutor_reports_status_index');
-            $table->dropIndex('tutor_reports_month_index');
-            $table->dropIndex('tutor_reports_tutor_id_index');
             $table->dropIndex('tutor_reports_director_approved_at_index');
         });
 
         Schema::table('tutor_assessments', function (Blueprint $table) {
-            $table->dropIndex('tutor_assessments_status_index');
-            $table->dropIndex('tutor_assessments_tutor_id_index');
             $table->dropIndex('tutor_assessments_created_at_index');
             $table->dropIndex('tutor_assessments_director_approved_at_index');
         });
 
         Schema::table('tutors', function (Blueprint $table) {
             $table->dropIndex('tutors_status_index');
-        });
-
-        Schema::table('director_activity_logs', function (Blueprint $table) {
-            $table->dropIndex('director_activity_logs_model_type_index');
-            $table->dropIndex('director_activity_logs_action_index');
-            $table->dropIndex('director_activity_logs_created_at_index');
-            $table->dropIndex('director_activity_logs_user_id_index');
         });
     }
 };
