@@ -23,6 +23,11 @@
 - [ ] Test migrations on staging environment first
 - [ ] Verify database indexes exist for frequently queried columns
 
+**Phase 4 Specific Migrations** (Director Approval Workflow):
+- [ ] `2025_11_25_200000_create_audit_logs_table.php` - Audit logging system
+- [ ] `2025_11_25_200100_add_rejected_status_to_tutor_reports.php` - Add 'rejected' status
+- [ ] `2025_11_25_200200_create_manager_notifications_table.php` - Manager notifications
+
 ### 3. Code Quality & Tests
 - [ ] All tests pass locally: `php artisan test`
 - [ ] No critical errors in logs: `tail -200 storage/logs/laravel.log`
@@ -157,6 +162,16 @@ php artisan up
 - [ ] Create test report
 - [ ] Verify notice board
 - [ ] Check logs for errors: `tail -50 storage/logs/laravel.log`
+
+**Phase 4 Specific Tests** (Director Approval):
+- [ ] Login as director and access `/director/reports`
+- [ ] Verify manager-approved reports appear in director queue
+- [ ] Test approve action with optional comment
+- [ ] Test reject action with required comment
+- [ ] Verify audit logs are created in database
+- [ ] Verify tutor and manager notifications are created
+- [ ] Check that approved reports have status `approved-by-director`
+- [ ] Check that rejected reports have status `rejected`
 
 ---
 

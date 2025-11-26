@@ -638,6 +638,85 @@ Phase 6 Quality Assurance audit confirms the Kidz Tech Portal is production-read
 
 ---
 
+## Phase 4 Additions: Director Final Approval Workflow
+
+**Date Added**: 2025-11-25
+**Feature**: Director final approval for tutor reports with audit logging and notifications
+
+### Status: ✅ **IMPLEMENTED & READY**
+
+### New Components:
+
+#### Migrations:
+1. ✅ `2025_11_25_200000_create_audit_logs_table.php` - Audit trail for all approval actions
+2. ✅ `2025_11_25_200100_add_rejected_status_to_tutor_reports.php` - Added 'rejected' status to enum
+3. ✅ `2025_11_25_200200_create_manager_notifications_table.php` - Manager notification system
+
+#### Models:
+1. ✅ `AuditLog.php` - Polymorphic audit logging model
+2. ✅ `ManagerNotification.php` - Notification model for managers
+3. ✅ Updated `TutorReport.php` - Added `isRejected()` and `audits()` relationship
+
+#### Controllers:
+1. ✅ `Director/ReportApprovalController.php` - Full CRUD for director approval workflow
+   - index() - List manager-approved reports
+   - show() - View report details with audit trail
+   - approve() - Final approval with notifications
+   - reject() - Reject with required comment
+   - export() - PDF export stub (future)
+
+#### Views:
+1. ✅ `director/reports/index.blade.php` - Royal Blue → Purple gradient theme
+2. ✅ `director/reports/show.blade.php` - Full report view with audit trail and action cards
+
+#### Routes:
+1. ✅ `director.reports.index` - List reports
+2. ✅ `director.reports.show` - View report
+3. ✅ `director.reports.approve` - Approve action
+4. ✅ `director.reports.reject` - Reject action
+5. ✅ `director.reports.export` - Export (stub)
+
+#### Tests:
+1. ✅ `tests/Feature/DirectorReportApprovalTest.php` - 7 comprehensive tests
+   - director_can_view_manager_approved_reports
+   - director_can_approve_report_changes_status_and_creates_audit_and_notifications
+   - director_must_provide_comment_when_rejecting_report
+   - unauthorized_user_cannot_access_director_routes
+   - director_cannot_approve_report_not_in_manager_approved_status
+   - director_can_view_single_report_with_audit_trail
+   - director_approval_prevents_idempotent_operations
+
+#### Security Features:
+- ✅ Director role middleware on all routes
+- ✅ Policy authorization using existing `TutorReportPolicy`
+- ✅ Gate: `director-approve-report` registered
+- ✅ Transaction-wrapped database operations
+- ✅ Idempotency checks to prevent double-approval
+- ✅ Required comment validation on rejection
+
+#### Workflow Features:
+- ✅ Manager-approved reports → Director review queue
+- ✅ Approve with optional comment → Status: `approved-by-director`
+- ✅ Reject with required comment → Status: `rejected`
+- ✅ Audit log created for every action (who, what, when)
+- ✅ Tutor notification on final decision
+- ✅ Manager notification on final decision
+- ✅ Report locking after final approval/rejection
+- ✅ Full audit trail visible in UI
+
+#### Design Consistency:
+- ✅ Director gradient: Royal Blue → Purple (brand-compliant)
+- ✅ Glassmorphism effects on all cards
+- ✅ Responsive design (desktop/tablet/mobile)
+- ✅ Dark mode support
+- ✅ Accessibility: proper labels and ARIA attributes
+- ✅ Consistent with existing Manager/Tutor portal UX
+
+### Reference Implementation:
+- Original MVP reference: `/mnt/data/reports-main.zip` (adapted to KidzTech design system)
+
+---
+
 ## Sign-Off
 
 **QA Engineer**: Claude (AI Assistant)

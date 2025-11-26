@@ -184,6 +184,24 @@ Route::prefix('manager')
             ->name('assessments.comment');
     });
 
+// Director Portal Routes
+Route::prefix('director')
+    ->middleware(['auth', 'verified', 'role:director'])
+    ->name('director.')
+    ->group(function () {
+        // Director Final Approval for Tutor Reports
+        Route::get('/reports', [App\Http\Controllers\Director\ReportApprovalController::class, 'index'])
+            ->name('reports.index');
+        Route::get('/reports/{report}', [App\Http\Controllers\Director\ReportApprovalController::class, 'show'])
+            ->name('reports.show');
+        Route::post('/reports/{report}/approve', [App\Http\Controllers\Director\ReportApprovalController::class, 'approve'])
+            ->name('reports.approve');
+        Route::post('/reports/{report}/reject', [App\Http\Controllers\Director\ReportApprovalController::class, 'reject'])
+            ->name('reports.reject');
+        Route::get('/reports/{report}/export', [App\Http\Controllers\Director\ReportApprovalController::class, 'export'])
+            ->name('reports.export');
+    });
+
 // Tutor Portal Routes
 Route::prefix('tutor')
     ->middleware(['auth', 'verified', 'role:tutor'])
