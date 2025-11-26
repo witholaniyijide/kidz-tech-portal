@@ -8,6 +8,7 @@ use App\Models\Tutor;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportReviewController extends Controller
 {
@@ -103,6 +104,21 @@ class ReportReviewController extends Controller
                 'manager_comment' => $validated['manager_comment'] ?? null,
                 'approved_by_manager_at' => now(),
             ]);
+
+            // Create notification for tutor
+            \App\Models\TutorNotification::create([
+                'tutor_id' => $report->tutor_id,
+                'title' => 'Report Approved by Manager',
+                'body' => "Your report for {$report->student->fullName()} ({$report->month}) has been approved by the manager and is awaiting director approval.",
+                'type' => 'system',
+                'is_read' => false,
+                'meta' => ['report_id' => $report->id],
+            ]);
+
+            // TODO: PHASE 5 - When director module is implemented, add director approval logic here
+            // When director approves (status changes to 'approved-by-director'), send email:
+            // Mail::to($report->tutor->email)->send(new \App\Mail\ReportApprovedMail($report));
+            // Also send to parent: Mail::to($report->student->parent_email)->send(...)
         });
 
         return redirect()
@@ -140,5 +156,34 @@ class ReportReviewController extends Controller
         return redirect()
             ->route('manager.reports.index')
             ->with('success', 'Report has been sent back to the tutor for corrections.');
+    }
+
+    /**
+     * Export report as PDF.
+     */
+    public function exportPdf(TutorReport $report)
+    {
+        // Load relationships
+        $report->load(['student', 'tutor']);
+
+        // Generate PDF
+        $pdf = Pdf::loadView('tutor.reports.pdf', compact('report'));
+
+        // Generate filename
+        $filename = 'report_' . $report->student->first_name . '_' . $report->student->last_name . '_' . $report->month . '.pdf';
+
+        // Return PDF download
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Display printable view of report.
+     */
+    public function print(TutorReport $report)
+    {
+        // Load relationships
+        $report->load(['student', 'tutor']);
+
+        return view('tutor.reports.print', compact('report'));
     }
 }

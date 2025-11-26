@@ -158,6 +158,10 @@ Route::prefix('manager')
             ->name('tutor-reports.approve');
         Route::post('/tutor-reports/{report}/correction', [App\Http\Controllers\Manager\ReportReviewController::class, 'sendBackForCorrection'])
             ->name('tutor-reports.correction');
+        Route::get('/tutor-reports/{report}/pdf', [App\Http\Controllers\Manager\ReportReviewController::class, 'exportPdf'])
+            ->name('tutor-reports.pdf');
+        Route::get('/tutor-reports/{report}/print', [App\Http\Controllers\Manager\ReportReviewController::class, 'print'])
+            ->name('tutor-reports.print');
 
         // Notice Board (can create, with restrictions)
         Route::get('/notices', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'index'])
@@ -223,6 +227,10 @@ Route::prefix('tutor')
         Route::resource('reports', App\Http\Controllers\Tutor\ReportController::class);
         Route::post('reports/{report}/submit', [App\Http\Controllers\Tutor\ReportController::class, 'submit'])
             ->name('reports.submit');
+        Route::get('reports/{report}/pdf', [App\Http\Controllers\Tutor\ReportController::class, 'exportPdf'])
+            ->name('reports.pdf');
+        Route::get('reports/{report}/print', [App\Http\Controllers\Tutor\ReportController::class, 'print'])
+            ->name('reports.print');
         Route::post('reports/{report}/comments', [App\Http\Controllers\Tutor\CommentController::class, 'store'])
             ->name('reports.comments.store');
 
