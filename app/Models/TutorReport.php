@@ -12,6 +12,7 @@ class TutorReport extends Model
     protected $fillable = [
         'student_id',
         'tutor_id',
+        'director_id',
         'month',
         'period_from',
         'period_to',
@@ -27,6 +28,7 @@ class TutorReport extends Model
         'status',
         'manager_comment',
         'director_comment',
+        'director_signature',
         'submitted_at',
         'approved_by_manager_at',
         'approved_by_director_at',
@@ -53,6 +55,14 @@ class TutorReport extends Model
     public function student()
     {
         return $this->belongsTo(Student::class);
+    }
+
+    /**
+     * Get the director that approved this report.
+     */
+    public function director()
+    {
+        return $this->belongsTo(User::class, 'director_id');
     }
 
     /**
