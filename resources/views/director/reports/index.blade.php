@@ -17,13 +17,23 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
             {{-- Page Header --}}
-            <div class="mb-8">
-                <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                    Manager Approved Reports — Awaiting Director Review
-                </h1>
-                <p class="text-gray-600 dark:text-gray-400">
-                    Final review and approval of tutor reports approved by managers
-                </p>
+            <div class="mb-8 flex justify-between items-start flex-wrap gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                        Manager Approved Reports — Awaiting Director Review
+                    </h1>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Final review and approval of tutor reports approved by managers
+                    </p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('director.activity-logs.index') }}" class="px-4 py-2 bg-white/20 dark:bg-gray-800/30 text-gray-700 dark:text-gray-300 rounded-xl border border-white/10 hover:bg-white/30 dark:hover:bg-gray-800/50 transition-colors flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Activity Logs
+                    </a>
+                </div>
             </div>
 
             {{-- Success/Error Messages --}}

@@ -121,6 +121,17 @@ class Student extends Model
         return $this->hasMany(TutorReport::class);
     }
 
+    /**
+     * Get only director-approved tutor reports for this student.
+     * These are visible to parents in the parent dashboard.
+     */
+    public function approvedReports()
+    {
+        return $this->hasMany(TutorReport::class)
+                    ->where('status', 'approved-by-director')
+                    ->orderBy('created_at', 'desc');
+    }
+
     public function fullName()
     {
         $name = $this->first_name;

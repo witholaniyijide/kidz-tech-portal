@@ -1,4 +1,10 @@
 <x-tutor-layout>
+    <!-- Breadcrumbs -->
+    <x-tutor.breadcrumbs :items="[
+        ['label' => 'My Reports', 'url' => route('tutor.reports.index')],
+        ['label' => 'Edit Report']
+    ]" />
+
     <!-- Page Header -->
     <div class="mb-8">
         <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
