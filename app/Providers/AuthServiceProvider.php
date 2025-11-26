@@ -38,5 +38,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('attendance-approve', function ($user) {
             return $user->hasRole('manager');
         });
+
+        Gate::define('director-approve-report', function ($user) {
+            return $user->hasRole('director') || $user->hasRole('admin');
+        });
     }
 }

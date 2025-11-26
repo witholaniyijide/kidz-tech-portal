@@ -142,4 +142,20 @@ class TutorReport extends Model
     {
         return $this->status === 'draft';
     }
+
+    /**
+     * Check if report is rejected.
+     */
+    public function isRejected()
+    {
+        return $this->status === 'rejected';
+    }
+
+    /**
+     * Get all audit logs for this report.
+     */
+    public function audits()
+    {
+        return $this->morphMany(AuditLog::class, 'auditable');
+    }
 }
