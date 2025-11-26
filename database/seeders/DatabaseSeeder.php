@@ -17,6 +17,9 @@ class DatabaseSeeder extends Seeder
             UsersSeeder::class,
             TutorsSeeder::class,
             StudentsSeeder::class,
+            ParentPortalSeeder::class,
+            StudentProgressSeeder::class,
+            ParentNotificationSeeder::class,
         ]);
     }
 }

@@ -98,4 +98,22 @@ class User extends Authenticatable
     {
         return $this->hasOne(Tutor::class, 'email', 'email');
     }
+
+    /**
+     * Get the students that this user is guardian for (parent relationship)
+     */
+    public function guardiansOf()
+    {
+        return $this->belongsToMany(Student::class, 'guardian_student', 'user_id', 'student_id')
+                    ->withPivot('relationship', 'primary_contact')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Check if this user is a parent
+     */
+    public function isParent(): bool
+    {
+        return $this->hasRole('parent');
+    }
 }
