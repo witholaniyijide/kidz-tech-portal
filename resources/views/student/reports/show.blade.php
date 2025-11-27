@@ -1,16 +1,7 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white">Progress Report - {{ $report->month }}</h2>
-    </x-slot>
+@extends('layouts.student')
 
-    <x-slot name="title">Progress Report</x-slot>
-
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 relative overflow-hidden">
-        {{-- Floating Orbs --}}
-        <div class="absolute top-0 left-0 w-72 h-72 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
-
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+@section('content')
+<div class="space-y-6 max-w-5xl">
 
             {{-- Back Button and Actions --}}
             <div class="mb-8 flex justify-between items-start flex-wrap gap-4">
@@ -156,6 +147,5 @@
             </div>
             @endif
 
-        </div>
-    </div>
-</x-app-layout>
+</div>
+@endsection

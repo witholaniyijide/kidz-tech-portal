@@ -1,115 +1,99 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white">
-            {{ __('My Progress Reports') }}
-        </h2>
-    </x-slot>
+@extends('layouts.student')
 
-    <x-slot name="title">{{ __('My Reports') }}</x-slot>
-
-    {{-- Animated Background - Student Blue to Cyan Gradient --}}
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 relative overflow-hidden">
-        {{-- Floating Orbs Background --}}
-        <div class="absolute top-0 left-0 w-72 h-72 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
-        <div class="absolute -bottom-8 left-20 w-72 h-72 bg-blue-400 dark:bg-blue-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 4s;"></div>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-
-            {{-- Page Header --}}
-            <div class="mb-8">
-                <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                    📚 My Monthly Progress Reports
-                </h1>
-                <p class="text-gray-600 dark:text-gray-400">
-                    Track your coding journey and celebrate your achievements!
-                </p>
-            </div>
-
-            {{-- Reports List --}}
-            @if($reports->isEmpty())
-                <div class="bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border border-white/10 rounded-2xl p-12 text-center shadow-lg">
-                    <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Reports Yet</h3>
-                    <p class="text-gray-600 dark:text-gray-400">Your progress reports will appear here once your tutor submits them and they're approved!</p>
-                </div>
-            @else
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($reports as $report)
-                        <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6 hover:shadow-2xl transform hover:-translate-y-1 transition-all">
-                            {{-- Report Header --}}
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">{{ $report->month }}</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        {{ $report->submitted_at ? $report->submitted_at->format('M d, Y') : 'N/A' }}
-                                    </p>
-                                </div>
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                                    ✓ Approved
-                                </span>
-                            </div>
-
-                            {{-- Tutor Info --}}
-                            <div class="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                                    <strong class="text-gray-900 dark:text-white">Tutor:</strong>
-                                </p>
-                                <p class="text-sm text-gray-700 dark:text-gray-300">
-                                    {{ $report->tutor->first_name }} {{ $report->tutor->last_name }}
-                                </p>
-                            </div>
-
-                            {{-- Report Summary --}}
-                            @if($report->progress_summary)
-                            <div class="mb-4">
-                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                                    <strong class="text-gray-900 dark:text-white">Summary:</strong>
-                                </p>
-                                <p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-3">
-                                    {{ $report->progress_summary }}
-                                </p>
-                            </div>
-                            @endif
-
-                            {{-- Performance Indicators --}}
-                            <div class="grid grid-cols-2 gap-3 mb-4">
-                                @if($report->attendance_score)
-                                <div class="bg-white/40 dark:bg-gray-800/40 rounded-lg p-3">
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Attendance</p>
-                                    <p class="text-lg font-bold text-blue-600 dark:text-blue-400">{{ $report->attendance_score }}%</p>
-                                </div>
-                                @endif
-                                @if($report->performance_rating)
-                                <div class="bg-white/40 dark:bg-gray-800/40 rounded-lg p-3">
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Rating</p>
-                                    <p class="text-lg font-bold text-blue-600 dark:text-blue-400 capitalize">{{ $report->performance_rating }}</p>
-                                </div>
-                                @endif
-                            </div>
-
-                            {{-- View Button --}}
-                            <a href="{{ route('student.reports.show', $report) }}" class="block w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all font-medium text-center">
-                                <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                View Full Report
-                            </a>
-                        </div>
-                    @endforeach
-                </div>
-
-                {{-- Pagination --}}
-                @if($reports->hasPages())
-                <div class="mt-8">
-                    {{ $reports->links() }}
-                </div>
-                @endif
-            @endif
-
+@section('content')
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Monthly Reports</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">View your tutor's monthly progress reports</p>
         </div>
     </div>
-</x-app-layout>
+
+    <!-- Reports List -->
+    @if($reports->count() > 0)
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            @foreach($reports as $report)
+                <x-ui.glass-card padding="p-0">
+                    <div class="p-6">
+                        <!-- Report Header -->
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ $report->month }}</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                    @if($report->period_from && $report->period_to)
+                                        {{ \Carbon\Carbon::parse($report->period_from)->format('M d') }} - {{ \Carbon\Carbon::parse($report->period_to)->format('M d, Y') }}
+                                    @endif
+                                </p>
+                            </div>
+                            <x-ui.status-badge :status="$report->status" />
+                        </div>
+
+                        <!-- Report Summary -->
+                        @if($report->summary)
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{{ $report->summary }}</p>
+                        @endif
+
+                        <!-- Performance Rating -->
+                        @if($report->performance_rating)
+                            <div class="mb-4 p-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-800">
+                                <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Performance Rating</p>
+                                <div class="flex items-center space-x-1">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <svg class="w-5 h-5 {{ $i <= $report->performance_rating ? 'text-amber-500' : 'text-gray-300 dark:text-gray-600' }}" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    @endfor
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Tutor Info -->
+                        @if($report->tutor)
+                            <div class="flex items-center space-x-2 mb-4 text-sm text-gray-600 dark:text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                <span>Tutor: {{ $report->tutor->full_name }}</span>
+                            </div>
+                        @endif
+
+                        <!-- Submitted Date -->
+                        @if($report->approved_by_director_at)
+                            <p class="text-xs text-gray-500 dark:text-gray-500 mb-4">
+                                Approved {{ $report->approved_by_director_at->format('M d, Y') }}
+                            </p>
+                        @endif
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="border-t border-white/10 dark:border-gray-700/10 p-4 flex space-x-2">
+                        <a href="{{ route('student.reports.show', $report->id) }}" class="flex-1 px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white text-sm font-medium rounded-xl hover:shadow-lg transition-all duration-200 text-center">
+                            View Report
+                        </a>
+                        <a href="{{ route('student.reports.download', $report->id) }}" class="px-4 py-2 bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-xl hover:bg-white/70 dark:hover:bg-gray-800/70 transition-all duration-200 border border-gray-200 dark:border-gray-700" title="Download PDF">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </x-ui.glass-card>
+            @endforeach
+        </div>
+
+        <!-- Pagination -->
+        @if($reports->hasPages())
+            <div class="mt-6">
+                {{ $reports->links() }}
+            </div>
+        @endif
+    @else
+        <x-ui.glass-card>
+            <x-ui.empty-state
+                title="No reports available yet"
+                description="Your tutor's monthly progress reports will appear here once they're approved by the director"
+                icon="document" />
+        </x-ui.glass-card>
+    @endif
+</div>
+@endsection
