@@ -29,10 +29,12 @@ class ParentReportController extends Controller
      */
     public function index(Student $student)
     {
-        // Ensure this student belongs to the logged-in parent
-        if ($student->parent_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized: You can only view reports for your own children.');
-        }
+        // Ensure this student belongs to the logged-in parent (use guardian relationship)
+        abort_unless(
+            $student->guardians->contains(Auth::id()) || Auth::user()->hasRole('admin'),
+            403,
+            'Unauthorized: You can only view reports for your own children.'
+        );
 
         // Get only director-approved reports
         $reports = $student->approvedReports()
@@ -47,20 +49,26 @@ class ParentReportController extends Controller
      */
     public function show(Student $student, TutorReport $report)
     {
-        // Ensure this student belongs to the logged-in parent
-        if ($student->parent_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized: You can only view reports for your own children.');
-        }
+        // Ensure this student belongs to the logged-in parent (use guardian relationship)
+        abort_unless(
+            $student->guardians->contains(Auth::id()) || Auth::user()->hasRole('admin'),
+            403,
+            'Unauthorized: You can only view reports for your own children.'
+        );
 
         // Ensure this report belongs to this student
-        if ($report->student_id !== $student->id) {
-            abort(403, 'Unauthorized: This report does not belong to this student.');
-        }
+        abort_unless(
+            $report->student_id === $student->id,
+            403,
+            'Unauthorized: This report does not belong to this student.'
+        );
 
         // Ensure this report is director-approved
-        if ($report->status !== 'approved-by-director') {
-            abort(403, 'Unauthorized: Only director-approved reports are visible to parents.');
-        }
+        abort_unless(
+            $report->status === 'approved-by-director',
+            403,
+            'Unauthorized: Only director-approved reports are visible to parents.'
+        );
 
         // Load relationships
         $report->load(['tutor', 'student']);
@@ -73,20 +81,19 @@ class ParentReportController extends Controller
      */
     public function exportPdf(Student $student, TutorReport $report)
     {
-        // Ensure this student belongs to the logged-in parent
-        if ($student->parent_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized access.');
-        }
+        // Ensure this student belongs to the logged-in parent (use guardian relationship)
+        abort_unless(
+            $student->guardians->contains(Auth::id()) || Auth::user()->hasRole('admin'),
+            403,
+            'Unauthorized access.'
+        );
 
-        // Ensure this report belongs to this student
-        if ($report->student_id !== $student->id) {
-            abort(403, 'Unauthorized access.');
-        }
-
-        // Ensure this report is director-approved
-        if ($report->status !== 'approved-by-director') {
-            abort(403, 'Only approved reports can be exported.');
-        }
+        // Ensure this report belongs to this student and is director-approved
+        abort_unless(
+            $report->student_id === $student->id && $report->status === 'approved-by-director',
+            403,
+            'Unauthorized access.'
+        );
 
         // TODO: Implement PDF generation
         return redirect()
@@ -99,20 +106,19 @@ class ParentReportController extends Controller
      */
     public function print(Student $student, TutorReport $report)
     {
-        // Ensure this student belongs to the logged-in parent
-        if ($student->parent_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized access.');
-        }
+        // Ensure this student belongs to the logged-in parent (use guardian relationship)
+        abort_unless(
+            $student->guardians->contains(Auth::id()) || Auth::user()->hasRole('admin'),
+            403,
+            'Unauthorized access.'
+        );
 
-        // Ensure this report belongs to this student
-        if ($report->student_id !== $student->id) {
-            abort(403, 'Unauthorized access.');
-        }
-
-        // Ensure this report is director-approved
-        if ($report->status !== 'approved-by-director') {
-            abort(403, 'Only approved reports can be printed.');
-        }
+        // Ensure this report belongs to this student and is director-approved
+        abort_unless(
+            $report->student_id === $student->id && $report->status === 'approved-by-director',
+            403,
+            'Unauthorized access.'
+        );
 
         // Load relationships
         $report->load(['tutor', 'student']);
