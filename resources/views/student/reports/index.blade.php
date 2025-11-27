@@ -10,6 +10,75 @@
         </div>
     </div>
 
+    <!-- Filters & Search -->
+    @if($reports->count() > 0 || request()->has('search') || request()->has('month') || request()->has('sort'))
+        <x-ui.glass-card padding="p-5">
+            <form method="GET" action="{{ route('student.reports.index') }}" class="grid gap-4 md:grid-cols-4">
+                <!-- Search -->
+                <div class="md:col-span-2">
+                    <label for="search" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Search Reports</label>
+                    <div class="relative">
+                        <input
+                            type="text"
+                            name="search"
+                            id="search"
+                            value="{{ request('search') }}"
+                            placeholder="Search by keyword..."
+                            class="w-full px-4 py-2 pl-10 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:border-transparent transition-all">
+                        <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Month Selector -->
+                <div>
+                    <label for="month" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Filter by Month</label>
+                    <select
+                        name="month"
+                        id="month"
+                        class="w-full px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:border-transparent transition-all">
+                        <option value="">All Months</option>
+                        @if(isset($availableMonths))
+                            @foreach($availableMonths as $month)
+                                <option value="{{ $month }}" {{ request('month') === $month ? 'selected' : '' }}>{{ $month }}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+
+                <!-- Sort -->
+                <div>
+                    <label for="sort" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">Sort By</label>
+                    <select
+                        name="sort"
+                        id="sort"
+                        class="w-full px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:border-transparent transition-all">
+                        <option value="newest" {{ request('sort', 'newest') === 'newest' ? 'selected' : '' }}>Newest First</option>
+                        <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                        <option value="rating" {{ request('sort') === 'rating' ? 'selected' : '' }}>Highest Rating</option>
+                    </select>
+                </div>
+
+                <!-- Search/Filter Buttons -->
+                <div class="md:col-span-4 flex items-center space-x-2">
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white text-sm font-medium rounded-xl hover:shadow-lg transition-all duration-200">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                        </svg>
+                        Apply Filters
+                    </button>
+
+                    @if(request()->hasAny(['search', 'month', 'sort']))
+                        <a href="{{ route('student.reports.index') }}" class="px-4 py-2 bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-xl hover:bg-white/70 dark:hover:bg-gray-800/70 transition-all border border-gray-200 dark:border-gray-700">
+                            Clear Filters
+                        </a>
+                    @endif
+                </div>
+            </form>
+        </x-ui.glass-card>
+    @endif
+
     <!-- Reports List -->
     @if($reports->count() > 0)
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -50,11 +119,18 @@
 
                         <!-- Tutor Info -->
                         @if($report->tutor)
-                            <div class="flex items-center space-x-2 mb-4 text-sm text-gray-600 dark:text-gray-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                </svg>
-                                <span>Tutor: {{ $report->tutor->full_name }}</span>
+                            <div class="flex items-center space-x-3 mb-4">
+                                @if($report->tutor->profile_photo_path)
+                                    <img src="{{ asset('storage/' . $report->tutor->profile_photo_path) }}" alt="{{ $report->tutor->full_name }}" class="w-8 h-8 rounded-full object-cover border-2 border-purple-500">
+                                @else
+                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-xs">
+                                        {{ strtoupper(substr($report->tutor->first_name, 0, 1)) }}{{ strtoupper(substr($report->tutor->last_name, 0, 1)) }}
+                                    </div>
+                                @endif
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Tutor</p>
+                                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{{ $report->tutor->full_name }}</p>
+                                </div>
                             </div>
                         @endif
 
