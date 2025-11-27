@@ -110,8 +110,16 @@ Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('
         ->name('notifications.index');
     Route::post('/notifications/{notification}/read', [App\Http\Controllers\Parent\ParentNotificationController::class, 'markAsRead'])
         ->name('notifications.read');
-    Route::post('/notifications/mark-all-read', [App\Http\Controllers\Parent\ParentNotificationController::class, 'markAllRead'])
-        ->name('notifications.markAllRead');
+
+    // Settings
+    Route::get('/settings', [App\Http\Controllers\Parent\ParentSettingsController::class, 'index'])
+        ->name('settings.index');
+    Route::put('/settings/profile', [App\Http\Controllers\Parent\ParentSettingsController::class, 'updateProfile'])
+        ->name('settings.profile');
+    Route::put('/settings/password', [App\Http\Controllers\Parent\ParentSettingsController::class, 'updatePassword'])
+        ->name('settings.password');
+    Route::put('/settings/notifications', [App\Http\Controllers\Parent\ParentSettingsController::class, 'updateNotifications'])
+        ->name('settings.notifications');
 });
 
 // Student Portal Routes
@@ -160,6 +168,10 @@ Route::prefix('student')
             ->name('reports.download');
         Route::get('/reports/{report}/print', [App\Http\Controllers\Student\StudentReportController::class, 'print'])
             ->name('reports.print');
+
+        // Settings (Read-Only)
+        Route::get('/settings', [App\Http\Controllers\Student\StudentSettingsController::class, 'index'])
+            ->name('settings.index');
     });
 
 // Manager Portal Routes
