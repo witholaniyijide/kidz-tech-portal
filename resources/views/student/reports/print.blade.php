@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progress Report - {{ $student->fullName() }} - {{ $report->month }}</title>
+    <title>Progress Report - {{ $report->student->fullName() }} - {{ $report->month }}</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -105,7 +105,7 @@
 
     <div class="header">
         <h1>Monthly Progress Report</h1>
-        <p><strong>{{ $student->fullName() }}</strong></p>
+        <p><strong>{{ $report->student->fullName() }}</strong></p>
         <p>{{ $report->month }}</p>
         <span class="status-badge">✓ Approved by Director</span>
     </div>
@@ -113,7 +113,7 @@
     <div class="info-grid">
         <div class="info-box">
             <div class="info-label">Student Name</div>
-            <div class="info-value">{{ $student->fullName() }}</div>
+            <div class="info-value">{{ $report->student->fullName() }}</div>
         </div>
         <div class="info-box">
             <div class="info-label">Tutor</div>

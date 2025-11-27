@@ -46,4 +46,50 @@ class StudentProgressController extends Controller
 
         return view('student.progress.show', compact('milestone', 'student'));
     }
+
+    /**
+     * Mark a progress milestone as complete.
+     * Only accessible by tutors and admins.
+     */
+    public function markComplete(Request $request, StudentProgress $progress)
+    {
+        // Authorize - only tutors and admins can mark milestones complete
+        $this->authorize('update', $progress);
+
+        // Validate
+        $request->validate([
+            'completed' => 'required|boolean',
+        ]);
+
+        // Update milestone
+        $progress->completed = $request->completed;
+        $progress->completed_at = $request->completed ? now() : null;
+        $progress->save();
+
+        // Recalculate student roadmap progress
+        $student = $progress->student;
+        $this->recalculateRoadmapProgress($student);
+
+        return redirect()->back()->with('success', 'Milestone updated successfully.');
+    }
+
+    /**
+     * Recalculate student roadmap progress percentage.
+     */
+    protected function recalculateRoadmapProgress(Student $student)
+    {
+        $totalMilestones = $student->progress()->count();
+
+        if ($totalMilestones === 0) {
+            $student->roadmap_progress = 0;
+            $student->save();
+            return;
+        }
+
+        $completedMilestones = $student->progress()->where('completed', true)->count();
+        $progressPercentage = (int) (($completedMilestones / $totalMilestones) * 100);
+
+        $student->roadmap_progress = $progressPercentage;
+        $student->save();
+    }
 }

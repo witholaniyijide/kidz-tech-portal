@@ -37,6 +37,40 @@ class ParentNotificationController extends Controller
 
         $notification->markAsRead();
 
+        // Return JSON for AJAX calls
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification marked as read.'
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Notification marked as read.');
+    }
+
+    /**
+     * Mark all notifications as read for the current parent.
+     */
+    public function markAllRead()
+    {
+        $user = Auth::user();
+
+        // Authorize
+        $this->authorize('viewAny', ParentNotification::class);
+
+        // Mark all notifications as read
+        ParentNotification::where('parent_id', $user->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        // Return JSON for AJAX calls
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'All notifications marked as read.'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'All notifications marked as read.');
     }
 }

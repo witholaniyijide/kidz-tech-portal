@@ -44,15 +44,40 @@ class StudentReportController extends Controller
     /**
      * Display a listing of director-approved reports for the authenticated student.
      */
-    public function index()
+    public function index(Request $request)
     {
         $student = $this->getAuthenticatedStudent();
 
-        // Get only director-approved reports for this student
-        $reports = $student->approvedReports()
-                          ->with(['tutor'])
-                          ->orderBy('month', 'desc')
-                          ->paginate(10);
+        // Determine sort column and direction
+        $sort = $request->get('sort', 'newest');
+        $sortColumn = 'created_at';
+        $sortDirection = 'desc';
+
+        if ($sort === 'oldest') {
+            $sortDirection = 'asc';
+        } elseif ($sort === 'rating') {
+            $sortColumn = 'performance_rating';
+            $sortDirection = 'desc';
+        }
+
+        // Get only director-approved reports for this student with filters
+        $reports = TutorReport::query()
+            ->where('student_id', $student->id)
+            ->where('status', 'approved-by-director')
+            ->when($request->q, function ($query) use ($request) {
+                $query->where(function ($w) use ($request) {
+                    $w->where('progress_summary', 'like', '%' . $request->q . '%')
+                      ->orWhere('strengths', 'like', '%' . $request->q . '%')
+                      ->orWhere('next_steps', 'like', '%' . $request->q . '%')
+                      ->orWhere('month', 'like', '%' . $request->q . '%');
+                });
+            })
+            ->when($request->month, function ($query) use ($request) {
+                $query->whereMonth('created_at', \Carbon\Carbon::parse($request->month)->month);
+            })
+            ->with(['tutor', 'director'])
+            ->orderBy($sortColumn, $sortDirection)
+            ->paginate(20);
 
         return view('student.reports.index', compact('student', 'reports'));
     }
@@ -77,7 +102,41 @@ class StudentReportController extends Controller
         // Load relationships
         $report->load(['tutor', 'student', 'director']);
 
-        return view('student.reports.show', compact('student', 'report'));
+        // Prepare radar chart data for Chart.js
+        $radarData = [
+            'labels' => ['Attendance', 'Performance', 'Progress', 'Engagement', 'Technical Skills'],
+            'values' => [
+                $report->attendance_score ?? 0,
+                ($report->performance_rating ?? 0) * 20, // Convert 1-5 rating to 0-100 scale
+                $student->progressPercentage() ?? 0,
+                $this->estimateEngagement($report),
+                $this->estimateTechnicalSkills($report)
+            ]
+        ];
+
+        return view('student.reports.show', compact('student', 'report', 'radarData'));
+    }
+
+    /**
+     * Estimate engagement score based on report data.
+     */
+    protected function estimateEngagement($report)
+    {
+        // Base engagement on attendance and report content quality
+        $baseScore = ($report->attendance_score ?? 0) * 0.6;
+        $contentBonus = strlen($report->progress_summary ?? '') > 100 ? 20 : 10;
+        return min(100, $baseScore + $contentBonus);
+    }
+
+    /**
+     * Estimate technical skills score based on report data.
+     */
+    protected function estimateTechnicalSkills($report)
+    {
+        // Base technical skills on performance rating and progress
+        $performanceScore = ($report->performance_rating ?? 0) * 18;
+        $strengthBonus = strlen($report->strengths ?? '') > 100 ? 15 : 5;
+        return min(100, $performanceScore + $strengthBonus);
     }
 
     /**
@@ -100,12 +159,21 @@ class StudentReportController extends Controller
         // Load relationships
         $report->load(['tutor', 'student', 'director']);
 
-        // Generate PDF using the tutor report PDF view
-        $pdf = Pdf::loadView('tutor.reports.pdf', compact('report'));
+        // Generate PDF using the student report print view
+        $pdf = Pdf::loadView('student.reports.print', compact('report'))
+            ->setPaper('a4', 'portrait');
 
-        $filename = 'report_' . $student->first_name . '_' . $student->last_name . '_' . $report->month . '.pdf';
+        $filename = 'Report-' . $report->id . '-' . $report->month . '.pdf';
 
         return $pdf->download($filename);
+    }
+
+    /**
+     * Alias for exportPdf for download response.
+     */
+    public function download(TutorReport $report)
+    {
+        return $this->exportPdf($report);
     }
 
     /**
