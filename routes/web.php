@@ -110,6 +110,8 @@ Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('
         ->name('notifications.index');
     Route::post('/notifications/{notification}/read', [App\Http\Controllers\Parent\ParentNotificationController::class, 'markAsRead'])
         ->name('notifications.read');
+    Route::post('/notifications/mark-all-read', [App\Http\Controllers\Parent\ParentNotificationController::class, 'markAllRead'])
+        ->name('notifications.markAllRead');
 });
 
 // Student Portal Routes
@@ -130,6 +132,22 @@ Route::prefix('student')
             ->name('progress.index');
         Route::get('/progress/{milestone}', [App\Http\Controllers\Student\StudentProgressController::class, 'show'])
             ->name('progress.show');
+        Route::post('/progress/{progress}/complete', [App\Http\Controllers\Student\StudentProgressController::class, 'markComplete'])
+            ->name('progress.complete');
+
+        // Roadmap
+        Route::get('/roadmap', [App\Http\Controllers\Student\StudentRoadmapController::class, 'full'])
+            ->name('roadmap.full');
+        Route::get('/roadmap/stage/{stageSlug}', [App\Http\Controllers\Student\StudentRoadmapController::class, 'stageShow'])
+            ->name('roadmap.stage');
+
+        // Attendance
+        Route::get('/attendance', [App\Http\Controllers\Student\StudentAttendanceController::class, 'index'])
+            ->name('attendance.index');
+        Route::get('/attendance/chart/{month}', [App\Http\Controllers\Student\StudentAttendanceController::class, 'attendanceChart'])
+            ->name('attendance.chart');
+        Route::get('/attendance/{record}', [App\Http\Controllers\Student\StudentAttendanceController::class, 'show'])
+            ->name('attendance.show');
 
         // Student Reports (Director-Approved Reports for Students)
         Route::get('/reports', [App\Http\Controllers\Student\StudentReportController::class, 'index'])
@@ -138,6 +156,8 @@ Route::prefix('student')
             ->name('reports.show');
         Route::get('/reports/{report}/pdf', [App\Http\Controllers\Student\StudentReportController::class, 'exportPdf'])
             ->name('reports.pdf');
+        Route::get('/reports/{report}/download', [App\Http\Controllers\Student\StudentReportController::class, 'download'])
+            ->name('reports.download');
         Route::get('/reports/{report}/print', [App\Http\Controllers\Student\StudentReportController::class, 'print'])
             ->name('reports.print');
     });
