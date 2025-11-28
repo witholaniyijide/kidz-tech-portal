@@ -12,14 +12,14 @@ class AttendanceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = AttendanceRecord::with(['student', 'submittedBy']);
+        $query = AttendanceRecord::with(['student', 'tutor']);
 
         if ($request->has('date') && $request->date) {
             $query->whereDate('class_date', $request->date);
         }
 
         if ($request->has('status') && $request->status) {
-            $query->where('approval_status', $request->status);
+            $query->where('status', $request->status);
         }
 
         $records = $query->orderBy('class_date', 'desc')
@@ -45,28 +45,33 @@ class AttendanceController extends Controller
     {
         $validated = $request->validate([
             'class_date' => 'required|date',
-            'session' => 'nullable|string|max:255',
+            'class_time' => 'nullable|date_format:H:i',
+            'duration_minutes' => 'nullable|integer|min:1',
+            'topic' => 'nullable|string|max:255',
             'attendance' => 'required|array',
             'attendance.*.student_id' => 'required|exists:students,id',
-            'attendance.*.status' => 'required|in:present,absent,late,excused',
             'attendance.*.notes' => 'nullable|string',
         ]);
 
+        $user = Auth::user();
+        $tutor = \App\Models\Tutor::where('user_id', $user->id)->first();
+
+        if (!$tutor) {
+            return back()->withErrors(['error' => 'Tutor profile not found.']);
+        }
+
         $count = 0;
         foreach ($request->attendance as $record) {
-            AttendanceRecord::updateOrCreate(
-                [
-                    'student_id' => $record['student_id'],
-                    'class_date' => $request->class_date,
-                    'session' => $request->session,
-                ],
-                [
-                    'status' => $record['status'],
-                    'notes' => $record['notes'] ?? null,
-                    'submitted_by' => Auth::id(),
-                    'approval_status' => 'pending',
-                ]
-            );
+            AttendanceRecord::create([
+                'student_id' => $record['student_id'],
+                'tutor_id' => $tutor->id,
+                'class_date' => $request->class_date,
+                'class_time' => $request->class_time ?? now()->format('H:i'),
+                'duration_minutes' => $request->duration_minutes ?? 60,
+                'topic' => $request->topic,
+                'notes' => $record['notes'] ?? null,
+                'status' => 'pending',
+            ]);
             $count++;
         }
 
@@ -76,7 +81,7 @@ class AttendanceController extends Controller
 
     public function show(AttendanceRecord $attendance)
     {
-        $attendance->load(['student', 'submittedBy', 'approvedBy']);
+        $attendance->load(['student', 'tutor', 'approver']);
         return view('attendance.show', compact('attendance'));
     }
 

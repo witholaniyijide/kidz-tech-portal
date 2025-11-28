@@ -322,14 +322,19 @@ class DashboardController extends Controller
                                 ->count();
 
         // Get today's attendance records submitted by this tutor
-        $todayAttendance = AttendanceRecord::whereDate('class_date', Carbon::today())
-                                          ->where('submitted_by', $user->id)
-                                          ->count();
+        $todayAttendance = 0;
+        $presentToday = 0;
 
-        $presentToday = AttendanceRecord::whereDate('class_date', Carbon::today())
-                                       ->where('submitted_by', $user->id)
-                                       ->where('status', 'present')
-                                       ->count();
+        if ($tutor) {
+            $todayAttendance = AttendanceRecord::whereDate('class_date', Carbon::today())
+                                              ->where('tutor_id', $tutor->id)
+                                              ->count();
+
+            $presentToday = AttendanceRecord::whereDate('class_date', Carbon::today())
+                                           ->where('tutor_id', $tutor->id)
+                                           ->where('status', 'approved')
+                                           ->count();
+        }
 
         // Recent students
         $recentStudents = Student::latest()->take(8)->get();
