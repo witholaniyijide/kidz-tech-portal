@@ -73,7 +73,32 @@
 
 ---
 
-## Deployment Steps (Production)
+## Quick Deployment (Automated Script)
+
+For quick deployments with automatic permission fixes, use the deployment script:
+
+```bash
+# Basic deployment (no caching)
+./deploy.sh
+
+# Production deployment (with caching)
+./deploy.sh production
+```
+
+The script automatically handles:
+- ✓ Storage and cache permissions
+- ✓ Required directory creation
+- ✓ Storage symlink
+- ✓ Cache clearing
+- ✓ Production optimization (config/route/view caching)
+- ✓ Database migrations (with confirmation)
+- ✓ Queue worker restart (with confirmation)
+
+For manual deployment or advanced scenarios, follow the detailed steps below.
+
+---
+
+## Deployment Steps (Production - Manual)
 
 ### Step 1: Pre-Deploy Backup
 ```bash
@@ -399,6 +424,46 @@ sudo supervisorctl start kidz-tech-queue:*
 - Check storage link: `php artisan storage:link`
 - Check permissions: `chmod -R 775 storage`
 - Check disk space: `df -h`
+
+### Issue: Permission Denied on Log Files
+**Error**: `The stream or file "storage/logs/laravel.log" could not be opened in append mode: Failed to open stream: Permission denied`
+
+**Solution**:
+```bash
+# Fix storage permissions
+chmod -R 775 storage bootstrap/cache
+
+# Set correct ownership (Ubuntu/Debian)
+chown -R www-data:www-data storage bootstrap/cache
+
+# Or for CentOS/RHEL
+chown -R apache:apache storage bootstrap/cache
+
+# Or for shared hosting
+chown -R your-username:your-username storage bootstrap/cache
+
+# Verify permissions
+ls -la storage/logs/
+ls -la storage/framework/sessions/
+
+# Alternative: Run deployment script
+./deploy.sh
+```
+
+**Root Causes**:
+1. Web server user doesn't have write permissions
+2. Files were created by different user (e.g., during manual artisan commands)
+3. SELinux restrictions (on CentOS/RHEL)
+
+**SELinux Fix** (if applicable):
+```bash
+# Check if SELinux is enforcing
+sestatus
+
+# Allow web server to write to storage
+chcon -R -t httpd_sys_rw_content_t storage
+chcon -R -t httpd_sys_rw_content_t bootstrap/cache
+```
 
 ---
 
