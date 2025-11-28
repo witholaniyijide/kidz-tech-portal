@@ -68,7 +68,7 @@ class StudentPortalHomeController extends Controller
         $recentReports = TutorReport::whereIn('student_id', $studentIds)
                               ->where('status', 'approved-by-director')
                               ->with(['student', 'tutor'])
-                              ->orderBy('approved_by_director_at', 'desc')
+                              ->orderBy('created_at', 'desc')
                               ->take(5)
                               ->get();
 
