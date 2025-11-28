@@ -40,6 +40,17 @@
 - [ ] Ensure `storage/` and `bootstrap/cache/` are writable by web server
   ```bash
   chmod -R 775 storage bootstrap/cache
+
+  # For Apache (Ubuntu/Debian)
+  chown -R www-data:www-data storage bootstrap/cache
+
+  # For OpenLiteSpeed
+  chown -R nobody:nogroup storage bootstrap/cache
+
+  # For Apache (CentOS/RHEL)
+  chown -R apache:apache storage bootstrap/cache
+
+  # For Nginx (Ubuntu/Debian)
   chown -R www-data:www-data storage bootstrap/cache
   ```
 - [ ] Backup media files: `tar czf storage_backup.tgz storage/app/public`
@@ -86,6 +97,7 @@ For quick deployments with automatic permission fixes, use the deployment script
 ```
 
 The script automatically handles:
+- ✓ **Auto-detects web server** (OpenLiteSpeed, Apache, Nginx) and sets correct ownership
 - ✓ Storage and cache permissions
 - ✓ Required directory creation
 - ✓ Storage symlink
@@ -428,30 +440,46 @@ sudo supervisorctl start kidz-tech-queue:*
 ### Issue: Permission Denied on Log Files
 **Error**: `The stream or file "storage/logs/laravel.log" could not be opened in append mode: Failed to open stream: Permission denied`
 
-**Solution**:
+**First, detect which web server you're using**:
+```bash
+# Check what's running
+ps aux | grep -E 'apache|httpd|nginx|lshttpd|openlitespeed' | grep -v grep
+```
+
+**Solution - Apply the correct ownership for your web server**:
 ```bash
 # Fix storage permissions
 chmod -R 775 storage bootstrap/cache
 
-# Set correct ownership (Ubuntu/Debian)
+# FOR OPENLITESPEED (most common issue)
+chown -R nobody:nogroup storage bootstrap/cache
+
+# For Apache (Ubuntu/Debian)
 chown -R www-data:www-data storage bootstrap/cache
 
-# Or for CentOS/RHEL
+# For Apache (CentOS/RHEL)
 chown -R apache:apache storage bootstrap/cache
 
-# Or for shared hosting
+# For Nginx (Ubuntu/Debian)
+chown -R www-data:www-data storage bootstrap/cache
+
+# For shared hosting
 chown -R your-username:your-username storage bootstrap/cache
 
 # Verify permissions
 ls -la storage/logs/
 ls -la storage/framework/sessions/
 
-# Alternative: Run deployment script
+# Clear Laravel caches
+php artisan cache:clear
+php artisan config:clear
+
+# Alternative: Run deployment script (auto-detects web server)
 ./deploy.sh
 ```
 
 **Root Causes**:
-1. Web server user doesn't have write permissions
+1. **Wrong web server user**: Most common! OpenLiteSpeed uses `nobody`, not `www-data`
 2. Files were created by different user (e.g., during manual artisan commands)
 3. SELinux restrictions (on CentOS/RHEL)
 

@@ -41,13 +41,45 @@ if [ -d "storage" ] && [ -d "bootstrap/cache" ]; then
     chmod -R 775 storage bootstrap/cache 2>/dev/null || chmod -R 755 storage bootstrap/cache
     print_success "Permissions updated for storage and bootstrap/cache"
 
-    # Try to set ownership (will fail without sudo, but that's okay)
-    if command -v www-data &> /dev/null; then
-        chown -R www-data:www-data storage bootstrap/cache 2>/dev/null && print_success "Ownership set to www-data" || print_warning "Could not set ownership (may need sudo)"
-    elif [ ! -z "$SUDO_USER" ]; then
-        chown -R $SUDO_USER:$SUDO_USER storage bootstrap/cache 2>/dev/null && print_success "Ownership set" || print_warning "Could not set ownership"
+    # Detect web server user and set ownership
+    WEB_USER=""
+    WEB_GROUP=""
+
+    # Check for OpenLiteSpeed
+    if pgrep -x "lshttpd" > /dev/null || pgrep -x "openlitespeed" > /dev/null; then
+        WEB_USER="nobody"
+        WEB_GROUP="nogroup"
+        print_success "Detected OpenLiteSpeed web server"
+    # Check for Apache
+    elif pgrep -x "apache2" > /dev/null || pgrep -x "httpd" > /dev/null; then
+        if id "www-data" &>/dev/null; then
+            WEB_USER="www-data"
+            WEB_GROUP="www-data"
+        elif id "apache" &>/dev/null; then
+            WEB_USER="apache"
+            WEB_GROUP="apache"
+        fi
+        print_success "Detected Apache web server"
+    # Check for Nginx (uses PHP-FPM)
+    elif pgrep -x "nginx" > /dev/null; then
+        if id "www-data" &>/dev/null; then
+            WEB_USER="www-data"
+            WEB_GROUP="www-data"
+        elif id "nginx" &>/dev/null; then
+            WEB_USER="nginx"
+            WEB_GROUP="nginx"
+        fi
+        print_success "Detected Nginx web server"
+    fi
+
+    # Apply ownership if web user was detected
+    if [ -n "$WEB_USER" ]; then
+        chown -R $WEB_USER:$WEB_GROUP storage bootstrap/cache 2>/dev/null && \
+            print_success "Ownership set to $WEB_USER:$WEB_GROUP" || \
+            print_warning "Could not set ownership to $WEB_USER:$WEB_GROUP (may need sudo)"
     else
-        print_warning "Skipping ownership change (run with sudo if needed)"
+        print_warning "Could not detect web server. Please manually set ownership."
+        print_warning "Run: chown -R <web-user>:<web-group> storage bootstrap/cache"
     fi
 else
     print_error "storage or bootstrap/cache directory not found"
@@ -118,6 +150,12 @@ fi
 echo ""
 echo "Step 8: Final permissions check..."
 chmod -R 775 storage bootstrap/cache 2>/dev/null || chmod -R 755 storage bootstrap/cache
+
+# Re-apply ownership in case new files were created
+if [ -n "$WEB_USER" ]; then
+    chown -R $WEB_USER:$WEB_GROUP storage bootstrap/cache 2>/dev/null
+fi
+
 print_success "Final permissions applied"
 
 echo ""
