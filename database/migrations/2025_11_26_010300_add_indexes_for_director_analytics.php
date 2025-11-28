@@ -17,6 +17,14 @@ return new class extends Migration
     }
 
     /**
+     * Check if a column exists in a table
+     */
+    private function columnExists($table, $column): bool
+    {
+        return Schema::hasColumn($table, $column);
+    }
+
+    /**
      * Run the migrations.
      */
     public function up(): void
@@ -34,8 +42,9 @@ return new class extends Migration
 
         Schema::table('tutor_reports', function (Blueprint $table) {
             // Note: status, month, and tutor_id indexes already exist from create migration
-            // Only add new index for director approval tracking
-            if (!$this->indexExists('tutor_reports', 'tutor_reports_director_approved_at_index')) {
+            // Only add new index for director approval tracking if the column exists
+            if ($this->columnExists('tutor_reports', 'approved_by_director_at') &&
+                !$this->indexExists('tutor_reports', 'tutor_reports_director_approved_at_index')) {
                 $table->index('approved_by_director_at', 'tutor_reports_director_approved_at_index');
             }
         });
@@ -43,10 +52,12 @@ return new class extends Migration
         Schema::table('tutor_assessments', function (Blueprint $table) {
             // Note: status and tutor_id indexes already exist from create migration
             // Add new indexes for time-based queries and director approval tracking
-            if (!$this->indexExists('tutor_assessments', 'tutor_assessments_created_at_index')) {
+            if ($this->columnExists('tutor_assessments', 'created_at') &&
+                !$this->indexExists('tutor_assessments', 'tutor_assessments_created_at_index')) {
                 $table->index('created_at', 'tutor_assessments_created_at_index');
             }
-            if (!$this->indexExists('tutor_assessments', 'tutor_assessments_director_approved_at_index')) {
+            if ($this->columnExists('tutor_assessments', 'approved_by_director_at') &&
+                !$this->indexExists('tutor_assessments', 'tutor_assessments_director_approved_at_index')) {
                 $table->index('approved_by_director_at', 'tutor_assessments_director_approved_at_index');
             }
         });
