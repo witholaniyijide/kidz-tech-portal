@@ -341,6 +341,40 @@ Route::prefix('director')
             ->name('settings.profile.update');
         Route::put('/settings/password', [App\Http\Controllers\Director\DirectorSettingsController::class, 'updatePassword'])
             ->name('settings.password.update');
+
+        // Director Dashboard (explicit route)
+        Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'director'])
+            ->name('dashboard');
+
+        // Director Students (Full CRUD)
+        Route::resource('students', App\Http\Controllers\Director\DirectorStudentController::class)
+            ->names('students');
+
+        // Director Tutors (Full CRUD)
+        Route::resource('tutors', App\Http\Controllers\Director\DirectorTutorController::class)
+            ->names('tutors');
+
+        // Director Attendance
+        Route::get('/attendance', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'index'])
+            ->name('attendance.index');
+        Route::get('/attendance/{attendance}', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'show'])
+            ->name('attendance.show');
+        Route::post('/attendance/{attendance}/approve', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'approve'])
+            ->name('attendance.approve');
+
+        // Director Finance
+        Route::get('/finance', [App\Http\Controllers\Director\DirectorFinanceController::class, 'index'])
+            ->name('finance.index');
+        Route::post('/finance/income', [App\Http\Controllers\Director\DirectorFinanceController::class, 'storeIncome'])
+            ->name('finance.income.store');
+        Route::post('/finance/expense', [App\Http\Controllers\Director\DirectorFinanceController::class, 'storeExpense'])
+            ->name('finance.expense.store');
+        Route::get('/finance/export', [App\Http\Controllers\Director\DirectorFinanceController::class, 'export'])
+            ->name('finance.export');
+
+        // Director Notices (Full CRUD)
+        Route::resource('notices', App\Http\Controllers\Director\DirectorNoticeController::class)
+            ->names('notices');
     });
 
 // Tutor Portal Routes
