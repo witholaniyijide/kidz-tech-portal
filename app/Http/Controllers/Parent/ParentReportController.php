@@ -25,6 +25,44 @@ class ParentReportController extends Controller
     }
 
     /**
+     * Display all director-approved reports for all children.
+     */
+    public function indexAll(Request $request)
+    {
+        $user = Auth::user();
+        $children = $user->guardiansOf()->get();
+
+        if ($children->isEmpty()) {
+            return view('parent.reports.index', [
+                'children' => $children,
+                'reports' => collect(),
+                'selectedChild' => null,
+            ]);
+        }
+
+        $studentIds = $children->pluck('id');
+
+        // Filter by child if specified
+        $selectedChildId = $request->input('child');
+        $query = TutorReport::where('status', 'approved-by-director')
+            ->with(['student', 'tutor']);
+
+        if ($selectedChildId && $children->contains('id', $selectedChildId)) {
+            $query->where('student_id', $selectedChildId);
+            $selectedChild = $children->find($selectedChildId);
+        } else {
+            $query->whereIn('student_id', $studentIds);
+            $selectedChild = null;
+        }
+
+        $reports = $query->orderBy('approved_by_director_at', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('parent.reports.index', compact('children', 'reports', 'selectedChild'));
+    }
+
+    /**
      * Display a listing of director-approved reports for a specific child.
      */
     public function index(Student $student)

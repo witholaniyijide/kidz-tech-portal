@@ -163,40 +163,78 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Parent Portal Routes
 Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('parent.')->group(function () {
     // Dashboard
-    Route::get('/dashboard', [App\Http\Controllers\Student\StudentPortalHomeController::class, 'parentDashboard'])
+    Route::get('/dashboard', [App\Http\Controllers\Parent\ParentDashboardController::class, 'index'])
         ->name('dashboard');
+    Route::post('/dashboard/switch-child', [App\Http\Controllers\Parent\ParentDashboardController::class, 'switchChild'])
+        ->name('dashboard.switch-child');
 
-    // Students
-    Route::get('/students', [App\Http\Controllers\Student\StudentProfileController::class, 'index'])
-        ->name('students.index');
-    Route::get('/students/{student}', [App\Http\Controllers\Student\StudentProfileController::class, 'show'])
-        ->name('students.show');
+    // My Children
+    Route::get('/children', [App\Http\Controllers\Parent\ParentChildrenController::class, 'index'])
+        ->name('children.index');
+    Route::get('/children/{student}', [App\Http\Controllers\Parent\ParentChildrenController::class, 'show'])
+        ->name('children.show');
 
-    // Student Progress
-    Route::get('/students/{student}/progress', [App\Http\Controllers\Student\StudentProgressController::class, 'index'])
-        ->name('students.progress');
+    // Performance
+    Route::get('/performance', [App\Http\Controllers\Parent\ParentPerformanceController::class, 'index'])
+        ->name('performance.index');
+    Route::get('/performance/{student}', [App\Http\Controllers\Parent\ParentPerformanceController::class, 'getChildPerformance'])
+        ->name('performance.child');
 
-    // Student Reports (Director-Approved)
-    Route::get('/students/{student}/reports', [App\Http\Controllers\Parent\ParentReportController::class, 'index'])
-        ->name('students.reports');
-    Route::get('/students/{student}/reports/{report}', [App\Http\Controllers\Parent\ParentReportController::class, 'show'])
-        ->name('students.reports.show');
+    // Reports (Director-Approved only)
+    Route::get('/reports', [App\Http\Controllers\Parent\ParentReportController::class, 'indexAll'])
+        ->name('reports.index');
+    Route::get('/reports/{student}/{report}', [App\Http\Controllers\Parent\ParentReportController::class, 'show'])
+        ->name('reports.show');
+    Route::get('/reports/{student}/{report}/pdf', [App\Http\Controllers\Parent\ParentReportController::class, 'exportPdf'])
+        ->name('reports.pdf');
+    Route::get('/reports/{student}/{report}/print', [App\Http\Controllers\Parent\ParentReportController::class, 'print'])
+        ->name('reports.print');
+
+    // Certifications
+    Route::get('/certifications', [App\Http\Controllers\Parent\ParentCertificateController::class, 'index'])
+        ->name('certifications.index');
+    Route::get('/certifications/{certification}', [App\Http\Controllers\Parent\ParentCertificateController::class, 'show'])
+        ->name('certifications.show');
+    Route::get('/certifications/{certification}/download', [App\Http\Controllers\Parent\ParentCertificateController::class, 'download'])
+        ->name('certifications.download');
+    Route::get('/certifications/{certification}/view', [App\Http\Controllers\Parent\ParentCertificateController::class, 'view'])
+        ->name('certifications.view');
+    Route::post('/certifications/validate', [App\Http\Controllers\Parent\ParentCertificateController::class, 'validate'])
+        ->name('certifications.validate');
 
     // Notifications
     Route::get('/notifications', [App\Http\Controllers\Parent\ParentNotificationController::class, 'index'])
         ->name('notifications.index');
     Route::post('/notifications/{notification}/read', [App\Http\Controllers\Parent\ParentNotificationController::class, 'markAsRead'])
-        ->name('notifications.read');
+        ->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [App\Http\Controllers\Parent\ParentNotificationController::class, 'markAllRead'])
+        ->name('notifications.mark-all-read');
+    Route::delete('/notifications/{notification}', [App\Http\Controllers\Parent\ParentNotificationController::class, 'destroy'])
+        ->name('notifications.destroy');
+    Route::get('/notifications/unread-count', [App\Http\Controllers\Parent\ParentNotificationController::class, 'unreadCount'])
+        ->name('notifications.unread-count');
+    Route::get('/notifications/recent', [App\Http\Controllers\Parent\ParentNotificationController::class, 'recent'])
+        ->name('notifications.recent');
 
     // Settings
     Route::get('/settings', [App\Http\Controllers\Parent\ParentSettingsController::class, 'index'])
         ->name('settings.index');
     Route::put('/settings/profile', [App\Http\Controllers\Parent\ParentSettingsController::class, 'updateProfile'])
-        ->name('settings.profile');
+        ->name('settings.update-profile');
     Route::put('/settings/password', [App\Http\Controllers\Parent\ParentSettingsController::class, 'updatePassword'])
-        ->name('settings.password');
+        ->name('settings.update-password');
     Route::put('/settings/notifications', [App\Http\Controllers\Parent\ParentSettingsController::class, 'updateNotifications'])
-        ->name('settings.notifications');
+        ->name('settings.update-notifications');
+
+    // Legacy routes (for backward compatibility)
+    Route::get('/students', [App\Http\Controllers\Parent\ParentChildrenController::class, 'index'])
+        ->name('students.index');
+    Route::get('/students/{student}', [App\Http\Controllers\Parent\ParentChildrenController::class, 'show'])
+        ->name('students.show');
+    Route::get('/students/{student}/reports', [App\Http\Controllers\Parent\ParentReportController::class, 'index'])
+        ->name('students.reports');
+    Route::get('/students/{student}/reports/{report}', [App\Http\Controllers\Parent\ParentReportController::class, 'show'])
+        ->name('students.reports.show');
 });
 
 // Student Portal Routes
