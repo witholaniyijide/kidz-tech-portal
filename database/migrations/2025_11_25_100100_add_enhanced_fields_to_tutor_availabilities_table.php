@@ -13,25 +13,30 @@ return new class extends Migration
     {
         Schema::table('tutor_availabilities', function (Blueprint $table) {
             // Type of availability slot
-            $table->enum('type', ['available', 'unavailable'])->default('available')->after('day');
-            
+            if (!Schema::hasColumn('tutor_availabilities', 'type')) {
+                $table->enum('type', ['available', 'unavailable'])->default('available');
+            }
+
             // For date-specific overrides (null means weekly recurring)
-            $table->date('specific_date')->nullable()->after('end_time');
-            
+            if (!Schema::hasColumn('tutor_availabilities', 'specific_date')) {
+                $table->date('specific_date')->nullable();
+            }
+
             // Timezone for the tutor
-            $table->string('timezone')->default('Africa/Lagos')->after('specific_date');
-            
+            if (!Schema::hasColumn('tutor_availabilities', 'timezone')) {
+                $table->string('timezone')->default('Africa/Lagos');
+            }
+
             // Google Calendar integration
-            $table->string('google_calendar_id')->nullable()->after('timezone');
-            
-            // Index for faster queries
-            $table->index(['tutor_id', 'day', 'specific_date']);
+            if (!Schema::hasColumn('tutor_availabilities', 'google_calendar_id')) {
+                $table->string('google_calendar_id')->nullable();
+            }
         });
 
         // Also add timezone to tutors table if not exists
         if (!Schema::hasColumn('tutors', 'timezone')) {
             Schema::table('tutors', function (Blueprint $table) {
-                $table->string('timezone')->default('Africa/Lagos')->after('status');
+                $table->string('timezone')->default('Africa/Lagos');
             });
         }
     }
@@ -42,8 +47,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('tutor_availabilities', function (Blueprint $table) {
-            $table->dropIndex(['tutor_id', 'day', 'specific_date']);
-            $table->dropColumn(['type', 'specific_date', 'timezone', 'google_calendar_id']);
+            $columns = ['type', 'specific_date', 'timezone', 'google_calendar_id'];
+            foreach ($columns as $column) {
+                if (Schema::hasColumn('tutor_availabilities', $column)) {
+                    $table->dropColumn($column);
+                }
+            }
         });
 
         if (Schema::hasColumn('tutors', 'timezone')) {
