@@ -146,14 +146,7 @@ class DashboardController extends Controller
 
         // Get recent notices (visible to tutors)
         $recentNotices = Notice::where('status', 'published')
-            ->where(function ($query) {
-                $query->where('audience', 'all')
-                    ->orWhere('audience', 'tutors');
-            })
-            ->where(function ($query) {
-                $query->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            })
+            ->whereJsonContains('visible_to', 'tutor')
             ->orderByRaw("FIELD(priority, 'urgent', 'high', 'normal', 'low')")
             ->orderBy('published_at', 'desc')
             ->take(3)
