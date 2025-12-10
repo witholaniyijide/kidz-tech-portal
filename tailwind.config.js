@@ -55,8 +55,8 @@ export default {
                         end: '#EC4899'
                     },
                     parent: {
-                        start: '#F43F5E',
-                        end: '#FB7185'
+                        start: '#0ea5e9',
+                        end: '#22d3ee'
                     }
                 }
             },
@@ -65,7 +65,7 @@ export default {
                 'gradient-admin': 'linear-gradient(to right, #14B8A6, #06B6D4)',
                 'gradient-manager': 'linear-gradient(to right, #0ea5e9, #38bdf8)',
                 'gradient-tutor': 'linear-gradient(to right, #8B5CF6, #EC4899)',
-                'gradient-parent': 'linear-gradient(to right, #F43F5E, #FB7185)',
+                'gradient-parent': 'linear-gradient(to right, #0ea5e9, #22d3ee)',
             }
         },
     },
