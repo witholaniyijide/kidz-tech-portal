@@ -1,0 +1,43 @@
+[90m= [39m[
+    [
+      "[34mid[39m" => [35m1[39m,
+      "[34mname[39m" => "[32mdirector[39m",
+      "[34mdisplay_name[39m" => "[32mDirector[39m",
+      "[34mdescription[39m" => "[32mFull system access - can manage everything[39m",
+      "[34mcreated_at[39m" => "[32m2025-11-05T12:04:48.000000Z[39m",
+      "[34mupdated_at[39m" => "[32m2025-11-05T12:04:48.000000Z[39m",
+    ],
+    [
+      "[34mid[39m" => [35m2[39m,
+      "[34mname[39m" => "[32madmin[39m",
+      "[34mdisplay_name[39m" => "[32mAdmin[39m",
+      "[34mdescription[39m" => "[32mAdministrative access - can manage users, students, and operations[39m",
+      "[34mcreated_at[39m" => "[32m2025-11-05T12:04:48.000000Z[39m",
+      "[34mupdated_at[39m" => "[32m2025-11-05T12:04:48.000000Z[39m",
+    ],
+    [
+      "[34mid[39m" => [35m3[39m,
+      "[34mname[39m" => "[32mmanager[39m",
+      "[34mdisplay_name[39m" => "[32mManager[39m",
+      "[34mdescription[39m" => "[32mCan approve reports and manage tutors[39m",
+      "[34mcreated_at[39m" => "[32m2025-11-05T12:04:48.000000Z[39m",
+      "[34mupdated_at[39m" => "[32m2025-11-05T12:04:48.000000Z[39m",
+    ],
+    [
+      "[34mid[39m" => [35m4[39m,
+      "[34mname[39m" => "[32mtutor[39m",
+      "[34mdisplay_name[39m" => "[32mTutor[39m",
+      "[34mdescription[39m" => "[32mCan submit attendance, create reports, and view assigned students[39m",
+      "[34mcreated_at[39m" => "[32m2025-11-05T12:04:48.000000Z[39m",
+      "[34mupdated_at[39m" => "[32m2025-11-05T12:04:48.000000Z[39m",
+    ],
+    [
+      "[34mid[39m" => [35m5[39m,
+      "[34mname[39m" => "[32mparent[39m",
+      "[34mdisplay_name[39m" => "[32mParent[39m",
+      "[34mdescription[39m" => "[32mCan view their child's progress and reports[39m",
+      "[34mcreated_at[39m" => "[32m2025-11-05T12:04:48.000000Z[39m",
+      "[34mupdated_at[39m" => "[32m2025-11-05T12:04:48.000000Z[39m",
+    ],
+  ]
+
