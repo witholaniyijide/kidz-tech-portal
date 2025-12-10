@@ -178,6 +178,22 @@ class Student extends Model
     }
 
     /**
+     * Get all certifications for this student
+     */
+    public function certifications()
+    {
+        return $this->hasMany(Certification::class);
+    }
+
+    /**
+     * Get active certifications for this student
+     */
+    public function activeCertifications()
+    {
+        return $this->hasMany(Certification::class)->where('status', 'active');
+    }
+
+    /**
      * Get the primary guardian for this student
      */
     public function primaryGuardian()
