@@ -55,12 +55,20 @@ return new class extends Migration
                 $table->text('comments_observation')->nullable()->after('assignments');
             }
             
+            // Ensure approval timestamp columns exist
+            if (!Schema::hasColumn('tutor_reports', 'approved_by_manager_at')) {
+                $table->timestamp('approved_by_manager_at')->nullable();
+            }
+            if (!Schema::hasColumn('tutor_reports', 'approved_by_director_at')) {
+                $table->timestamp('approved_by_director_at')->nullable();
+            }
+
             // Import from Claude Artifact metadata
             if (!Schema::hasColumn('tutor_reports', 'imported_from_artifact')) {
-                $table->boolean('imported_from_artifact')->default(false)->after('approved_by_director_at');
+                $table->boolean('imported_from_artifact')->default(false);
             }
             if (!Schema::hasColumn('tutor_reports', 'artifact_export_date')) {
-                $table->timestamp('artifact_export_date')->nullable()->after('imported_from_artifact');
+                $table->timestamp('artifact_export_date')->nullable();
             }
         });
     }
