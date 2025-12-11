@@ -490,12 +490,12 @@
                 exportCSV() {
                     // Create CSV export
                     const data = @json($assessments->map(fn($a) => [
-                        'tutor' => ($a->tutor->first_name ?? '') . ' ' . ($a->tutor->last_name ?? ''),
-                        'month' => $a->assessment_month,
-                        'score' => $a->performance_score,
-                        'status' => $a->status,
+                        'tutor' => ($a->tutor?->first_name ?? '') . ' ' . ($a->tutor?->last_name ?? ''),
+                        'month' => $a->assessment_month ?? '',
+                        'score' => $a->performance_score ?? 0,
+                        'status' => $a->status ?? '',
                         'director_comment' => $a->director_comment ?? ''
-                    ]));
+                    ])->values());
                     
                     if (data.length === 0) {
                         this.showToast('No data to export', 'error');

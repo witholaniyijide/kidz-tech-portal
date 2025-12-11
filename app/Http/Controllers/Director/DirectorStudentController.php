@@ -18,7 +18,7 @@ class DirectorStudentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Student::with(['tutor', 'user', 'guardians']);
+        $query = Student::with(['tutor', 'parent', 'guardians']);
 
         // Filter by search (name, email, student_id)
         if ($request->filled('search')) {
@@ -124,7 +124,7 @@ class DirectorStudentController extends Controller
      */
     public function show(Student $student)
     {
-        $student->load(['tutor', 'user', 'guardians', 'attendanceRecords', 'reports']);
+        $student->load(['tutor', 'parent', 'guardians', 'attendanceRecords', 'reports']);
         
         return view('director.students.show', compact('student'));
     }
