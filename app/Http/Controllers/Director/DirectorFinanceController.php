@@ -23,7 +23,7 @@ class DirectorFinanceController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('description', 'like', "%{$search}%")
-                  ->orWhere('reference', 'like', "%{$search}%");
+                  ->orWhere('reference_number', 'like', "%{$search}%");
             });
         }
 
@@ -81,12 +81,12 @@ class DirectorFinanceController extends Controller
             'category' => 'nullable|string|max:100',
             'payment_date' => 'required|date',
             'payment_method' => 'nullable|string|max:50',
-            'reference' => 'nullable|string|max:100',
+            'reference_number' => 'nullable|string|max:100',
         ]);
 
         try {
             $validated['type'] = 'income';
-            $validated['reference'] = $validated['reference'] ?? 'INC-' . strtoupper(uniqid());
+            $validated['reference_number'] = $validated['reference_number'] ?? 'INC-' . strtoupper(uniqid());
             $validated['recorded_by'] = Auth::id();
 
             $payment = Payment::create($validated);
@@ -122,12 +122,12 @@ class DirectorFinanceController extends Controller
             'category' => 'nullable|string|max:100',
             'payment_date' => 'required|date',
             'payment_method' => 'nullable|string|max:50',
-            'reference' => 'nullable|string|max:100',
+            'reference_number' => 'nullable|string|max:100',
         ]);
 
         try {
             $validated['type'] = 'expense';
-            $validated['reference'] = $validated['reference'] ?? 'EXP-' . strtoupper(uniqid());
+            $validated['reference_number'] = $validated['reference_number'] ?? 'EXP-' . strtoupper(uniqid());
             $validated['recorded_by'] = Auth::id();
 
             $payment = Payment::create($validated);
@@ -271,12 +271,12 @@ class DirectorFinanceController extends Controller
             foreach ($transactions as $transaction) {
                 fputcsv($file, [
                     $transaction->payment_date?->format('Y-m-d') ?? '',
-                    ucfirst($transaction->type),
+                    ucfirst($transaction->type ?? 'income'),
                     $transaction->category ?? '',
-                    $transaction->description,
+                    $transaction->description ?? $transaction->notes ?? '',
                     $transaction->amount,
                     $transaction->payment_method ?? '',
-                    $transaction->reference ?? '',
+                    $transaction->reference_number ?? '',
                 ]);
             }
 
