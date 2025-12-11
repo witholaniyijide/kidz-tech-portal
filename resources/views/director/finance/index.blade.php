@@ -1,22 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-bold text-2xl text-white">{{ __('Finance Management') }}</h2>
-            <div class="flex space-x-3">
-                <button onclick="document.getElementById('incomeModal').classList.remove('hidden')" class="inline-flex items-center px-4 py-2 bg-green-500/80 hover:bg-green-500 text-white font-semibold rounded-lg transition-all">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                    Add Income
-                </button>
-                <button onclick="document.getElementById('expenseModal').classList.remove('hidden')" class="inline-flex items-center px-4 py-2 bg-red-500/80 hover:bg-red-500 text-white font-semibold rounded-lg transition-all">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
-                    Add Expense
-                </button>
-                <a href="{{ route('director.finance.export') }}" class="inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg transition-all">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Export CSV
-                </a>
-            </div>
-        </div>
+        <h2 class="font-bold text-2xl text-white">{{ __('Finance Management') }}</h2>
     </x-slot>
     <x-slot name="title">{{ __('Finance') }}</x-slot>
 
@@ -41,6 +25,24 @@
 
             <!-- Filter Section -->
             <x-ui.glass-card class="mb-8">
+                <!-- Action Buttons Row -->
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex space-x-3">
+                        <button onclick="document.getElementById('incomeModal').classList.remove('hidden')" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                            Add Income
+                        </button>
+                        <button onclick="document.getElementById('expenseModal').classList.remove('hidden')" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                            Add Expense
+                        </button>
+                    </div>
+                    <a href="{{ route('director.finance.export') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Export CSV
+                    </a>
+                </div>
+                <!-- Filter Form -->
                 <form method="GET" action="{{ route('director.finance.index') }}" class="flex flex-wrap gap-4 items-end">
                     <div class="flex-1 min-w-[150px]">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>

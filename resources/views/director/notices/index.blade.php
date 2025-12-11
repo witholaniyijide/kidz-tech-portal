@@ -1,12 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-bold text-2xl text-white">{{ __('Notice Board') }}</h2>
-            <a href="{{ route('director.notices.create') }}" class="inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg transition-all">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                Create Notice
-            </a>
-        </div>
+        <h2 class="font-bold text-2xl text-white">{{ __('Notice Board') }}</h2>
     </x-slot>
     <x-slot name="title">{{ __('Notices') }}</x-slot>
 
@@ -15,6 +9,13 @@
 
             <!-- Filter Section -->
             <x-ui.glass-card class="mb-8">
+                <!-- Action Button -->
+                <div class="flex justify-end mb-4">
+                    <a href="{{ route('director.notices.create') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                        Create Notice
+                    </a>
+                </div>
                 <form method="GET" action="{{ route('director.notices.index') }}" class="flex flex-wrap gap-4 items-end">
                     <div class="flex-1 min-w-[200px]">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>

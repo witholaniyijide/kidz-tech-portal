@@ -133,7 +133,7 @@
                 <!-- Footer -->
                 <footer class="py-4 px-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                     <div class="text-center text-sm text-gray-500 dark:text-gray-400">
-                        &copy; {{ date('Y') }} KidzTech Portal. All rights reserved.
+&copy; {{ date('Y') }} With <span class="text-red-500">❤</span> Kidz Tech Coding Club. All rights reserved.
                     </div>
                 </footer>
             </div>
