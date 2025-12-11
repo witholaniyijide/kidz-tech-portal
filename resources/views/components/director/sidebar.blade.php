@@ -27,17 +27,31 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         <div class="flex items-center justify-between">
             {{-- Logo - responsive sizing based on collapsed state --}}
             <a href="{{ route('dashboard') }}" class="flex-shrink-0">
-                <div :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'" class="transition-all duration-300">
+                <div :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'" class="transition-all duration-300 relative">
+                    {{-- Light mode logo --}}
                     <img src="{{ asset('images/logo_light.png') }}"
                          alt="KidzTech Logo"
                          :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
                          class="object-contain dark:hidden transition-all duration-300"
-                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg\' :class=\'collapsed ? \"w-10 h-10\" : \"w-14 h-14\"\'><span class=\'text-white font-bold\' :class=\'collapsed ? \"text-lg\" : \"text-2xl\"\'>K</span></div>';">
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    {{-- Fallback for light mode --}}
+                    <div :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
+                         class="rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 items-center justify-center shadow-lg dark:hidden transition-all duration-300"
+                         style="display: none;">
+                        <span :class="collapsed ? 'text-lg' : 'text-2xl'" class="text-white font-bold">K</span>
+                    </div>
+                    {{-- Dark mode logo --}}
                     <img src="{{ asset('images/logo_dark.png') }}"
                          alt="KidzTech Logo"
                          :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
                          class="object-contain hidden dark:block transition-all duration-300"
-                         onerror="this.onerror=null; this.style.display='none';">
+                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                    {{-- Fallback for dark mode --}}
+                    <div :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
+                         class="rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 items-center justify-center shadow-lg hidden dark:hidden transition-all duration-300"
+                         x-bind:class="{ 'dark:flex': true }">
+                        <span :class="collapsed ? 'text-lg' : 'text-2xl'" class="text-white font-bold">K</span>
+                    </div>
                 </div>
             </a>
 
