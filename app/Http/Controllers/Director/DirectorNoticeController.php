@@ -68,7 +68,7 @@ class DirectorNoticeController extends Controller
         try {
             $validated['author_id'] = Auth::id();
             $validated['posted_by'] = Auth::id();
-            $validated['visible_to'] = json_encode($validated['visible_to']);
+            // Note: visible_to is already cast as array in model, no need to json_encode
 
             $notice = Notice::create($validated);
 
@@ -128,7 +128,7 @@ class DirectorNoticeController extends Controller
         ]);
 
         try {
-            $validated['visible_to'] = json_encode($validated['visible_to']);
+            // Note: visible_to is already cast as array in model, no need to json_encode
 
             $notice->update($validated);
 

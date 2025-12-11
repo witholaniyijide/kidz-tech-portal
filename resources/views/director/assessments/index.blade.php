@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white">{{ __('Tutor Assessments') }}</h2>
+        {{ __('Tutor Assessments') }}
     </x-slot>
     <x-slot name="title">{{ __('Director - Tutor Assessments') }}</x-slot>
 

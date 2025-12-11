@@ -1,15 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-bold text-2xl text-white">{{ __('Sent Messages') }}</h2>
-            <a href="{{ route('director.messages.create') }}" 
-               class="inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg transition-all">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                </svg>
-                Compose
-            </a>
-        </div>
+        {{ __('Sent Messages') }}
     </x-slot>
     <x-slot name="title">{{ __('Sent') }}</x-slot>
 
