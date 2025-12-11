@@ -37,10 +37,9 @@
             <!-- Main Content Area -->
             <div x-data="{ collapsed: localStorage.getItem('directorSidebarCollapsed') === 'true' }"
                  x-init="
-                    // Listen for sidebar toggle changes
-                    setInterval(() => {
+                    window.addEventListener('sidebar-toggled', () => {
                         collapsed = localStorage.getItem('directorSidebarCollapsed') === 'true';
-                    }, 100);
+                    });
                  "
                  :class="collapsed ? 'ml-20' : 'ml-64'"
                  class="flex-1 flex flex-col min-h-screen transition-all duration-300">
