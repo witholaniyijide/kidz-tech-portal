@@ -432,6 +432,8 @@ Route::prefix('director')
             ->name('assessments.approve');
         Route::post('/assessments/{assessment}/comment', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'comment'])
             ->name('assessments.comment');
+        Route::get('/assessments-export', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'export'])
+            ->name('assessments.export');
 
         // Director Activity Logs
         Route::get('/activity-logs', [App\Http\Controllers\Director\DirectorActivityController::class, 'index'])

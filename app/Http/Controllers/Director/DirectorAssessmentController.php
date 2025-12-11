@@ -235,4 +235,44 @@ class DirectorAssessmentController extends Controller
             ->back()
             ->with('success', 'Comment added successfully.');
     }
+
+    /**
+     * Export assessments to CSV.
+     */
+    public function export()
+    {
+        $assessments = TutorAssessment::with(['tutor'])
+            ->whereIn('status', ['approved-by-manager', 'approved-by-director'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $filename = 'director-assessments-' . now()->format('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function() use ($assessments) {
+            $file = fopen('php://output', 'w');
+
+            // Add headers
+            fputcsv($file, ['Tutor', 'Month', 'Score', 'Status', 'Director Comment']);
+
+            // Add data
+            foreach ($assessments as $a) {
+                fputcsv($file, [
+                    ($a->tutor?->first_name ?? '') . ' ' . ($a->tutor?->last_name ?? ''),
+                    $a->assessment_month ?? '',
+                    $a->performance_score ?? 0,
+                    $a->status ?? '',
+                    $a->director_comment ?? ''
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
