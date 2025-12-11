@@ -62,7 +62,9 @@ class DirectorMessageController extends Controller
     public function create(Request $request)
     {
         // Get all parents for recipient dropdown
-        $parents = User::role('parent')->orderBy('name')->get();
+        $parents = User::whereHas('roles', function($q) {
+            $q->where('name', 'parent');
+        })->orderBy('name')->get();
         $students = Student::where('status', 'active')->orderBy('first_name')->get();
         
         $replyTo = null;

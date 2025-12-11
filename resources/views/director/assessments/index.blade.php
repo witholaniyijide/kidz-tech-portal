@@ -488,35 +488,9 @@
                 },
                 
                 exportCSV() {
-                    // Create CSV export
-                    const data = @json($assessments->map(fn($a) => [
-                        'tutor' => ($a->tutor?->first_name ?? '') . ' ' . ($a->tutor?->last_name ?? ''),
-                        'month' => $a->assessment_month ?? '',
-                        'score' => $a->performance_score ?? 0,
-                        'status' => $a->status ?? '',
-                        'director_comment' => $a->director_comment ?? ''
-                    ])->values());
-                    
-                    if (data.length === 0) {
-                        this.showToast('No data to export', 'error');
-                        return;
-                    }
-                    
-                    const headers = Object.keys(data[0]);
-                    const csv = [
-                        headers.join(','),
-                        ...data.map(row => headers.map(h => `"${(row[h] || '').toString().replace(/"/g, '""')}"`).join(','))
-                    ].join('\n');
-                    
-                    const blob = new Blob([csv], { type: 'text/csv' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `director-assessments-${new Date().toISOString().split('T')[0]}.csv`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    
-                    this.showToast('CSV exported successfully');
+                    // Export via server-side route
+                    window.location.href = '{{ route("director.assessments.export") }}';
+                    this.showToast('CSV export started');
                 },
                 
                 generateReportCard(assessmentId) {

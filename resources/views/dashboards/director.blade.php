@@ -1,10 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-bold text-2xl text-white">
-                {{ __('Director Dashboard') }}
-            </h2>
-        </div>
+        {{ __('Director Dashboard') }}
     </x-slot>
 
     <x-slot name="title">{{ __('Director Dashboard') }}</x-slot>

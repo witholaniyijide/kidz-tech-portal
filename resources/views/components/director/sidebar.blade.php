@@ -25,16 +25,18 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
     {{-- Logo Section with Toggle --}}
     <div class="p-4 border-b border-gray-200 dark:border-slate-700">
         <div class="flex items-center justify-between">
-            {{-- Logo --}}
+            {{-- Logo - responsive sizing based on collapsed state --}}
             <a href="{{ route('dashboard') }}" class="flex-shrink-0">
-                <div class="w-12 h-12">
+                <div :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'" class="transition-all duration-300">
                     <img src="{{ asset('images/logo_light.png') }}"
                          alt="KidzTech Logo"
-                         class="w-12 h-12 object-contain dark:hidden"
-                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg\'><span class=\'text-white font-bold text-xl\'>K</span></div>';">
+                         :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
+                         class="object-contain dark:hidden transition-all duration-300"
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg\' :class=\'collapsed ? \"w-10 h-10\" : \"w-14 h-14\"\'><span class=\'text-white font-bold\' :class=\'collapsed ? \"text-lg\" : \"text-2xl\"\'>K</span></div>';">
                     <img src="{{ asset('images/logo_dark.png') }}"
                          alt="KidzTech Logo"
-                         class="w-12 h-12 object-contain hidden dark:block"
+                         :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
+                         class="object-contain hidden dark:block transition-all duration-300"
                          onerror="this.onerror=null; this.style.display='none';">
                 </div>
             </a>
