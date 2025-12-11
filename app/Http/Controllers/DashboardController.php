@@ -310,7 +310,7 @@ class DashboardController extends Controller
 
         // To-do list - dynamic based on pending items
         $pendingAttendance = AttendanceRecord::where('status', 'pending')->count();
-        $pendingAssessments = \App\Models\TutorAssessment::where('director_status', 'pending')->count();
+        $pendingAssessments = \App\Models\TutorAssessment::where('status', 'approved-by-manager')->count();
         
         $todos = [
             [
