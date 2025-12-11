@@ -24,24 +24,18 @@ class="fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-900 via-slate-800
 
     {{-- Logo Section with Toggle --}}
     <div class="p-4 border-b border-slate-700/50">
-        <div class="flex items-center" :class="collapsed ? 'justify-center' : 'justify-between'">
+        <div class="flex items-center justify-between">
             {{-- Logo --}}
-            <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 flex-shrink-0">
-                {{-- Logo Image --}}
-                <div class="w-10 h-10 flex-shrink-0">
+            <a href="{{ route('dashboard') }}" class="flex-shrink-0">
+                <div class="w-10 h-10">
                     <img src="{{ asset('images/logo_light.png') }}"
                          alt="KidzTech Logo"
                          class="w-10 h-10 object-contain"
                          onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg\'><span class=\'text-white font-bold text-lg\'>K</span></div>';">
                 </div>
-                {{-- Logo Text --}}
-                <span x-show="!collapsed" x-transition:enter="transition ease-out duration-200"
-                      x-transition:enter-start="opacity-0 transform -translate-x-2"
-                      x-transition:enter-end="opacity-100 transform translate-x-0"
-                      class="font-bold text-lg text-white whitespace-nowrap">KidzTech Portal</span>
             </a>
 
-            {{-- Toggle Button (beside logo when expanded, below when collapsed) --}}
+            {{-- Toggle Button --}}
             <button @click="toggleCollapse()"
                     x-show="!collapsed"
                     class="p-2 rounded-lg hover:bg-slate-700/50 transition-colors text-slate-400 hover:text-white"
@@ -50,17 +44,17 @@ class="fixed left-0 top-0 h-screen bg-gradient-to-b from-slate-900 via-slate-800
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
                 </svg>
             </button>
-        </div>
 
-        {{-- Toggle button when collapsed (centered below logo) --}}
-        <button @click="toggleCollapse()"
-                x-show="collapsed"
-                class="w-full mt-3 p-2 rounded-lg hover:bg-slate-700/50 transition-colors text-slate-400 hover:text-white flex justify-center"
-                title="Expand Sidebar">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
-            </svg>
-        </button>
+            {{-- Expand button when collapsed --}}
+            <button @click="toggleCollapse()"
+                    x-show="collapsed"
+                    class="p-2 rounded-lg hover:bg-slate-700/50 transition-colors text-slate-400 hover:text-white"
+                    title="Expand Sidebar">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </div>
     </div>
 
     {{-- Navigation Links --}}
