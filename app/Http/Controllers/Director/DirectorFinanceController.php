@@ -86,6 +86,7 @@ class DirectorFinanceController extends Controller
 
         try {
             $validated['type'] = 'income';
+            $validated['payment_id'] = 'PAY-' . strtoupper(uniqid());
             $validated['reference_number'] = $validated['reference_number'] ?? 'INC-' . strtoupper(uniqid());
             $validated['recorded_by'] = Auth::id();
 
@@ -127,6 +128,7 @@ class DirectorFinanceController extends Controller
 
         try {
             $validated['type'] = 'expense';
+            $validated['payment_id'] = 'PAY-' . strtoupper(uniqid());
             $validated['reference_number'] = $validated['reference_number'] ?? 'EXP-' . strtoupper(uniqid());
             $validated['recorded_by'] = Auth::id();
 

@@ -61,8 +61,8 @@ class DirectorNoticeController extends Controller
             'status' => 'required|in:draft,published,archived',
             'visible_to' => 'required|array|min:1',
             'visible_to.*' => 'in:admin,manager,tutor,parent,student',
-            'publish_at' => 'nullable|date',
-            'expires_at' => 'nullable|date|after:publish_at',
+            'published_at' => 'nullable|date',
+            'expires_at' => 'nullable|date|after:published_at',
         ]);
 
         try {
@@ -123,8 +123,8 @@ class DirectorNoticeController extends Controller
             'status' => 'required|in:draft,published,archived',
             'visible_to' => 'required|array|min:1',
             'visible_to.*' => 'in:admin,manager,tutor,parent,student',
-            'publish_at' => 'nullable|date',
-            'expires_at' => 'nullable|date|after:publish_at',
+            'published_at' => 'nullable|date',
+            'expires_at' => 'nullable|date|after:published_at',
         ]);
 
         try {
