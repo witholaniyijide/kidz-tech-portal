@@ -20,6 +20,11 @@
                 document.documentElement.classList.add('dark');
             }
         </script>
+
+        <!-- Hide Alpine.js elements until loaded -->
+        <style>
+            [x-cloak] { display: none !important; }
+        </style>
     </head>
     <body class="font-sans text-gray-900 dark:text-gray-100 antialiased">
         <!-- Animated Background with Brand Colors -->
