@@ -1,8 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white">
-            {{ __('Director Final Approval') }}
-        </h2>
+        {{ __('Director Final Approval') }}
     </x-slot>
 
     <x-slot name="title">{{ __('Director Final Approval') }}</x-slot>

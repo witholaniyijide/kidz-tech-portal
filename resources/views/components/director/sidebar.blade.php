@@ -24,38 +24,32 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
 
     {{-- Logo Section with Toggle --}}
     <div class="p-4 border-b border-gray-200 dark:border-slate-700">
-        <div class="flex items-center justify-between">
-            {{-- Logo - responsive sizing based on collapsed state --}}
-            <a href="{{ route('dashboard') }}" class="flex-shrink-0">
-                <div :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'" class="transition-all duration-300 relative">
-                    {{-- Light mode logo --}}
-                    <img src="{{ asset('images/logo_light.png') }}"
-                         alt="KidzTech Logo"
-                         :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
-                         class="object-contain dark:hidden transition-all duration-300"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    {{-- Fallback for light mode --}}
-                    <div :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
-                         class="rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 items-center justify-center shadow-lg dark:hidden transition-all duration-300"
-                         style="display: none;">
-                        <span :class="collapsed ? 'text-lg' : 'text-2xl'" class="text-white font-bold">K</span>
-                    </div>
-                    {{-- Dark mode logo --}}
-                    <img src="{{ asset('images/logo_dark.png') }}"
-                         alt="KidzTech Logo"
-                         :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
-                         class="object-contain hidden dark:block transition-all duration-300"
-                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
-                    {{-- Fallback for dark mode --}}
-                    <div :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
-                         class="rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 items-center justify-center shadow-lg hidden dark:hidden transition-all duration-300"
-                         x-bind:class="{ 'dark:flex': true }">
-                        <span :class="collapsed ? 'text-lg' : 'text-2xl'" class="text-white font-bold">K</span>
-                    </div>
+        <div class="flex items-center" :class="collapsed ? 'justify-center' : 'justify-between'">
+            {{-- Logo - shows fallback immediately, image loads in background --}}
+            <a href="{{ route('dashboard') }}" class="flex-shrink-0 flex items-center justify-center"
+               x-data="{ imageLoaded: false, imageError: false }"
+               x-init="
+                   const img = new Image();
+                   img.onload = () => { imageLoaded = true; };
+                   img.onerror = () => { imageError = true; };
+                   img.src = '{{ asset('images/logo_light.png') }}';
+               ">
+                {{-- Fallback logo (shown by default) --}}
+                <div x-show="!imageLoaded || imageError"
+                     :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
+                     class="rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg transition-all duration-300">
+                    <span :class="collapsed ? 'text-lg' : 'text-2xl'" class="text-white font-bold">K</span>
                 </div>
+                {{-- Actual logo (shown when loaded) --}}
+                <img x-show="imageLoaded && !imageError"
+                     x-cloak
+                     src="{{ asset('images/logo_light.png') }}"
+                     alt="KidzTech Logo"
+                     :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
+                     class="object-contain transition-all duration-300">
             </a>
 
-            {{-- Toggle Button --}}
+            {{-- Toggle Button (only when expanded) --}}
             <button @click="toggleCollapse()"
                     x-show="!collapsed"
                     class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white"
@@ -64,10 +58,10 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
                 </svg>
             </button>
-
-            {{-- Expand button when collapsed --}}
+        </div>
+        {{-- Expand button (centered below logo when collapsed) --}}
+        <div x-show="collapsed" class="flex justify-center mt-2">
             <button @click="toggleCollapse()"
-                    x-show="collapsed"
                     class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white"
                     title="Expand Sidebar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

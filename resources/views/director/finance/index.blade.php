@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white">{{ __('Finance Management') }}</h2>
+        {{ __('Finance Management') }}
     </x-slot>
     <x-slot name="title">{{ __('Finance') }}</x-slot>
 

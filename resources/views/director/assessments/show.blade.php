@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white">Tutor Assessment Review</h2>
+        {{ __('Tutor Assessment Review') }}
     </x-slot>
 
     <x-slot name="title">Assessment Review</x-slot>

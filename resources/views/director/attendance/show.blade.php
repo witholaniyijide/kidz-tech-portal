@@ -1,17 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-bold text-2xl text-white">{{ __('Attendance Details') }}</h2>
-            <a href="{{ route('director.attendance.index') }}" class="inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg transition-all">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                Back
-            </a>
-        </div>
+        {{ __('Attendance Details') }}
     </x-slot>
     <x-slot name="title">{{ __('Attendance Details') }}</x-slot>
 
     <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <!-- Action Button -->
+            <div class="flex justify-end mb-4">
+                <a href="{{ route('director.attendance.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition-all">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    Back
+                </a>
+            </div>
             <x-ui.glass-card>
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white">Attendance Record</h3>

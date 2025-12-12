@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white">Analytics & Insights</h2>
+        {{ __('Analytics & Insights') }}
     </x-slot>
 
     <x-slot name="title">Director Analytics</x-slot>
