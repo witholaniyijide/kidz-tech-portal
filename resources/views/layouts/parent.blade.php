@@ -93,6 +93,9 @@
             .notification-badge {
                 animation: notification-pulse 2s infinite;
             }
+
+            /* Hide Alpine.js elements until loaded */
+            [x-cloak] { display: none !important; }
         </style>
 
         <!-- Dark Mode Initialization -->
