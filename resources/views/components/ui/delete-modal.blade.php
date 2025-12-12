@@ -26,8 +26,9 @@
     class="relative z-50"
 >
     <!-- Backdrop -->
-    <div 
-        x-show="open" 
+    <div
+        x-cloak
+        x-show="open"
         x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100"
@@ -39,7 +40,8 @@
     ></div>
 
     <!-- Modal -->
-    <div 
+    <div
+        x-cloak
         x-show="open"
         x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0 scale-95"
