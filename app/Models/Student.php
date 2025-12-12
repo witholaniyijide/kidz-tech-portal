@@ -32,6 +32,8 @@ class Student extends Model
         'career_interest',
         'class_link',
         'google_classroom_link',
+        'live_classroom_link',
+        'current_level',
         'tutor_id',
         'class_schedule',
         'classes_per_week',

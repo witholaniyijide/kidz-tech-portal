@@ -25,28 +25,12 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
     {{-- Logo Section with Toggle --}}
     <div class="p-4 border-b border-gray-200 dark:border-slate-700">
         <div class="flex items-center" :class="collapsed ? 'justify-center' : 'justify-between'">
-            {{-- Logo - shows fallback immediately, image loads in background --}}
-            <a href="{{ route('dashboard') }}" class="flex-shrink-0 flex items-center justify-center"
-               x-data="{ imageLoaded: false, imageError: false }"
-               x-init="
-                   const img = new Image();
-                   img.onload = () => { imageLoaded = true; };
-                   img.onerror = () => { imageError = true; };
-                   img.src = '{{ asset('images/logo_light.png') }}';
-               ">
-                {{-- Fallback logo (shown by default) --}}
-                <div x-show="!imageLoaded || imageError"
-                     :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
+            {{-- Logo - Simple gradient "K" logo --}}
+            <a href="{{ route('dashboard') }}" class="flex-shrink-0 flex items-center justify-center">
+                <div :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
                      class="rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg transition-all duration-300">
-                    <span :class="collapsed ? 'text-lg' : 'text-2xl'" class="text-white font-bold">K</span>
+                    <span :class="collapsed ? 'text-lg' : 'text-3xl'" class="text-white font-bold">K</span>
                 </div>
-                {{-- Actual logo (shown when loaded) --}}
-                <img x-show="imageLoaded && !imageError"
-                     x-cloak
-                     src="{{ asset('images/logo_light.png') }}"
-                     alt="KidzTech Logo"
-                     :class="collapsed ? 'w-10 h-10' : 'w-14 h-14'"
-                     class="object-contain transition-all duration-300">
             </a>
 
             {{-- Toggle Button (only when expanded) --}}

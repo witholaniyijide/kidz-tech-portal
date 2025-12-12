@@ -115,11 +115,17 @@
                                 <select name="current_level" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                     <option value="">Select Level</option>
                                     <option value="Level 1 - Introduction to Computer Science" {{ old('current_level', $student->current_level) == 'Level 1 - Introduction to Computer Science' ? 'selected' : '' }}>Level 1 - Introduction to Computer Science</option>
-                                    <option value="Level 2 - Coding Fundamentals" {{ old('current_level', $student->current_level) == 'Level 2 - Coding Fundamentals' ? 'selected' : '' }}>Level 2 - Coding Fundamentals</option>
+                                    <option value="Level 2 - Coding and Fundamental Concepts" {{ old('current_level', $student->current_level) == 'Level 2 - Coding and Fundamental Concepts' ? 'selected' : '' }}>Level 2 - Coding and Fundamental Concepts</option>
                                     <option value="Level 3 - Scratch Programming" {{ old('current_level', $student->current_level) == 'Level 3 - Scratch Programming' ? 'selected' : '' }}>Level 3 - Scratch Programming</option>
-                                    <option value="Level 4 - Web Development Basics" {{ old('current_level', $student->current_level) == 'Level 4 - Web Development Basics' ? 'selected' : '' }}>Level 4 - Web Development Basics</option>
-                                    <option value="Level 5 - Python Programming" {{ old('current_level', $student->current_level) == 'Level 5 - Python Programming' ? 'selected' : '' }}>Level 5 - Python Programming</option>
-                                    <option value="Level 6 - Advanced Programming" {{ old('current_level', $student->current_level) == 'Level 6 - Advanced Programming' ? 'selected' : '' }}>Level 6 - Advanced Programming</option>
+                                    <option value="Level 4 - Artificial Intelligence" {{ old('current_level', $student->current_level) == 'Level 4 - Artificial Intelligence' ? 'selected' : '' }}>Level 4 - Artificial Intelligence</option>
+                                    <option value="Level 5 - Graphics Design" {{ old('current_level', $student->current_level) == 'Level 5 - Graphics Design' ? 'selected' : '' }}>Level 5 - Graphics Design</option>
+                                    <option value="Level 6 - Game Development" {{ old('current_level', $student->current_level) == 'Level 6 - Game Development' ? 'selected' : '' }}>Level 6 - Game Development</option>
+                                    <option value="Level 7 - Mobile App Development" {{ old('current_level', $student->current_level) == 'Level 7 - Mobile App Development' ? 'selected' : '' }}>Level 7 - Mobile App Development</option>
+                                    <option value="Level 8 - Website Development" {{ old('current_level', $student->current_level) == 'Level 8 - Website Development' ? 'selected' : '' }}>Level 8 - Website Development</option>
+                                    <option value="Level 9 - Python Programming" {{ old('current_level', $student->current_level) == 'Level 9 - Python Programming' ? 'selected' : '' }}>Level 9 - Python Programming</option>
+                                    <option value="Level 10 - Digital Literacy & Safety" {{ old('current_level', $student->current_level) == 'Level 10 - Digital Literacy & Safety' ? 'selected' : '' }}>Level 10 - Digital Literacy & Safety</option>
+                                    <option value="Level 11 - Machine Learning" {{ old('current_level', $student->current_level) == 'Level 11 - Machine Learning' ? 'selected' : '' }}>Level 11 - Machine Learning</option>
+                                    <option value="Level 12 - Robotics" {{ old('current_level', $student->current_level) == 'Level 12 - Robotics' ? 'selected' : '' }}>Level 12 - Robotics</option>
                                 </select>
                                 @error('current_level') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
@@ -149,6 +155,18 @@
                                     @endfor
                                 </select>
                                 @error('classes_per_week') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Google Classroom Link</label>
+                                <input type="url" name="google_classroom_link" value="{{ old('google_classroom_link', $student->google_classroom_link) }}" placeholder="https://classroom.google.com/..."
+                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                @error('google_classroom_link') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Live Classroom Link</label>
+                                <input type="url" name="live_classroom_link" value="{{ old('live_classroom_link', $student->live_classroom_link) }}" placeholder="https://meet.google.com/... or Zoom link"
+                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                @error('live_classroom_link') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
                     </div>
