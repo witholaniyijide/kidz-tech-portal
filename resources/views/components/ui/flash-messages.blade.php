@@ -12,22 +12,22 @@
     $position = $positionClasses[$position] ?? $positionClasses['top-right'];
 @endphp
 
-<div 
-    x-data="{ 
+<div
+    x-data="{
         messages: [],
         init() {
             // Add messages from session
             @if(session('success'))
-                this.addMessage('success', '{{ session('success') }}');
+                this.addMessage('success', {{ json_encode(session('success')) }});
             @endif
             @if(session('error'))
-                this.addMessage('error', '{{ session('error') }}');
+                this.addMessage('error', {{ json_encode(session('error')) }});
             @endif
             @if(session('warning'))
-                this.addMessage('warning', '{{ session('warning') }}');
+                this.addMessage('warning', {{ json_encode(session('warning')) }});
             @endif
             @if(session('info'))
-                this.addMessage('info', '{{ session('info') }}');
+                this.addMessage('info', {{ json_encode(session('info')) }});
             @endif
         },
         addMessage(type, text) {
