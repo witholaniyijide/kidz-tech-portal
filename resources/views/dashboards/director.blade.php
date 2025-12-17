@@ -107,75 +107,7 @@
                 </x-ui.glass-card>
 
                 <!-- Today's To-Do List -->
-                <x-ui.glass-card x-data="{
-                    todos: [],
-                    newTodo: '',
-                    editingId: null,
-                    editText: '',
-                    init() {
-                        const saved = localStorage.getItem('directorTodos');
-                        if (saved) {
-                            this.todos = JSON.parse(saved);
-                        } else {
-                            // Initialize with default tasks
-                            this.todos = [
-                                { id: 1, text: "Post today's schedule", completed: false },
-                                { id: 2, text: "Review pending attendance", completed: false },
-                                { id: 3, text: "Follow up inactive students", completed: false },
-                                { id: 4, text: "Approve tutor submissions", completed: false }
-                            ];
-                            this.saveTodos();
-                        }
-                    },
-                    saveTodos() {
-                        localStorage.setItem('directorTodos', JSON.stringify(this.todos));
-                    },
-                    addTodo() {
-                        if (this.newTodo.trim()) {
-                            this.todos.push({
-                                id: Date.now(),
-                                text: this.newTodo.trim(),
-                                completed: false
-                            });
-                            this.newTodo = '';
-                            this.saveTodos();
-                        }
-                    },
-                    toggleTodo(id) {
-                        const todo = this.todos.find(t => t.id === id);
-                        if (todo) {
-                            todo.completed = !todo.completed;
-                            this.saveTodos();
-                        }
-                    },
-                    startEdit(todo) {
-                        this.editingId = todo.id;
-                        this.editText = todo.text;
-                        this.$nextTick(() => {
-                            const input = this.$refs['editInput' + todo.id];
-                            if (input) input.focus();
-                        });
-                    },
-                    saveEdit(id) {
-                        if (this.editText.trim()) {
-                            const todo = this.todos.find(t => t.id === id);
-                            if (todo) {
-                                todo.text = this.editText.trim();
-                                this.saveTodos();
-                            }
-                        }
-                        this.editingId = null;
-                        this.editText = '';
-                    },
-                    cancelEdit() {
-                        this.editingId = null;
-                        this.editText = '';
-                    },
-                    deleteTodo(id) {
-                        this.todos = this.todos.filter(t => t.id !== id);
-                        this.saveTodos();
-                    }
-                }">
+                <x-ui.glass-card x-data="todoList()">
                     <!-- Header -->
                     <div class="flex items-center gap-2 mb-2">
                         <div class="w-6 h-6 bg-teal-500 rounded flex items-center justify-center">
@@ -477,6 +409,76 @@
 
         </div>
     </div>
+
+    <!-- Alpine.js Todo List Component -->
+    <script>
+        function todoList() {
+            return {
+                todos: [],
+                newTodo: '',
+                editingId: null,
+                editText: '',
+                init() {
+                    const saved = localStorage.getItem('directorTodos');
+                    if (saved) {
+                        this.todos = JSON.parse(saved);
+                    } else {
+                        this.todos = [
+                            { id: 1, text: "Post today's schedule", completed: false },
+                            { id: 2, text: "Review pending attendance", completed: false },
+                            { id: 3, text: "Follow up inactive students", completed: false },
+                            { id: 4, text: "Approve tutor submissions", completed: false }
+                        ];
+                        this.saveTodos();
+                    }
+                },
+                saveTodos() {
+                    localStorage.setItem('directorTodos', JSON.stringify(this.todos));
+                },
+                addTodo() {
+                    if (this.newTodo.trim()) {
+                        this.todos.push({
+                            id: Date.now(),
+                            text: this.newTodo.trim(),
+                            completed: false
+                        });
+                        this.newTodo = '';
+                        this.saveTodos();
+                    }
+                },
+                toggleTodo(id) {
+                    const todo = this.todos.find(t => t.id === id);
+                    if (todo) {
+                        todo.completed = !todo.completed;
+                        this.saveTodos();
+                    }
+                },
+                startEdit(todo) {
+                    this.editingId = todo.id;
+                    this.editText = todo.text;
+                },
+                saveEdit(id) {
+                    if (this.editText.trim()) {
+                        const todo = this.todos.find(t => t.id === id);
+                        if (todo) {
+                            todo.text = this.editText.trim();
+                            this.saveTodos();
+                        }
+                    }
+                    this.editingId = null;
+                    this.editText = '';
+                },
+                cancelEdit() {
+                    this.editingId = null;
+                    this.editText = '';
+                },
+                deleteTodo(id) {
+                    this.todos = this.todos.filter(t => t.id !== id);
+                    this.saveTodos();
+                }
+            }
+        }
+    </script>
 
     <!-- Chart.js Initialization Scripts with Dynamic Data -->
     <script>
