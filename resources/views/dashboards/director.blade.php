@@ -54,9 +54,9 @@
                 />
 
                 <x-ui.stat-card
-                    title="Monthly Revenue"
-                    value="₦{{ number_format($monthlyRevenue) }}"
-                    icon='<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+                    title="Monthly Reports"
+                    value="{{ $monthlyReports }}"
+                    icon='<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>'
                     gradient="bg-gradient-to-br from-orange-500 to-red-600"
                 />
             </div>
@@ -106,21 +106,91 @@
                     @endif
                 </x-ui.glass-card>
 
-                <!-- To-Do List -->
-                <x-ui.glass-card>
+                <!-- To-Do List with Persistence -->
+                <x-ui.glass-card x-data="{
+                    todos: [],
+                    newTodo: '',
+                    editingId: null,
+                    editText: '',
+                    init() {
+                        const saved = localStorage.getItem('directorTodos');
+                        if (saved) {
+                            this.todos = JSON.parse(saved);
+                        }
+                    },
+                    saveTodos() {
+                        localStorage.setItem('directorTodos', JSON.stringify(this.todos));
+                    },
+                    addTodo() {
+                        if (this.newTodo.trim()) {
+                            this.todos.push({
+                                id: Date.now(),
+                                text: this.newTodo.trim(),
+                                completed: false
+                            });
+                            this.newTodo = '';
+                            this.saveTodos();
+                        }
+                    },
+                    toggleTodo(id) {
+                        const todo = this.todos.find(t => t.id === id);
+                        if (todo) {
+                            todo.completed = !todo.completed;
+                            this.saveTodos();
+                        }
+                    },
+                    startEdit(todo) {
+                        this.editingId = todo.id;
+                        this.editText = todo.text;
+                    },
+                    saveEdit(id) {
+                        if (this.editText.trim()) {
+                            const todo = this.todos.find(t => t.id === id);
+                            if (todo) {
+                                todo.text = this.editText.trim();
+                                this.saveTodos();
+                            }
+                        }
+                        this.editingId = null;
+                        this.editText = '';
+                    },
+                    cancelEdit() {
+                        this.editingId = null;
+                        this.editText = '';
+                    },
+                    deleteTodo(id) {
+                        this.todos = this.todos.filter(t => t.id !== id);
+                        this.saveTodos();
+                    }
+                }">
                     <x-ui.section-title>To-Do List</x-ui.section-title>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Tasks requiring your attention</p>
-                    
-                    <div class="space-y-3">
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Your personal task list (saved locally)</p>
+
+                    <!-- Add Todo Form -->
+                    <div class="flex gap-2 mb-4">
+                        <input type="text"
+                               x-model="newTodo"
+                               @keydown.enter="addTodo()"
+                               placeholder="Add a new task..."
+                               class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button @click="addTodo()"
+                                class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
+                            Add
+                        </button>
+                    </div>
+
+                    <!-- System Todos -->
+                    <div class="space-y-2 mb-4">
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">System Tasks</p>
                         @foreach($todos as $todo)
                             <a href="{{ $todo['link'] }}" class="flex items-center p-3 rounded-lg {{ $todo['completed'] ? 'bg-green-50 dark:bg-green-900/20' : 'bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30' }} transition-colors">
                                 <div class="flex-shrink-0">
                                     @if($todo['completed'])
-                                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                     @else
-                                        <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                     @endif
@@ -138,19 +208,115 @@
                             </a>
                         @endforeach
                     </div>
+
+                    <!-- User Todos -->
+                    <div class="space-y-2">
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Your Tasks</p>
+                        <template x-if="todos.length === 0">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 py-2">No personal tasks yet. Add one above!</p>
+                        </template>
+                        <template x-for="todo in todos" :key="todo.id">
+                            <div class="flex items-center p-3 rounded-lg transition-colors"
+                                 :class="todo.completed ? 'bg-green-50 dark:bg-green-900/20' : 'bg-blue-50 dark:bg-blue-900/20'">
+                                <!-- Checkbox -->
+                                <button @click="toggleTodo(todo.id)" class="flex-shrink-0">
+                                    <svg x-show="todo.completed" class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <svg x-show="!todo.completed" class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </button>
+
+                                <!-- Text/Edit -->
+                                <div class="ml-3 flex-1">
+                                    <template x-if="editingId !== todo.id">
+                                        <p class="text-sm font-medium"
+                                           :class="todo.completed ? 'text-green-800 dark:text-green-200 line-through' : 'text-blue-800 dark:text-blue-200'"
+                                           x-text="todo.text"></p>
+                                    </template>
+                                    <template x-if="editingId === todo.id">
+                                        <input type="text"
+                                               x-model="editText"
+                                               @keydown.enter="saveEdit(todo.id)"
+                                               @keydown.escape="cancelEdit()"
+                                               class="w-full px-2 py-1 text-sm border border-blue-300 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                    </template>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="flex items-center gap-1 ml-2">
+                                    <template x-if="editingId !== todo.id">
+                                        <button @click="startEdit(todo)"
+                                                class="p-1 text-gray-400 hover:text-blue-500 transition-colors"
+                                                title="Edit">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </button>
+                                    </template>
+                                    <template x-if="editingId === todo.id">
+                                        <button @click="saveEdit(todo.id)"
+                                                class="p-1 text-green-500 hover:text-green-600 transition-colors"
+                                                title="Save">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </button>
+                                    </template>
+                                    <button @click="deleteTodo(todo.id)"
+                                            class="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                            title="Delete">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
                 </x-ui.glass-card>
             </div>
 
             <!-- Charts and Analytics Section -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
-                <!-- Revenue Trend Chart -->
+                <!-- Notice Board -->
                 <div class="lg:col-span-2">
                     <x-ui.glass-card>
-                        <x-ui.section-title>Revenue Trend</x-ui.section-title>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Monthly revenue over the last 6 months</p>
-                        <div class="h-80">
-                            <canvas id="revenueChart"></canvas>
+                        <div class="flex items-center justify-between mb-4">
+                            <x-ui.section-title>Notice Board</x-ui.section-title>
+                            <a href="{{ route('director.notices.create') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium">+ Create Notice</a>
+                        </div>
+                        <div class="space-y-4 max-h-80 overflow-y-auto">
+                            @if(($notices ?? collect())->isEmpty())
+                                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                    <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                                    </svg>
+                                    <p>No notices published yet</p>
+                                </div>
+                            @else
+                                @foreach($notices as $notice)
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border-l-4
+                                        @if($notice->priority === 'urgent') border-red-500
+                                        @elseif($notice->priority === 'high') border-amber-500
+                                        @else border-blue-500
+                                        @endif">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <h4 class="font-semibold text-gray-800 dark:text-white">{{ $notice->title }}</h4>
+                                            @if($notice->priority === 'urgent')
+                                                <span class="px-2 py-0.5 text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 rounded-full">Urgent</span>
+                                            @elseif($notice->priority === 'high')
+                                                <span class="px-2 py-0.5 text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 rounded-full">High</span>
+                                            @endif
+                                        </div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{{ Str::limit($notice->content, 100) }}</p>
+                                        <p class="text-xs text-gray-500 mt-2">{{ $notice->created_at->diffForHumans() }}</p>
+                                    </div>
+                                @endforeach
+                                <a href="{{ route('director.notices.index') }}" class="block text-center mt-4 text-blue-600 dark:text-blue-400 hover:underline text-sm">View All Notices →</a>
+                            @endif
                         </div>
                     </x-ui.glass-card>
                 </div>
@@ -277,14 +443,14 @@
                         </div>
                     </a>
 
-                    <a href="{{ route('director.finance.index') }}" class="group">
+                    <a href="{{ route('director.assessments.index') }}" class="group">
                         <div class="rounded-xl bg-white/10 dark:bg-gray-900/10 p-6 text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
                             <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                                 </svg>
                             </div>
-                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-orange-600">Finance</span>
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-orange-600">Assessments</span>
                         </div>
                     </a>
 
@@ -320,55 +486,6 @@
     <!-- Chart.js Initialization Scripts with Dynamic Data -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Revenue Trend Chart - Dynamic Data
-            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-            new Chart(revenueCtx, {
-                type: 'line',
-                data: {
-                    labels: @json($revenueLabels),
-                    datasets: [{
-                        label: 'Revenue',
-                        data: @json($revenueTrend),
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        pointBackgroundColor: 'rgb(59, 130, 246)',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            callbacks: {
-                                label: function(context) {
-                                    return '₦' + context.parsed.y.toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '₦' + (value / 1000) + 'k';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
             // Student Distribution Chart - Dynamic Data
             const distributionCtx = document.getElementById('studentDistributionChart').getContext('2d');
             const studentData = @json($studentDistribution);

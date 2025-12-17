@@ -62,7 +62,6 @@ class DirectorNoticeController extends Controller
             'visible_to' => 'required|array|min:1',
             'visible_to.*' => 'in:admin,manager,tutor,parent,student',
             'published_at' => 'nullable|date',
-            'expires_at' => 'nullable|date|after:published_at',
         ]);
 
         try {
@@ -124,7 +123,6 @@ class DirectorNoticeController extends Controller
             'visible_to' => 'required|array|min:1',
             'visible_to.*' => 'in:admin,manager,tutor,parent,student',
             'published_at' => 'nullable|date',
-            'expires_at' => 'nullable|date|after:published_at',
         ]);
 
         try {
