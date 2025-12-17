@@ -473,13 +473,19 @@ Route::prefix('director')
         Route::resource('tutors', App\Http\Controllers\Director\DirectorTutorController::class)
             ->names('tutors');
 
-        // Director Attendance
+        // Director Attendance (Full CRUD)
         Route::get('/attendance', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'index'])
             ->name('attendance.index');
         Route::post('/attendance', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'store'])
             ->name('attendance.store');
         Route::get('/attendance/{attendance}', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'show'])
             ->name('attendance.show');
+        Route::get('/attendance/{attendance}/edit', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'edit'])
+            ->name('attendance.edit');
+        Route::put('/attendance/{attendance}', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'update'])
+            ->name('attendance.update');
+        Route::delete('/attendance/{attendance}', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'destroy'])
+            ->name('attendance.destroy');
         Route::post('/attendance/{attendance}/approve', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'approve'])
             ->name('attendance.approve');
 

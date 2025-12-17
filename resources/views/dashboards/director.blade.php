@@ -106,7 +106,7 @@
                     @endif
                 </x-ui.glass-card>
 
-                <!-- To-Do List with Persistence -->
+                <!-- Today's To-Do List -->
                 <x-ui.glass-card x-data="{
                     todos: [],
                     newTodo: '',
@@ -116,6 +116,15 @@
                         const saved = localStorage.getItem('directorTodos');
                         if (saved) {
                             this.todos = JSON.parse(saved);
+                        } else {
+                            // Initialize with default tasks
+                            this.todos = [
+                                { id: 1, text: 'Post today\'s schedule', completed: false },
+                                { id: 2, text: 'Review pending attendance', completed: false },
+                                { id: 3, text: 'Follow up inactive students', completed: false },
+                                { id: 4, text: 'Approve tutor submissions', completed: false }
+                            ];
+                            this.saveTodos();
                         }
                     },
                     saveTodos() {
@@ -142,6 +151,10 @@
                     startEdit(todo) {
                         this.editingId = todo.id;
                         this.editText = todo.text;
+                        this.$nextTick(() => {
+                            const input = this.$refs['editInput' + todo.id];
+                            if (input) input.focus();
+                        });
                     },
                     saveEdit(id) {
                         if (this.editText.trim()) {
@@ -163,76 +176,36 @@
                         this.saveTodos();
                     }
                 }">
-                    <x-ui.section-title>To-Do List</x-ui.section-title>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Your personal task list (saved locally)</p>
-
-                    <!-- Add Todo Form -->
-                    <div class="flex gap-2 mb-4">
-                        <input type="text"
-                               x-model="newTodo"
-                               @keydown.enter="addTodo()"
-                               placeholder="Add a new task..."
-                               class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <button @click="addTodo()"
-                                class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
-                            Add
-                        </button>
+                    <!-- Header -->
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-6 h-6 bg-teal-500 rounded flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Today's To-Do List</h3>
                     </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Keep track of your daily tasks</p>
 
-                    <!-- System Todos -->
-                    <div class="space-y-2 mb-4">
-                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">System Tasks</p>
-                        @foreach($todos as $todo)
-                            <a href="{{ $todo['link'] }}" class="flex items-center p-3 rounded-lg {{ $todo['completed'] ? 'bg-green-50 dark:bg-green-900/20' : 'bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30' }} transition-colors">
-                                <div class="flex-shrink-0">
-                                    @if($todo['completed'])
-                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
-                                    @else
-                                        <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
-                                    @endif
-                                </div>
-                                <div class="ml-3 flex-1">
-                                    <p class="text-sm font-medium {{ $todo['completed'] ? 'text-green-800 dark:text-green-200 line-through' : 'text-yellow-800 dark:text-yellow-200' }}">
-                                        {{ $todo['text'] }}
-                                    </p>
-                                </div>
-                                @if($todo['count'] > 0)
-                                    <span class="ml-2 px-2 py-1 text-xs font-bold rounded-full bg-red-500 text-white">
-                                        {{ $todo['count'] }}
-                                    </span>
-                                @endif
-                            </a>
-                        @endforeach
-                    </div>
-
-                    <!-- User Todos -->
-                    <div class="space-y-2">
-                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Your Tasks</p>
-                        <template x-if="todos.length === 0">
-                            <p class="text-sm text-gray-500 dark:text-gray-400 py-2">No personal tasks yet. Add one above!</p>
-                        </template>
+                    <!-- To-Do Items -->
+                    <div class="space-y-3 mb-4 max-h-64 overflow-y-auto">
                         <template x-for="todo in todos" :key="todo.id">
-                            <div class="flex items-center p-3 rounded-lg transition-colors"
-                                 :class="todo.completed ? 'bg-green-50 dark:bg-green-900/20' : 'bg-blue-50 dark:bg-blue-900/20'">
+                            <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-600 hover:border-teal-300 dark:hover:border-teal-500 transition-all group">
                                 <!-- Checkbox -->
-                                <button @click="toggleTodo(todo.id)" class="flex-shrink-0">
-                                    <svg x-show="todo.completed" class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <svg x-show="!todo.completed" class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                <button @click="toggleTodo(todo.id)"
+                                        class="w-6 h-6 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-colors"
+                                        :class="todo.completed ? 'bg-teal-500 border-teal-500' : 'border-gray-300 dark:border-gray-500 hover:border-teal-400'">
+                                    <svg x-show="todo.completed" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
                                 </button>
 
                                 <!-- Text/Edit -->
-                                <div class="ml-3 flex-1">
+                                <div class="flex-1 min-w-0">
                                     <template x-if="editingId !== todo.id">
-                                        <p class="text-sm font-medium"
-                                           :class="todo.completed ? 'text-green-800 dark:text-green-200 line-through' : 'text-blue-800 dark:text-blue-200'"
+                                        <p class="text-sm font-medium truncate cursor-pointer"
+                                           :class="todo.completed ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-700 dark:text-gray-200'"
+                                           @dblclick="startEdit(todo)"
                                            x-text="todo.text"></p>
                                     </template>
                                     <template x-if="editingId === todo.id">
@@ -240,32 +213,25 @@
                                                x-model="editText"
                                                @keydown.enter="saveEdit(todo.id)"
                                                @keydown.escape="cancelEdit()"
-                                               class="w-full px-2 py-1 text-sm border border-blue-300 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                               @blur="saveEdit(todo.id)"
+                                               x-ref="editInput"
+                                               class="w-full px-2 py-1 text-sm border border-teal-400 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
                                     </template>
                                 </div>
 
                                 <!-- Actions -->
-                                <div class="flex items-center gap-1 ml-2">
+                                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <template x-if="editingId !== todo.id">
                                         <button @click="startEdit(todo)"
-                                                class="p-1 text-gray-400 hover:text-blue-500 transition-colors"
+                                                class="p-1.5 text-gray-400 hover:text-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/30 rounded-lg transition-colors"
                                                 title="Edit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                             </svg>
                                         </button>
                                     </template>
-                                    <template x-if="editingId === todo.id">
-                                        <button @click="saveEdit(todo.id)"
-                                                class="p-1 text-green-500 hover:text-green-600 transition-colors"
-                                                title="Save">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                            </svg>
-                                        </button>
-                                    </template>
                                     <button @click="deleteTodo(todo.id)"
-                                            class="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                            class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                                             title="Delete">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -274,6 +240,35 @@
                                 </div>
                             </div>
                         </template>
+
+                        <template x-if="todos.length === 0">
+                            <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                                <p class="text-sm">No tasks yet. Add one below!</p>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Add New Task -->
+                    <div class="flex gap-2 mb-3">
+                        <input type="text"
+                               x-model="newTodo"
+                               @keydown.enter="addTodo()"
+                               placeholder="Add a new task..."
+                               class="flex-1 px-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                        <button @click="addTodo()"
+                                class="px-4 py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-xl transition-colors shadow-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Info Banner -->
+                    <div class="flex items-center gap-2 p-3 bg-teal-50 dark:bg-teal-900/20 rounded-xl border border-teal-100 dark:border-teal-800">
+                        <svg class="w-5 h-5 text-teal-600 dark:text-teal-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-sm text-teal-700 dark:text-teal-300">Tasks are saved automatically in your browser</span>
                     </div>
                 </x-ui.glass-card>
             </div>

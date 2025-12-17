@@ -65,7 +65,6 @@ class DirectorNoticeController extends Controller
         ]);
 
         try {
-            $validated['author_id'] = Auth::id();
             $validated['posted_by'] = Auth::id();
             // Note: visible_to is already cast as array in model, no need to json_encode
 

@@ -26,11 +26,13 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
     <div class="p-4 border-b border-gray-200 dark:border-slate-700">
         <div class="flex items-center" :class="collapsed ? 'justify-center' : 'justify-between'">
             {{-- Logo --}}
-            <a href="{{ route('dashboard') }}" class="flex-shrink-0 flex items-center justify-center">
+            <a href="{{ route('dashboard') }}" class="flex-shrink-0 flex items-center justify-center" x-cloak>
                 <img src="{{ asset('images/logo_light.png') }}"
                      alt="KidzTech Logo"
                      :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
                      class="object-contain transition-all duration-300 dark:hidden"
+                     style="display: none;"
+                     x-init="$el.style.display = ''"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
                      class="rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 items-center justify-center shadow-lg transition-all duration-300 hidden dark:flex">
