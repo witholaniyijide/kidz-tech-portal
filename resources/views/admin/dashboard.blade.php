@@ -136,7 +136,7 @@
                 </div>
 
                 <div class="p-6">
-                    @if(($todaySchedule ?? collect())->isEmpty())
+                    @if(empty($todayClasses))
                         <div class="text-center py-8 text-gray-500 dark:text-gray-400">
                             <div class="text-5xl mb-4">📭</div>
                             <p class="text-lg">No classes scheduled for today</p>
@@ -144,31 +144,32 @@
                         </div>
                     @else
                         <div class="space-y-3" id="scheduleList">
-                            @foreach($todaySchedule as $index => $class)
+                            @foreach($todayClasses as $index => $class)
                                 <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                     <div class="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                                         {{ $index + 1 }}
                                     </div>
                                     <div class="flex-1">
                                         <div class="font-semibold text-gray-800 dark:text-white">
-                                            {{ $class->student->first_name ?? 'Unknown' }} {{ $class->student->last_name ?? '' }}
+                                            {{ $class['student_name'] ?? 'Unknown' }}
                                         </div>
                                         <div class="text-sm text-gray-500 dark:text-gray-400">
-                                            by {{ $class->tutor->first_name ?? 'Unknown' }} {{ $class->tutor->last_name ?? '' }}
+                                            by {{ $class['tutor_name'] ?? 'Unknown' }}
                                         </div>
                                     </div>
                                     <div class="text-right">
                                         <div class="font-semibold text-teal-600 dark:text-teal-400">
-                                            {{ \Carbon\Carbon::parse($class->class_time)->format('g:i A') }}
+                                            @php
+                                                try {
+                                                    $time = \Carbon\Carbon::parse($class['time'] ?? '00:00')->format('g:i A');
+                                                } catch (\Exception $e) {
+                                                    $time = $class['time'] ?? '00:00';
+                                                }
+                                            @endphp
+                                            {{ $time }}
                                         </div>
                                         <div class="text-xs text-gray-500">
-                                            @if($class->status === 'completed')
-                                                <span class="text-emerald-600">✅ Completed</span>
-                                            @elseif($class->status === 'in_progress')
-                                                <span class="text-blue-600">🔵 In Progress</span>
-                                            @else
-                                                <span class="text-gray-500">⏳ Scheduled</span>
-                                            @endif
+                                            <span class="text-gray-500">⏳ Scheduled</span>
                                         </div>
                                     </div>
                                 </div>
@@ -282,12 +283,12 @@
                         <span class="text-sm font-medium">Add Tutor</span>
                     </a>
 
-                    {{-- Mark Attendance --}}
-                    <a href="{{ route('admin.attendance.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                    {{-- Review Attendance --}}
+                    <a href="{{ route('admin.attendance.index', ['status' => 'pending']) }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
                         <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span class="text-sm font-medium">Mark Attendance</span>
+                        <span class="text-sm font-medium">Review Attendance</span>
                     </a>
 
                     {{-- Post Schedule --}}

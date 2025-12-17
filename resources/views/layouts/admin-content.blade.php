@@ -147,6 +147,7 @@
                                 <!-- Dropdown Menu -->
                                 <div
                                     x-show="open"
+                                    x-cloak
                                     @click.away="open = false"
                                     x-transition:enter="transition ease-out duration-200"
                                     x-transition:enter-start="opacity-0 scale-95"
