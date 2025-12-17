@@ -31,6 +31,15 @@ class AdminDashboardController extends Controller
      */
     public function index()
     {
+        // Get today's schedule (one row per day with classes JSON)
+        $todayScheduleRecord = DailyClassSchedule::whereDate('schedule_date', Carbon::today())->first();
+        $todayClasses = $todayScheduleRecord ? ($todayScheduleRecord->classes ?? []) : [];
+
+        // Sort classes by time
+        usort($todayClasses, function($a, $b) {
+            return strcmp($a['time'] ?? '00:00', $b['time'] ?? '00:00');
+        });
+
         // Stat Cards Data
         $stats = [
             'totalStudents' => Student::count(),
@@ -38,38 +47,25 @@ class AdminDashboardController extends Controller
             'inactiveStudents' => Student::where('status', 'inactive')->count(),
             'graduatedStudents' => Student::where('status', 'graduated')->count(),
             'withdrawnStudents' => Student::where('status', 'withdrawn')->count(),
-            
+
             'totalTutors' => Tutor::count(),
             'activeTutors' => Tutor::where('status', 'active')->count(),
             'inactiveTutors' => Tutor::where('status', 'inactive')->count(),
             'onLeaveTutors' => Tutor::where('status', 'on_leave')->count(),
             'resignedTutors' => Tutor::where('status', 'resigned')->count(),
-            
-            'todayClasses' => DailyClassSchedule::whereDate('schedule_date', Carbon::today())->count(),
-            'completedClasses' => DailyClassSchedule::whereDate('schedule_date', Carbon::today())
-                ->where('status', 'completed')->count(),
-            'upcomingClasses' => DailyClassSchedule::whereDate('schedule_date', Carbon::today())
-                ->where('status', 'scheduled')->count(),
-            
+
+            'todayClasses' => count($todayClasses),
+            'completedClasses' => 0, // Can be calculated from attendance records
+            'upcomingClasses' => count($todayClasses),
+
             'pendingAttendance' => AttendanceRecord::where('status', 'pending')->count(),
             'approvedAttendance' => AttendanceRecord::where('status', 'approved')->count(),
             'lateAttendance' => AttendanceRecord::where('is_late', true)->count(),
         ];
 
-        // Today's Schedule
-        $todaySchedule = DailyClassSchedule::with(['student', 'tutor'])
-            ->whereDate('schedule_date', Carbon::today())
-            ->orderBy('class_time')
-            ->get();
-
         // Check if schedule is posted
-        $schedulePosted = DailyClassSchedule::whereDate('schedule_date', Carbon::today())
-            ->whereNotNull('posted_at')
-            ->exists();
-        
-        $schedulePostedAt = DailyClassSchedule::whereDate('schedule_date', Carbon::today())
-            ->whereNotNull('posted_at')
-            ->first()?->posted_at;
+        $schedulePosted = $todayScheduleRecord && $todayScheduleRecord->posted_at !== null;
+        $schedulePostedAt = $todayScheduleRecord?->posted_at;
 
         // Recent Activities (last 20)
         $recentActivities = ActivityLog::with('user')
@@ -97,7 +93,8 @@ class AdminDashboardController extends Controller
 
         return view('admin.dashboard', compact(
             'stats',
-            'todaySchedule',
+            'todayScheduleRecord',
+            'todayClasses',
             'schedulePosted',
             'schedulePostedAt',
             'recentActivities',
@@ -113,23 +110,29 @@ class AdminDashboardController extends Controller
     public function postSchedule(Request $request)
     {
         $today = Carbon::today();
-        
-        // Update all today's schedules as posted
-        DailyClassSchedule::whereDate('schedule_date', $today)
-            ->update([
+
+        $schedule = DailyClassSchedule::whereDate('schedule_date', $today)->first();
+
+        if ($schedule) {
+            $schedule->update([
+                'status' => 'posted',
                 'posted_at' => now(),
                 'posted_by' => Auth::id(),
             ]);
 
-        // Log the action
-        ActivityLog::create([
-            'user_id' => Auth::id(),
-            'action' => 'posted_schedule',
-            'description' => 'Posted daily schedule for ' . $today->format('l, M j, Y'),
-            'model_type' => DailyClassSchedule::class,
-        ]);
+            // Log the action
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action' => 'posted_schedule',
+                'description' => 'Posted daily schedule for ' . $today->format('l, M j, Y'),
+                'model_type' => DailyClassSchedule::class,
+                'model_id' => $schedule->id,
+            ]);
 
-        return redirect()->back()->with('success', 'Schedule posted successfully!');
+            return redirect()->back()->with('success', 'Schedule posted successfully!');
+        }
+
+        return redirect()->back()->with('error', 'No schedule found for today.');
     }
 
     /**
@@ -138,25 +141,39 @@ class AdminDashboardController extends Controller
     public function getScheduleWhatsAppFormat()
     {
         $today = Carbon::today();
-        $schedules = DailyClassSchedule::with(['student', 'tutor'])
-            ->whereDate('schedule_date', $today)
-            ->orderBy('class_time')
-            ->get();
+        $schedule = DailyClassSchedule::whereDate('schedule_date', $today)->first();
+        $classes = $schedule ? ($schedule->classes ?? []) : [];
+
+        // Sort classes by time
+        usort($classes, function($a, $b) {
+            return strcmp($a['time'] ?? '00:00', $b['time'] ?? '00:00');
+        });
 
         $format = "📚 *Classes Scheduled for Today*\n";
         $format .= "📅 " . $today->format('l, M j, Y') . "\n\n";
 
         $count = 1;
-        foreach ($schedules as $schedule) {
-            $studentName = $schedule->student->first_name ?? 'Unknown';
-            $tutorName = $schedule->tutor->first_name ?? 'Unknown';
-            $time = Carbon::parse($schedule->class_time)->format('g:ia');
-            
+        foreach ($classes as $class) {
+            $studentName = $class['student_name'] ?? 'Unknown';
+            $tutorName = $class['tutor_name'] ?? 'Unknown';
+            $time = $class['time'] ?? '00:00';
+
+            // Format time nicely
+            try {
+                $time = Carbon::parse($time)->format('g:ia');
+            } catch (\Exception $e) {
+                // Keep original time if parsing fails
+            }
+
             $format .= "{$count}. {$studentName} - {$time} by {$tutorName}\n";
             $count++;
         }
 
         $format .= "\n✅ Total: " . ($count - 1) . " classes";
+
+        if ($schedule && $schedule->footer_note) {
+            $format .= "\n\n📌 " . $schedule->footer_note;
+        }
 
         return response()->json(['format' => $format]);
     }

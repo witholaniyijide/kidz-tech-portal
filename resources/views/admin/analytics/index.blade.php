@@ -166,15 +166,6 @@
                 </div>
             </div>
 
-            {{-- Note about Finance --}}
-            <div class="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 rounded-xl">
-                <div class="flex items-center gap-3">
-                    <span class="text-xl">ℹ️</span>
-                    <p class="text-sm text-amber-800 dark:text-amber-400">
-                        Financial analytics are only available to the Director. Contact the Director for financial reports.
-                    </p>
-                </div>
-            </div>
         </div>
     </div>
 

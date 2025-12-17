@@ -14,6 +14,11 @@
                     {{ session('success') }}
                 </div>
             @endif
+            @if(session('error'))
+                <div class="mb-6 bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-800 dark:text-red-400 px-6 py-4 rounded-xl">
+                    {{ session('error') }}
+                </div>
+            @endif
 
             {{-- Header --}}
             <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
@@ -22,11 +27,11 @@
                     <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $selectedDate->format('l, F j, Y') }}</p>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{{ route('admin.schedules.create') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-medium rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+                    <a href="{{ route('admin.schedules.create', ['date' => $selectedDate->toDateString()]) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-medium rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
-                        Add Entry
+                        {{ $todaySchedule ? 'Edit Schedule' : 'Add Schedule' }}
                     </a>
                     <form action="{{ route('admin.schedules.generate') }}" method="POST" class="inline">
                         @csrf
@@ -44,20 +49,20 @@
             {{-- Date Navigator --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl p-4 shadow mb-6">
                 <div class="flex items-center justify-between">
-                    <a href="{{ route('admin.schedules.index', ['date' => $selectedDate->copy()->subDay()->toDateString()]) }}" 
+                    <a href="{{ route('admin.schedules.index', ['date' => $selectedDate->copy()->subDay()->toDateString()]) }}"
                        class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                         <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                         </svg>
                     </a>
-                    
+
                     <div class="flex items-center gap-4">
                         <form method="GET" class="flex items-center gap-2">
-                            <input type="date" name="date" value="{{ $selectedDate->toDateString() }}" 
+                            <input type="date" name="date" value="{{ $selectedDate->toDateString() }}"
                                    onchange="this.form.submit()"
                                    class="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
                         </form>
-                        
+
                         @if(!$selectedDate->isToday())
                             <a href="{{ route('admin.schedules.index') }}" class="px-3 py-1 text-sm bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 rounded-full hover:bg-teal-200 transition-colors">
                                 Today
@@ -68,8 +73,8 @@
                             </span>
                         @endif
                     </div>
-                    
-                    <a href="{{ route('admin.schedules.index', ['date' => $selectedDate->copy()->addDay()->toDateString()]) }}" 
+
+                    <a href="{{ route('admin.schedules.index', ['date' => $selectedDate->copy()->addDay()->toDateString()]) }}"
                        class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                         <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -79,7 +84,7 @@
             </div>
 
             {{-- Post Schedule & WhatsApp --}}
-            @if($todaySchedule->count() > 0)
+            @if(count($classes) > 0)
                 <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl p-4 shadow mb-6">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -90,7 +95,7 @@
                                     </svg>
                                     Posted
                                 </span>
-                                <span class="text-sm text-gray-500">{{ $todaySchedule->first()->posted_at?->format('M j \a\t g:i A') }}</span>
+                                <span class="text-sm text-gray-500">{{ $todaySchedule?->posted_at?->format('M j \a\t g:i A') }}</span>
                             @else
                                 <span class="inline-flex items-center px-3 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-sm">
                                     Not Posted Yet
@@ -124,17 +129,22 @@
             {{-- Today's Schedule --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-8">
                 <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white flex justify-between items-center">
-                    <h3 class="text-lg font-semibold">{{ $selectedDate->format('l\'s') }} Classes ({{ $todaySchedule->count() }})</h3>
+                    <h3 class="text-lg font-semibold">{{ $selectedDate->format('l\'s') }} Classes ({{ count($classes) }})</h3>
+                    @if($todaySchedule)
+                        <a href="{{ route('admin.schedules.edit', $todaySchedule) }}" class="text-white/80 hover:text-white text-sm">
+                            Edit Schedule →
+                        </a>
+                    @endif
                 </div>
-                
-                @if($todaySchedule->isEmpty())
+
+                @if(empty($classes))
                     <div class="p-12 text-center">
                         <div class="text-6xl mb-4">📅</div>
                         <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Classes Scheduled</h3>
                         <p class="text-gray-500 dark:text-gray-400 mb-4">Add entries manually or auto-generate from student schedules</p>
                         <div class="flex justify-center gap-3">
-                            <a href="{{ route('admin.schedules.create') }}" class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
-                                Add Entry
+                            <a href="{{ route('admin.schedules.create', ['date' => $selectedDate->toDateString()]) }}" class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
+                                Add Schedule
                             </a>
                             <form action="{{ route('admin.schedules.generate') }}" method="POST">
                                 @csrf
@@ -147,7 +157,7 @@
                     </div>
                 @else
                     <div class="divide-y divide-gray-200 dark:divide-gray-700">
-                        @foreach($todaySchedule as $index => $schedule)
+                        @foreach($classes as $index => $class)
                             <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-4">
@@ -156,51 +166,58 @@
                                         </div>
                                         <div>
                                             <div class="font-semibold text-gray-900 dark:text-white">
-                                                {{ $schedule->student->first_name ?? 'Unknown' }} {{ $schedule->student->last_name ?? '' }}
+                                                {{ $class['student_name'] ?? 'Unknown Student' }}
                                             </div>
                                             <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                Tutor: {{ $schedule->tutor->first_name ?? 'Unknown' }} {{ $schedule->tutor->last_name ?? '' }}
+                                                Tutor: {{ $class['tutor_name'] ?? 'Unknown Tutor' }}
                                             </div>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-4">
                                         <div class="text-right">
                                             <div class="font-medium text-gray-900 dark:text-white">
-                                                {{ \Carbon\Carbon::parse($schedule->class_time)->format('g:i A') }}
+                                                @php
+                                                    try {
+                                                        $time = \Carbon\Carbon::parse($class['time'] ?? '00:00')->format('g:i A');
+                                                    } catch (\Exception $e) {
+                                                        $time = $class['time'] ?? '00:00';
+                                                    }
+                                                @endphp
+                                                {{ $time }}
                                             </div>
-                                            @if($schedule->class_link)
-                                                <a href="{{ $schedule->class_link }}" target="_blank" class="text-xs text-teal-600 hover:underline">Join Class</a>
+                                            @if(!empty($class['class_link']))
+                                                <a href="{{ $class['class_link'] }}" target="_blank" class="text-xs text-teal-600 hover:underline">Join Class</a>
                                             @endif
                                         </div>
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full
-                                            @if($schedule->status === 'completed') bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400
-                                            @elseif($schedule->status === 'in_progress') bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400
-                                            @elseif($schedule->status === 'cancelled') bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400
-                                            @else bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300
-                                            @endif">
-                                            {{ ucfirst(str_replace('_', ' ', $schedule->status ?? 'scheduled')) }}
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                                            Scheduled
                                         </span>
-                                        <div class="flex gap-1">
-                                            <a href="{{ route('admin.schedules.edit', $schedule) }}" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                </svg>
-                                            </a>
-                                            <form action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST" onsubmit="return confirm('Delete this schedule entry?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        </div>
                                     </div>
                                 </div>
+                                @if(!empty($class['notes']))
+                                    <div class="mt-2 ml-12 text-sm text-gray-500 dark:text-gray-400">
+                                        {{ $class['notes'] }}
+                                    </div>
+                                @endif
                             </div>
                         @endforeach
                     </div>
+
+                    {{-- Delete Entire Schedule --}}
+                    @if($todaySchedule)
+                        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex justify-between items-center">
+                            <span class="text-sm text-gray-500">
+                                {{ $todaySchedule->footer_note ?? '' }}
+                            </span>
+                            <form action="{{ route('admin.schedules.destroy', $todaySchedule) }}" method="POST" onsubmit="return confirm('Delete the entire schedule for {{ $selectedDate->format('l, M j') }}?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-sm text-red-600 hover:text-red-700 hover:underline">
+                                    Delete Schedule
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 @endif
             </div>
 
@@ -214,39 +231,43 @@
                     @php
                         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
                     @endphp
-                    @foreach($days as $day)
+                    @foreach($days as $dayIndex => $day)
                         @php
-                            $daySchedules = $weeklySchedule[$day] ?? collect();
-                            $dayDate = $weekStart->copy()->next($day)->subWeek();
-                            if ($day === 'Monday') $dayDate = $weekStart->copy();
-                            else $dayDate = $weekStart->copy()->next($day)->subWeek();
-                            // Recalculate correctly
-                            $dayIndex = array_search($day, $days);
+                            $daySchedule = $weeklySchedules[$day] ?? null;
+                            $dayClasses = $daySchedule ? ($daySchedule->classes ?? []) : [];
                             $dayDate = $weekStart->copy()->addDays($dayIndex);
                         @endphp
-                        <div class="p-3 {{ $dayDate->isToday() ? 'bg-teal-50 dark:bg-teal-900/20' : '' }}">
+                        <a href="{{ route('admin.schedules.index', ['date' => $dayDate->toDateString()]) }}"
+                           class="p-3 {{ $dayDate->isToday() ? 'bg-teal-50 dark:bg-teal-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700/30' }} transition-colors">
                             <div class="text-center mb-2">
                                 <div class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ substr($day, 0, 3) }}</div>
                                 <div class="text-lg font-bold {{ $dayDate->isToday() ? 'text-teal-600' : 'text-gray-900 dark:text-white' }}">{{ $dayDate->format('j') }}</div>
                             </div>
                             <div class="text-center">
-                                <span class="inline-flex items-center justify-center w-6 h-6 text-xs font-semibold rounded-full {{ $daySchedules->count() > 0 ? 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' }}">
-                                    {{ $daySchedules->count() }}
+                                <span class="inline-flex items-center justify-center w-6 h-6 text-xs font-semibold rounded-full {{ count($dayClasses) > 0 ? 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' }}">
+                                    {{ count($dayClasses) }}
                                 </span>
                             </div>
-                            @if($daySchedules->count() > 0)
+                            @if(count($dayClasses) > 0)
                                 <div class="mt-2 space-y-1">
-                                    @foreach($daySchedules->take(3) as $s)
-                                        <div class="text-xs text-gray-600 dark:text-gray-400 truncate" title="{{ $s->student->first_name ?? 'Unknown' }}">
-                                            {{ \Carbon\Carbon::parse($s->class_time)->format('g:i') }} - {{ $s->student->first_name ?? '?' }}
+                                    @foreach(array_slice($dayClasses, 0, 3) as $c)
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 truncate" title="{{ $c['student_name'] ?? 'Unknown' }}">
+                                            @php
+                                                try {
+                                                    $classTime = \Carbon\Carbon::parse($c['time'] ?? '00:00')->format('g:i');
+                                                } catch (\Exception $e) {
+                                                    $classTime = $c['time'] ?? '?';
+                                                }
+                                            @endphp
+                                            {{ $classTime }} - {{ explode(' ', $c['student_name'] ?? '?')[0] }}
                                         </div>
                                     @endforeach
-                                    @if($daySchedules->count() > 3)
-                                        <div class="text-xs text-gray-400">+{{ $daySchedules->count() - 3 }} more</div>
+                                    @if(count($dayClasses) > 3)
+                                        <div class="text-xs text-gray-400">+{{ count($dayClasses) - 3 }} more</div>
                                     @endif
                                 </div>
                             @endif
-                        </div>
+                        </a>
                     @endforeach
                 </div>
             </div>
