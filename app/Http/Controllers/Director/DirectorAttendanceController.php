@@ -135,7 +135,7 @@ class DirectorAttendanceController extends Controller
 
         try {
             $status = $request->boolean('auto_approve') ? 'approved' : 'pending';
-            
+
             $attendance = AttendanceRecord::create([
                 'student_id' => $validated['student_id'],
                 'tutor_id' => $validated['tutor_id'],
@@ -171,6 +171,105 @@ class DirectorAttendanceController extends Controller
                 ->with('success', 'Attendance record created successfully.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', 'Failed to create attendance: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Show the form for editing the specified attendance record.
+     */
+    public function edit(AttendanceRecord $attendance)
+    {
+        $attendance->load(['student', 'tutor']);
+        $students = Student::where('status', 'active')->get();
+        $tutors = Tutor::where('status', 'active')->get();
+
+        return view('director.attendance.edit', compact('attendance', 'students', 'tutors'));
+    }
+
+    /**
+     * Update the specified attendance record.
+     */
+    public function update(Request $request, AttendanceRecord $attendance)
+    {
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'tutor_id' => 'required|exists:tutors,id',
+            'class_date' => 'required|date',
+            'attendance_status' => 'required|in:present,absent,late,excused',
+            'class_start_time' => 'nullable|date_format:H:i',
+            'class_end_time' => 'nullable|date_format:H:i',
+            'topics_covered' => 'nullable|string|max:1000',
+            'notes' => 'nullable|string|max:500',
+            'status' => 'nullable|in:pending,approved,rejected',
+        ]);
+
+        try {
+            $attendance->update([
+                'student_id' => $validated['student_id'],
+                'tutor_id' => $validated['tutor_id'],
+                'class_date' => $validated['class_date'],
+                'class_time' => $validated['class_start_time'] ?? $attendance->class_time,
+                'class_start_time' => $validated['class_start_time'] ?? null,
+                'class_end_time' => $validated['class_end_time'] ?? null,
+                'topics_covered' => $validated['topics_covered'] ?? null,
+                'notes' => $validated['notes'] ?? null,
+                'status' => $validated['status'] ?? $attendance->status,
+            ]);
+
+            // Log director activity
+            DirectorActivityLog::create([
+                'director_id' => Auth::id(),
+                'action_type' => 'attendance_updated',
+                'model_type' => 'AttendanceRecord',
+                'model_id' => $attendance->id,
+                'payload' => [
+                    'description' => 'Attendance record updated',
+                    'student_id' => $validated['student_id'],
+                    'class_date' => $validated['class_date'],
+                    'changes' => $attendance->getChanges(),
+                ],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
+            return redirect()->route('director.attendance.index')
+                ->with('success', 'Attendance record updated successfully.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Failed to update attendance: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified attendance record.
+     */
+    public function destroy(AttendanceRecord $attendance)
+    {
+        try {
+            $attendanceId = $attendance->id;
+            $studentId = $attendance->student_id;
+            $classDate = $attendance->class_date;
+
+            $attendance->delete();
+
+            // Log director activity
+            DirectorActivityLog::create([
+                'director_id' => Auth::id(),
+                'action_type' => 'attendance_deleted',
+                'model_type' => 'AttendanceRecord',
+                'model_id' => $attendanceId,
+                'payload' => [
+                    'description' => 'Attendance record deleted',
+                    'student_id' => $studentId,
+                    'class_date' => $classDate,
+                ],
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+
+            return redirect()->route('director.attendance.index')
+                ->with('success', 'Attendance record deleted successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to delete attendance: ' . $e->getMessage());
         }
     }
 }

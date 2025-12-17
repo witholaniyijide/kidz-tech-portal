@@ -17,7 +17,6 @@ class Notice extends Model
         'priority',
         'visible_to',
         'posted_by',
-        'author_id',
         'published_at',
         'status',
     ];

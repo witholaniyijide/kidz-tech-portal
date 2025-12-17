@@ -114,13 +114,21 @@
                                     <x-ui.status-badge :status="$record->status" />
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a href="{{ route('director.attendance.show', $record) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400">View</a>
-                                    @if($record->status == 'pending')
-                                    <form method="POST" action="{{ route('director.attendance.approve', $record) }}" class="inline ml-2">
-                                        @csrf
-                                        <button type="submit" class="text-green-600 hover:text-green-900 dark:text-green-400">Approve</button>
-                                    </form>
-                                    @endif
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a href="{{ route('director.attendance.show', $record) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400">View</a>
+                                        <a href="{{ route('director.attendance.edit', $record) }}" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400">Edit</a>
+                                        @if($record->status == 'pending')
+                                        <form method="POST" action="{{ route('director.attendance.approve', $record) }}" class="inline">
+                                            @csrf
+                                            <button type="submit" class="text-green-600 hover:text-green-900 dark:text-green-400">Approve</button>
+                                        </form>
+                                        @endif
+                                        <form method="POST" action="{{ route('director.attendance.destroy', $record) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this attendance record?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400">Delete</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             @empty
