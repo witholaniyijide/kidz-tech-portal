@@ -464,6 +464,8 @@ Route::prefix('director')
             ->name('settings.profile.update');
         Route::put('/settings/password', [App\Http\Controllers\Director\DirectorSettingsController::class, 'updatePassword'])
             ->name('settings.password.update');
+        Route::put('/settings/avatar', [App\Http\Controllers\Director\DirectorSettingsController::class, 'updateAvatar'])
+            ->name('settings.avatar.update');
 
         // Director Students (Full CRUD)
         Route::resource('students', App\Http\Controllers\Director\DirectorStudentController::class)

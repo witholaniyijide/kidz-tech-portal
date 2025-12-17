@@ -2,7 +2,7 @@
 
 <aside x-data="{
     collapsed: localStorage.getItem('directorSidebarCollapsed') === 'true',
-    darkMode: localStorage.getItem('darkMode') === 'true',
+    darkMode: localStorage.getItem('darkMode') !== null ? localStorage.getItem('darkMode') === 'true' : window.matchMedia('(prefers-color-scheme: dark)').matches,
     toggleCollapse() {
         this.collapsed = !this.collapsed;
         localStorage.setItem('directorSidebarCollapsed', this.collapsed);
@@ -11,14 +11,19 @@
     toggleDarkMode() {
         this.darkMode = !this.darkMode;
         localStorage.setItem('darkMode', this.darkMode);
+        this.applyDarkMode();
+    },
+    applyDarkMode() {
         if (this.darkMode) {
             document.documentElement.classList.add('dark');
+            document.body.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
+            document.body.classList.remove('dark');
         }
     }
 }"
-x-init="if (darkMode) { document.documentElement.classList.add('dark'); }"
+x-init="applyDarkMode()"
 :class="collapsed ? 'w-20' : 'w-64'"
 class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col transition-all duration-300 z-50 shadow-xl border-r border-gray-200 dark:border-slate-700">
 

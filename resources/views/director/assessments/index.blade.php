@@ -15,16 +15,10 @@
                         Management
                         <span x-show="stats.pending > 0" class="ml-2 px-2 py-0.5 text-xs bg-amber-500 text-white rounded-full" x-text="stats.pending"></span>
                     </button>
-                    <button @click="view = 'analytics'" 
+                    <button @click="view = 'analytics'"
                             :class="view === 'analytics' ? 'text-sky-600 border-b-3 border-sky-500' : 'text-gray-500 hover:text-sky-600'"
                             class="relative px-5 py-4 font-medium transition-all whitespace-nowrap">
                         Analytics
-                    </button>
-                    <button @click="view = 'chat'" 
-                            :class="view === 'chat' ? 'text-sky-600 border-b-3 border-sky-500' : 'text-gray-500 hover:text-sky-600'"
-                            class="relative px-5 py-4 font-medium transition-all whitespace-nowrap">
-                        Chat
-                        <span x-show="unreadMessages > 0" class="ml-2 px-2 py-0.5 text-xs bg-red-500 text-white rounded-full" x-text="unreadMessages"></span>
                     </button>
                 </div>
             </div>
@@ -385,37 +379,6 @@
                 </div>
             </div>
 
-            {{-- Chat Tab --}}
-            <div x-show="view === 'chat'" x-transition class="w-full max-w-4xl mx-auto p-4 sm:p-6">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden" style="height: 70vh; display: flex; flex-direction: column;">
-                    {{-- Chat Header --}}
-                    <div class="p-4 bg-gradient-to-r from-sky-500 to-sky-600 text-white">
-                        <h3 class="font-semibold text-lg">💬 Director ↔️ Manager Chat</h3>
-                        <p class="text-sm text-sky-100">Real-time messaging</p>
-                    </div>
-
-                    {{-- Messages Area --}}
-                    <div class="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-900" id="chatMessages">
-                        <div class="text-center text-gray-400 py-12">
-                            <div class="text-6xl mb-4">💬</div>
-                            <p>Chat messages will appear here.</p>
-                            <p class="text-sm mt-2">This feature requires real-time messaging setup.</p>
-                        </div>
-                    </div>
-
-                    {{-- Input Area --}}
-                    <div class="p-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700">
-                        <div class="flex gap-2">
-                            <input type="text" x-model="chatMessage" placeholder="Type a message..."
-                                   @keyup.enter="sendMessage()"
-                                   class="flex-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-full px-4 py-2 focus:outline-none focus:border-sky-500">
-                            <button @click="sendMessage()" class="bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-full px-6 py-2 font-medium hover:shadow-lg transition-all">
-                                Send
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
 
         {{-- Footer Stats --}}
@@ -453,10 +416,7 @@
                 
                 filterTutor: '',
                 filterMonth: '',
-                
-                chatMessage: '',
-                unreadMessages: 0,
-                
+
                 toast: {
                     show: false,
                     message: '',
@@ -496,13 +456,7 @@
                 generateReportCard(assessmentId) {
                     window.open(`{{ url('director/assessments') }}/${assessmentId}/print`, '_blank');
                 },
-                
-                sendMessage() {
-                    if (!this.chatMessage.trim()) return;
-                    this.showToast('Chat requires real-time messaging setup', 'error');
-                    this.chatMessage = '';
-                },
-                
+
                 initCharts() {
                     // Destroy existing charts
                     Object.values(this.charts).forEach(chart => {

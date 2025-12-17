@@ -110,7 +110,7 @@
                 <x-ui.glass-card x-data="todoList()">
                     <!-- Header -->
                     <div class="flex items-center gap-2 mb-2">
-                        <div class="w-6 h-6 bg-teal-500 rounded flex items-center justify-center">
+                        <div class="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
@@ -122,11 +122,11 @@
                     <!-- To-Do Items -->
                     <div class="space-y-3 mb-4 max-h-64 overflow-y-auto">
                         <template x-for="todo in todos" :key="todo.id">
-                            <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-600 hover:border-teal-300 dark:hover:border-teal-500 transition-all group">
+                            <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-all group">
                                 <!-- Checkbox -->
                                 <button @click="toggleTodo(todo.id)"
                                         class="w-6 h-6 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-colors"
-                                        :class="todo.completed ? 'bg-teal-500 border-teal-500' : 'border-gray-300 dark:border-gray-500 hover:border-teal-400'">
+                                        :class="todo.completed ? 'bg-blue-500 border-blue-500' : 'border-gray-300 dark:border-gray-500 hover:border-blue-400'">
                                     <svg x-show="todo.completed" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
@@ -147,7 +147,7 @@
                                                @keydown.escape="cancelEdit()"
                                                @blur="saveEdit(todo.id)"
                                                x-ref="editInput"
-                                               class="w-full px-2 py-1 text-sm border border-teal-400 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                                               class="w-full px-2 py-1 text-sm border border-blue-400 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
                                     </template>
                                 </div>
 
@@ -155,7 +155,7 @@
                                 <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <template x-if="editingId !== todo.id">
                                         <button @click="startEdit(todo)"
-                                                class="p-1.5 text-gray-400 hover:text-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900/30 rounded-lg transition-colors"
+                                                class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                                                 title="Edit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -186,9 +186,9 @@
                                x-model="newTodo"
                                @keydown.enter="addTodo()"
                                placeholder="Add a new task..."
-                               class="flex-1 px-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                               class="flex-1 px-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <button @click="addTodo()"
-                                class="px-4 py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-xl transition-colors shadow-sm">
+                                class="px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors shadow-sm">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
@@ -196,11 +196,11 @@
                     </div>
 
                     <!-- Info Banner -->
-                    <div class="flex items-center gap-2 p-3 bg-teal-50 dark:bg-teal-900/20 rounded-xl border border-teal-100 dark:border-teal-800">
-                        <svg class="w-5 h-5 text-teal-600 dark:text-teal-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span class="text-sm text-teal-700 dark:text-teal-300">Tasks are saved automatically in your browser</span>
+                        <span class="text-sm text-blue-700 dark:text-blue-300">Tasks are saved automatically in your browser</span>
                     </div>
                 </x-ui.glass-card>
             </div>
