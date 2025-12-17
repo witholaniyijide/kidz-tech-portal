@@ -119,10 +119,10 @@
                         } else {
                             // Initialize with default tasks
                             this.todos = [
-                                { id: 1, text: 'Post today\'s schedule', completed: false },
-                                { id: 2, text: 'Review pending attendance', completed: false },
-                                { id: 3, text: 'Follow up inactive students', completed: false },
-                                { id: 4, text: 'Approve tutor submissions', completed: false }
+                                { id: 1, text: "Post today's schedule", completed: false },
+                                { id: 2, text: "Review pending attendance", completed: false },
+                                { id: 3, text: "Follow up inactive students", completed: false },
+                                { id: 4, text: "Approve tutor submissions", completed: false }
                             ];
                             this.saveTodos();
                         }
