@@ -379,7 +379,13 @@ class DashboardController extends Controller
                 ],
             ]);
         }
-        
+
+        // Notices for the notice board
+        $notices = \App\Models\Notice::where('status', 'published')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
         $data = [
             'totalStudents' => $totalStudents,
             'activeStudents' => $activeStudents,
@@ -400,6 +406,7 @@ class DashboardController extends Controller
             'todayClasses' => $todayClasses,
             'todos' => $todos,
             'recentActivities' => $recentActivities,
+            'notices' => $notices,
         ];
         
         return view('dashboards.director', $data);

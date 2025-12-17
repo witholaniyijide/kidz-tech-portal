@@ -140,6 +140,7 @@ class DirectorAttendanceController extends Controller
                 'student_id' => $validated['student_id'],
                 'tutor_id' => $validated['tutor_id'],
                 'class_date' => $validated['class_date'],
+                'class_time' => $validated['class_start_time'] ?? '09:00',
                 'status' => $status,
                 'class_start_time' => $validated['class_start_time'] ?? null,
                 'class_end_time' => $validated['class_end_time'] ?? null,

@@ -25,10 +25,15 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
     {{-- Logo Section with Toggle --}}
     <div class="p-4 border-b border-gray-200 dark:border-slate-700">
         <div class="flex items-center" :class="collapsed ? 'justify-center' : 'justify-between'">
-            {{-- Logo - Simple gradient "K" logo --}}
+            {{-- Logo --}}
             <a href="{{ route('dashboard') }}" class="flex-shrink-0 flex items-center justify-center">
+                <img src="{{ asset('images/logo_light.png') }}"
+                     alt="KidzTech Logo"
+                     :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
+                     class="object-contain transition-all duration-300 dark:hidden"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
-                     class="rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg transition-all duration-300">
+                     class="rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 items-center justify-center shadow-lg transition-all duration-300 hidden dark:flex">
                     <span :class="collapsed ? 'text-lg' : 'text-3xl'" class="text-white font-bold">K</span>
                 </div>
             </a>
@@ -100,17 +105,6 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
             </svg>
             <span x-show="!collapsed" x-transition class="ml-3 font-medium">Attendance</span>
-        </a>
-
-        {{-- Finance --}}
-        <a href="{{ route('director.finance.index') }}"
-           class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('director.finance.*') ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
-           :title="collapsed ? 'Finance' : ''">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span x-show="!collapsed" x-transition class="ml-3 font-medium">Finance</span>
         </a>
 
         {{-- Reports --}}
