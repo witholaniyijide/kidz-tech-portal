@@ -81,10 +81,6 @@
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Hire Date</p>
                                 <p class="font-medium text-gray-900 dark:text-white">{{ $tutor->hire_date ? \Carbon\Carbon::parse($tutor->hire_date)->format('M d, Y') : 'Not set' }}</p>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Hourly Rate</p>
-                                <p class="font-medium text-gray-900 dark:text-white">{{ $tutor->hourly_rate ? '₦' . number_format($tutor->hourly_rate, 2) : 'Not set' }}</p>
-                            </div>
                         </div>
                         @if($tutor->bio)
                         <div class="mt-4">
