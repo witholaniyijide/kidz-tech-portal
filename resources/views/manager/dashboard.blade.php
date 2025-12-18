@@ -111,7 +111,14 @@
             </div>
 
             {{-- Section 2: Today's Class Schedule (Full Width) --}}
-            <div class="mb-10">
+            <div class="mb-10" x-data="{
+                showModal: false,
+                selectedClass: null,
+                openModal(classData) {
+                    this.selectedClass = classData;
+                    this.showModal = true;
+                }
+            }">
                 <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-md p-6">
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-3">
@@ -130,19 +137,40 @@
                     @if($todaySchedule && $todaySchedule->classes && count($todaySchedule->classes) > 0)
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-80 overflow-y-auto">
                             @foreach($todaySchedule->classes as $class)
-                                <div class="bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                                <div class="bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-xl p-4 border border-white/10 cursor-pointer hover:bg-white/40 dark:hover:bg-gray-800/40 transition-colors"
+                                     @click="openModal({
+                                         time: '{{ $class['time'] ?? 'TBD' }}',
+                                         student: '{{ $class['student_name'] ?? 'Student' }}',
+                                         tutor: '{{ $class['tutor_name'] ?? 'Assigned' }}',
+                                         class_link: '{{ $class['class_link'] ?? '' }}'
+                                     })">
                                     <div class="flex items-center gap-3 mb-2">
                                         <div class="bg-gradient-to-r from-emerald-500 to-teal-500 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm">
                                             {{ strtoupper(substr($class['student_name'] ?? 'S', 0, 1)) }}
                                         </div>
                                         <div>
                                             <p class="font-semibold text-gray-900 dark:text-white">{{ $class['student_name'] ?? 'Student' }}</p>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $class['time'] ?? 'TBD' }}</p>
+                                            @php
+                                                try {
+                                                    $formattedTime = \Carbon\Carbon::parse($class['time'])->format('g:i A');
+                                                } catch (\Exception $e) {
+                                                    $formattedTime = $class['time'] ?? 'TBD';
+                                                }
+                                            @endphp
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $formattedTime }}</p>
                                         </div>
                                     </div>
                                     <p class="text-sm text-gray-600 dark:text-gray-400">
                                         <span class="font-medium">Tutor:</span> {{ $class['tutor_name'] ?? 'Assigned' }}
                                     </p>
+                                    @if(isset($class['class_link']) && $class['class_link'])
+                                        <span class="inline-flex items-center mt-2 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/>
+                                            </svg>
+                                            Has Link
+                                        </span>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>
@@ -154,6 +182,117 @@
                             <p class="text-gray-500 dark:text-gray-400">No classes scheduled for today</p>
                         </div>
                     @endif
+                </div>
+
+                <!-- Class Details Modal -->
+                <div x-show="showModal"
+                     x-cloak
+                     class="fixed inset-0 z-50 overflow-y-auto"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0">
+                    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+                        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showModal = false"></div>
+
+                        <div class="relative inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl"
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-200"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95">
+
+                            <!-- Modal Header -->
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Class Details</h3>
+                                <button @click="showModal = false" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Modal Body -->
+                            <div class="space-y-4">
+                                <!-- Student -->
+                                <div class="flex items-center p-4 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Student</p>
+                                        <p class="font-semibold text-gray-900 dark:text-white" x-text="selectedClass?.student"></p>
+                                    </div>
+                                </div>
+
+                                <!-- Tutor -->
+                                <div class="flex items-center p-4 bg-teal-50 dark:bg-teal-900/30 rounded-xl">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Tutor</p>
+                                        <p class="font-semibold text-gray-900 dark:text-white" x-text="selectedClass?.tutor"></p>
+                                    </div>
+                                </div>
+
+                                <!-- Class Time -->
+                                <div class="flex items-center p-4 bg-cyan-50 dark:bg-cyan-900/30 rounded-xl">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Class Time</p>
+                                        <p class="font-semibold text-gray-900 dark:text-white" x-text="selectedClass?.time"></p>
+                                    </div>
+                                </div>
+
+                                <!-- Class Link -->
+                                <template x-if="selectedClass?.class_link">
+                                    <a :href="selectedClass?.class_link" target="_blank" class="flex items-center p-4 bg-green-50 dark:bg-green-900/30 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-lime-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Class Link</p>
+                                            <p class="font-semibold text-green-600 dark:text-green-400">Click to join class →</p>
+                                        </div>
+                                    </a>
+                                </template>
+                                <template x-if="!selectedClass?.class_link">
+                                    <div class="flex items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                                        <div class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 mr-4">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Class Link</p>
+                                            <p class="font-semibold text-gray-500 dark:text-gray-400">No link available</p>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- Modal Footer -->
+                            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <button @click="showModal = false" class="w-full px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-600 hover:to-teal-700 transition-all">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
