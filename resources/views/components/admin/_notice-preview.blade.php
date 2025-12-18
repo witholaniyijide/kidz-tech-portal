@@ -11,7 +11,7 @@
         <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">No Notices Posted</h3>
         <p class="text-gray-500 dark:text-gray-400 mb-6">There are no notices on the board yet.</p>
         <a
-            href="{{ route('noticeboard.create') }}"
+            href="{{ route('admin.notices.create') }}"
             class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#14B8A6] to-[#06B6D4] text-white text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
             aria-label="Create new notice"
         >
@@ -32,7 +32,7 @@
             Notice Board
         </h3>
         <a
-            href="{{ route('noticeboard.index') }}"
+            href="{{ route('admin.notices.index') }}"
             class="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 rounded px-2 py-1 flex items-center"
             aria-label="View all notices"
         >
@@ -80,7 +80,7 @@
     </div>
 
     <a
-        href="{{ route('noticeboard.create') }}"
+        href="{{ route('admin.notices.create') }}"
         class="block w-full text-center px-6 py-3 bg-gradient-to-r from-[#14B8A6] to-[#06B6D4] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500"
         aria-label="Post new notice"
     >

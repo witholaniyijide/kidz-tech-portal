@@ -1,7 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white">{{ __('Edit Notice') }}</h2>
-    </x-slot>
+    <x-slot name="header">{{ __('Edit Notice') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Edit Notice') }}</x-slot>
 
     <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
@@ -84,25 +82,19 @@
                     <div class="px-6 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
                         <h3 class="text-lg font-semibold">Settings</h3>
                     </div>
+                    @php
+                        $visibleTo = old('visible_to', is_array($notice->visible_to) ? $notice->visible_to : json_decode($notice->visible_to ?? '[]', true) ?: []);
+                    @endphp
                     <div class="p-6 space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {{-- Priority --}}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
                                 <select name="priority" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
-                                    <option value="normal" {{ old('priority', $notice->priority) === 'normal' ? 'selected' : '' }}>Normal</option>
-                                    <option value="high" {{ old('priority', $notice->priority) === 'high' ? 'selected' : '' }}>🔴 High</option>
                                     <option value="low" {{ old('priority', $notice->priority) === 'low' ? 'selected' : '' }}>Low</option>
-                                </select>
-                            </div>
-
-                            {{-- Audience --}}
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Audience</label>
-                                <select name="audience" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
-                                    <option value="all" {{ old('audience', $notice->audience) === 'all' ? 'selected' : '' }}>👥 Everyone</option>
-                                    <option value="tutors" {{ old('audience', $notice->audience) === 'tutors' ? 'selected' : '' }}>👨‍🏫 Tutors Only</option>
-                                    <option value="parents" {{ old('audience', $notice->audience) === 'parents' ? 'selected' : '' }}>👪 Parents Only</option>
+                                    <option value="normal" {{ old('priority', $notice->priority) === 'normal' ? 'selected' : '' }}>Normal</option>
+                                    <option value="high" {{ old('priority', $notice->priority) === 'high' ? 'selected' : '' }}>High</option>
+                                    <option value="urgent" {{ old('priority', $notice->priority) === 'urgent' ? 'selected' : '' }}>Urgent</option>
                                 </select>
                             </div>
 
@@ -110,19 +102,46 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                                 <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
-                                    <option value="draft" {{ old('status', $notice->status) === 'draft' ? 'selected' : '' }}>📝 Draft</option>
-                                    <option value="published" {{ old('status', $notice->status) === 'published' ? 'selected' : '' }}>✅ Published</option>
-                                    <option value="archived" {{ old('status', $notice->status) === 'archived' ? 'selected' : '' }}>📦 Archived</option>
+                                    <option value="draft" {{ old('status', $notice->status) === 'draft' ? 'selected' : '' }}>Draft</option>
+                                    <option value="published" {{ old('status', $notice->status) === 'published' ? 'selected' : '' }}>Published</option>
+                                    <option value="archived" {{ old('status', $notice->status) === 'archived' ? 'selected' : '' }}>Archived</option>
                                 </select>
                             </div>
                         </div>
 
-                        {{-- Expiry Date --}}
+                        {{-- Visible To (Audience) --}}
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Expiry Date (Optional)</label>
-                            <input type="date" name="expires_at" value="{{ old('expires_at', $notice->expires_at?->format('Y-m-d')) }}"
-                                   class="w-full md:w-1/2 px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
-                            <p class="text-xs text-gray-500 mt-1">Leave empty if the notice doesn't expire.</p>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Visible To <span class="text-red-500">*</span></label>
+                            <p class="text-xs text-gray-500 mb-3">Select who can see this notice. Director always sees all notices.</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <input type="checkbox" name="visible_to[]" value="tutor"
+                                           {{ in_array('tutor', $visibleTo) ? 'checked' : '' }}
+                                           class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500 mr-2">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Tutors</span>
+                                </label>
+                                <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <input type="checkbox" name="visible_to[]" value="admin"
+                                           {{ in_array('admin', $visibleTo) ? 'checked' : '' }}
+                                           class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500 mr-2">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Admins</span>
+                                </label>
+                                <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <input type="checkbox" name="visible_to[]" value="manager"
+                                           {{ in_array('manager', $visibleTo) ? 'checked' : '' }}
+                                           class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500 mr-2">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Managers</span>
+                                </label>
+                                <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <input type="checkbox" name="visible_to[]" value="director"
+                                           {{ in_array('director', $visibleTo) ? 'checked' : '' }}
+                                           class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500 mr-2">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Director</span>
+                                </label>
+                            </div>
+                            @error('visible_to')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>

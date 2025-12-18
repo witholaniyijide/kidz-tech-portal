@@ -162,4 +162,115 @@ class AdminAttendanceController extends Controller
     // Note: Admin does NOT create or edit attendance.
     // Tutors submit attendance after completing classes.
     // Admin only reviews, approves, marks late, or deletes for resubmission.
+
+    /**
+     * Export attendance records to CSV.
+     */
+    public function export(Request $request)
+    {
+        $period = $request->get('period', 'week');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+
+        // Determine date range
+        if ($startDate && $endDate) {
+            $start = Carbon::parse($startDate);
+            $end = Carbon::parse($endDate);
+        } elseif ($period === 'month') {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now()->endOfMonth();
+        } else {
+            // Default to current week
+            $start = Carbon::now()->startOfWeek();
+            $end = Carbon::now()->endOfWeek();
+        }
+
+        $attendances = AttendanceRecord::with(['student', 'tutor', 'approver'])
+            ->whereBetween('class_date', [$start, $end])
+            ->orderBy('class_date', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // Create CSV content
+        $filename = "attendance_export_{$start->format('Y-m-d')}_to_{$end->format('Y-m-d')}.csv";
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function() use ($attendances, $start, $end) {
+            $file = fopen('php://output', 'w');
+
+            // Add BOM for Excel UTF-8 compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // CSV Header
+            fputcsv($file, [
+                'Date',
+                'Student Name',
+                'Tutor Name',
+                'Class Start',
+                'Class End',
+                'Status',
+                'Late Submission',
+                'Topic Covered',
+                'Student Performance',
+                'Homework Given',
+                'Comments',
+                'Submitted At',
+                'Approved By',
+                'Approved At',
+            ]);
+
+            // CSV Data
+            foreach ($attendances as $attendance) {
+                fputcsv($file, [
+                    $attendance->class_date?->format('Y-m-d'),
+                    ($attendance->student?->first_name ?? '') . ' ' . ($attendance->student?->last_name ?? ''),
+                    ($attendance->tutor?->first_name ?? '') . ' ' . ($attendance->tutor?->last_name ?? ''),
+                    $attendance->class_start_time ?? '',
+                    $attendance->class_end_time ?? '',
+                    ucfirst($attendance->status),
+                    $attendance->is_late ? 'Yes' : 'No',
+                    $attendance->topic_covered ?? '',
+                    $attendance->student_performance ?? '',
+                    $attendance->homework_given ?? '',
+                    $attendance->comments ?? '',
+                    $attendance->created_at?->format('Y-m-d H:i'),
+                    $attendance->approver ? ($attendance->approver->name ?? 'Unknown') : '',
+                    $attendance->approved_at?->format('Y-m-d H:i'),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Show export options modal data (AJAX).
+     */
+    public function exportOptions()
+    {
+        return response()->json([
+            'current_week' => [
+                'start' => Carbon::now()->startOfWeek()->format('Y-m-d'),
+                'end' => Carbon::now()->endOfWeek()->format('Y-m-d'),
+            ],
+            'current_month' => [
+                'start' => Carbon::now()->startOfMonth()->format('Y-m-d'),
+                'end' => Carbon::now()->endOfMonth()->format('Y-m-d'),
+            ],
+            'last_week' => [
+                'start' => Carbon::now()->subWeek()->startOfWeek()->format('Y-m-d'),
+                'end' => Carbon::now()->subWeek()->endOfWeek()->format('Y-m-d'),
+            ],
+            'last_month' => [
+                'start' => Carbon::now()->subMonth()->startOfMonth()->format('Y-m-d'),
+                'end' => Carbon::now()->subMonth()->endOfMonth()->format('Y-m-d'),
+            ],
+        ]);
+    }
 }

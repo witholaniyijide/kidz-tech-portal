@@ -107,35 +107,46 @@ class AdminScheduleController extends Controller
 
     public function store(Request $request)
     {
+        // Support both old 'classes' format and new 'entries' format
+        $entriesKey = $request->has('entries') ? 'entries' : 'classes';
+
         $validated = $request->validate([
             'schedule_date' => 'required|date',
-            'classes' => 'nullable|array',
-            'classes.*.student_id' => 'required|exists:students,id',
-            'classes.*.tutor_id' => 'required|exists:tutors,id',
-            'classes.*.time' => 'required',
-            'classes.*.class_link' => 'nullable|url|max:500',
-            'classes.*.notes' => 'nullable|string|max:500',
+            'repeat_weekly' => 'nullable|boolean',
+            $entriesKey => 'required|array|min:1',
+            $entriesKey . '.*.student_id' => 'required|exists:students,id',
+            $entriesKey . '.*.tutor_id' => 'required|exists:tutors,id',
+            $entriesKey . '.*.start_time' => 'nullable',
+            $entriesKey . '.*.end_time' => 'nullable',
+            $entriesKey . '.*.time' => 'nullable', // For backwards compatibility
+            $entriesKey . '.*.class_link' => 'nullable|url|max:500',
+            $entriesKey . '.*.notes' => 'nullable|string|max:500',
             'footer_note' => 'nullable|string|max:500',
         ]);
 
         $scheduleDate = Carbon::parse($validated['schedule_date']);
+        $entries = $validated[$entriesKey] ?? [];
 
         // Enrich classes with names
         $classes = [];
-        if (!empty($validated['classes'])) {
-            foreach ($validated['classes'] as $class) {
-                $student = Student::find($class['student_id']);
-                $tutor = Tutor::find($class['tutor_id']);
-                $classes[] = [
-                    'student_id' => $class['student_id'],
-                    'tutor_id' => $class['tutor_id'],
-                    'student_name' => $student ? $student->first_name . ' ' . $student->last_name : 'Unknown',
-                    'tutor_name' => $tutor ? $tutor->first_name . ' ' . $tutor->last_name : 'Unknown',
-                    'time' => $class['time'],
-                    'class_link' => $class['class_link'] ?? null,
-                    'notes' => $class['notes'] ?? null,
-                ];
-            }
+        foreach ($entries as $entry) {
+            $student = Student::find($entry['student_id']);
+            $tutor = Tutor::find($entry['tutor_id']);
+
+            // Support both new format (start_time/end_time) and old format (time)
+            $time = $entry['start_time'] ?? $entry['time'] ?? '09:00';
+            $endTime = $entry['end_time'] ?? null;
+
+            $classes[] = [
+                'student_id' => $entry['student_id'],
+                'tutor_id' => $entry['tutor_id'],
+                'student_name' => $student ? $student->first_name . ' ' . $student->last_name : 'Unknown',
+                'tutor_name' => $tutor ? $tutor->first_name . ' ' . $tutor->last_name : 'Unknown',
+                'time' => $time,
+                'end_time' => $endTime,
+                'class_link' => $entry['class_link'] ?? null,
+                'notes' => $entry['notes'] ?? null,
+            ];
         }
 
         // Sort classes by time
@@ -149,6 +160,7 @@ class AdminScheduleController extends Controller
                 'day_name' => $scheduleDate->format('l'),
                 'classes' => $classes,
                 'footer_note' => $validated['footer_note'] ?? null,
+                'repeat_weekly' => $request->boolean('repeat_weekly'),
             ]
         );
 
@@ -161,7 +173,7 @@ class AdminScheduleController extends Controller
         ]);
 
         return redirect()->route('admin.schedules.index', ['date' => $validated['schedule_date']])
-            ->with('success', 'Schedule saved successfully.');
+            ->with('success', 'Schedule saved successfully with ' . count($classes) . ' class entries.');
     }
 
     public function edit(DailyClassSchedule $schedule)

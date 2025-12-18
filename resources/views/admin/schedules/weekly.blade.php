@@ -1,7 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white">{{ __('Weekly Schedule') }}</h2>
-    </x-slot>
+    <x-slot name="header">{{ __('Weekly Schedule') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Weekly Schedule') }}</x-slot>
 
     <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
