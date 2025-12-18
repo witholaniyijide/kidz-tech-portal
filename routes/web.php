@@ -131,6 +131,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::put('/settings/profile', [App\Http\Controllers\Admin\AdminSettingsController::class, 'updateProfile'])->name('settings.profile');
     Route::put('/settings/password', [App\Http\Controllers\Admin\AdminSettingsController::class, 'updatePassword'])->name('settings.password');
     Route::put('/settings/notifications', [App\Http\Controllers\Admin\AdminSettingsController::class, 'updateNotifications'])->name('settings.notifications');
+    Route::put('/settings/avatar', [App\Http\Controllers\Admin\AdminSettingsController::class, 'updateAvatar'])->name('settings.avatar');
 });
 
 // Legacy admin route redirect

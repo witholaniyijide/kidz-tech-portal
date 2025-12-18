@@ -42,15 +42,20 @@ class AdminScheduleController extends Controller
 
         if (!$todaySchedule) {
             // Find a schedule from a previous week on the same day that has repeat_weekly enabled
-            $repeatSchedule = DailyClassSchedule::where('repeat_weekly', true)
-                ->where('day_name', $selectedDate->format('l'))
-                ->whereDate('schedule_date', '<', $selectedDate)
-                ->orderBy('schedule_date', 'desc')
-                ->first();
+            try {
+                $repeatSchedule = DailyClassSchedule::where('repeat_weekly', true)
+                    ->where('day_name', $selectedDate->format('l'))
+                    ->whereDate('schedule_date', '<', $selectedDate)
+                    ->orderBy('schedule_date', 'desc')
+                    ->first();
 
-            if ($repeatSchedule) {
-                $classes = $repeatSchedule->classes ?? [];
-                $inheritedFromWeekly = true;
+                if ($repeatSchedule) {
+                    $classes = $repeatSchedule->classes ?? [];
+                    $inheritedFromWeekly = true;
+                }
+            } catch (\Exception $e) {
+                // repeat_weekly column may not exist yet - migration pending
+                $repeatSchedule = null;
             }
         } else {
             $classes = $todaySchedule->classes ?? [];
@@ -78,15 +83,19 @@ class AdminScheduleController extends Controller
         $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         foreach ($daysOfWeek as $day) {
             if (!isset($weeklySchedules[$day])) {
-                $repeatSchedule = DailyClassSchedule::where('repeat_weekly', true)
-                    ->where('day_name', $day)
-                    ->whereDate('schedule_date', '<', $weekStart)
-                    ->orderBy('schedule_date', 'desc')
-                    ->first();
+                try {
+                    $repeatSchedule = DailyClassSchedule::where('repeat_weekly', true)
+                        ->where('day_name', $day)
+                        ->whereDate('schedule_date', '<', $weekStart)
+                        ->orderBy('schedule_date', 'desc')
+                        ->first();
 
-                if ($repeatSchedule) {
-                    // Create a virtual schedule entry for display purposes
-                    $weeklySchedules[$day] = $repeatSchedule;
+                    if ($repeatSchedule) {
+                        // Create a virtual schedule entry for display purposes
+                        $weeklySchedules[$day] = $repeatSchedule;
+                    }
+                } catch (\Exception $e) {
+                    // repeat_weekly column may not exist yet - migration pending
                 }
             }
         }
