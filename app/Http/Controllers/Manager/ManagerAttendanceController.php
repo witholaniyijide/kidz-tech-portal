@@ -18,14 +18,45 @@ class ManagerAttendanceController extends Controller
     {
         $query = AttendanceRecord::with(['student', 'tutor', 'approver']);
 
+        // Filter by date range (week/month presets)
+        if ($request->filled('date_range')) {
+            $now = Carbon::now();
+            switch ($request->date_range) {
+                case 'today':
+                    $query->whereDate('class_date', $now->toDateString());
+                    break;
+                case 'this_week':
+                    $query->whereBetween('class_date', [
+                        $now->copy()->startOfWeek()->toDateString(),
+                        $now->copy()->endOfWeek()->toDateString()
+                    ]);
+                    break;
+                case 'this_month':
+                    $query->whereMonth('class_date', $now->month)
+                          ->whereYear('class_date', $now->year);
+                    break;
+                case 'last_week':
+                    $lastWeekStart = $now->copy()->subWeek()->startOfWeek();
+                    $lastWeekEnd = $now->copy()->subWeek()->endOfWeek();
+                    $query->whereBetween('class_date', [
+                        $lastWeekStart->toDateString(),
+                        $lastWeekEnd->toDateString()
+                    ]);
+                    break;
+                case 'last_month':
+                    $lastMonth = $now->copy()->subMonth();
+                    $query->whereMonth('class_date', $lastMonth->month)
+                          ->whereYear('class_date', $lastMonth->year);
+                    break;
+            }
+        } elseif ($request->has('date') && $request->date) {
+            // Filter by specific date (only if no date_range preset selected)
+            $query->whereDate('class_date', $request->date);
+        }
+
         // Filter by status if provided
         if ($request->has('status') && $request->status) {
             $query->where('status', $request->status);
-        }
-
-        // Filter by date
-        if ($request->has('date') && $request->date) {
-            $query->whereDate('class_date', $request->date);
         }
 
         // Filter by student if provided
