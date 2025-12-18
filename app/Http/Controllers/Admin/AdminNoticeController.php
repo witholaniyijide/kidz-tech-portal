@@ -74,7 +74,7 @@ class AdminNoticeController extends Controller
             'status' => 'required|in:draft,published,archived',
         ]);
 
-        $validated['author_id'] = Auth::id();
+        $validated['posted_by'] = Auth::id();
         $validated['visible_to'] = json_encode($validated['visible_to']);
 
         DB::transaction(function() use ($validated) {

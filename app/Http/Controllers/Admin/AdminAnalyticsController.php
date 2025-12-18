@@ -118,11 +118,11 @@ class AdminAnalyticsController extends Controller
     }
 
     /**
-     * Get student analytics data (AJAX).
+     * Display student analytics page.
      */
     public function students(Request $request)
     {
-        $studentStats = [
+        $stats = [
             'total' => Student::count(),
             'active' => Student::where('status', 'active')->count(),
             'inactive' => Student::where('status', 'inactive')->count(),
@@ -130,49 +130,86 @@ class AdminAnalyticsController extends Controller
             'withdrawn' => Student::where('status', 'withdrawn')->count(),
         ];
 
-        $enrollmentTrend = Student::select(
-                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
-                DB::raw('COUNT(*) as count')
-            )
-            ->where('created_at', '>=', Carbon::now()->subMonths(12))
-            ->groupBy('month')
-            ->orderBy('month')
+        // Classes per week distribution
+        $classesPerWeek = [];
+        for ($i = 1; $i <= 7; $i++) {
+            $classesPerWeek[$i] = Student::where('classes_per_week', $i)->count();
+        }
+
+        // Top students by attendance count
+        $topStudents = Student::withCount('attendanceRecords as attendances_count')
+            ->with('tutor:id,first_name,last_name')
+            ->where('status', 'active')
+            ->orderBy('attendances_count', 'desc')
+            ->take(10)
             ->get();
 
-        return response()->json([
-            'stats' => $studentStats,
-            'trend' => $enrollmentTrend,
-        ]);
+        // Students without assigned tutor
+        $studentsWithoutTutor = Student::whereNull('tutor_id')
+            ->where('status', 'active')
+            ->get();
+
+        return view('admin.analytics.students', compact(
+            'stats',
+            'classesPerWeek',
+            'topStudents',
+            'studentsWithoutTutor'
+        ));
     }
 
     /**
-     * Get tutor analytics data (AJAX).
+     * Display tutor analytics page.
      */
     public function tutors(Request $request)
     {
-        $tutorStats = [
+        $activeTutors = Tutor::where('status', 'active')->count();
+        $activeStudents = Student::where('status', 'active')->count();
+
+        $stats = [
             'total' => Tutor::count(),
-            'active' => Tutor::where('status', 'active')->count(),
+            'active' => $activeTutors,
             'inactive' => Tutor::where('status', 'inactive')->count(),
             'on_leave' => Tutor::where('status', 'on_leave')->count(),
             'resigned' => Tutor::where('status', 'resigned')->count(),
+            'avg_students' => $activeTutors > 0 ? round($activeStudents / $activeTutors, 1) : 0,
         ];
 
-        $tutorLoad = Tutor::withCount('students')
+        // Tutor workloads (students per tutor)
+        $tutorWorkloads = Tutor::withCount('students')
             ->where('status', 'active')
             ->orderBy('students_count', 'desc')
-            ->get()
-            ->map(function($tutor) {
-                return [
-                    'name' => $tutor->first_name,
-                    'students' => $tutor->students_count,
-                ];
-            });
+            ->get();
 
-        return response()->json([
-            'stats' => $tutorStats,
-            'load' => $tutorLoad,
-        ]);
+        // Classes completed this month per tutor
+        $tutorClassesThisMonth = Tutor::withCount(['students', 'attendanceRecords as attendances_count' => function($query) {
+                $query->whereMonth('class_date', Carbon::now()->month)
+                      ->whereYear('class_date', Carbon::now()->year);
+            }])
+            ->where('status', 'active')
+            ->orderBy('attendances_count', 'desc')
+            ->take(10)
+            ->get();
+
+        // All tutors with performance metrics
+        $allTutors = Tutor::withCount(['students',
+            'attendanceRecords as classes_this_month' => function($query) {
+                $query->whereMonth('class_date', Carbon::now()->month)
+                      ->whereYear('class_date', Carbon::now()->year);
+            },
+            'attendanceRecords as total_classes',
+            'attendanceRecords as late_submissions' => function($query) {
+                $query->where('status', 'late');
+            }
+        ])
+        ->orderBy('first_name')
+        ->get();
+
+        return view('admin.analytics.tutors', compact(
+            'stats',
+            'tutorWorkloads',
+            'tutorClassesThisMonth',
+            'allTutors'
+        ));
     }
 
     // Note: Admin does NOT have access to financial analytics per specification

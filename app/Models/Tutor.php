@@ -55,6 +55,14 @@ class Tutor extends Model
         return $this->hasMany(AttendanceRecord::class);
     }
 
+    /**
+     * Alias for attendanceRecords - used by views
+     */
+    public function attendances()
+    {
+        return $this->hasMany(AttendanceRecord::class);
+    }
+
     public function reports()
     {
         return $this->hasMany(TutorReport::class);

@@ -36,8 +36,27 @@ class AdminScheduleController extends Controller
         // Get schedule for selected date (one row per day)
         $todaySchedule = DailyClassSchedule::whereDate('schedule_date', $selectedDate)->first();
 
+        // If no schedule exists for this date, check for repeat_weekly schedules from previous weeks
+        $classes = [];
+        $inheritedFromWeekly = false;
+
+        if (!$todaySchedule) {
+            // Find a schedule from a previous week on the same day that has repeat_weekly enabled
+            $repeatSchedule = DailyClassSchedule::where('repeat_weekly', true)
+                ->where('day_name', $selectedDate->format('l'))
+                ->whereDate('schedule_date', '<', $selectedDate)
+                ->orderBy('schedule_date', 'desc')
+                ->first();
+
+            if ($repeatSchedule) {
+                $classes = $repeatSchedule->classes ?? [];
+                $inheritedFromWeekly = true;
+            }
+        } else {
+            $classes = $todaySchedule->classes ?? [];
+        }
+
         $schedulePosted = $todaySchedule && $todaySchedule->posted_at !== null;
-        $classes = $todaySchedule ? ($todaySchedule->classes ?? []) : [];
 
         // Sort classes by time
         usort($classes, function($a, $b) {
@@ -55,12 +74,29 @@ class AdminScheduleController extends Controller
                 return Carbon::parse($schedule->schedule_date)->format('l');
             });
 
+        // For days without schedules, check for repeat_weekly schedules
+        $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        foreach ($daysOfWeek as $day) {
+            if (!isset($weeklySchedules[$day])) {
+                $repeatSchedule = DailyClassSchedule::where('repeat_weekly', true)
+                    ->where('day_name', $day)
+                    ->whereDate('schedule_date', '<', $weekStart)
+                    ->orderBy('schedule_date', 'desc')
+                    ->first();
+
+                if ($repeatSchedule) {
+                    // Create a virtual schedule entry for display purposes
+                    $weeklySchedules[$day] = $repeatSchedule;
+                }
+            }
+        }
+
         $students = Student::where('status', 'active')->orderBy('first_name')->get();
         $tutors = Tutor::where('status', 'active')->orderBy('first_name')->get();
 
         return view('admin.schedules.index', compact(
             'todaySchedule', 'schedulePosted', 'classes', 'weeklySchedules',
-            'selectedDate', 'weekStart', 'weekEnd', 'students', 'tutors'
+            'selectedDate', 'weekStart', 'weekEnd', 'students', 'tutors', 'inheritedFromWeekly'
         ));
     }
 

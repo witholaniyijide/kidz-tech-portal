@@ -8,6 +8,7 @@ use App\Models\Tutor;
 use App\Models\AttendanceRecord;
 use App\Models\DailyClassSchedule;
 use App\Models\Notice;
+use App\Models\TutorReport;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -61,6 +62,10 @@ class AdminDashboardController extends Controller
             'pendingAttendance' => AttendanceRecord::where('status', 'pending')->count(),
             'approvedAttendance' => AttendanceRecord::where('status', 'approved')->count(),
             'lateAttendance' => AttendanceRecord::where('is_late', true)->count(),
+
+            // For To-Do List
+            'studentsWithoutTutor' => Student::whereNull('tutor_id')->where('status', 'active')->count(),
+            'pendingReports' => TutorReport::where('status', 'pending')->count(),
         ];
 
         // Check if schedule is posted

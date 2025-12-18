@@ -279,32 +279,51 @@ class DashboardController extends Controller
             'Withdrawn' => Student::where('status', 'withdrawn')->count(),
         ];
 
-        // Today's Class Schedule - from students with class_schedule
-        $todayName = Carbon::today()->format('l'); // e.g., "Monday"
+        // Today's Class Schedule - prioritize posted DailyClassSchedule, fallback to students' class_schedule
+        $todayScheduleRecord = DailyClassSchedule::whereDate('schedule_date', Carbon::today())->first();
+        $schedulePosted = $todayScheduleRecord && $todayScheduleRecord->posted_at !== null;
+        $schedulePostedAt = $todayScheduleRecord?->posted_at;
+
         $todayClasses = [];
-        
-        $studentsWithSchedule = Student::with('tutor')
-            ->where('status', 'active')
-            ->whereNotNull('class_schedule')
-            ->get();
-            
-        foreach ($studentsWithSchedule as $student) {
-            $schedules = is_array($student->class_schedule) 
-                ? $student->class_schedule 
-                : json_decode($student->class_schedule, true) ?? [];
-            
-            foreach ($schedules as $schedule) {
-                if (isset($schedule['day']) && $schedule['day'] === $todayName) {
-                    $todayClasses[] = [
-                        'time' => $schedule['time'] ?? '09:00',
-                        'student' => $student->first_name . ' ' . $student->last_name,
-                        'tutor' => $student->tutor ? $student->tutor->first_name . ' ' . $student->tutor->last_name : 'Unassigned',
-                        'level' => $student->current_level ?? 'Not set',
-                    ];
+
+        // If admin has posted a schedule for today, use that
+        if ($schedulePosted && $todayScheduleRecord && !empty($todayScheduleRecord->classes)) {
+            foreach ($todayScheduleRecord->classes as $class) {
+                $todayClasses[] = [
+                    'time' => $class['time'] ?? '09:00',
+                    'student' => $class['student_name'] ?? 'Unknown',
+                    'tutor' => $class['tutor_name'] ?? 'Unassigned',
+                    'level' => $class['level'] ?? 'Not set',
+                    'class_link' => $class['class_link'] ?? null,
+                ];
+            }
+        } else {
+            // Fallback to students' class_schedule
+            $todayName = Carbon::today()->format('l'); // e.g., "Monday"
+
+            $studentsWithSchedule = Student::with('tutor')
+                ->where('status', 'active')
+                ->whereNotNull('class_schedule')
+                ->get();
+
+            foreach ($studentsWithSchedule as $student) {
+                $schedules = is_array($student->class_schedule)
+                    ? $student->class_schedule
+                    : json_decode($student->class_schedule, true) ?? [];
+
+                foreach ($schedules as $schedule) {
+                    if (isset($schedule['day']) && $schedule['day'] === $todayName) {
+                        $todayClasses[] = [
+                            'time' => $schedule['time'] ?? '09:00',
+                            'student' => $student->first_name . ' ' . $student->last_name,
+                            'tutor' => $student->tutor ? $student->tutor->first_name . ' ' . $student->tutor->last_name : 'Unassigned',
+                            'level' => $student->current_level ?? 'Not set',
+                        ];
+                    }
                 }
             }
         }
-        
+
         // Sort by time
         usort($todayClasses, fn($a, $b) => strcmp($a['time'], $b['time']));
 
@@ -404,6 +423,8 @@ class DashboardController extends Controller
             'studentDistribution' => $studentDistribution,
             // Schedule & Todos
             'todayClasses' => $todayClasses,
+            'schedulePosted' => $schedulePosted,
+            'schedulePostedAt' => $schedulePostedAt,
             'todos' => $todos,
             'recentActivities' => $recentActivities,
             'notices' => $notices,
