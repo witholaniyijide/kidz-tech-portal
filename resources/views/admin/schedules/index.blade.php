@@ -127,7 +127,12 @@
             {{-- Today's Schedule --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-8">
                 <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white flex justify-between items-center">
-                    <h3 class="text-lg font-semibold">{{ $selectedDate->format('l\'s') }} Classes ({{ count($classes) }})</h3>
+                    <div>
+                        <h3 class="text-lg font-semibold">{{ $selectedDate->format('l, M j') }} Classes ({{ count($classes) }})</h3>
+                        @if($inheritedFromWeekly ?? false)
+                            <p class="text-xs text-white/70">🔄 Inherited from weekly repeat schedule</p>
+                        @endif
+                    </div>
                     @if($todaySchedule)
                         <a href="{{ route('admin.schedules.edit', $todaySchedule) }}" class="text-white/80 hover:text-white text-sm">
                             Edit Schedule →

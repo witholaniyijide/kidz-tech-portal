@@ -66,10 +66,19 @@
                 <!-- Today's Class Schedule -->
                 <x-ui.glass-card>
                     <div class="flex items-center justify-between mb-4">
-                        <x-ui.section-title>Today's Classes</x-ui.section-title>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ now()->format('l') }}</span>
+                        <div>
+                            <x-ui.section-title>Today's Classes</x-ui.section-title>
+                            @if($schedulePosted ?? false)
+                                <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                                    ✅ Posted by Admin {{ $schedulePostedAt ? \Carbon\Carbon::parse($schedulePostedAt)->format('g:i A') : '' }}
+                                </p>
+                            @else
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ now()->format('l, M j') }}</p>
+                            @endif
+                        </div>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ count($todayClasses) }} classes</span>
                     </div>
-                    
+
                     @if(count($todayClasses) > 0)
                         <div class="space-y-3 max-h-80 overflow-y-auto">
                             @foreach($todayClasses as $class)

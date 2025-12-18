@@ -92,88 +92,176 @@
                 </a>
             </div>
 
-            {{-- SECTION 2: Daily Class Schedule --}}
-            <div class="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg mb-8 overflow-hidden">
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center justify-between flex-wrap gap-4">
-                        <div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                📅 Classes Scheduled for Today
-                            </h3>
-                            @if($schedulePosted ?? false)
-                                <p class="text-sm text-emerald-600 dark:text-emerald-400 mt-1">
-                                    ✅ Posted {{ $schedulePostedAt ? \Carbon\Carbon::parse($schedulePostedAt)->format('g:i A') : '' }}
-                                </p>
-                            @else
-                                <p class="text-sm text-amber-600 dark:text-amber-400 mt-1">⏳ Draft - Not yet posted</p>
-                            @endif
+            {{-- SECTION 2: Daily Class Schedule & To-Do List --}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                {{-- Daily Class Schedule --}}
+                <div class="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg overflow-hidden">
+                    <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between flex-wrap gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    📅 Today's Classes
+                                </h3>
+                                @if($schedulePosted ?? false)
+                                    <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                                        ✅ Posted {{ $schedulePostedAt ? \Carbon\Carbon::parse($schedulePostedAt)->format('g:i A') : '' }}
+                                    </p>
+                                @else
+                                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">⏳ Draft</p>
+                                @endif
+                            </div>
+                            <div class="flex gap-2">
+                                <button @click="copyToClipboard()" class="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors" title="Copy for WhatsApp">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                                    </svg>
+                                </button>
+                                @if(!($schedulePosted ?? false))
+                                    <form action="{{ route('admin.schedules.post') }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="p-2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-lg hover:shadow-lg transition-all" title="Post Schedule">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                @endif
+                                <a href="{{ route('admin.schedules.index') }}" class="p-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" title="Manage Schedules">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                </a>
+                            </div>
                         </div>
-                        <div class="flex gap-2">
-                            <button @click="copyToClipboard()" class="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors text-sm font-medium flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                                </svg>
-                                Copy for WhatsApp
-                            </button>
-                            @if(!($schedulePosted ?? false))
-                                <form action="{{ route('admin.schedules.post') }}" method="POST" class="inline">
-                                    @csrf
-                                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                                        </svg>
-                                        Post Schedule
-                                    </button>
-                                </form>
-                            @endif
-                            <a href="{{ route('admin.schedules.index') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium">
-                                Manage Schedules
-                            </a>
-                        </div>
+                    </div>
+
+                    <div class="p-5 max-h-80 overflow-y-auto">
+                        @if(empty($todayClasses))
+                            <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                <div class="text-4xl mb-3">📭</div>
+                                <p>No classes scheduled</p>
+                                <a href="{{ route('admin.schedules.create') }}" class="inline-block mt-3 text-teal-600 dark:text-teal-400 hover:underline text-sm">+ Add classes</a>
+                            </div>
+                        @else
+                            <div class="space-y-3" id="scheduleList">
+                                @foreach($todayClasses as $index => $class)
+                                    <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                        <div class="w-7 h-7 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                                            {{ $index + 1 }}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="font-medium text-gray-800 dark:text-white text-sm truncate">
+                                                {{ $class['student_name'] ?? 'Unknown' }}
+                                            </div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                                by {{ $class['tutor_name'] ?? 'Unknown' }}
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="font-semibold text-teal-600 dark:text-teal-400 text-sm">
+                                                @php
+                                                    try {
+                                                        $time = \Carbon\Carbon::parse($class['time'] ?? '00:00')->format('g:i A');
+                                                    } catch (\Exception $e) {
+                                                        $time = $class['time'] ?? '00:00';
+                                                    }
+                                                @endphp
+                                                {{ $time }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
                 </div>
 
-                <div class="p-6">
-                    @if(empty($todayClasses))
-                        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                            <div class="text-5xl mb-4">📭</div>
-                            <p class="text-lg">No classes scheduled for today</p>
-                            <a href="{{ route('admin.schedules.create') }}" class="inline-block mt-4 text-teal-600 dark:text-teal-400 hover:underline">+ Add classes</a>
-                        </div>
-                    @else
-                        <div class="space-y-3" id="scheduleList">
-                            @foreach($todayClasses as $index => $class)
-                                <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                        {{ $index + 1 }}
+                {{-- Admin To-Do List --}}
+                <div class="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg overflow-hidden">
+                    <div class="p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            ✅ Admin To-Do List
+                        </h3>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ now()->format('M j, Y') }}</span>
+                    </div>
+                    <div class="p-5 max-h-80 overflow-y-auto">
+                        <div class="space-y-3">
+                            {{-- Review Pending Attendance --}}
+                            @if(($stats['pendingAttendance'] ?? 0) > 0)
+                                <a href="{{ route('admin.attendance.index', ['status' => 'pending']) }}" class="flex items-center gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors">
+                                    <div class="w-7 h-7 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs">
+                                        ⏳
                                     </div>
                                     <div class="flex-1">
-                                        <div class="font-semibold text-gray-800 dark:text-white">
-                                            {{ $class['student_name'] ?? 'Unknown' }}
-                                        </div>
-                                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                                            by {{ $class['tutor_name'] ?? 'Unknown' }}
-                                        </div>
+                                        <div class="font-medium text-amber-800 dark:text-amber-300 text-sm">Review Attendance</div>
+                                        <div class="text-xs text-amber-600 dark:text-amber-400">{{ $stats['pendingAttendance'] }} pending approvals</div>
                                     </div>
-                                    <div class="text-right">
-                                        <div class="font-semibold text-teal-600 dark:text-teal-400">
-                                            @php
-                                                try {
-                                                    $time = \Carbon\Carbon::parse($class['time'] ?? '00:00')->format('g:i A');
-                                                } catch (\Exception $e) {
-                                                    $time = $class['time'] ?? '00:00';
-                                                }
-                                            @endphp
-                                            {{ $time }}
-                                        </div>
-                                        <div class="text-xs text-gray-500">
-                                            <span class="text-gray-500">⏳ Scheduled</span>
-                                        </div>
+                                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            @endif
+
+                            {{-- Post Today's Schedule --}}
+                            @if(!($schedulePosted ?? false) && !empty($todayClasses))
+                                <div class="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 rounded-xl">
+                                    <div class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+                                        📤
                                     </div>
+                                    <div class="flex-1">
+                                        <div class="font-medium text-blue-800 dark:text-blue-300 text-sm">Post Schedule</div>
+                                        <div class="text-xs text-blue-600 dark:text-blue-400">{{ count($todayClasses) }} classes ready</div>
+                                    </div>
+                                    <form action="{{ route('admin.schedules.post') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600">Post</button>
+                                    </form>
                                 </div>
-                            @endforeach
+                            @endif
+
+                            {{-- Check Reports --}}
+                            @if(($stats['pendingReports'] ?? 0) > 0)
+                                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/30 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
+                                    <div class="w-7 h-7 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs">
+                                        📋
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="font-medium text-purple-800 dark:text-purple-300 text-sm">Review Reports</div>
+                                        <div class="text-xs text-purple-600 dark:text-purple-400">{{ $stats['pendingReports'] }} awaiting review</div>
+                                    </div>
+                                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            @endif
+
+                            {{-- Students without tutor --}}
+                            @if(($stats['studentsWithoutTutor'] ?? 0) > 0)
+                                <a href="{{ route('admin.students.index', ['without_tutor' => 1]) }}" class="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                                    <div class="w-7 h-7 bg-red-500 rounded-full flex items-center justify-center text-white text-xs">
+                                        ⚠️
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="font-medium text-red-800 dark:text-red-300 text-sm">Assign Tutors</div>
+                                        <div class="text-xs text-red-600 dark:text-red-400">{{ $stats['studentsWithoutTutor'] }} students unassigned</div>
+                                    </div>
+                                    <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            @endif
+
+                            {{-- All caught up message --}}
+                            @if(($stats['pendingAttendance'] ?? 0) == 0 && ($schedulePosted ?? true) && ($stats['pendingReports'] ?? 0) == 0 && ($stats['studentsWithoutTutor'] ?? 0) == 0)
+                                <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                                    <div class="text-4xl mb-3">🎉</div>
+                                    <p class="font-medium">All caught up!</p>
+                                    <p class="text-sm">No pending tasks for today</p>
+                                </div>
+                            @endif
                         </div>
-                    @endif
+                    </div>
                 </div>
             </div>
 
@@ -259,64 +347,8 @@
                 </div>
             </div>
 
-            {{-- SECTION 5: Quick Actions --}}
-            <div class="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg p-6 mb-8">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
-                    ⚡ Quick Actions
-                </h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    {{-- Add Student --}}
-                    <a href="{{ route('admin.students.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
-                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                        </svg>
-                        <span class="text-sm font-medium">Add Student</span>
-                    </a>
-
-                    {{-- Add Tutor --}}
-                    <a href="{{ route('admin.tutors.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
-                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                        </svg>
-                        <span class="text-sm font-medium">Add Tutor</span>
-                    </a>
-
-                    {{-- Review Attendance --}}
-                    <a href="{{ route('admin.attendance.index', ['status' => 'pending']) }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
-                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span class="text-sm font-medium">Review Attendance</span>
-                    </a>
-
-                    {{-- Post Schedule --}}
-                    <a href="{{ route('admin.schedules.index') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
-                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        <span class="text-sm font-medium">Post Schedule</span>
-                    </a>
-
-                    {{-- View Reports --}}
-                    <a href="{{ route('admin.reports.index') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
-                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        <span class="text-sm font-medium">View Reports</span>
-                    </a>
-
-                    {{-- Create Notice --}}
-                    <a href="{{ route('admin.notices.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
-                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
-                        <span class="text-sm font-medium">Create Notice</span>
-                    </a>
-                </div>
-            </div>
-
             {{-- Recent Students & Tutors Tables --}}
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 {{-- Recent Students --}}
                 <div class="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg overflow-hidden">
                     <div class="p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
@@ -405,6 +437,62 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            {{-- SECTION: Quick Actions (at bottom) --}}
+            <div class="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
+                    ⚡ Quick Actions
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    {{-- Add Student --}}
+                    <a href="{{ route('admin.students.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        <span class="text-sm font-medium">Add Student</span>
+                    </a>
+
+                    {{-- Add Tutor --}}
+                    <a href="{{ route('admin.tutors.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        <span class="text-sm font-medium">Add Tutor</span>
+                    </a>
+
+                    {{-- Review Attendance --}}
+                    <a href="{{ route('admin.attendance.index', ['status' => 'pending']) }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-sm font-medium">Review Attendance</span>
+                    </a>
+
+                    {{-- Post Schedule --}}
+                    <a href="{{ route('admin.schedules.index') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="text-sm font-medium">Post Schedule</span>
+                    </a>
+
+                    {{-- View Reports --}}
+                    <a href="{{ route('admin.reports.index') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span class="text-sm font-medium">View Reports</span>
+                    </a>
+
+                    {{-- Create Notice --}}
+                    <a href="{{ route('admin.notices.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        <span class="text-sm font-medium">Create Notice</span>
+                    </a>
                 </div>
             </div>
         </div>
