@@ -169,23 +169,71 @@
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Assigned Students ({{ $tutor->students->count() }})</h3>
                     </div>
                     <div class="p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="space-y-4">
                             @foreach($tutor->students as $student)
-                                <a href="{{ route('admin.students.show', $student) }}" class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                        {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
+                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <div class="flex items-start gap-4">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                                            {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between gap-2 mb-2">
+                                                <a href="{{ route('admin.students.show', $student) }}" class="font-semibold text-gray-900 dark:text-white hover:text-teal-600 dark:hover:text-teal-400">
+                                                    {{ $student->first_name }} {{ $student->last_name }}
+                                                </a>
+                                                <span class="px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0
+                                                    @if($student->status === 'active') bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400
+                                                    @else bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300
+                                                    @endif">
+                                                    {{ ucfirst($student->status) }}
+                                                </span>
+                                            </div>
+
+                                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                                {{ $student->classes_per_week ?? 0 }} classes/week
+                                            </div>
+
+                                            {{-- Class Schedule --}}
+                                            @if($student->class_schedule && count($student->class_schedule) > 0)
+                                                <div class="mb-3">
+                                                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Schedule</div>
+                                                    <div class="flex flex-wrap gap-1">
+                                                        @foreach($student->class_schedule as $schedule)
+                                                            @if(isset($schedule['day']) && isset($schedule['time']))
+                                                                <span class="inline-flex items-center px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs">
+                                                                    {{ ucfirst($schedule['day']) }} @ {{ $schedule['time'] }}
+                                                                </span>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
+
+                                            {{-- Links --}}
+                                            <div class="flex flex-wrap gap-3">
+                                                @if($student->class_link)
+                                                    <a href="{{ $student->class_link }}" target="_blank" class="inline-flex items-center text-xs text-teal-600 dark:text-teal-400 hover:underline">
+                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                        </svg>
+                                                        Class Link
+                                                    </a>
+                                                @endif
+                                                @if($student->google_classroom_link)
+                                                    <a href="{{ $student->google_classroom_link }}" target="_blank" class="inline-flex items-center text-xs text-green-600 dark:text-green-400 hover:underline">
+                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                                        </svg>
+                                                        Google Classroom
+                                                    </a>
+                                                @endif
+                                                @if(!$student->class_link && !$student->google_classroom_link)
+                                                    <span class="text-xs text-gray-400 italic">No links set</span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div class="font-medium text-gray-900 dark:text-white">{{ $student->first_name }} {{ $student->last_name }}</div>
-                                        <div class="text-xs text-gray-500">{{ $student->classes_per_week ?? 0 }} classes/week</div>
-                                    </div>
-                                    <span class="ml-auto px-2 py-0.5 text-xs font-medium rounded-full
-                                        @if($student->status === 'active') bg-emerald-100 text-emerald-700
-                                        @else bg-gray-100 text-gray-600
-                                        @endif">
-                                        {{ ucfirst($student->status) }}
-                                    </span>
-                                </a>
+                                </div>
                             @endforeach
                         </div>
                     </div>
