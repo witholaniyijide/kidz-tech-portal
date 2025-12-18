@@ -29,14 +29,45 @@ class AdminAnalyticsController extends Controller
      */
     public function index()
     {
-        // Student Analytics
-        $studentStats = [
-            'total' => Student::count(),
-            'active' => Student::where('status', 'active')->count(),
-            'inactive' => Student::where('status', 'inactive')->count(),
-            'graduated' => Student::where('status', 'graduated')->count(),
-            'withdrawn' => Student::where('status', 'withdrawn')->count(),
+        // Attendance rate overview
+        $totalAttendance = AttendanceRecord::count();
+        $approvedAttendance = AttendanceRecord::where('status', 'approved')->count();
+        $attendanceRate = $totalAttendance > 0 ? round(($approvedAttendance / $totalAttendance) * 100, 1) : 0;
+
+        // Classes this month (from attendance records)
+        $classesThisMonth = AttendanceRecord::whereMonth('class_date', Carbon::now()->month)
+            ->whereYear('class_date', Carbon::now()->year)
+            ->count();
+
+        // Average students per tutor
+        $activeTutors = Tutor::where('status', 'active')->count();
+        $activeStudents = Student::where('status', 'active')->count();
+        $avgStudentsPerTutor = $activeTutors > 0 ? round($activeStudents / $activeTutors, 1) : 0;
+
+        // Stats for the view
+        $stats = [
+            'total_students' => Student::count(),
+            'active_students' => $activeStudents,
+            'inactive_students' => Student::where('status', 'inactive')->count(),
+            'graduated_students' => Student::where('status', 'graduated')->count(),
+            'withdrawn_students' => Student::where('status', 'withdrawn')->count(),
+            'total_tutors' => Tutor::count(),
+            'active_tutors' => $activeTutors,
+            'inactive_tutors' => Tutor::where('status', 'inactive')->count(),
+            'on_leave_tutors' => Tutor::where('status', 'on_leave')->count(),
+            'resigned_tutors' => Tutor::where('status', 'resigned')->count(),
+            'classes_this_month' => $classesThisMonth,
+            'avg_attendance_rate' => $attendanceRate,
+            'avg_students_per_tutor' => $avgStudentsPerTutor,
         ];
+
+        // Monthly classes breakdown (for chart)
+        $monthlyClasses = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $monthlyClasses[$i] = AttendanceRecord::whereMonth('class_date', $i)
+                ->whereYear('class_date', Carbon::now()->year)
+                ->count();
+        }
 
         // Enrollment trend (last 12 months)
         $enrollmentTrend = Student::select(
@@ -54,28 +85,6 @@ class AdminAnalyticsController extends Controller
             ->orderBy('students_count', 'desc')
             ->take(10)
             ->get();
-
-        // Classes per week distribution
-        $classesPerWeek = Student::where('status', 'active')
-            ->whereNotNull('classes_per_week')
-            ->select('classes_per_week', DB::raw('COUNT(*) as count'))
-            ->groupBy('classes_per_week')
-            ->orderBy('classes_per_week')
-            ->get();
-
-        // Attendance rate overview
-        $totalAttendance = AttendanceRecord::count();
-        $approvedAttendance = AttendanceRecord::where('status', 'approved')->count();
-        $attendanceRate = $totalAttendance > 0 ? round(($approvedAttendance / $totalAttendance) * 100, 1) : 0;
-
-        // Tutor Analytics
-        $tutorStats = [
-            'total' => Tutor::count(),
-            'active' => Tutor::where('status', 'active')->count(),
-            'inactive' => Tutor::where('status', 'inactive')->count(),
-            'on_leave' => Tutor::where('status', 'on_leave')->count(),
-            'resigned' => Tutor::where('status', 'resigned')->count(),
-        ];
 
         // Tutor load (students per tutor)
         $tutorLoad = Tutor::withCount('students')
@@ -99,12 +108,10 @@ class AdminAnalyticsController extends Controller
             ->get();
 
         return view('admin.analytics.index', compact(
-            'studentStats',
+            'stats',
+            'monthlyClasses',
             'enrollmentTrend',
             'studentsPerTutor',
-            'classesPerWeek',
-            'attendanceRate',
-            'tutorStats',
             'tutorLoad',
             'tutorActivity'
         ));

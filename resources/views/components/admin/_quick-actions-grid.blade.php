@@ -11,7 +11,7 @@
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4" role="list" aria-label="Available quick actions">
 
         {{-- Add Student --}}
-        <a href="{{ route('students.create') }}" class="group" role="listitem">
+        <a href="{{ route('admin.students.create') }}" class="group" role="listitem">
             <div class="glass-card rounded-xl p-6 text-center hover-lift cursor-pointer transform transition-all duration-300">
                 <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-gradient-to-br from-[#14B8A6] to-[#06B6D4] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,7 +23,7 @@
         </a>
 
         {{-- Add Tutor --}}
-        <a href="{{ route('tutors.create') }}" class="group" role="listitem">
+        <a href="{{ route('admin.tutors.create') }}" class="group" role="listitem">
             <div class="glass-card rounded-xl p-6 text-center hover-lift cursor-pointer transform transition-all duration-300">
                 <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-gradient-to-br from-[#06B6D4] to-[#0EA5E9] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +35,7 @@
         </a>
 
         {{-- Post Schedule --}}
-        <a href="{{ route('schedule.today') }}" class="group" role="listitem">
+        <a href="{{ route('admin.schedules.index') }}" class="group" role="listitem">
             <div class="glass-card rounded-xl p-6 text-center hover-lift cursor-pointer transform transition-all duration-300">
                 <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,7 +47,7 @@
         </a>
 
         {{-- Approve Attendance --}}
-        <a href="{{ route('attendance.pending') }}" class="group" role="listitem">
+        <a href="{{ route('admin.attendance.index') }}" class="group" role="listitem">
             <div class="glass-card rounded-xl p-6 text-center hover-lift cursor-pointer transform transition-all duration-300">
                 <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#EF4444] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,7 +59,7 @@
         </a>
 
         {{-- View Reports --}}
-        <a href="{{ route('reports.index') }}" class="group" role="listitem">
+        <a href="{{ route('admin.reports.index') }}" class="group" role="listitem">
             <div class="glass-card rounded-xl p-6 text-center hover-lift cursor-pointer transform transition-all duration-300">
                 <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,7 +71,7 @@
         </a>
 
         {{-- Notice Board --}}
-        <a href="{{ route('noticeboard.index') }}" class="group" role="listitem">
+        <a href="{{ route('admin.notices.index') }}" class="group" role="listitem">
             <div class="glass-card rounded-xl p-6 text-center hover-lift cursor-pointer transform transition-all duration-300">
                 <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-gradient-to-br from-[#EC4899] to-[#DB2777] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

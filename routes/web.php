@@ -83,11 +83,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     
     // Attendance (View/Approve/Mark Late/Delete - Tutors submit, Admin reviews)
     Route::get('/attendance', [App\Http\Controllers\Admin\AdminAttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('/attendance/export', [App\Http\Controllers\Admin\AdminAttendanceController::class, 'export'])->name('attendance.export');
     Route::get('/attendance/{attendance}', [App\Http\Controllers\Admin\AdminAttendanceController::class, 'show'])->name('attendance.show');
     Route::post('/attendance/{attendance}/approve', [App\Http\Controllers\Admin\AdminAttendanceController::class, 'approve'])->name('attendance.approve');
     Route::post('/attendance/{attendance}/late', [App\Http\Controllers\Admin\AdminAttendanceController::class, 'markLate'])->name('attendance.late');
     Route::delete('/attendance/{attendance}', [App\Http\Controllers\Admin\AdminAttendanceController::class, 'destroy'])->name('attendance.destroy');
-    
+
     // Schedules (Full control)
     Route::get('/schedules', [App\Http\Controllers\Admin\AdminScheduleController::class, 'index'])->name('schedules.index');
     Route::get('/schedules/create', [App\Http\Controllers\Admin\AdminScheduleController::class, 'create'])->name('schedules.create');

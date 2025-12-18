@@ -38,35 +38,35 @@ class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 s
 
                 {{-- Navigation Links (No Dropdowns) --}}
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('students.index')" :active="request()->routeIs('students.*')">
+                    <x-nav-link :href="route('admin.students.index')" :active="request()->routeIs('admin.students.*')">
                         {{ __('Students') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('tutors.index')" :active="request()->routeIs('tutors.*')">
+                    <x-nav-link :href="route('admin.tutors.index')" :active="request()->routeIs('admin.tutors.*')">
                         {{ __('Tutors') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('attendance.index')" :active="request()->routeIs('attendance.*')">
+                    <x-nav-link :href="route('admin.attendance.index')" :active="request()->routeIs('admin.attendance.*')">
                         {{ __('Attendance') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                    <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
                         {{ __('Reports') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('schedule.today')" :active="request()->routeIs('schedule.*')">
+                    <x-nav-link :href="route('admin.schedules.index')" :active="request()->routeIs('admin.schedules.*')">
                         {{ __('Schedule') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('noticeboard.index')" :active="request()->routeIs('noticeboard.*')">
+                    <x-nav-link :href="route('admin.notices.index')" :active="request()->routeIs('admin.notices.*')">
                         {{ __('Notice Board') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('analytics.students')" :active="request()->routeIs('analytics.*')">
+                    <x-nav-link :href="route('admin.analytics.index')" :active="request()->routeIs('admin.analytics.*')">
                         {{ __('Analytics') }}
                     </x-nav-link>
                 </div>
@@ -214,35 +214,35 @@ class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 s
     {{-- Responsive Navigation Menu --}}
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+            <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('students.index')" :active="request()->routeIs('students.*')">
+            <x-responsive-nav-link :href="route('admin.students.index')" :active="request()->routeIs('admin.students.*')">
                 {{ __('Students') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('tutors.index')" :active="request()->routeIs('tutors.*')">
+            <x-responsive-nav-link :href="route('admin.tutors.index')" :active="request()->routeIs('admin.tutors.*')">
                 {{ __('Tutors') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('attendance.index')" :active="request()->routeIs('attendance.*')">
+            <x-responsive-nav-link :href="route('admin.attendance.index')" :active="request()->routeIs('admin.attendance.*')">
                 {{ __('Attendance') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+            <x-responsive-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
                 {{ __('Reports') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('schedule.today')" :active="request()->routeIs('schedule.*')">
+            <x-responsive-nav-link :href="route('admin.schedules.index')" :active="request()->routeIs('admin.schedules.*')">
                 {{ __('Schedule') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('noticeboard.index')" :active="request()->routeIs('noticeboard.*')">
+            <x-responsive-nav-link :href="route('admin.notices.index')" :active="request()->routeIs('admin.notices.*')">
                 {{ __('Notice Board') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('analytics.students')" :active="request()->routeIs('analytics.*')">
+            <x-responsive-nav-link :href="route('admin.analytics.index')" :active="request()->routeIs('admin.analytics.*')">
                 {{ __('Analytics') }}
             </x-responsive-nav-link>
         </div>

@@ -1,7 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white">{{ __('Attendance Management') }}</h2>
-    </x-slot>
+    <x-slot name="header">{{ __('Attendance Management') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Attendance') }}</x-slot>
 
     <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
@@ -20,6 +18,77 @@
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Attendance Management</h1>
                     <p class="text-gray-600 dark:text-gray-400 mt-1">Review and approve tutor-submitted attendance records</p>
+                </div>
+                <div x-data="{ exportOpen: false }" class="relative">
+                    <button @click="exportOpen = !exportOpen" type="button" class="inline-flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg shadow transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Export CSV
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="exportOpen" @click.away="exportOpen = false" x-transition
+                         class="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                        <div class="p-4">
+                            <h4 class="font-semibold text-gray-900 dark:text-white mb-3">Export Attendance Data</h4>
+                            <div class="space-y-2">
+                                <a href="{{ route('admin.attendance.export', ['period' => 'week']) }}"
+                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white text-sm">This Week</div>
+                                        <div class="text-xs text-gray-500">{{ now()->startOfWeek()->format('M j') }} - {{ now()->endOfWeek()->format('M j, Y') }}</div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                </a>
+                                <a href="{{ route('admin.attendance.export', ['period' => 'month']) }}"
+                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white text-sm">This Month</div>
+                                        <div class="text-xs text-gray-500">{{ now()->startOfMonth()->format('M j') }} - {{ now()->endOfMonth()->format('M j, Y') }}</div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                </a>
+                                <a href="{{ route('admin.attendance.export', ['start_date' => now()->subWeek()->startOfWeek()->format('Y-m-d'), 'end_date' => now()->subWeek()->endOfWeek()->format('Y-m-d')]) }}"
+                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white text-sm">Last Week</div>
+                                        <div class="text-xs text-gray-500">{{ now()->subWeek()->startOfWeek()->format('M j') }} - {{ now()->subWeek()->endOfWeek()->format('M j, Y') }}</div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                </a>
+                                <a href="{{ route('admin.attendance.export', ['start_date' => now()->subMonth()->startOfMonth()->format('Y-m-d'), 'end_date' => now()->subMonth()->endOfMonth()->format('Y-m-d')]) }}"
+                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white text-sm">Last Month</div>
+                                        <div class="text-xs text-gray-500">{{ now()->subMonth()->startOfMonth()->format('M j') }} - {{ now()->subMonth()->endOfMonth()->format('M j, Y') }}</div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <form action="{{ route('admin.attendance.export') }}" method="GET" class="space-y-3">
+                                    <div class="text-xs font-medium text-gray-700 dark:text-gray-300">Custom Date Range</div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <input type="date" name="start_date" class="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-2 focus:ring-teal-500">
+                                        <input type="date" name="end_date" class="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-2 focus:ring-teal-500">
+                                    </div>
+                                    <button type="submit" class="w-full px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm rounded-lg transition-colors">
+                                        Export Custom Range
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
