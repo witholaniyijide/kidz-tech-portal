@@ -2,9 +2,9 @@
     <x-slot name="header">{{ __('Student Details') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Student Details') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             {{-- Flash Messages --}}
@@ -17,7 +17,7 @@
             {{-- Header --}}
             <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
                         {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
                     </div>
                     <div>
@@ -57,7 +57,7 @@
 
             {{-- Student Info --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
-                <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white">
+                <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
                     <h3 class="text-lg font-semibold">Student Information</h3>
                 </div>
                 <div class="p-6">
@@ -118,7 +118,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Class Link</label>
                             @if($student->class_link)
-                                <a href="{{ $student->class_link }}" target="_blank" class="text-teal-600 dark:text-teal-400 hover:underline truncate block">{{ $student->class_link }}</a>
+                                <a href="{{ $student->class_link }}" target="_blank" class="text-[#423A8E] dark:text-[#00CCCD] hover:underline truncate block">{{ $student->class_link }}</a>
                             @else
                                 <p class="text-gray-400">-</p>
                             @endif
@@ -126,7 +126,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Google Classroom</label>
                             @if($student->google_classroom_link)
-                                <a href="{{ $student->google_classroom_link }}" target="_blank" class="text-teal-600 dark:text-teal-400 hover:underline truncate block">{{ $student->google_classroom_link }}</a>
+                                <a href="{{ $student->google_classroom_link }}" target="_blank" class="text-[#423A8E] dark:text-[#00CCCD] hover:underline truncate block">{{ $student->google_classroom_link }}</a>
                             @else
                                 <p class="text-gray-400">-</p>
                             @endif
@@ -227,7 +227,7 @@
                 <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Attendance</h3>
-                        <a href="{{ route('admin.attendance.index', ['student_id' => $student->id]) }}" class="text-sm text-teal-600 dark:text-teal-400 hover:underline">View All</a>
+                        <a href="{{ route('admin.attendance.index', ['student_id' => $student->id]) }}" class="text-sm text-[#423A8E] dark:text-[#00CCCD] hover:underline">View All</a>
                     </div>
                     <div class="p-6">
                         <div class="space-y-3">

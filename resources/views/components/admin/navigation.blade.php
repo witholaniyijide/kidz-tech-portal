@@ -153,7 +153,7 @@ class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 s
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none transition ease-in-out duration-150">
                             <div class="flex items-center space-x-2">
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-teal-400 to-cyan-500 flex items-center justify-center text-white font-semibold text-sm">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-[#00CCCD] to-[#00CCCD] flex items-center justify-center text-white font-semibold text-sm">
                                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                 </div>
                                 <div>{{ Auth::user()->name }}</div>

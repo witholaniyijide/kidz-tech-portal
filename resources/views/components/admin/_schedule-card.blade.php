@@ -3,7 +3,7 @@
 @if(empty($classes))
 <div class="glass-card rounded-2xl p-6 shadow-xl text-center" role="region" aria-label="Daily Class Schedule" style="animation-delay: 0.5s;">
     <div class="py-12">
-        <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#14B8A6] to-[#06B6D4] flex items-center justify-center shadow-lg">
+        <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#423A8E] to-[#00CCCD] flex items-center justify-center shadow-lg">
             <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
@@ -12,7 +12,7 @@
         <p class="text-gray-500 dark:text-gray-400 mb-6">There are no classes scheduled for today.</p>
         <a
             href="{{ route('schedule.generate') }}"
-            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#14B8A6] to-[#06B6D4] text-white text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#423A8E]"
             aria-label="Generate today's schedule"
         >
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -60,7 +60,7 @@
 >
     <div class="mb-6">
         <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-            <svg class="w-5 h-5 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 mr-2 text-[#423A8E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             Coding Classes Scheduled for Today
@@ -70,8 +70,8 @@
 
     <ol id="schedule-list" class="space-y-3 mb-6" role="list" aria-label="Today's class schedule">
         @foreach($classes as $index => $class)
-        <li class="flex items-start p-4 rounded-lg bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border-l-4 border-{{ $index % 2 == 0 ? 'teal' : 'cyan' }}-500">
-            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#14B8A6] to-[#06B6D4] flex items-center justify-center text-white font-bold text-sm">
+        <li class="flex items-start p-4 rounded-lg bg-gradient-to-r from-[#423A8E]/5 to-[#00CCCD]/5 dark:from-[#423A8E]/20 dark:to-[#00CCCD]/20 border-l-4 border-[#423A8E]">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#423A8E] to-[#00CCCD] flex items-center justify-center text-white font-bold text-sm">
                 {{ $index + 1 }}
             </div>
             <div class="ml-4 flex-1">
@@ -90,7 +90,7 @@
     </ol>
 
     {{-- Footer Notes --}}
-    <div class="p-4 rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/30 dark:to-cyan-900/30 border border-teal-200 dark:border-teal-700 mb-6" role="note" aria-label="Important reminders">
+    <div class="p-4 rounded-xl bg-gradient-to-r from-[#423A8E]/5 to-[#00CCCD]/5 dark:from-[#423A8E]/30 dark:to-[#00CCCD]/30 border border-[#423A8E]/20 dark:border-[#423A8E] mb-6" role="note" aria-label="Important reminders">
         <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
             <p class="flex items-start">
                 <span class="mr-2">📌</span>
@@ -109,7 +109,7 @@
                 <span>Give at least 12-hours notice if you won't be making it to your class.</span>
             </p>
         </div>
-        <p class="mt-3 font-semibold italic text-transparent bg-clip-text bg-gradient-to-r from-[#14B8A6] to-[#06B6D4]">
+        <p class="mt-3 font-semibold italic text-transparent bg-clip-text bg-gradient-to-r from-[#423A8E] to-[#00CCCD]">
             Let's go raise the next generation of coders! 💪
         </p>
     </div>
@@ -120,7 +120,7 @@
             @csrf
             <button
                 type="submit"
-                class="px-6 py-3 bg-gradient-to-r from-[#14B8A6] to-[#06B6D4] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500"
+                class="px-6 py-3 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#423A8E] focus-visible:ring-2 focus-visible:ring-[#423A8E]"
                 aria-label="Post schedule to WhatsApp groups"
             >
                 📝 Post Schedule
@@ -129,14 +129,14 @@
         <button
             type="button"
             @click="copyToWhatsApp"
-            class="px-6 py-3 bg-white dark:bg-slate-700 text-gray-800 dark:text-white font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 border border-gray-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500"
+            class="px-6 py-3 bg-white dark:bg-slate-700 text-gray-800 dark:text-white font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 border border-gray-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00CCCD] focus-visible:ring-2 focus-visible:ring-[#00CCCD]"
             aria-label="Copy schedule for WhatsApp"
         >
             📋 Copy for WhatsApp
         </button>
         <a
             href="{{ route('schedule.generate') }}"
-            class="px-6 py-3 text-teal-600 dark:text-teal-400 font-semibold rounded-xl hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500 inline-flex items-center"
+            class="px-6 py-3 text-[#423A8E] dark:text-[#00CCCD] font-semibold rounded-xl hover:bg-[#423A8E]/5 dark:hover:bg-[#423A8E]/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#423A8E] focus-visible:ring-2 focus-visible:ring-[#423A8E] inline-flex items-center"
             aria-label="Generate tomorrow's schedule"
         >
             ⏭️ Generate Tomorrow's Schedule

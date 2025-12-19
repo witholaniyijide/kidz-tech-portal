@@ -25,6 +25,36 @@
     }
 }
 
+/* Admin Dashboard Theme Gradients */
+@layer utilities {
+    .gradient-admin-primary {
+        background: linear-gradient(135deg, #423A8E 0%, #00CCCD 100%);
+    }
+
+    .gradient-admin-secondary {
+        background: linear-gradient(135deg, #00CCCD 0%, #0D6EFD 100%);
+    }
+
+    .gradient-admin-amber {
+        background: linear-gradient(135deg, #FFC107 0%, #DC3545 100%);
+    }
+
+    .gradient-admin-green {
+        background: linear-gradient(135deg, #198754 0%, #00CCCD 100%);
+    }
+
+    .gradient-admin-blue {
+        background: linear-gradient(135deg, #0D6EFD 0%, #423A8E 100%);
+    }
+
+    .text-gradient-admin {
+        background: linear-gradient(to right, #423A8E, #00CCCD);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+}
+
 /* Custom Animations */
 @keyframes float {
     0%, 100% { transform: translateY(0px); }
@@ -32,8 +62,8 @@
 }
 
 @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-    50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8); }
+    0%, 100% { box-shadow: 0 0 20px rgba(66, 58, 142, 0.5); }
+    50% { box-shadow: 0 0 40px rgba(66, 58, 142, 0.8); }
 }
 
 @keyframes slide-in {

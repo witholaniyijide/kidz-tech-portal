@@ -2,9 +2,9 @@
     <x-slot name="header">{{ __('Create Daily Schedule') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Create Schedule') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10" x-data="scheduleForm()">
             {{-- Header --}}
@@ -36,7 +36,7 @@
 
                 {{-- Date Selection --}}
                 <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-6">
-                    <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white">
+                    <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
                         <h3 class="text-lg font-semibold">Schedule Date</h3>
                     </div>
                     <div class="p-6">
@@ -45,7 +45,7 @@
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Date <span class="text-red-500">*</span></label>
                                 <input type="date" name="schedule_date" x-model="scheduleDate"
                                        value="{{ old('schedule_date', request('date', date('Y-m-d'))) }}" required
-                                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Day</label>
@@ -55,7 +55,7 @@
                             <div class="flex items-end">
                                 <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors w-full">
                                     <input type="checkbox" name="repeat_weekly" value="1" x-model="repeatWeekly"
-                                           class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500 mr-3">
+                                           class="w-4 h-4 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E] mr-3">
                                     <div>
                                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Repeat Weekly</span>
                                         <p class="text-xs text-gray-500">Create this schedule every week on this day</p>
@@ -93,7 +93,7 @@
                                             x-model="entry.student_id"
                                             @change="onStudentChange(index)"
                                             required
-                                            class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                            class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                                         <option value="">Select Student</option>
                                         @foreach($students as $student)
                                             <option value="{{ $student->id }}"
@@ -111,7 +111,7 @@
                                     <select :name="'entries[' + index + '][tutor_id]'"
                                             x-model="entry.tutor_id"
                                             required
-                                            class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                            class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                                         <option value="">Select Tutor</option>
                                         @foreach($tutors as $tutor)
                                             <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
@@ -125,7 +125,7 @@
                                     <input type="time" :name="'entries[' + index + '][start_time]'"
                                            x-model="entry.start_time"
                                            required
-                                           class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                           class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                                 </div>
 
                                 {{-- End Time --}}
@@ -134,7 +134,7 @@
                                     <input type="time" :name="'entries[' + index + '][end_time]'"
                                            x-model="entry.end_time"
                                            required
-                                           class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                           class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                                 </div>
 
                                 {{-- Class Link --}}
@@ -143,7 +143,7 @@
                                     <input type="url" :name="'entries[' + index + '][class_link]'"
                                            x-model="entry.class_link"
                                            placeholder="https://..."
-                                           class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                           class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                                 </div>
 
                                 {{-- Delete Button --}}
@@ -161,7 +161,7 @@
 
                         {{-- Add Entry Button --}}
                         <button type="button" @click="addEntry()"
-                                class="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-600 dark:text-gray-400 hover:border-teal-500 hover:text-teal-600 transition-colors flex items-center justify-center gap-2">
+                                class="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-600 dark:text-gray-400 hover:border-[#423A8E] hover:text-[#423A8E] transition-colors flex items-center justify-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
@@ -175,7 +175,7 @@
                     <div class="p-6">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Footer Note (Optional)</label>
                         <textarea name="footer_note" rows="2" placeholder="Add any additional notes for this day's schedule..."
-                                  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">{{ old('footer_note') }}</textarea>
+                                  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">{{ old('footer_note') }}</textarea>
                     </div>
                 </div>
 
@@ -185,7 +185,7 @@
                        class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium">
                         Cancel
                     </a>
-                    <button type="submit" class="px-8 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all font-medium">
+                    <button type="submit" class="px-8 py-3 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all font-medium">
                         Save Schedule
                     </button>
                 </div>

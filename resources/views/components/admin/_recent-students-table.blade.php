@@ -25,7 +25,7 @@
     <x-slot:emptyAction>
         <a
             href="{{ route('students.create') }}"
-            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#423A8E]"
             aria-label="Add new student"
         >
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -41,7 +41,7 @@
     </div>
     <div class="overflow-x-auto">
         <table class="w-full" role="table" aria-label="Recent students list">
-            <thead class="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20">
+            <thead class="bg-gradient-to-r from-[#423A8E]/5 to-[#00CCCD]/5 dark:from-[#423A8E]/20 dark:to-[#00CCCD]/20">
                 <tr role="row">
                     <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider font-inter">Name</th>
                     <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider font-inter">Tutor</th>
@@ -52,7 +52,7 @@
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-slate-700" role="rowgroup">
                 @foreach($students as $student)
-                <tr class="hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-colors" role="row">
+                <tr class="hover:bg-[#423A8E]/5/50 dark:hover:bg-[#423A8E]/10 transition-colors" role="row">
                     <td class="px-6 py-4 whitespace-nowrap" role="cell">
                         <div class="flex items-center">
                             @if(isset($student['avatar']))
@@ -63,7 +63,7 @@
                                 loading="lazy"
                             >
                             @else
-                            <div class="h-10 w-10 rounded-full {{ $student['avatarGradient'] ?? 'bg-gradient-to-br from-blue-500 to-cyan-600' }} flex items-center justify-center text-white font-semibold text-sm shadow-md" aria-label="Avatar for {{ $student['name'] ?? '' }}">
+                            <div class="h-10 w-10 rounded-full {{ $student['avatarGradient'] ?? 'bg-gradient-to-br from-blue-500 to-[#00CCCD]' }} flex items-center justify-center text-white font-semibold text-sm shadow-md" aria-label="Avatar for {{ $student['name'] ?? '' }}">
                                 {{ $student['initials'] ?? 'NA' }}
                             </div>
                             @endif
@@ -88,7 +88,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2" role="cell">
                         <a
                             href="{{ route('students.show', $student['id'] ?? '#') }}"
-                            class="text-teal-600 hover:text-teal-900 dark:text-teal-400 dark:hover:text-teal-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 rounded px-1 py-0.5"
+                            class="text-[#423A8E] hover:text-[#423A8E] dark:text-[#00CCCD] dark:hover:text-[#00CCCD] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#423A8E] focus-visible:ring-offset-2 rounded px-1 py-0.5"
                             aria-label="View details for {{ $student['name'] ?? 'student' }}"
                         >
                             View
@@ -117,7 +117,7 @@
     <div class="px-6 py-4 border-t border-gray-200 dark:border-slate-700">
         <a
             href="{{ route('students.index') }}"
-            class="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 rounded px-2 py-1"
+            class="text-[#423A8E] dark:text-[#00CCCD] hover:text-[#423A8E] dark:hover:text-[#00CCCD] font-medium text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#423A8E] focus-visible:ring-offset-2 rounded px-2 py-1"
             aria-label="View all students"
         >
             View All Students →
@@ -174,7 +174,7 @@
                     <button
                         type="button"
                         @click="showModal = false"
-                        class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors"
+                        class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#423A8E] sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors"
                     >
                         Cancel
                     </button>

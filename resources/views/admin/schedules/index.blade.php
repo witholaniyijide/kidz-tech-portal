@@ -2,9 +2,9 @@
     <x-slot name="header">{{ __('Daily Schedule') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Schedules') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden" x-data="scheduleManager()">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden" x-data="scheduleManager()">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             @if(session('success'))
@@ -25,7 +25,7 @@
                     <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $selectedDate->format('l, F j, Y') }}</p>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{{ route('admin.schedules.create', ['date' => $selectedDate->toDateString()]) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-medium rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+                    <a href="{{ route('admin.schedules.create', ['date' => $selectedDate->toDateString()]) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white font-medium rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -58,11 +58,11 @@
                         <form method="GET" class="flex items-center gap-2">
                             <input type="date" name="date" value="{{ $selectedDate->toDateString() }}"
                                    onchange="this.form.submit()"
-                                   class="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                   class="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                         </form>
 
                         @if(!$selectedDate->isToday())
-                            <a href="{{ route('admin.schedules.index') }}" class="px-3 py-1 text-sm bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 rounded-full hover:bg-teal-200 transition-colors">
+                            <a href="{{ route('admin.schedules.index') }}" class="px-3 py-1 text-sm bg-[#423A8E]/10 text-[#423A8E] dark:bg-[#423A8E]/30/30 dark:text-[#00CCCD] rounded-full hover:bg-[#423A8E]/20 transition-colors">
                                 Today
                             </a>
                         @else
@@ -111,7 +111,7 @@
                                 <form action="{{ route('admin.schedules.post') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="date" value="{{ $selectedDate->toDateString() }}">
-                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm">
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E] transition-colors text-sm">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
@@ -126,7 +126,7 @@
 
             {{-- Today's Schedule --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-8">
-                <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white flex justify-between items-center">
+                <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white flex justify-between items-center">
                     <div>
                         <h3 class="text-lg font-semibold">{{ $selectedDate->format('l, M j') }} Classes ({{ count($classes) }})</h3>
                         @if($inheritedFromWeekly ?? false)
@@ -146,7 +146,7 @@
                         <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Classes Scheduled</h3>
                         <p class="text-gray-500 dark:text-gray-400 mb-4">Add entries manually or auto-generate from student schedules</p>
                         <div class="flex justify-center gap-3">
-                            <a href="{{ route('admin.schedules.create', ['date' => $selectedDate->toDateString()]) }}" class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
+                            <a href="{{ route('admin.schedules.create', ['date' => $selectedDate->toDateString()]) }}" class="inline-flex items-center px-4 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E]">
                                 Add Schedule
                             </a>
                             <form action="{{ route('admin.schedules.generate') }}" method="POST">
@@ -164,7 +164,7 @@
                             <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-4">
-                                        <div class="w-8 h-8 bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded-full flex items-center justify-center font-bold text-sm">
+                                        <div class="w-8 h-8 bg-[#423A8E]/10 dark:bg-[#423A8E]/30/30 text-[#423A8E] dark:text-[#00CCCD] rounded-full flex items-center justify-center font-bold text-sm">
                                             {{ $index + 1 }}
                                         </div>
                                         <div>
@@ -189,7 +189,7 @@
                                                 {{ $time }}
                                             </div>
                                             @if(!empty($class['class_link']))
-                                                <a href="{{ $class['class_link'] }}" target="_blank" class="text-xs text-teal-600 hover:underline">Join Class</a>
+                                                <a href="{{ $class['class_link'] }}" target="_blank" class="text-xs text-[#423A8E] hover:underline">Join Class</a>
                                             @endif
                                         </div>
                                         <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
@@ -241,13 +241,13 @@
                             $dayDate = $weekStart->copy()->addDays($dayIndex);
                         @endphp
                         <a href="{{ route('admin.schedules.index', ['date' => $dayDate->toDateString()]) }}"
-                           class="p-3 {{ $dayDate->isToday() ? 'bg-teal-50 dark:bg-teal-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700/30' }} transition-colors">
+                           class="p-3 {{ $dayDate->isToday() ? 'bg-[#423A8E]/5 dark:bg-[#423A8E]/30/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700/30' }} transition-colors">
                             <div class="text-center mb-2">
                                 <div class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ substr($day, 0, 3) }}</div>
-                                <div class="text-lg font-bold {{ $dayDate->isToday() ? 'text-teal-600' : 'text-gray-900 dark:text-white' }}">{{ $dayDate->format('j') }}</div>
+                                <div class="text-lg font-bold {{ $dayDate->isToday() ? 'text-[#423A8E]' : 'text-gray-900 dark:text-white' }}">{{ $dayDate->format('j') }}</div>
                             </div>
                             <div class="text-center">
-                                <span class="inline-flex items-center justify-center w-6 h-6 text-xs font-semibold rounded-full {{ count($dayClasses) > 0 ? 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' }}">
+                                <span class="inline-flex items-center justify-center w-6 h-6 text-xs font-semibold rounded-full {{ count($dayClasses) > 0 ? 'bg-[#423A8E]/10 text-[#423A8E] dark:bg-[#423A8E]/30/30 dark:text-[#00CCCD]' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' }}">
                                     {{ count($dayClasses) }}
                                 </span>
                             </div>

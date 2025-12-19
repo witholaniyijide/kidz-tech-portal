@@ -50,7 +50,7 @@
 >
     <div class="mb-6">
         <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-            <svg class="w-5 h-5 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 mr-2 text-[#423A8E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
             Today's To-Do List
@@ -67,12 +67,12 @@
                     x-model="todo.completed"
                     @change="saveTodos()"
                     @keydown="handleKeydown($event, index)"
-                    class="mt-0.5 w-5 h-5 text-teal-500 border-gray-300 dark:border-gray-600 rounded focus:ring-teal-500 focus:ring-2 cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
+                    class="mt-0.5 w-5 h-5 text-[#423A8E] border-gray-300 dark:border-gray-600 rounded focus:ring-[#423A8E] focus:ring-2 cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#423A8E] focus-visible:ring-offset-2"
                     :aria-label="'Mark task as ' + (todo.completed ? 'incomplete' : 'complete')"
                 >
                 <label
                     :for="'todo-' + index"
-                    class="flex-1 ml-3 text-gray-800 dark:text-gray-200 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors cursor-pointer text-sm"
+                    class="flex-1 ml-3 text-gray-800 dark:text-gray-200 group-hover:text-[#423A8E] dark:group-hover:text-[#00CCCD] transition-colors cursor-pointer text-sm"
                     :class="{ 'line-through opacity-50': todo.completed }"
                     x-text="todo.text"
                 ></label>
@@ -90,7 +90,7 @@
         </template>
 
         <div x-show="todos.length === 0" class="text-center py-8">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-[#14B8A6] to-[#06B6D4] flex items-center justify-center opacity-50">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-[#423A8E] to-[#00CCCD] flex items-center justify-center opacity-50">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
@@ -105,12 +105,12 @@
             type="text"
             x-model="newTodo"
             placeholder="Add a new task..."
-            class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-teal-500"
+            class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#423A8E] focus:border-[#423A8E] dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-[#423A8E]"
             aria-label="New task input"
         >
         <button
             type="submit"
-            class="px-5 py-2.5 bg-gradient-to-r from-[#14B8A6] to-[#06B6D4] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 focus-visible:ring-2 focus-visible:ring-teal-500"
+            class="px-5 py-2.5 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#423A8E] focus-visible:ring-2 focus-visible:ring-[#423A8E]"
             aria-label="Add task"
         >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -119,9 +119,9 @@
         </button>
     </form>
 
-    <div class="p-3 rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/30 dark:to-cyan-900/30 border border-teal-200 dark:border-teal-700">
+    <div class="p-3 rounded-xl bg-gradient-to-r from-[#423A8E]/5 to-[#00CCCD]/5 dark:from-[#423A8E]/30 dark:to-[#00CCCD]/30 border border-[#423A8E]/20 dark:border-[#423A8E]">
         <p class="text-xs text-gray-700 dark:text-gray-300 flex items-center">
-            <svg class="w-4 h-4 mr-2 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg class="w-4 h-4 mr-2 text-[#423A8E] dark:text-[#00CCCD]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             Tasks are saved automatically in your browser
