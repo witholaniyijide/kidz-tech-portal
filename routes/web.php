@@ -389,6 +389,16 @@ Route::prefix('manager')
             ->name('assessments.submit');
         Route::post('/assessments/{assessment}/comment', [App\Http\Controllers\Manager\AssessmentController::class, 'comment'])
             ->name('assessments.comment');
+
+        // Settings
+        Route::get('/settings', [App\Http\Controllers\Manager\ManagerSettingsController::class, 'index'])
+            ->name('settings.index');
+        Route::put('/settings/profile', [App\Http\Controllers\Manager\ManagerSettingsController::class, 'updateProfile'])
+            ->name('settings.updateProfile');
+        Route::put('/settings/password', [App\Http\Controllers\Manager\ManagerSettingsController::class, 'updatePassword'])
+            ->name('settings.updatePassword');
+        Route::put('/settings/notifications', [App\Http\Controllers\Manager\ManagerSettingsController::class, 'updateNotifications'])
+            ->name('settings.updateNotifications');
     });
 
 // Director Portal Routes
