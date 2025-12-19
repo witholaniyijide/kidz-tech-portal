@@ -2,9 +2,9 @@
     <x-slot name="header">{{ __('Attendance Details') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Attendance Details') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             @if(session('success'))
@@ -88,7 +88,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {{-- Class Information --}}
                 <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden">
-                    <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white">
+                    <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
                         <h3 class="text-lg font-semibold">Class Information</h3>
                     </div>
                     <div class="p-6 space-y-4">
@@ -161,7 +161,7 @@
                 <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
                     <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-4">Student</h4>
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold">
+                        <div class="w-12 h-12 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-full flex items-center justify-center text-white font-bold">
                             {{ strtoupper(substr($attendance->student->first_name ?? 'U', 0, 1)) }}{{ strtoupper(substr($attendance->student->last_name ?? '', 0, 1)) }}
                         </div>
                         <div>
@@ -170,7 +170,7 @@
                             </p>
                             <p class="text-sm text-gray-500">{{ $attendance->student->email ?? '-' }}</p>
                         </div>
-                        <a href="{{ route('admin.students.show', $attendance->student) }}" class="ml-auto text-teal-600 hover:text-teal-700">
+                        <a href="{{ route('admin.students.show', $attendance->student) }}" class="ml-auto text-[#423A8E] hover:text-[#423A8E]">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                             </svg>
@@ -191,7 +191,7 @@
                             </p>
                             <p class="text-sm text-gray-500">{{ $attendance->tutor->email ?? '-' }}</p>
                         </div>
-                        <a href="{{ route('admin.tutors.show', $attendance->tutor) }}" class="ml-auto text-teal-600 hover:text-teal-700">
+                        <a href="{{ route('admin.tutors.show', $attendance->tutor) }}" class="ml-auto text-[#423A8E] hover:text-[#423A8E]">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                             </svg>

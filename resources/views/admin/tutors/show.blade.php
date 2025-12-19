@@ -2,9 +2,9 @@
     <x-slot name="header">{{ __('Tutor Details') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Tutor Details') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             @if(session('success'))
@@ -19,7 +19,7 @@
                     @if($tutor->profile_photo)
                         <img src="{{ Storage::url($tutor->profile_photo) }}" alt="Profile" class="w-16 h-16 rounded-2xl object-cover shadow-lg">
                     @else
-                        <div class="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                        <div class="w-16 h-16 bg-gradient-to-br from-[#00CCCD] to-blue-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
                             {{ strtoupper(substr($tutor->first_name, 0, 1)) }}{{ strtoupper(substr($tutor->last_name, 0, 1)) }}
                         </div>
                     @endif
@@ -75,7 +75,7 @@
 
             {{-- Personal Info --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
-                <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white">
+                <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
                     <h3 class="text-lg font-semibold">Personal Information</h3>
                 </div>
                 <div class="p-6">
@@ -173,12 +173,12 @@
                             @foreach($tutor->students as $student)
                                 <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                     <div class="flex items-start gap-4">
-                                        <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                                             {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-center justify-between gap-2 mb-2">
-                                                <a href="{{ route('admin.students.show', $student) }}" class="font-semibold text-gray-900 dark:text-white hover:text-teal-600 dark:hover:text-teal-400">
+                                                <a href="{{ route('admin.students.show', $student) }}" class="font-semibold text-gray-900 dark:text-white hover:text-[#423A8E] dark:hover:text-[#00CCCD]">
                                                     {{ $student->first_name }} {{ $student->last_name }}
                                                 </a>
                                                 <span class="px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0
@@ -212,7 +212,7 @@
                                             {{-- Links --}}
                                             <div class="flex flex-wrap gap-3">
                                                 @if($student->class_link)
-                                                    <a href="{{ $student->class_link }}" target="_blank" class="inline-flex items-center text-xs text-teal-600 dark:text-teal-400 hover:underline">
+                                                    <a href="{{ $student->class_link }}" target="_blank" class="inline-flex items-center text-xs text-[#423A8E] dark:text-[#00CCCD] hover:underline">
                                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                                         </svg>

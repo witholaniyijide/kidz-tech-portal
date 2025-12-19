@@ -43,8 +43,8 @@ export default {
                         end: '#6366F1'
                     },
                     admin: {
-                        start: '#14B8A6',
-                        end: '#06B6D4'
+                        start: '#423A8E',
+                        end: '#00CCCD'
                     },
                     manager: {
                         start: '#0ea5e9',
@@ -58,11 +58,20 @@ export default {
                         start: '#0ea5e9',
                         end: '#22d3ee'
                     }
+                },
+                // Admin Dashboard Theme Colors
+                admin: {
+                    primary: '#423A8E',
+                    secondary: '#00CCCD',
+                    amber: '#FFC107',
+                    red: '#DC3545',
+                    green: '#198754',
+                    blue: '#0D6EFD'
                 }
             },
             backgroundImage: {
                 'gradient-director': 'linear-gradient(to right, #3B82F6, #6366F1)',
-                'gradient-admin': 'linear-gradient(to right, #14B8A6, #06B6D4)',
+                'gradient-admin': 'linear-gradient(to right, #423A8E, #00CCCD)',
                 'gradient-manager': 'linear-gradient(to right, #0ea5e9, #38bdf8)',
                 'gradient-tutor': 'linear-gradient(to right, #8B5CF6, #EC4899)',
                 'gradient-parent': 'linear-gradient(to right, #0ea5e9, #22d3ee)',

@@ -2,9 +2,9 @@
     <x-slot name="header">{{ __('Weekly Schedule') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Weekly Schedule') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             @if(session('success'))
@@ -43,7 +43,7 @@
                             {{ $weekStart->format('M j') }} - {{ $weekEnd->format('M j, Y') }}
                         </span>
                         @if($weekOffset == 0)
-                            <span class="ml-2 px-2 py-0.5 text-xs bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 rounded-full">Current Week</span>
+                            <span class="ml-2 px-2 py-0.5 text-xs bg-[#423A8E]/10 text-[#423A8E] dark:bg-[#423A8E]/30/30 dark:text-[#00CCCD] rounded-full">Current Week</span>
                         @endif
                     </div>
                     
@@ -68,14 +68,14 @@
                         $dayDate = $weekStart->copy()->addDays($index);
                         $isToday = $dayDate->isToday();
                     @endphp
-                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border {{ $isToday ? 'border-teal-400 ring-2 ring-teal-400/50' : 'border-white/20' }} rounded-2xl shadow overflow-hidden">
-                        <div class="px-4 py-3 {{ $isToday ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white' : 'bg-gray-50 dark:bg-gray-700/50' }}">
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border {{ $isToday ? 'border-[#00CCCD] ring-2 ring-[#00CCCD]/50' : 'border-white/20' }} rounded-2xl shadow overflow-hidden">
+                        <div class="px-4 py-3 {{ $isToday ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white' : 'bg-gray-50 dark:bg-gray-700/50' }}">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <div class="text-xs font-medium {{ $isToday ? 'text-teal-100' : 'text-gray-500 dark:text-gray-400' }}">{{ $day }}</div>
+                                    <div class="text-xs font-medium {{ $isToday ? 'text-white' : 'text-gray-500 dark:text-gray-400' }}">{{ $day }}</div>
                                     <div class="text-lg font-bold {{ $isToday ? 'text-white' : 'text-gray-900 dark:text-white' }}">{{ $dayDate->format('M j') }}</div>
                                 </div>
-                                <span class="inline-flex items-center justify-center w-7 h-7 text-sm font-semibold rounded-full {{ $isToday ? 'bg-white/20 text-white' : 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400' }}">
+                                <span class="inline-flex items-center justify-center w-7 h-7 text-sm font-semibold rounded-full {{ $isToday ? 'bg-white/20 text-white' : 'bg-[#423A8E]/10 text-[#423A8E] dark:bg-[#423A8E]/30/30 dark:text-[#00CCCD]' }}">
                                     {{ $daySchedules->count() }}
                                 </span>
                             </div>
@@ -93,7 +93,7 @@
                                         <a href="{{ route('admin.schedules.index', ['date' => $dayDate->toDateString()]) }}" 
                                            class="block p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                             <div class="flex items-center justify-between mb-1">
-                                                <span class="text-xs font-medium text-teal-600 dark:text-teal-400">
+                                                <span class="text-xs font-medium text-[#423A8E] dark:text-[#00CCCD]">
                                                     {{ \Carbon\Carbon::parse($schedule->class_time)->format('g:i A') }}
                                                 </span>
                                                 <span class="w-2 h-2 rounded-full

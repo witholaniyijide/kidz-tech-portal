@@ -2,9 +2,9 @@
     <x-slot name="header">{{ __('Analytics') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Analytics') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             {{-- Header --}}
@@ -29,7 +29,7 @@
                             <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ $stats['total_students'] ?? 0 }}</div>
                             <div class="text-sm text-gray-600 dark:text-gray-400">Total Students</div>
                         </div>
-                        <div class="w-12 h-12 bg-teal-100 dark:bg-teal-900/30 rounded-full flex items-center justify-center">
+                        <div class="w-12 h-12 bg-[#423A8E]/10 dark:bg-[#423A8E]/30/30 rounded-full flex items-center justify-center">
                             <span class="text-2xl">👨‍🎓</span>
                         </div>
                     </div>
@@ -73,7 +73,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {{-- Students Analytics --}}
                 <a href="{{ route('admin.analytics.students') }}" class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden hover:shadow-xl transition-all transform hover:-translate-y-1 group">
-                    <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white">
+                    <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
                         <h3 class="text-lg font-semibold flex items-center">
                             <span class="mr-2">👨‍🎓</span> Students Analytics
                         </h3>
@@ -82,8 +82,8 @@
                         <p class="text-gray-600 dark:text-gray-400 mb-4">View detailed student performance, attendance trends, and progress metrics.</p>
                         
                         <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="text-center p-3 bg-teal-50 dark:bg-teal-900/20 rounded-lg">
-                                <div class="text-2xl font-bold text-teal-600">{{ $stats['active_students'] ?? 0 }}</div>
+                            <div class="text-center p-3 bg-[#423A8E]/5 dark:bg-[#423A8E]/30/20 rounded-lg">
+                                <div class="text-2xl font-bold text-[#423A8E]">{{ $stats['active_students'] ?? 0 }}</div>
                                 <div class="text-xs text-gray-500">Active</div>
                             </div>
                             <div class="text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
@@ -92,7 +92,7 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center text-teal-600 dark:text-teal-400 font-medium group-hover:translate-x-2 transition-transform">
+                        <div class="flex items-center text-[#423A8E] dark:text-[#00CCCD] font-medium group-hover:translate-x-2 transition-transform">
                             View Students Analytics
                             <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -152,11 +152,11 @@
                             @endphp
                             <div class="text-center">
                                 <div class="h-24 flex items-end justify-center mb-2">
-                                    <div class="w-8 rounded-t transition-all {{ $isCurrent ? 'bg-teal-500' : 'bg-gray-300 dark:bg-gray-600' }}"
+                                    <div class="w-8 rounded-t transition-all {{ $isCurrent ? 'bg-[#423A8E]' : 'bg-gray-300 dark:bg-gray-600' }}"
                                          style="height: {{ max($height, 10) }}%">
                                     </div>
                                 </div>
-                                <div class="text-xs font-medium {{ $isCurrent ? 'text-teal-600' : 'text-gray-500' }}">{{ $month }}</div>
+                                <div class="text-xs font-medium {{ $isCurrent ? 'text-[#423A8E]' : 'text-gray-500' }}">{{ $month }}</div>
                                 <div class="text-sm font-bold text-gray-900 dark:text-white">{{ $count }}</div>
                             </div>
                         @endforeach

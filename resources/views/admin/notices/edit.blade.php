@@ -2,9 +2,9 @@
     <x-slot name="header">{{ __('Edit Notice') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Edit Notice') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             {{-- Header --}}
@@ -57,7 +57,7 @@
 
                 {{-- Notice Content --}}
                 <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-6">
-                    <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white">
+                    <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
                         <h3 class="text-lg font-semibold">Notice Content</h3>
                     </div>
                     <div class="p-6 space-y-6">
@@ -65,14 +65,14 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title <span class="text-red-500">*</span></label>
                             <input type="text" name="title" value="{{ old('title', $notice->title) }}" required maxlength="255"
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                         </div>
 
                         {{-- Content --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Content <span class="text-red-500">*</span></label>
                             <textarea name="content" rows="8" required
-                                      class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">{{ old('content', $notice->content) }}</textarea>
+                                      class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">{{ old('content', $notice->content) }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -90,7 +90,7 @@
                             {{-- Priority --}}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
-                                <select name="priority" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                <select name="priority" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                                     <option value="low" {{ old('priority', $notice->priority) === 'low' ? 'selected' : '' }}>Low</option>
                                     <option value="normal" {{ old('priority', $notice->priority) === 'normal' ? 'selected' : '' }}>Normal</option>
                                     <option value="high" {{ old('priority', $notice->priority) === 'high' ? 'selected' : '' }}>High</option>
@@ -101,7 +101,7 @@
                             {{-- Status --}}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                                <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                                     <option value="draft" {{ old('status', $notice->status) === 'draft' ? 'selected' : '' }}>Draft</option>
                                     <option value="published" {{ old('status', $notice->status) === 'published' ? 'selected' : '' }}>Published</option>
                                     <option value="archived" {{ old('status', $notice->status) === 'archived' ? 'selected' : '' }}>Archived</option>
@@ -117,25 +117,25 @@
                                 <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                     <input type="checkbox" name="visible_to[]" value="tutor"
                                            {{ in_array('tutor', $visibleTo) ? 'checked' : '' }}
-                                           class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500 mr-2">
+                                           class="w-4 h-4 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E] mr-2">
                                     <span class="text-sm text-gray-700 dark:text-gray-300">Tutors</span>
                                 </label>
                                 <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                     <input type="checkbox" name="visible_to[]" value="admin"
                                            {{ in_array('admin', $visibleTo) ? 'checked' : '' }}
-                                           class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500 mr-2">
+                                           class="w-4 h-4 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E] mr-2">
                                     <span class="text-sm text-gray-700 dark:text-gray-300">Admins</span>
                                 </label>
                                 <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                     <input type="checkbox" name="visible_to[]" value="manager"
                                            {{ in_array('manager', $visibleTo) ? 'checked' : '' }}
-                                           class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500 mr-2">
+                                           class="w-4 h-4 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E] mr-2">
                                     <span class="text-sm text-gray-700 dark:text-gray-300">Managers</span>
                                 </label>
                                 <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                     <input type="checkbox" name="visible_to[]" value="director"
                                            {{ in_array('director', $visibleTo) ? 'checked' : '' }}
-                                           class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500 mr-2">
+                                           class="w-4 h-4 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E] mr-2">
                                     <span class="text-sm text-gray-700 dark:text-gray-300">Director</span>
                                 </label>
                             </div>
@@ -160,7 +160,7 @@
                         <a href="{{ route('admin.notices.index') }}" class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium">
                             Cancel
                         </a>
-                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all font-medium">
+                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all font-medium">
                             Update Notice
                         </button>
                     </div>

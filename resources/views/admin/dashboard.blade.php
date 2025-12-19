@@ -2,11 +2,11 @@
     <x-slot name="header">{{ __('Admin Dashboard') }}</x-slot>
     <x-slot name="title">{{ __('Admin Dashboard') }}</x-slot>
 
-    <div x-data="adminDashboard()" class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+    <div x-data="adminDashboard()" class="min-h-screen bg-gradient-to-br from-indigo-50 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
         {{-- Floating Orbs Background --}}
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
-        <div class="absolute -bottom-8 left-20 w-72 h-72 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 4s;"></div>
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+        <div class="absolute -bottom-8 left-20 w-72 h-72 bg-[#0D6EFD]/30 dark:bg-[#0D6EFD]/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 4s;"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
@@ -22,7 +22,7 @@
                 <div class="flex items-center justify-between flex-wrap gap-4">
                     <div>
                         <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                            Welcome back, <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-cyan-500">{{ auth()->user()->name }}</span>!
+                            Welcome back, <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#423A8E] to-[#00CCCD]">{{ auth()->user()->name }}</span>!
                         </h3>
                         <p class="text-gray-600 dark:text-gray-300 text-lg">Here's what's happening with your organization today.</p>
                     </div>
@@ -37,7 +37,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {{-- Total Students --}}
                 <a href="{{ route('admin.students.index') }}" class="group">
-                    <div class="bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                    <div class="bg-gradient-to-br from-[#423A8E] to-[#00CCCD] rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                         <div class="absolute top-4 right-4 opacity-30 group-hover:opacity-50 transition-opacity">
                             <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -51,7 +51,7 @@
 
                 {{-- Total Tutors --}}
                 <a href="{{ route('admin.tutors.index') }}" class="group">
-                    <div class="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                    <div class="bg-gradient-to-br from-[#00CCCD] to-[#0D6EFD] rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                         <div class="absolute top-4 right-4 opacity-30 group-hover:opacity-50 transition-opacity">
                             <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -65,7 +65,7 @@
 
                 {{-- Today's Classes --}}
                 <a href="{{ route('admin.schedules.index') }}" class="group">
-                    <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                    <div class="bg-gradient-to-br from-[#198754] to-[#00CCCD] rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                         <div class="absolute top-4 right-4 opacity-30 group-hover:opacity-50 transition-opacity">
                             <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -79,7 +79,7 @@
 
                 {{-- Pending Attendance --}}
                 <a href="{{ route('admin.attendance.index', ['status' => 'pending']) }}" class="group">
-                    <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                    <div class="bg-gradient-to-br from-[#FFC107] to-[#DC3545] rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                         <div class="absolute top-4 right-4 opacity-30 group-hover:opacity-50 transition-opacity">
                             <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -119,7 +119,7 @@
                                 @if(!($schedulePosted ?? false))
                                     <form action="{{ route('admin.schedules.post') }}" method="POST" class="inline">
                                         @csrf
-                                        <button type="submit" class="p-2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-lg hover:shadow-lg transition-all" title="Post Schedule">
+                                        <button type="submit" class="p-2 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white rounded-lg hover:shadow-lg transition-all" title="Post Schedule">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                                             </svg>
@@ -141,13 +141,13 @@
                             <div class="text-center py-8 text-gray-500 dark:text-gray-400">
                                 <div class="text-4xl mb-3">📭</div>
                                 <p>No classes scheduled</p>
-                                <a href="{{ route('admin.schedules.create') }}" class="inline-block mt-3 text-teal-600 dark:text-teal-400 hover:underline text-sm">+ Add classes</a>
+                                <a href="{{ route('admin.schedules.create') }}" class="inline-block mt-3 text-[#423A8E] dark:text-[#00CCCD] hover:underline text-sm">+ Add classes</a>
                             </div>
                         @else
                             <div class="space-y-3" id="scheduleList">
                                 @foreach($todayClasses as $index => $class)
                                     <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                        <div class="w-7 h-7 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                                        <div class="w-7 h-7 bg-gradient-to-br from-[#423A8E] to-[#00CCCD] rounded-full flex items-center justify-center text-white font-bold text-xs">
                                             {{ $index + 1 }}
                                         </div>
                                         <div class="flex-1 min-w-0">
@@ -159,7 +159,7 @@
                                             </div>
                                         </div>
                                         <div class="text-right">
-                                            <div class="font-semibold text-teal-600 dark:text-teal-400 text-sm">
+                                            <div class="font-semibold text-[#423A8E] dark:text-[#00CCCD] text-sm">
                                                 @php
                                                     try {
                                                         $time = \Carbon\Carbon::parse($class['time'] ?? '00:00')->format('g:i A');
@@ -281,7 +281,7 @@
                             <div class="space-y-3">
                                 @foreach($recentActivities->take(10) as $activity)
                                     <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                        <div class="w-8 h-8 bg-teal-100 dark:bg-teal-900/50 rounded-full flex items-center justify-center text-teal-600 dark:text-teal-400 flex-shrink-0">
+                                        <div class="w-8 h-8 bg-[#423A8E]/10 dark:bg-[#423A8E]/30 rounded-full flex items-center justify-center text-[#423A8E] dark:text-[#00CCCD] flex-shrink-0">
                                             @switch($activity->action ?? 'default')
                                                 @case('created')
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -315,7 +315,7 @@
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                             📌 Notice Board
                         </h3>
-                        <a href="{{ route('admin.notices.create') }}" class="text-sm text-teal-600 dark:text-teal-400 hover:underline font-medium">+ Create Notice</a>
+                        <a href="{{ route('admin.notices.create') }}" class="text-sm text-[#423A8E] dark:text-[#00CCCD] hover:underline font-medium">+ Create Notice</a>
                     </div>
                     <div class="p-5">
                         @if(($notices ?? collect())->isEmpty())
@@ -326,7 +326,7 @@
                                     <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border-l-4 
                                         @if($notice->priority === 'urgent') border-red-500
                                         @elseif($notice->priority === 'high') border-amber-500
-                                        @else border-teal-500
+                                        @else border-[#423A8E]
                                         @endif">
                                         <div class="flex items-start justify-between gap-2">
                                             <h4 class="font-semibold text-gray-800 dark:text-white">{{ $notice->title }}</h4>
@@ -341,7 +341,7 @@
                                     </div>
                                 @endforeach
                             </div>
-                            <a href="{{ route('admin.notices.index') }}" class="block text-center mt-4 text-teal-600 dark:text-teal-400 hover:underline text-sm">View All Notices →</a>
+                            <a href="{{ route('admin.notices.index') }}" class="block text-center mt-4 text-[#423A8E] dark:text-[#00CCCD] hover:underline text-sm">View All Notices →</a>
                         @endif
                     </div>
                 </div>
@@ -353,7 +353,7 @@
                 <div class="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg overflow-hidden">
                     <div class="p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">👨‍🎓 Recent Students</h3>
-                        <a href="{{ route('admin.students.index') }}" class="text-sm text-teal-600 dark:text-teal-400 hover:underline">View All</a>
+                        <a href="{{ route('admin.students.index') }}" class="text-sm text-[#423A8E] dark:text-[#00CCCD] hover:underline">View All</a>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
@@ -398,7 +398,7 @@
                 <div class="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg overflow-hidden">
                     <div class="p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">👨‍🏫 Recent Tutors</h3>
-                        <a href="{{ route('admin.tutors.index') }}" class="text-sm text-teal-600 dark:text-teal-400 hover:underline">View All</a>
+                        <a href="{{ route('admin.tutors.index') }}" class="text-sm text-[#423A8E] dark:text-[#00CCCD] hover:underline">View All</a>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
@@ -447,7 +447,7 @@
                 </h3>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     {{-- Add Student --}}
-                    <a href="{{ route('admin.students.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                    <a href="{{ route('admin.students.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-[#423A8E] to-[#00CCCD] rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
                         <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                         </svg>
@@ -455,7 +455,7 @@
                     </a>
 
                     {{-- Add Tutor --}}
-                    <a href="{{ route('admin.tutors.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                    <a href="{{ route('admin.tutors.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-[#00CCCD] to-[#0D6EFD] rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
                         <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                         </svg>
@@ -463,7 +463,7 @@
                     </a>
 
                     {{-- Review Attendance --}}
-                    <a href="{{ route('admin.attendance.index', ['status' => 'pending']) }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                    <a href="{{ route('admin.attendance.index', ['status' => 'pending']) }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-[#0D6EFD] to-[#423A8E] rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
                         <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
@@ -471,7 +471,7 @@
                     </a>
 
                     {{-- Post Schedule --}}
-                    <a href="{{ route('admin.schedules.index') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                    <a href="{{ route('admin.schedules.index') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-[#198754] to-[#00CCCD] rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
                         <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
@@ -479,7 +479,7 @@
                     </a>
 
                     {{-- View Reports --}}
-                    <a href="{{ route('admin.reports.index') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                    <a href="{{ route('admin.reports.index') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-[#FFC107] to-[#DC3545] rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
                         <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
@@ -487,7 +487,7 @@
                     </a>
 
                     {{-- Create Notice --}}
-                    <a href="{{ route('admin.notices.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                    <a href="{{ route('admin.notices.create') }}" class="group flex flex-col items-center p-5 bg-gradient-to-br from-[#DC3545] to-[#423A8E] rounded-2xl text-white shadow hover:shadow-lg transform hover:-translate-y-1 transition-all">
                         <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>

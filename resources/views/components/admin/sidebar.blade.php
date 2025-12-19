@@ -40,7 +40,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
                      x-init="$el.style.display = ''"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
-                     class="rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 items-center justify-center shadow-lg transition-all duration-300 hidden dark:flex">
+                     class="rounded-xl bg-gradient-to-br from-[#423A8E] to-[#00CCCD] items-center justify-center shadow-lg transition-all duration-300 hidden dark:flex">
                     <span :class="collapsed ? 'text-lg' : 'text-3xl'" class="text-white font-bold">K</span>
                 </div>
             </a>
@@ -72,7 +72,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         {{-- 1. Dashboard --}}
         <a href="{{ route('admin.dashboard') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('admin.dashboard') ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('admin.dashboard') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Dashboard' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -83,7 +83,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         {{-- 2. Students --}}
         <a href="{{ route('admin.students.index') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('admin.students.*') ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('admin.students.*') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Students' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
@@ -95,7 +95,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         {{-- 3. Tutors --}}
         <a href="{{ route('admin.tutors.index') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('admin.tutors.*') ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('admin.tutors.*') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Tutors' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -106,7 +106,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         {{-- 4. Schedules --}}
         <a href="{{ route('admin.schedules.index') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('admin.schedules.*') ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('admin.schedules.*') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Schedules' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -117,7 +117,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         {{-- 5. Attendance --}}
         <a href="{{ route('admin.attendance.index') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('admin.attendance.*') ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('admin.attendance.*') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Attendance' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
@@ -128,7 +128,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         {{-- 6. Reports --}}
         <a href="{{ route('admin.reports.index') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('admin.reports.*') ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('admin.reports.*') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Reports' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -139,7 +139,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         {{-- 7. Assessments --}}
         <a href="{{ route('admin.assessments.index') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('admin.assessments.*') ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('admin.assessments.*') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Assessments' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -150,7 +150,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         {{-- 8. Notices --}}
         <a href="{{ route('admin.notices.index') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('admin.notices.*') ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('admin.notices.*') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Notices' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
@@ -161,7 +161,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         {{-- 9. Analytics --}}
         <a href="{{ route('admin.analytics.index') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('admin.analytics.*') ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('admin.analytics.*') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Analytics' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
@@ -176,7 +176,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         {{-- 10. Settings --}}
         <a href="{{ route('admin.settings.index') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('admin.settings.*') ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('admin.settings.*') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Settings' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -204,7 +204,7 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
 
         {{-- User Profile --}}
         <div class="flex items-center px-3 py-2.5 rounded-xl bg-gray-100 dark:bg-slate-700/30" :class="collapsed ? 'justify-center' : ''">
-            <div class="w-9 h-9 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-r from-[#423A8E] to-[#00CCCD] flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
             </div>
             <div x-show="!collapsed" x-transition class="ml-3 flex-1 min-w-0">

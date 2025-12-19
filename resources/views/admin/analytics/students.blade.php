@@ -2,9 +2,9 @@
     <x-slot name="header">{{ __('Students Analytics') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Students Analytics') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             {{-- Header --}}
@@ -92,7 +92,7 @@
                                 @endphp
                                 <div class="text-center">
                                     <div class="h-32 flex items-end justify-center mb-2">
-                                        <div class="w-full max-w-[40px] bg-teal-500 rounded-t transition-all" style="height: {{ max($height, 5) }}%"></div>
+                                        <div class="w-full max-w-[40px] bg-[#423A8E] rounded-t transition-all" style="height: {{ max($height, 5) }}%"></div>
                                     </div>
                                     <div class="text-xs text-gray-500">{{ $i }}x</div>
                                     <div class="text-sm font-bold text-gray-900 dark:text-white">{{ $count }}</div>
@@ -126,7 +126,7 @@
                                     <td class="px-6 py-4 text-sm text-gray-500">{{ $index + 1 }}</td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center">
-                                            <div class="w-8 h-8 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xs mr-3">
+                                            <div class="w-8 h-8 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-full flex items-center justify-center text-white font-bold text-xs mr-3">
                                                 {{ strtoupper(substr($student->first_name, 0, 1)) }}
                                             </div>
                                             <span class="font-medium text-gray-900 dark:text-white">{{ $student->first_name }} {{ $student->last_name }}</span>
@@ -136,7 +136,7 @@
                                         {{ $student->tutor->first_name ?? 'Unassigned' }}
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <span class="font-semibold text-teal-600">{{ $student->attendances_count }}</span>
+                                        <span class="font-semibold text-[#423A8E]">{{ $student->attendances_count }}</span>
                                     </td>
                                     <td class="px-6 py-4">
                                         @php
@@ -144,7 +144,7 @@
                                         @endphp
                                         <div class="flex items-center justify-center gap-2">
                                             <div class="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                                <div class="bg-teal-500 h-2 rounded-full" style="width: {{ min($progress, 100) }}%"></div>
+                                                <div class="bg-[#423A8E] h-2 rounded-full" style="width: {{ min($progress, 100) }}%"></div>
                                             </div>
                                             <span class="text-xs text-gray-500">{{ number_format($progress, 0) }}%</span>
                                         </div>

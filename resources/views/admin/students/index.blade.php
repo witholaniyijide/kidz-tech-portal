@@ -2,10 +2,10 @@
     <x-slot name="header">{{ __('Student Management') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Students') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
         {{-- Floating Orbs --}}
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             {{-- Flash Messages --}}
@@ -21,7 +21,7 @@
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Student Management</h1>
                     <p class="text-gray-600 dark:text-gray-400 mt-1">Manage all students in the system</p>
                 </div>
-                <a href="{{ route('admin.students.create') }}" class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-medium rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+                <a href="{{ route('admin.students.create') }}" class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white font-medium rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                     </svg>
@@ -59,11 +59,11 @@
                     <div class="flex-1 min-w-[200px]">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Name or email..."
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                     </div>
                     <div class="w-40">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                        <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                             <option value="">All Status</option>
                             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
@@ -71,7 +71,7 @@
                             <option value="withdrawn" {{ request('status') === 'withdrawn' ? 'selected' : '' }}>Withdrawn</option>
                         </select>
                     </div>
-                    <button type="submit" class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+                    <button type="submit" class="px-5 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E] transition-colors">
                         Filter
                     </button>
                     @if(request()->hasAny(['search', 'status']))
@@ -89,7 +89,7 @@
                         <div class="text-6xl mb-4">👨‍🎓</div>
                         <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Students Found</h3>
                         <p class="text-gray-500 dark:text-gray-400 mb-4">Get started by adding your first student</p>
-                        <a href="{{ route('admin.students.create') }}" class="inline-flex items-center px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
+                        <a href="{{ route('admin.students.create') }}" class="inline-flex items-center px-5 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E]">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
@@ -113,7 +113,7 @@
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                                         <td class="px-6 py-4">
                                             <div class="flex items-center">
-                                                <div class="w-10 h-10 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                                                <div class="w-10 h-10 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
                                                     {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
                                                 </div>
                                                 <div>
@@ -148,7 +148,7 @@
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex items-center justify-end gap-2">
-                                                <a href="{{ route('admin.students.show', $student) }}" class="p-2 text-gray-600 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition-colors" title="View">
+                                                <a href="{{ route('admin.students.show', $student) }}" class="p-2 text-gray-600 dark:text-gray-400 hover:text-[#423A8E] dark:hover:text-[#00CCCD] hover:bg-[#423A8E]/5 dark:hover:bg-[#423A8E]/40/20 rounded-lg transition-colors" title="View">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>

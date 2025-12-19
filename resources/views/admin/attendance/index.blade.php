@@ -2,9 +2,9 @@
     <x-slot name="header">{{ __('Attendance Management') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Attendance') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             @if(session('success'))
@@ -20,7 +20,7 @@
                     <p class="text-gray-600 dark:text-gray-400 mt-1">Review and approve tutor-submitted attendance records</p>
                 </div>
                 <div x-data="{ exportOpen: false }" class="relative">
-                    <button @click="exportOpen = !exportOpen" type="button" class="inline-flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg shadow transition-colors">
+                    <button @click="exportOpen = !exportOpen" type="button" class="inline-flex items-center px-4 py-2 bg-[#423A8E] hover:bg-[#423A8E] text-white rounded-lg shadow transition-colors">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                         </svg>
@@ -35,42 +35,42 @@
                             <h4 class="font-semibold text-gray-900 dark:text-white mb-3">Export Attendance Data</h4>
                             <div class="space-y-2">
                                 <a href="{{ route('admin.attendance.export', ['period' => 'week']) }}"
-                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-[#423A8E]/5 dark:hover:bg-[#423A8E]/40/20 transition-colors">
                                     <div>
                                         <div class="font-medium text-gray-900 dark:text-white text-sm">This Week</div>
                                         <div class="text-xs text-gray-500">{{ now()->startOfWeek()->format('M j') }} - {{ now()->endOfWeek()->format('M j, Y') }}</div>
                                     </div>
-                                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 text-[#423A8E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                     </svg>
                                 </a>
                                 <a href="{{ route('admin.attendance.export', ['period' => 'month']) }}"
-                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-[#423A8E]/5 dark:hover:bg-[#423A8E]/40/20 transition-colors">
                                     <div>
                                         <div class="font-medium text-gray-900 dark:text-white text-sm">This Month</div>
                                         <div class="text-xs text-gray-500">{{ now()->startOfMonth()->format('M j') }} - {{ now()->endOfMonth()->format('M j, Y') }}</div>
                                     </div>
-                                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 text-[#423A8E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                     </svg>
                                 </a>
                                 <a href="{{ route('admin.attendance.export', ['start_date' => now()->subWeek()->startOfWeek()->format('Y-m-d'), 'end_date' => now()->subWeek()->endOfWeek()->format('Y-m-d')]) }}"
-                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-[#423A8E]/5 dark:hover:bg-[#423A8E]/40/20 transition-colors">
                                     <div>
                                         <div class="font-medium text-gray-900 dark:text-white text-sm">Last Week</div>
                                         <div class="text-xs text-gray-500">{{ now()->subWeek()->startOfWeek()->format('M j') }} - {{ now()->subWeek()->endOfWeek()->format('M j, Y') }}</div>
                                     </div>
-                                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 text-[#423A8E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                     </svg>
                                 </a>
                                 <a href="{{ route('admin.attendance.export', ['start_date' => now()->subMonth()->startOfMonth()->format('Y-m-d'), 'end_date' => now()->subMonth()->endOfMonth()->format('Y-m-d')]) }}"
-                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                                   class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-[#423A8E]/5 dark:hover:bg-[#423A8E]/40/20 transition-colors">
                                     <div>
                                         <div class="font-medium text-gray-900 dark:text-white text-sm">Last Month</div>
                                         <div class="text-xs text-gray-500">{{ now()->subMonth()->startOfMonth()->format('M j') }} - {{ now()->subMonth()->endOfMonth()->format('M j, Y') }}</div>
                                     </div>
-                                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 text-[#423A8E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                     </svg>
                                 </a>
@@ -79,10 +79,10 @@
                                 <form action="{{ route('admin.attendance.export') }}" method="GET" class="space-y-3">
                                     <div class="text-xs font-medium text-gray-700 dark:text-gray-300">Custom Date Range</div>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <input type="date" name="start_date" class="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-2 focus:ring-teal-500">
-                                        <input type="date" name="end_date" class="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-2 focus:ring-teal-500">
+                                        <input type="date" name="start_date" class="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-2 focus:ring-[#423A8E]">
+                                        <input type="date" name="end_date" class="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded focus:ring-2 focus:ring-[#423A8E]">
                                     </div>
-                                    <button type="submit" class="w-full px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm rounded-lg transition-colors">
+                                    <button type="submit" class="w-full px-3 py-2 bg-[#423A8E] hover:bg-[#423A8E] text-white text-sm rounded-lg transition-colors">
                                         Export Custom Range
                                     </button>
                                 </form>
@@ -117,7 +117,7 @@
                 <form method="GET" class="flex flex-wrap items-end gap-4">
                     <div class="w-36">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <select name="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                        <select name="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                             <option value="">All</option>
                             <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                             <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
@@ -126,11 +126,11 @@
                     <div class="w-40">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class Date</label>
                         <input type="date" name="date" value="{{ request('date') }}"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                     </div>
                     <div class="w-44">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tutor</label>
-                        <select name="tutor_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                        <select name="tutor_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                             <option value="">All Tutors</option>
                             @foreach($tutors as $tutor)
                                 <option value="{{ $tutor->id }}" {{ request('tutor_id') == $tutor->id ? 'selected' : '' }}>
@@ -141,7 +141,7 @@
                     </div>
                     <div class="w-44">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student</label>
-                        <select name="student_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                        <select name="student_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                             <option value="">All Students</option>
                             @foreach($students as $student)
                                 <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
@@ -155,7 +155,7 @@
                                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
                         <label for="late_only" class="text-sm text-gray-700 dark:text-gray-300">Late Only</label>
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+                    <button type="submit" class="px-4 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E] transition-colors">
                         Filter
                     </button>
                     @if(request()->hasAny(['status', 'date', 'tutor_id', 'student_id', 'late_only']))
@@ -193,7 +193,7 @@
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors {{ $attendance->status === 'pending' ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}">
                                         <td class="px-4 py-4">
                                             <div class="flex items-center">
-                                                <div class="w-8 h-8 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xs mr-2">
+                                                <div class="w-8 h-8 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-full flex items-center justify-center text-white font-bold text-xs mr-2">
                                                     {{ strtoupper(substr($attendance->student->first_name ?? 'U', 0, 1)) }}
                                                 </div>
                                                 <span class="font-medium text-gray-900 dark:text-white">{{ $attendance->student->first_name ?? 'Unknown' }} {{ $attendance->student->last_name ?? '' }}</span>
@@ -235,7 +235,7 @@
                                         <td class="px-4 py-4">
                                             <div class="flex items-center justify-center gap-1">
                                                 {{-- View --}}
-                                                <a href="{{ route('admin.attendance.show', $attendance) }}" class="p-1.5 text-gray-600 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition-colors" title="View Details">
+                                                <a href="{{ route('admin.attendance.show', $attendance) }}" class="p-1.5 text-gray-600 dark:text-gray-400 hover:text-[#423A8E] dark:hover:text-[#00CCCD] hover:bg-[#423A8E]/5 dark:hover:bg-[#423A8E]/40/20 rounded-lg transition-colors" title="View Details">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -296,7 +296,7 @@
                 <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Action Legend</h4>
                 <div class="flex flex-wrap gap-4 text-xs text-gray-600 dark:text-gray-400">
                     <div class="flex items-center gap-1">
-                        <span class="w-5 h-5 bg-teal-100 text-teal-600 rounded flex items-center justify-center">👁</span>
+                        <span class="w-5 h-5 bg-[#423A8E]/10 text-[#423A8E] rounded flex items-center justify-center">👁</span>
                         <span>View Details</span>
                     </div>
                     <div class="flex items-center gap-1">

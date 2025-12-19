@@ -2,9 +2,9 @@
     <x-slot name="header">{{ __('Settings') }}</x-slot>
     <x-slot name="title">{{ __('Admin - Settings') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-teal-300 dark:bg-teal-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div class="absolute top-0 right-0 w-72 h-72 bg-cyan-300 dark:bg-cyan-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             @if(session('success'))
@@ -41,7 +41,7 @@
                                 <img src="{{ Storage::url($user->profile_photo) }}" alt="Profile Photo"
                                      class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg">
                             @else
-                                <div class="w-24 h-24 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-3xl border-4 border-white shadow-lg">
+                                <div class="w-24 h-24 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-full flex items-center justify-center text-white font-bold text-3xl border-4 border-white shadow-lg">
                                     {{ strtoupper(substr($user->name, 0, 1)) }}
                                 </div>
                             @endif
@@ -57,9 +57,9 @@
                                           file:mr-4 file:py-2 file:px-4
                                           file:rounded-lg file:border-0
                                           file:text-sm file:font-medium
-                                          file:bg-teal-100 file:text-teal-700
-                                          hover:file:bg-teal-200
-                                          dark:file:bg-teal-900/30 dark:file:text-teal-400
+                                          file:bg-[#423A8E]/10 file:text-[#423A8E]
+                                          hover:file:bg-[#423A8E]/20
+                                          dark:file:bg-[#423A8E]/40/30 dark:file:text-[#00CCCD]
                                           cursor-pointer">
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
                                 JPG, PNG or GIF. Max size 2MB.
@@ -80,7 +80,7 @@
 
             {{-- Profile Information --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-6">
-                <div class="px-6 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white">
+                <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
                     <h3 class="text-lg font-semibold">Profile Information</h3>
                 </div>
                 <form action="{{ route('admin.settings.profile') }}" method="POST" class="p-6">
@@ -91,7 +91,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
                             <input type="text" name="name" value="{{ old('name', $user->name) }}" required
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                             @error('name')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -100,7 +100,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                             <input type="email" name="email" value="{{ old('email', $user->email) }}" required
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                             @error('email')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -108,7 +108,7 @@
                     </div>
 
                     <div class="mt-6 flex justify-end">
-                        <button type="submit" class="px-6 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg hover:shadow-lg transition-all font-medium">
+                        <button type="submit" class="px-6 py-2 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white rounded-lg hover:shadow-lg transition-all font-medium">
                             Update Profile
                         </button>
                     </div>
@@ -117,7 +117,7 @@
 
             {{-- Change Password --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-6">
-                <div class="px-6 py-4 bg-gradient-to-r from-teal-600 to-teal-500 text-white">
+                <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
                     <h3 class="text-lg font-semibold">Change Password</h3>
                 </div>
                 <form action="{{ route('admin.settings.password') }}" method="POST" class="p-6">
@@ -128,7 +128,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
                             <input type="password" name="current_password" required
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                             @error('current_password')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -138,7 +138,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
                                 <input type="password" name="password" required minlength="8"
-                                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                                 @error('password')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
@@ -147,13 +147,13 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Password</label>
                                 <input type="password" name="password_confirmation" required
-                                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-teal-500">
+                                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
                             </div>
                         </div>
                     </div>
 
                     <div class="mt-6 flex justify-end">
-                        <button type="submit" class="px-6 py-2 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-lg hover:shadow-lg transition-all font-medium">
+                        <button type="submit" class="px-6 py-2 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white rounded-lg hover:shadow-lg transition-all font-medium">
                             Change Password
                         </button>
                     </div>
@@ -162,7 +162,7 @@
 
             {{-- Notification Preferences --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-6">
-                <div class="px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
+                <div class="px-6 py-4 bg-gradient-to-r from-emerald-500 to-[#00CCCD] text-white">
                     <h3 class="text-lg font-semibold">Notification Preferences</h3>
                 </div>
                 <form action="{{ route('admin.settings.notifications') }}" method="POST" class="p-6">
@@ -170,49 +170,49 @@
                     @method('PUT')
 
                     <div class="space-y-4">
-                        <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                        <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-[#423A8E]/5 dark:hover:bg-[#423A8E]/40/20 transition-colors">
                             <div>
                                 <p class="font-medium text-gray-900 dark:text-white">Email Notifications</p>
                                 <p class="text-sm text-gray-500">Receive email alerts for important updates</p>
                             </div>
                             <input type="checkbox" name="email_notifications" value="1"
                                    {{ ($preferences['email_notifications'] ?? true) ? 'checked' : '' }}
-                                   class="w-5 h-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+                                   class="w-5 h-5 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E]">
                         </label>
 
-                        <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                        <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-[#423A8E]/5 dark:hover:bg-[#423A8E]/40/20 transition-colors">
                             <div>
                                 <p class="font-medium text-gray-900 dark:text-white">Attendance Alerts</p>
                                 <p class="text-sm text-gray-500">Get notified when new attendance is submitted</p>
                             </div>
                             <input type="checkbox" name="attendance_alerts" value="1"
                                    {{ ($preferences['attendance_alerts'] ?? true) ? 'checked' : '' }}
-                                   class="w-5 h-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+                                   class="w-5 h-5 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E]">
                         </label>
 
-                        <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                        <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-[#423A8E]/5 dark:hover:bg-[#423A8E]/40/20 transition-colors">
                             <div>
                                 <p class="font-medium text-gray-900 dark:text-white">Daily Schedule Reminder</p>
                                 <p class="text-sm text-gray-500">Receive daily summary of scheduled classes</p>
                             </div>
                             <input type="checkbox" name="schedule_reminder" value="1"
                                    {{ ($preferences['schedule_reminder'] ?? false) ? 'checked' : '' }}
-                                   class="w-5 h-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+                                   class="w-5 h-5 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E]">
                         </label>
 
-                        <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors">
+                        <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-[#423A8E]/5 dark:hover:bg-[#423A8E]/40/20 transition-colors">
                             <div>
                                 <p class="font-medium text-gray-900 dark:text-white">Report Submission Alerts</p>
                                 <p class="text-sm text-gray-500">Get notified when tutors submit reports</p>
                             </div>
                             <input type="checkbox" name="report_alerts" value="1"
                                    {{ ($preferences['report_alerts'] ?? true) ? 'checked' : '' }}
-                                   class="w-5 h-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+                                   class="w-5 h-5 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E]">
                         </label>
                     </div>
 
                     <div class="mt-6 flex justify-end">
-                        <button type="submit" class="px-6 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:shadow-lg transition-all font-medium">
+                        <button type="submit" class="px-6 py-2 bg-gradient-to-r from-emerald-500 to-[#00CCCD] text-white rounded-lg hover:shadow-lg transition-all font-medium">
                             Save Preferences
                         </button>
                     </div>
