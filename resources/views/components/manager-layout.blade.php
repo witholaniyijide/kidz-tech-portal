@@ -27,43 +27,61 @@
         [x-cloak] { display: none !important; }
 
         /* ========================================
-           MANAGER PORTAL - CLAUDE ORANGE THEME
-           Primary: Crail #C15F3C
-           Light: #DA7756
-           Dark: #A34E30
+           MANAGER PORTAL - AMBER/ORANGE THEME
+           Primary: #F5A623 (Sidebar active, buttons, links)
+           Secondary: #248AFD (Info cards, secondary actions)
+           Red: #FF4747 (Alerts, errors, urgent)
+           Green: #71C02B (Success, positive indicators)
+           Yellow: #FFC100 (Warnings, highlights)
         ======================================== */
 
         :root {
-            --manager-primary: #C15F3C;
-            --manager-primary-light: #DA7756;
-            --manager-primary-dark: #A34E30;
+            --manager-primary: #F5A623;
+            --manager-primary-light: #FFB84D;
+            --manager-primary-dark: #E09000;
+            --manager-secondary: #248AFD;
+            --manager-red: #FF4747;
+            --manager-green: #71C02B;
+            --manager-yellow: #FFC100;
         }
 
-        /* Primary Gradient - Claude Orange */
+        /* Primary Gradient - Amber/Orange */
         .bg-gradient-manager {
-            background: linear-gradient(135deg, #C15F3C 0%, #DA7756 100%);
+            background: linear-gradient(135deg, #F5A623 0%, #FFB84D 100%);
         }
 
         /* Dark Gradient */
         .bg-gradient-manager-dark {
-            background: linear-gradient(135deg, #A34E30 0%, #C15F3C 100%);
+            background: linear-gradient(135deg, #E09000 0%, #F5A623 100%);
         }
 
         /* Button Gradient */
         .btn-manager-primary {
-            background: linear-gradient(135deg, #C15F3C 0%, #DA7756 100%);
+            background: linear-gradient(135deg, #F5A623 0%, #FFB84D 100%);
             color: white;
             transition: all 0.3s ease;
         }
         .btn-manager-primary:hover {
             opacity: 0.9;
             transform: translateY(-1px);
-            box-shadow: 0 10px 25px -5px rgba(193, 95, 60, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(245, 166, 35, 0.4);
+        }
+
+        /* Secondary Button */
+        .btn-manager-secondary {
+            background: linear-gradient(135deg, #248AFD 0%, #4DA3FF 100%);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-manager-secondary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px -5px rgba(36, 138, 253, 0.4);
         }
 
         /* Text Gradient */
         .text-gradient-manager {
-            background: linear-gradient(135deg, #C15F3C 0%, #DA7756 100%);
+            background: linear-gradient(135deg, #F5A623 0%, #FFB84D 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -78,30 +96,30 @@
             animation: float 6s ease-in-out infinite;
         }
 
-        /* Pulse Glow Animation - Orange */
-        @keyframes pulse-glow-orange {
-            0%, 100% { box-shadow: 0 0 20px rgba(193, 95, 60, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(193, 95, 60, 0.5); }
+        /* Pulse Glow Animation - Amber */
+        @keyframes pulse-glow-amber {
+            0%, 100% { box-shadow: 0 0 20px rgba(245, 166, 35, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(245, 166, 35, 0.5); }
         }
         .animate-pulse-glow {
-            animation: pulse-glow-orange 3s ease-in-out infinite;
+            animation: pulse-glow-amber 3s ease-in-out infinite;
         }
 
-        /* Custom Scrollbar - Orange Theme */
+        /* Custom Scrollbar - Amber Theme */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: rgba(193, 95, 60, 0.1);
+            background: rgba(245, 166, 35, 0.1);
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #C15F3C 0%, #DA7756 100%);
+            background: linear-gradient(180deg, #F5A623 0%, #FFB84D 100%);
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #DA7756 0%, #C15F3C 100%);
+            background: linear-gradient(180deg, #FFB84D 0%, #F5A623 100%);
         }
 
         /* Glass Card */
@@ -122,38 +140,49 @@
         }
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 20px 40px -15px rgba(193, 95, 60, 0.2);
+            box-shadow: 0 20px 40px -15px rgba(245, 166, 35, 0.2);
         }
 
-        /* Icon Container - Orange */
+        /* Icon Container - Amber */
         .icon-container {
-            background: linear-gradient(135deg, #C15F3C 0%, #DA7756 100%);
+            background: linear-gradient(135deg, #F5A623 0%, #FFB84D 100%);
+        }
+
+        /* Info Card - Secondary Blue */
+        .info-card {
+            background: linear-gradient(135deg, #248AFD 0%, #4DA3FF 100%);
         }
 
         /* Status Badge Colors */
         .badge-draft { background: #E2E8F0; color: #475569; }
-        .badge-submitted { background: #DBEAFE; color: #1E40AF; }
-        .badge-pending { background: #FEF3C7; color: #92400E; }
-        .badge-approved { background: #D1FAE5; color: #065F46; }
-        .badge-rejected { background: #FEE2E2; color: #991B1B; }
+        .badge-submitted { background: rgba(36, 138, 253, 0.15); color: #248AFD; }
+        .badge-pending { background: rgba(255, 193, 0, 0.15); color: #B38600; }
+        .badge-approved { background: rgba(113, 192, 43, 0.15); color: #71C02B; }
+        .badge-rejected { background: rgba(255, 71, 71, 0.15); color: #FF4747; }
 
         .dark .badge-draft { background: rgba(71, 85, 105, 0.3); color: #94A3B8; }
-        .dark .badge-submitted { background: rgba(59, 130, 246, 0.2); color: #60A5FA; }
-        .dark .badge-pending { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
-        .dark .badge-approved { background: rgba(16, 185, 129, 0.2); color: #34D399; }
-        .dark .badge-rejected { background: rgba(239, 68, 68, 0.2); color: #F87171; }
+        .dark .badge-submitted { background: rgba(36, 138, 253, 0.2); color: #4DA3FF; }
+        .dark .badge-pending { background: rgba(255, 193, 0, 0.2); color: #FFC100; }
+        .dark .badge-approved { background: rgba(113, 192, 43, 0.2); color: #8ED43F; }
+        .dark .badge-rejected { background: rgba(255, 71, 71, 0.2); color: #FF6B6B; }
 
-        /* Form Input Focus - Orange */
+        /* Alert Colors */
+        .alert-success { background: rgba(113, 192, 43, 0.1); border-color: #71C02B; color: #5A9A22; }
+        .alert-warning { background: rgba(255, 193, 0, 0.1); border-color: #FFC100; color: #B38600; }
+        .alert-error { background: rgba(255, 71, 71, 0.1); border-color: #FF4747; color: #CC3939; }
+        .alert-info { background: rgba(36, 138, 253, 0.1); border-color: #248AFD; color: #1D6FC9; }
+
+        /* Form Input Focus - Amber */
         input:focus, select:focus, textarea:focus {
-            border-color: #C15F3C !important;
-            box-shadow: 0 0 0 3px rgba(193, 95, 60, 0.1) !important;
+            border-color: #F5A623 !important;
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1) !important;
         }
 
-        /* Checkbox/Radio Accent - Orange */
+        /* Checkbox/Radio Accent - Amber */
         input[type="checkbox"]:checked,
         input[type="radio"]:checked {
-            background-color: #C15F3C;
-            border-color: #C15F3C;
+            background-color: #F5A623;
+            border-color: #F5A623;
         }
     </style>
 
@@ -206,7 +235,7 @@
                         <!-- Search -->
                         <div class="hidden md:block relative">
                             <input type="text" placeholder="Search..."
-                                   class="w-64 pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#C15F3C] focus:border-transparent">
+                                   class="w-64 pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#F5A623] focus:border-transparent">
                             <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
@@ -269,7 +298,7 @@
                                 @click="open = !open"
                                 class="flex items-center gap-3 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
                             >
-                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#C15F3C] to-[#DA7756] flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#F5A623] to-[#FFB84D] flex items-center justify-center text-white font-bold text-sm shadow-lg">
                                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                 </div>
                                 <div class="text-left hidden md:block">
