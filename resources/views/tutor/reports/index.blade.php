@@ -17,7 +17,7 @@
             </button>
             <!-- Create Report Button -->
             <a href="{{ route('tutor.reports.create') }}" 
-               class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+               class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
@@ -104,7 +104,7 @@
         <form method="GET" action="{{ route('tutor.reports.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label for="student_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Student</label>
-                <select id="student_id" name="student_id" class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                <select id="student_id" name="student_id" class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                     <option value="">All Students</option>
                     @foreach($students as $student)
                         <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
@@ -116,7 +116,7 @@
 
             <div>
                 <label for="month" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Month</label>
-                <select id="month" name="month" class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                <select id="month" name="month" class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                     <option value="">All Months</option>
                     @foreach($months as $monthOption)
                         <option value="{{ $monthOption }}" {{ request('month') === $monthOption ? 'selected' : '' }}>{{ $monthOption }}</option>
@@ -126,7 +126,7 @@
 
             <div>
                 <label for="status" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Status</label>
-                <select id="status" name="status" class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                <select id="status" name="status" class="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                     <option value="">All Statuses</option>
                     <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
                     <option value="submitted" {{ request('status') === 'submitted' ? 'selected' : '' }}>Submitted</option>
@@ -137,7 +137,7 @@
             </div>
 
             <div class="flex items-end gap-2">
-                <button type="submit" class="flex-1 px-4 py-2.5 bg-[#4B51FF] text-white font-medium rounded-xl hover:bg-[#3a40cc] transition-colors">Filter</button>
+                <button type="submit" class="flex-1 px-4 py-2.5 bg-[#7978E9] text-white font-medium rounded-xl hover:bg-[#3a40cc] transition-colors">Filter</button>
                 @if(request()->hasAny(['month', 'status', 'student_id']))
                     <a href="{{ route('tutor.reports.index') }}" class="px-4 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Reset</a>
                 @endif
@@ -160,7 +160,7 @@
                 {{ request()->hasAny(['month', 'status', 'student_id']) ? 'Try adjusting your filters' : 'Create your first student progress report' }}
             </p>
             @if(!request()->hasAny(['month', 'status', 'student_id']))
-                <a href="{{ route('tutor.reports.create') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white font-semibold rounded-xl hover:opacity-90 transition-all">
+                <a href="{{ route('tutor.reports.create') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-semibold rounded-xl hover:opacity-90 transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     Create Report
                 </a>
@@ -173,7 +173,7 @@
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-center gap-3 mb-2">
-                                <a href="{{ route('tutor.reports.show', $report) }}" class="text-lg font-semibold text-slate-900 dark:text-white hover:text-[#4B51FF] dark:hover:text-[#22D3EE] transition-colors truncate">
+                                <a href="{{ route('tutor.reports.show', $report) }}" class="text-lg font-semibold text-slate-900 dark:text-white hover:text-[#7978E9] dark:hover:text-[#98BDFF] transition-colors truncate">
                                     {{ $report->student->first_name }} {{ $report->student->last_name }} - {{ $report->month }} {{ $report->year }}
                                 </a>
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
@@ -212,7 +212,7 @@
                             @endif
                         </div>
                         <div class="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                            <a href="{{ route('tutor.reports.show', $report) }}" class="p-2 text-slate-500 hover:text-[#4B51FF] hover:bg-[#4B51FF]/10 rounded-lg transition-colors" title="View">
+                            <a href="{{ route('tutor.reports.show', $report) }}" class="p-2 text-slate-500 hover:text-[#7978E9] hover:bg-[#7978E9]/10 rounded-lg transition-colors" title="View">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </a>
                             @if($report->canEdit())
@@ -253,13 +253,13 @@
                 @csrf
                 <div>
                     <label for="json_data" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Paste Report JSON</label>
-                    <textarea id="json_data" name="json_data" rows="8" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent font-mono text-sm" placeholder='{"studentName": "...", "month": "...", ...}'></textarea>
+                    <textarea id="json_data" name="json_data" rows="8" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9] focus:border-transparent font-mono text-sm" placeholder='{"studentName": "...", "month": "...", ...}'></textarea>
                 </div>
                 <div id="importError" class="hidden p-3 bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400 rounded-lg text-sm"></div>
                 <div id="importSuccess" class="hidden p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-sm"></div>
                 <div class="flex justify-end gap-3">
                     <button type="button" onclick="document.getElementById('importModal').classList.add('hidden')" class="px-4 py-2 text-slate-600 dark:text-slate-400 font-medium">Cancel</button>
-                    <button type="submit" id="importBtn" class="px-6 py-2 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white font-semibold rounded-xl hover:opacity-90">Import Report</button>
+                    <button type="submit" id="importBtn" class="px-6 py-2 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-semibold rounded-xl hover:opacity-90">Import Report</button>
                 </div>
             </form>
         </div>

@@ -2,7 +2,7 @@
 <div class="space-y-6">
     <!-- Breadcrumb & Back -->
     <div class="flex items-center justify-between">
-        <a href="{{ route('tutor.notices.index') }}" class="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-[#4B51FF] transition-colors">
+        <a href="{{ route('tutor.notices.index') }}" class="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-[#7978E9] transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
@@ -13,7 +13,7 @@
         <div class="flex items-center gap-2">
             @if($previousNotice)
                 <a href="{{ route('tutor.notices.show', $previousNotice) }}"
-                   class="p-2 text-slate-500 hover:text-[#4B51FF] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                   class="p-2 text-slate-500 hover:text-[#7978E9] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                    title="Previous Notice">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -29,7 +29,7 @@
 
             @if($nextNotice)
                 <a href="{{ route('tutor.notices.show', $nextNotice) }}"
-                   class="p-2 text-slate-500 hover:text-[#4B51FF] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                   class="p-2 text-slate-500 hover:text-[#7978E9] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                    title="Next Notice">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -51,7 +51,7 @@
         <div class="px-6 py-4
             @if($notice->priority === 'urgent') bg-gradient-to-r from-red-500 to-rose-600
             @elseif($notice->priority === 'high') bg-gradient-to-r from-amber-500 to-orange-500
-            @else bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF]
+            @else bg-gradient-to-r from-[#4B49AC] to-[#7978E9]
             @endif">
             <div class="flex items-start justify-between gap-4">
                 <div>
@@ -132,14 +132,14 @@
             @if($previousNotice)
                 <a href="{{ route('tutor.notices.show', $previousNotice) }}" class="glass-card rounded-xl p-4 hover:shadow-lg transition-all group">
                     <div class="flex items-center gap-3">
-                        <div class="flex-shrink-0 p-2 bg-slate-100 dark:bg-slate-700 rounded-lg group-hover:bg-[#4B51FF]/10 transition-colors">
-                            <svg class="w-5 h-5 text-slate-500 group-hover:text-[#4B51FF] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="flex-shrink-0 p-2 bg-slate-100 dark:bg-slate-700 rounded-lg group-hover:bg-[#7978E9]/10 transition-colors">
+                            <svg class="w-5 h-5 text-slate-500 group-hover:text-[#7978E9] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                             </svg>
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-xs text-slate-500 uppercase tracking-wider">Previous Notice</p>
-                            <p class="font-medium text-slate-900 dark:text-white truncate group-hover:text-[#4B51FF] transition-colors">
+                            <p class="font-medium text-slate-900 dark:text-white truncate group-hover:text-[#7978E9] transition-colors">
                                 {{ $previousNotice->title }}
                             </p>
                         </div>
@@ -155,12 +155,12 @@
                     <div class="flex items-center gap-3 justify-end">
                         <div class="flex-1 min-w-0">
                             <p class="text-xs text-slate-500 uppercase tracking-wider">Next Notice</p>
-                            <p class="font-medium text-slate-900 dark:text-white truncate group-hover:text-[#4B51FF] transition-colors">
+                            <p class="font-medium text-slate-900 dark:text-white truncate group-hover:text-[#7978E9] transition-colors">
                                 {{ $nextNotice->title }}
                             </p>
                         </div>
-                        <div class="flex-shrink-0 p-2 bg-slate-100 dark:bg-slate-700 rounded-lg group-hover:bg-[#4B51FF]/10 transition-colors">
-                            <svg class="w-5 h-5 text-slate-500 group-hover:text-[#4B51FF] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="flex-shrink-0 p-2 bg-slate-100 dark:bg-slate-700 rounded-lg group-hover:bg-[#7978E9]/10 transition-colors">
+                            <svg class="w-5 h-5 text-slate-500 group-hover:text-[#7978E9] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </div>

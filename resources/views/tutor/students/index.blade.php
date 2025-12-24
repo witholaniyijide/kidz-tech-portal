@@ -22,7 +22,7 @@
 
                 <!-- Student Name -->
                 <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-3">
+                    <div class="w-12 h-12 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] rounded-full flex items-center justify-center text-white font-bold text-lg mr-3">
                         {{ substr($student->first_name, 0, 1) }}{{ substr($student->last_name, 0, 1) }}
                     </div>
                     <div>

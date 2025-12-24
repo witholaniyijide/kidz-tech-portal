@@ -29,11 +29,11 @@
     <!-- Mode Toggle -->
     <div class="flex gap-2">
         <a href="{{ route('tutor.attendance.create') }}" 
-           class="px-4 py-2 rounded-xl font-medium transition-all {{ !$isStandIn ? 'bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
+           class="px-4 py-2 rounded-xl font-medium transition-all {{ !$isStandIn ? 'bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
             My Students
         </a>
         <a href="{{ route('tutor.attendance.create', ['standin' => 1]) }}" 
-           class="px-4 py-2 rounded-xl font-medium transition-all {{ $isStandIn ? 'bg-gradient-to-r from-[#4B51FF] to-[#22D3EE] text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
+           class="px-4 py-2 rounded-xl font-medium transition-all {{ $isStandIn ? 'bg-gradient-to-r from-[#7978E9] to-[#98BDFF] text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
             Stand-in
         </a>
     </div>
@@ -63,7 +63,7 @@
             <input type="hidden" name="is_stand_in" value="{{ $isStandIn ? '1' : '0' }}">
 
             <!-- Header -->
-            <div class="px-6 py-4 {{ $isStandIn ? 'bg-gradient-to-r from-[#4B51FF] to-[#22D3EE]' : 'bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF]' }}">
+            <div class="px-6 py-4 {{ $isStandIn ? 'bg-gradient-to-r from-[#7978E9] to-[#98BDFF]' : 'bg-gradient-to-r from-[#4B49AC] to-[#7978E9]' }}">
                 <h2 class="text-lg font-semibold text-white flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
@@ -85,7 +85,7 @@
                             </div>
                         @else
                             <select id="student_id" name="student_id" required
-                                class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                                class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                                 <option value="">Select a student to cover</option>
                                 @foreach($standInStudents as $student)
                                     <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
@@ -106,7 +106,7 @@
                             </div>
                         @else
                             <select id="student_id" name="student_id" required
-                                class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                                class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                                 <option value="">Select your student</option>
                                 @foreach($myStudents as $student)
                                     <option value="{{ $student->id }}" {{ old('student_id', request('student_id')) == $student->id ? 'selected' : '' }}>
@@ -128,7 +128,7 @@
                             Reason for Stand-in <span class="text-red-500">*</span>
                         </label>
                         <select id="stand_in_reason" name="stand_in_reason" required
-                            class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                            class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                             <option value="">Select a reason</option>
                             <option value="tutor_sick" {{ old('stand_in_reason') === 'tutor_sick' ? 'selected' : '' }}>Assigned tutor is sick</option>
                             <option value="tutor_leave" {{ old('stand_in_reason') === 'tutor_leave' ? 'selected' : '' }}>Assigned tutor on leave</option>
@@ -154,7 +154,7 @@
                                value="{{ old('class_date', date('Y-m-d')) }}" 
                                required 
                                max="{{ date('Y-m-d') }}"
-                               class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                               class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                         @error('class_date')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
@@ -168,7 +168,7 @@
                         <input type="time" id="class_time" name="class_time" 
                                value="{{ old('class_time') }}" 
                                required
-                               class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                               class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                         @error('class_time')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
@@ -186,7 +186,7 @@
                                required 
                                min="15" 
                                max="240"
-                               class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                               class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                         <div class="flex gap-1">
                             <button type="button" onclick="setDuration(30)" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 text-sm font-medium">30</button>
                             <button type="button" onclick="setDuration(45)" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 text-sm font-medium">45</button>
@@ -209,7 +209,7 @@
                            value="{{ old('topic') }}" 
                            maxlength="255"
                            placeholder="e.g., Introduction to Python, Scratch Animation"
-                           class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                           class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                     @error('topic')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
@@ -222,7 +222,7 @@
                     </label>
                     <textarea id="notes" name="notes" rows="4" maxlength="2000"
                               placeholder="Any additional notes about the class, student progress, homework assigned..."
-                              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent resize-none">{{ old('notes') }}</textarea>
+                              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent resize-none">{{ old('notes') }}</textarea>
                     @error('notes')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
@@ -263,7 +263,7 @@
                     Cancel
                 </a>
                 <button type="submit"
-                        class="px-6 py-2.5 {{ $isStandIn ? 'bg-gradient-to-r from-[#4B51FF] to-[#22D3EE]' : 'bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF]' }} text-white rounded-xl hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5 transition-all font-semibold">
+                        class="px-6 py-2.5 {{ $isStandIn ? 'bg-gradient-to-r from-[#7978E9] to-[#98BDFF]' : 'bg-gradient-to-r from-[#4B49AC] to-[#7978E9]' }} text-white rounded-xl hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5 transition-all font-semibold">
                     Submit {{ $isStandIn ? 'Stand-in ' : '' }}Attendance
                 </button>
             </div>

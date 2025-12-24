@@ -116,7 +116,7 @@
         <form method="GET" action="{{ route('tutor.performance.index') }}" class="flex items-center gap-4">
             <div class="flex items-center gap-2">
                 <label for="year" class="text-sm font-medium text-slate-700 dark:text-slate-300">Year:</label>
-                <select id="year" name="year" onchange="this.form.submit()" class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF]">
+                <select id="year" name="year" onchange="this.form.submit()" class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9]">
                     <option value="">All Years</option>
                     @foreach($years as $year)
                         <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>{{ $year }}</option>
@@ -124,7 +124,7 @@
                 </select>
             </div>
             @if(request('year'))
-                <a href="{{ route('tutor.performance.index') }}" class="text-sm text-slate-500 hover:text-[#4B51FF]">Clear filter</a>
+                <a href="{{ route('tutor.performance.index') }}" class="text-sm text-slate-500 hover:text-[#7978E9]">Clear filter</a>
             @endif
         </form>
     </div>
@@ -148,7 +148,7 @@
                     <!-- Header -->
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
-                            <div class="w-10 h-10 bg-gradient-to-br from-[#1D2A6D] to-[#4B51FF] rounded-lg flex items-center justify-center">
+                            <div class="w-10 h-10 bg-gradient-to-br from-[#4B49AC] to-[#7978E9] rounded-lg flex items-center justify-center">
                                 <span class="text-white font-bold text-sm">{{ \Carbon\Carbon::parse($assessment->assessment_month)->format('M') }}</span>
                             </div>
                             <div>
@@ -156,7 +156,7 @@
                                 <p class="text-xs text-slate-500">Performance Review</p>
                             </div>
                         </div>
-                        <svg class="w-5 h-5 text-slate-400 group-hover:text-[#4B51FF] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-slate-400 group-hover:text-[#7978E9] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
                     </div>
