@@ -218,6 +218,46 @@ Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('
     Route::get('/notifications/recent', [App\Http\Controllers\Parent\ParentNotificationController::class, 'recent'])
         ->name('notifications.recent');
 
+    // Attendance
+    Route::get('/attendance', [App\Http\Controllers\Parent\ParentAttendanceController::class, 'index'])
+        ->name('attendance.index');
+    Route::get('/attendance/{attendance}', [App\Http\Controllers\Parent\ParentAttendanceController::class, 'show'])
+        ->name('attendance.show');
+
+    // Schedule
+    Route::get('/schedule', [App\Http\Controllers\Parent\ParentScheduleController::class, 'index'])
+        ->name('schedule.index');
+
+    // Payments
+    Route::get('/payments', [App\Http\Controllers\Parent\ParentPaymentController::class, 'index'])
+        ->name('payments.index');
+    Route::get('/payments/{payment}', [App\Http\Controllers\Parent\ParentPaymentController::class, 'show'])
+        ->name('payments.show');
+    Route::get('/payments/{payment}/receipt', [App\Http\Controllers\Parent\ParentPaymentController::class, 'receipt'])
+        ->name('payments.receipt');
+
+    // Messages
+    Route::get('/messages', [App\Http\Controllers\Parent\ParentMessageController::class, 'index'])
+        ->name('messages.index');
+    Route::get('/messages/sent', [App\Http\Controllers\Parent\ParentMessageController::class, 'sent'])
+        ->name('messages.sent');
+    Route::get('/messages/create', [App\Http\Controllers\Parent\ParentMessageController::class, 'create'])
+        ->name('messages.create');
+    Route::post('/messages', [App\Http\Controllers\Parent\ParentMessageController::class, 'store'])
+        ->name('messages.store');
+    Route::get('/messages/{message}', [App\Http\Controllers\Parent\ParentMessageController::class, 'show'])
+        ->name('messages.show');
+    Route::post('/messages/{message}/reply', [App\Http\Controllers\Parent\ParentMessageController::class, 'reply'])
+        ->name('messages.reply');
+
+    // Notices
+    Route::get('/notices', [App\Http\Controllers\Parent\ParentNoticeController::class, 'index'])
+        ->name('notices.index');
+    Route::get('/notices/{notice}', [App\Http\Controllers\Parent\ParentNoticeController::class, 'show'])
+        ->name('notices.show');
+    Route::post('/notices/{notice}/read', [App\Http\Controllers\Parent\ParentNoticeController::class, 'markAsRead'])
+        ->name('notices.read');
+
     // Settings
     Route::get('/settings', [App\Http\Controllers\Parent\ParentSettingsController::class, 'index'])
         ->name('settings.index');
@@ -285,6 +325,20 @@ Route::prefix('student')
             ->name('reports.download');
         Route::get('/reports/{report}/print', [App\Http\Controllers\Student\StudentReportController::class, 'print'])
             ->name('reports.print');
+
+        // Schedule
+        Route::get('/schedule', [App\Http\Controllers\Student\StudentScheduleController::class, 'index'])
+            ->name('schedule.index');
+
+        // Notices
+        Route::get('/notices', [App\Http\Controllers\Student\StudentNoticeController::class, 'index'])
+            ->name('notices.index');
+        Route::get('/notices/{notice}', [App\Http\Controllers\Student\StudentNoticeController::class, 'show'])
+            ->name('notices.show');
+
+        // Profile Update
+        Route::put('/profile', [App\Http\Controllers\Student\StudentProfileController::class, 'update'])
+            ->name('profile.update');
 
         // Settings (Read-Only)
         Route::get('/settings', [App\Http\Controllers\Student\StudentSettingsController::class, 'index'])
