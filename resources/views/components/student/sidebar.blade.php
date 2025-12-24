@@ -130,9 +130,9 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
         <div class="my-4 border-t border-gray-200 dark:border-slate-700"></div>
 
         {{-- 6. My Profile --}}
-        <a href="{{ route('student.profile.index') }}"
+        <a href="{{ route('student.profile') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
-                  {{ request()->routeIs('student.profile.*') ? 'bg-gradient-to-r from-[#F5A623] to-[#F7B74A] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('student.profile*') ? 'bg-gradient-to-r from-[#F5A623] to-[#F7B74A] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'My Profile' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
