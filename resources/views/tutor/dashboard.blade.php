@@ -28,7 +28,7 @@
                     <h3 class="text-3xl font-bold text-slate-900 dark:text-white mt-1">{{ $studentsCount }}</h3>
                     <p class="text-xs text-slate-500 mt-1">Active students</p>
                 </div>
-                <div class="p-3 bg-gradient-to-br from-[#1D2A6D] to-[#4B51FF] rounded-xl shadow-lg group-hover:scale-110 transition-transform">
+                <div class="p-3 bg-gradient-to-br from-[#4B49AC] to-[#7978E9] rounded-xl shadow-lg group-hover:scale-110 transition-transform">
                     <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
@@ -44,7 +44,7 @@
                     <h3 class="text-3xl font-bold text-slate-900 dark:text-white mt-1">{{ $submittedThisMonth }}</h3>
                     <p class="text-xs text-slate-500 mt-1">{{ now()->format('F Y') }}</p>
                 </div>
-                <div class="p-3 bg-gradient-to-br from-[#4B51FF] to-[#22D3EE] rounded-xl shadow-lg group-hover:scale-110 transition-transform">
+                <div class="p-3 bg-gradient-to-br from-[#7978E9] to-[#98BDFF] rounded-xl shadow-lg group-hover:scale-110 transition-transform">
                     <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
@@ -60,7 +60,7 @@
                     <h3 class="text-3xl font-bold {{ $pendingReportsCount > 0 ? 'text-amber-600' : 'text-slate-900 dark:text-white' }} mt-1">{{ $pendingReportsCount }}</h3>
                     <p class="text-xs text-slate-500 mt-1">Draft / Returned</p>
                 </div>
-                <div class="p-3 {{ $pendingReportsCount > 0 ? 'bg-gradient-to-br from-amber-500 to-orange-500' : 'bg-gradient-to-br from-[#1D2A6D] to-[#4B51FF]' }} rounded-xl shadow-lg group-hover:scale-110 transition-transform">
+                <div class="p-3 {{ $pendingReportsCount > 0 ? 'bg-gradient-to-br from-amber-500 to-orange-500' : 'bg-gradient-to-br from-[#4B49AC] to-[#7978E9]' }} rounded-xl shadow-lg group-hover:scale-110 transition-transform">
                     <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
@@ -87,10 +87,10 @@
 
     <!-- SECTION 2: Daily Class Schedule -->
     <div class="glass-card rounded-2xl shadow-lg overflow-hidden">
-        <div class="px-6 py-4 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF]">
+        <div class="px-6 py-4 bg-gradient-to-r from-[#4B49AC] to-[#7978E9]">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <svg class="w-6 h-6 text-[#22D3EE]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-6 h-6 text-[#98BDFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                     <h2 class="text-lg font-semibold text-white">Today's Class Schedule</h2>
@@ -123,7 +123,7 @@
                 <div class="space-y-3">
                     @foreach($todayClasses as $index => $class)
                         <div class="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                            <div class="w-10 h-10 bg-gradient-to-br from-[#4B51FF] to-[#22D3EE] rounded-full flex items-center justify-center text-white font-bold">
+                            <div class="w-10 h-10 bg-gradient-to-br from-[#4B49AC] to-[#7DA0FA] rounded-full flex items-center justify-center text-white font-bold">
                                 {{ $index + 1 }}
                             </div>
                             <div class="flex-1">
@@ -135,7 +135,7 @@
                                 </p>
                             </div>
                             @if(isset($class['class_link']) && $class['class_link'])
-                                <a href="{{ $class['class_link'] }}" target="_blank" class="px-4 py-2 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+                                <a href="{{ $class['class_link'] }}" target="_blank" class="px-4 py-2 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                     </svg>
@@ -201,7 +201,7 @@
 
         <!-- SECTION 4: Recent Reports -->
         <div class="glass-card rounded-2xl shadow-lg overflow-hidden">
-            <div class="px-6 py-4 bg-gradient-to-r from-[#4B51FF] to-[#22D3EE]">
+            <div class="px-6 py-4 bg-gradient-to-r from-[#7978E9] to-[#98BDFF]">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,14 +209,14 @@
                         </svg>
                         <h2 class="text-lg font-semibold text-white">Recent Reports</h2>
                     </div>
-                    <a href="{{ route('tutor.reports.index') }}" class="text-sm text-cyan-100 hover:text-white">View all →</a>
+                    <a href="{{ route('tutor.reports.index') }}" class="text-sm text-indigo-100 hover:text-white">View all →</a>
                 </div>
             </div>
             <div class="p-4">
                 @if($recentReports->isEmpty())
                     <div class="text-center py-6">
                         <p class="text-slate-500 dark:text-slate-400">No reports yet.</p>
-                        <a href="{{ route('tutor.reports.create') }}" class="inline-flex items-center gap-2 mt-3 text-[#4B51FF] hover:text-[#22D3EE] font-medium">
+                        <a href="{{ route('tutor.reports.create') }}" class="inline-flex items-center gap-2 mt-3 text-[#4B49AC] hover:text-[#7978E9] font-medium">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
@@ -266,7 +266,7 @@
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <!-- Submit Attendance -->
                 <a href="{{ route('tutor.attendance.create') }}" class="flex flex-col items-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all hover:-translate-y-1 group">
-                    <div class="w-12 h-12 bg-gradient-to-br from-[#1D2A6D] to-[#4B51FF] rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg">
+                    <div class="w-12 h-12 bg-gradient-to-br from-[#4B49AC] to-[#7978E9] rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                         </svg>
@@ -276,7 +276,7 @@
 
                 <!-- Submit Report -->
                 <a href="{{ route('tutor.reports.create') }}" class="flex flex-col items-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all hover:-translate-y-1 group">
-                    <div class="w-12 h-12 bg-gradient-to-br from-[#4B51FF] to-[#22D3EE] rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg">
+                    <div class="w-12 h-12 bg-gradient-to-br from-[#7978E9] to-[#98BDFF] rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
@@ -286,7 +286,7 @@
 
                 <!-- View My Reports -->
                 <a href="{{ route('tutor.reports.index') }}" class="flex flex-col items-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all hover:-translate-y-1 group">
-                    <div class="w-12 h-12 bg-gradient-to-br from-[#1D2A6D] to-[#4B51FF] rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg">
+                    <div class="w-12 h-12 bg-gradient-to-br from-[#4B49AC] to-[#7DA0FA] rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
@@ -334,7 +334,7 @@
             <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Recent Attendance</h2>
-                    <a href="{{ route('tutor.attendance.index') }}" class="text-sm text-[#4B51FF] hover:text-[#22D3EE]">View all →</a>
+                    <a href="{{ route('tutor.attendance.index') }}" class="text-sm text-[#4B49AC] hover:text-[#7978E9]">View all →</a>
                 </div>
             </div>
             <div class="p-4">
@@ -379,7 +379,7 @@
             <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold text-slate-900 dark:text-white">My Students</h2>
-                    <a href="{{ route('tutor.students.index') }}" class="text-sm text-[#4B51FF] hover:text-[#22D3EE]">View all →</a>
+                    <a href="{{ route('tutor.students.index') }}" class="text-sm text-[#4B49AC] hover:text-[#7978E9]">View all →</a>
                 </div>
             </div>
             <div class="p-4">
@@ -392,7 +392,7 @@
                         @foreach($students->take(5) as $student)
                             <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-[#4B51FF] to-[#22D3EE] rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-[#4B49AC] to-[#7DA0FA] rounded-full flex items-center justify-center text-white font-bold text-sm">
                                         {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
                                     </div>
                                     <div>
@@ -400,7 +400,7 @@
                                         <p class="text-sm text-slate-500">{{ $student->course_level ?? 'Level 1' }}</p>
                                     </div>
                                 </div>
-                                <a href="{{ route('tutor.reports.create', ['student_id' => $student->id]) }}" class="p-2 text-[#4B51FF] hover:text-[#22D3EE] hover:bg-[#4B51FF]/10 rounded-lg transition-colors" title="Create Report">
+                                <a href="{{ route('tutor.reports.create', ['student_id' => $student->id]) }}" class="p-2 text-[#4B49AC] hover:text-[#7978E9] hover:bg-[#4B49AC]/10 rounded-lg transition-colors" title="Create Report">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>

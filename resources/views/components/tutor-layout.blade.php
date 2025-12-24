@@ -1,4 +1,4 @@
-@props(['title' => 'Tutor Portal'])
+@props(['title' => 'Tutor Portal', 'header' => null])
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
@@ -9,9 +9,16 @@
 
     <title>{{ config('app.name', 'Kidz Tech') }} - {{ $title }}</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}"
+          onerror="this.href='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%234B49AC%22 width=%22100%22 height=%22100%22 rx=%2220%22/%3E%3Ctext x=%2250%22 y=%2265%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22%3EK%3C/text%3E%3C/svg%3E'">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -20,54 +27,65 @@
         [x-cloak] { display: none !important; }
 
         /* ========================================
-           TUTOR PORTAL - MATURE BRAND THEME
-           Primary: Deep Navy #1D2A6D
-           Secondary: Royal Indigo #4B51FF
-           Accent: Cyan #22D3EE
+           TUTOR PORTAL - PURPLE/INDIGO THEME
+           Primary: #4B49AC (Sidebar, buttons, links)
+           Secondary: #98BDFF (Hover states, accents)
+           Blue: #7DA0FA (Info cards, icons)
+           Purple: #7978E9 (Highlights)
+           Coral: #F3797E (Alerts, notifications)
         ======================================== */
 
-        /* Primary Gradient - Deep Navy to Royal Indigo */
+        :root {
+            --tutor-primary: #4B49AC;
+            --tutor-primary-light: #98BDFF;
+            --tutor-primary-dark: #3B3A8C;
+            --tutor-blue: #7DA0FA;
+            --tutor-purple: #7978E9;
+            --tutor-coral: #F3797E;
+        }
+
+        /* Primary Gradient - Purple Theme */
         .bg-gradient-tutor {
-            background: linear-gradient(135deg, #1D2A6D 0%, #4B51FF 100%);
+            background: linear-gradient(135deg, #4B49AC 0%, #7978E9 100%);
         }
 
-        /* Accent Gradient - Indigo to Cyan */
-        .bg-gradient-tutor-accent {
-            background: linear-gradient(135deg, #4B51FF 0%, #22D3EE 100%);
+        /* Light Gradient */
+        .bg-gradient-tutor-light {
+            background: linear-gradient(135deg, #7978E9 0%, #98BDFF 100%);
         }
 
-        /* Header Gradient */
-        .bg-gradient-tutor-header {
-            background: linear-gradient(135deg, #1D2A6D 0%, #2D3A8C 50%, #4B51FF 100%);
+        /* Dark Gradient */
+        .bg-gradient-tutor-dark {
+            background: linear-gradient(135deg, #3B3A8C 0%, #4B49AC 100%);
         }
 
         /* Button Gradient */
         .btn-tutor-primary {
-            background: linear-gradient(135deg, #1D2A6D 0%, #4B51FF 100%);
+            background: linear-gradient(135deg, #4B49AC 0%, #7978E9 100%);
             color: white;
             transition: all 0.3s ease;
         }
         .btn-tutor-primary:hover {
             opacity: 0.9;
             transform: translateY(-1px);
-            box-shadow: 0 10px 25px -5px rgba(75, 81, 255, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(75, 73, 172, 0.4);
         }
 
-        /* Cyan Accent Button */
+        /* Accent Button */
         .btn-tutor-accent {
-            background: linear-gradient(135deg, #4B51FF 0%, #22D3EE 100%);
+            background: linear-gradient(135deg, #7DA0FA 0%, #98BDFF 100%);
             color: white;
             transition: all 0.3s ease;
         }
         .btn-tutor-accent:hover {
             opacity: 0.9;
             transform: translateY(-1px);
-            box-shadow: 0 10px 25px -5px rgba(34, 211, 238, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(125, 160, 250, 0.4);
         }
 
         /* Text Gradient */
         .text-gradient-tutor {
-            background: linear-gradient(135deg, #4B51FF 0%, #22D3EE 100%);
+            background: linear-gradient(135deg, #4B49AC 0%, #7978E9 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -82,33 +100,33 @@
             animation: float 6s ease-in-out infinite;
         }
 
-        /* Pulse Glow Animation */
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(75, 81, 255, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(75, 81, 255, 0.5); }
+        /* Pulse Glow Animation - Purple */
+        @keyframes pulse-glow-purple {
+            0%, 100% { box-shadow: 0 0 20px rgba(75, 73, 172, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(75, 73, 172, 0.5); }
         }
         .animate-pulse-glow {
-            animation: pulse-glow 3s ease-in-out infinite;
+            animation: pulse-glow-purple 3s ease-in-out infinite;
         }
 
-        /* Custom Scrollbar - Indigo Theme */
+        /* Custom Scrollbar - Purple Theme */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: rgba(29, 42, 109, 0.1);
+            background: rgba(75, 73, 172, 0.1);
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #4B51FF 0%, #22D3EE 100%);
+            background: linear-gradient(180deg, #4B49AC 0%, #7978E9 100%);
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #5B61FF 0%, #32E3FE 100%);
+            background: linear-gradient(180deg, #7978E9 0%, #4B49AC 100%);
         }
 
-        /* Glass Card - Subtle glassmorphism */
+        /* Glass Card */
         .glass-card {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(16px);
@@ -126,56 +144,48 @@
         }
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 20px 40px -15px rgba(75, 81, 255, 0.2);
+            box-shadow: 0 20px 40px -15px rgba(75, 73, 172, 0.2);
         }
 
-        /* Icon Container */
+        /* Icon Container - Purple */
         .icon-container {
-            background: linear-gradient(135deg, #1D2A6D 0%, #4B51FF 100%);
-        }
-        .icon-container-accent {
-            background: linear-gradient(135deg, #4B51FF 0%, #22D3EE 100%);
+            background: linear-gradient(135deg, #4B49AC 0%, #7978E9 100%);
         }
 
         /* Status Badge Colors */
         .badge-draft { background: #E2E8F0; color: #475569; }
         .badge-submitted { background: #DBEAFE; color: #1E40AF; }
-        .badge-returned { background: #FEF3C7; color: #92400E; }
-        .badge-approved { background: #D1FAE5; color: #065F46; }
         .badge-pending { background: #FEF3C7; color: #92400E; }
+        .badge-approved { background: #D1FAE5; color: #065F46; }
+        .badge-rejected { background: #FEE2E2; color: #991B1B; }
+        .badge-returned { background: #FEF3C7; color: #92400E; }
         .badge-late { background: #FEE2E2; color: #991B1B; }
 
         .dark .badge-draft { background: rgba(71, 85, 105, 0.3); color: #94A3B8; }
         .dark .badge-submitted { background: rgba(59, 130, 246, 0.2); color: #60A5FA; }
-        .dark .badge-returned { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
-        .dark .badge-approved { background: rgba(16, 185, 129, 0.2); color: #34D399; }
         .dark .badge-pending { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
+        .dark .badge-approved { background: rgba(16, 185, 129, 0.2); color: #34D399; }
+        .dark .badge-rejected { background: rgba(239, 68, 68, 0.2); color: #F87171; }
+        .dark .badge-returned { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
         .dark .badge-late { background: rgba(239, 68, 68, 0.2); color: #F87171; }
 
-        /* Form Input Focus */
+        /* Form Input Focus - Purple */
         input:focus, select:focus, textarea:focus {
-            border-color: #4B51FF !important;
-            box-shadow: 0 0 0 3px rgba(75, 81, 255, 0.1) !important;
+            border-color: #4B49AC !important;
+            box-shadow: 0 0 0 3px rgba(75, 73, 172, 0.1) !important;
         }
 
-        /* Checkbox/Radio Accent */
+        /* Checkbox/Radio Accent - Purple */
         input[type="checkbox"]:checked,
         input[type="radio"]:checked {
-            background-color: #4B51FF;
-            border-color: #4B51FF;
-        }
-
-        /* Dark mode check on load */
-        @media (prefers-color-scheme: dark) {
-            html:not(.light) {
-                color-scheme: dark;
-            }
+            background-color: #4B49AC;
+            border-color: #4B49AC;
         }
     </style>
 
     <script>
         // Dark mode initialization
-        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
@@ -184,131 +194,221 @@
 
     @stack('styles')
 </head>
-<body class="h-full font-sans antialiased" x-data="{ sidebarOpen: false }">
-    <div class="flex h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+<body class="h-full font-sans antialiased">
+    <!-- Flash Messages -->
+    @if(session('success'))
+        <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)"
+             class="fixed top-4 right-4 z-[100] bg-emerald-100 dark:bg-emerald-900/90 border border-emerald-400 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 px-4 py-3 rounded-xl shadow-lg" role="alert">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="font-medium">{{ session('success') }}</span>
+                <button @click="show = false" class="ml-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
 
-        <!-- Mobile Sidebar Backdrop -->
-        <div 
-            x-show="sidebarOpen" 
-            x-transition:enter="transition-opacity ease-linear duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition-opacity ease-linear duration-300"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            @click="sidebarOpen = false"
-            class="fixed inset-0 bg-slate-900/50 z-40 lg:hidden"
-        ></div>
+    @if(session('error'))
+        <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)"
+             class="fixed top-4 right-4 z-[100] bg-rose-100 dark:bg-rose-900/90 border border-rose-400 dark:border-rose-700 text-rose-700 dark:text-rose-300 px-4 py-3 rounded-xl shadow-lg" role="alert">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="font-medium">{{ session('error') }}</span>
+                <button @click="show = false" class="ml-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
 
-        <!-- Mobile Sidebar -->
-        <aside 
-            x-show="sidebarOpen"
-            x-transition:enter="transition ease-in-out duration-300 transform"
-            x-transition:enter-start="-translate-x-full"
-            x-transition:enter-end="translate-x-0"
-            x-transition:leave="transition ease-in-out duration-300 transform"
-            x-transition:leave-start="translate-x-0"
-            x-transition:leave-end="-translate-x-full"
-            class="fixed inset-y-0 left-0 z-50 w-64 lg:hidden"
-        >
-            <x-tutor.nav />
-        </aside>
+    @if(session('warning'))
+        <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)"
+             class="fixed top-4 right-4 z-[100] bg-amber-100 dark:bg-amber-900/90 border border-amber-400 dark:border-amber-700 text-amber-700 dark:text-amber-300 px-4 py-3 rounded-xl shadow-lg" role="alert">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <span class="font-medium">{{ session('warning') }}</span>
+                <button @click="show = false" class="ml-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
 
-        <!-- Desktop Sidebar Navigation -->
-        <aside class="hidden lg:flex lg:flex-shrink-0 w-64">
-            <x-tutor.nav />
-        </aside>
+    @if(session('info'))
+        <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)"
+             class="fixed top-4 right-4 z-[100] bg-blue-100 dark:bg-blue-900/90 border border-blue-400 dark:border-blue-700 text-blue-700 dark:text-blue-300 px-4 py-3 rounded-xl shadow-lg" role="alert">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="font-medium">{{ session('info') }}</span>
+                <button @click="show = false" class="ml-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
+
+    <div class="flex h-screen overflow-hidden bg-gradient-to-br from-indigo-50/50 via-purple-50/30 to-blue-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <!-- Sidebar -->
+        <x-tutor.sidebar />
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div x-data="{ collapsed: localStorage.getItem('tutorSidebarCollapsed') === 'true' }"
+             x-init="
+                window.addEventListener('tutor-sidebar-toggled', () => {
+                    collapsed = localStorage.getItem('tutorSidebarCollapsed') === 'true';
+                });
+             "
+             :class="collapsed ? 'ml-20' : 'ml-64'"
+             class="flex-1 flex flex-col overflow-hidden transition-all duration-300">
 
             <!-- Top Bar -->
-            <x-tutor.top-bar :userName="auth()->user()->name ?? 'Tutor'" />
+            <header class="sticky top-0 z-40 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between h-16 px-6">
+                    <!-- Page Title -->
+                    <div>
+                        @if (isset($header))
+                            <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ $header }}</h1>
+                        @elseif (isset($title))
+                            <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ $title }}</h1>
+                        @else
+                            <h1 class="text-xl font-bold text-gray-900 dark:text-white">Tutor Portal</h1>
+                        @endif
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ now()->format('l, F j, Y') }}</p>
+                    </div>
+
+                    <!-- Right Side: Search, Notifications, Profile -->
+                    <div class="flex items-center space-x-4">
+                        <!-- Search -->
+                        <div class="hidden md:block relative">
+                            <input type="text" placeholder="Search students, reports..."
+                                   class="w-64 pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent">
+                            <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+
+                        <!-- Notifications -->
+                        <a href="{{ route('tutor.notices.index') }}"
+                           class="relative p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            @php
+                                try {
+                                    $unreadCount = Auth::user()->unreadNotifications->count();
+                                } catch (\Exception $e) {
+                                    $unreadCount = 0;
+                                }
+                            @endphp
+                            @if($unreadCount > 0)
+                                <span class="absolute top-0 right-0 w-5 h-5 text-xs font-bold text-white bg-[#F3797E] rounded-full flex items-center justify-center animate-pulse">
+                                    {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                                </span>
+                            @endif
+                        </a>
+
+                        <!-- Profile Dropdown -->
+                        <div x-data="{ open: false }" class="relative">
+                            <button
+                                @click="open = !open"
+                                class="flex items-center gap-3 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                            >
+                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#4B49AC] to-[#7978E9] flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                </div>
+                                <div class="text-left hidden md:block">
+                                    <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ Auth::user()->name }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">Tutor</div>
+                                </div>
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div
+                                x-show="open"
+                                x-cloak
+                                @click.away="open = false"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 scale-95"
+                                x-transition:enter-end="opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100 scale-100"
+                                x-transition:leave-end="opacity-0 scale-95"
+                                class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-50"
+                            >
+                                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ Auth::user()->name }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Tutor Account</p>
+                                </div>
+
+                                <a href="{{ route('tutor.profile.edit') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                    My Profile
+                                </a>
+
+                                <a href="{{ route('tutor.availability.index') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    My Availability
+                                </a>
+
+                                <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                        Sign Out
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
 
             <!-- Main Content -->
             <main class="flex-1 overflow-y-auto relative">
-                <!-- Floating Orbs Background - Updated Colors -->
+                <!-- Floating Orbs Background - Purple Theme -->
                 <div class="absolute top-0 left-0 w-72 h-72 bg-indigo-200 dark:bg-indigo-900/50 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-60 animate-float pointer-events-none"></div>
-                <div class="absolute top-0 right-0 w-72 h-72 bg-blue-200 dark:bg-blue-900/50 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-60 animate-float pointer-events-none" style="animation-delay: 2s;"></div>
-                <div class="absolute -bottom-8 left-20 w-72 h-72 bg-cyan-200 dark:bg-cyan-900/50 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-60 animate-float pointer-events-none" style="animation-delay: 4s;"></div>
+                <div class="absolute top-0 right-0 w-72 h-72 bg-purple-200 dark:bg-purple-900/50 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-60 animate-float pointer-events-none" style="animation-delay: 2s;"></div>
+                <div class="absolute -bottom-8 left-20 w-72 h-72 bg-blue-200 dark:bg-blue-900/50 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-60 animate-float pointer-events-none" style="animation-delay: 4s;"></div>
 
                 <!-- Page Content -->
                 <div class="relative z-10 p-6">
-                    <!-- Flash Messages -->
-                    @if(session('success'))
-                        <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)" class="mb-6 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-400 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400 px-4 py-3 rounded-xl relative" role="alert">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <span class="font-medium">{{ session('success') }}</span>
-                                </div>
-                                <button @click="show = false" class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)" class="mb-6 bg-rose-100 dark:bg-rose-900/30 border border-rose-400 dark:border-rose-700 text-rose-700 dark:text-rose-400 px-4 py-3 rounded-xl relative" role="alert">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <span class="font-medium">{{ session('error') }}</span>
-                                </div>
-                                <button @click="show = false" class="text-rose-700 dark:text-rose-400 hover:text-rose-900 dark:hover:text-rose-300">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    @endif
-
-                    @if(session('info'))
-                        <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)" class="mb-6 bg-blue-100 dark:bg-blue-900/30 border border-blue-400 dark:border-blue-700 text-blue-700 dark:text-blue-400 px-4 py-3 rounded-xl relative" role="alert">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <span class="font-medium">{{ session('info') }}</span>
-                                </div>
-                                <button @click="show = false" class="text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    @endif
-
-                    @if(session('warning'))
-                        <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)" class="mb-6 bg-amber-100 dark:bg-amber-900/30 border border-amber-400 dark:border-amber-700 text-amber-700 dark:text-amber-400 px-4 py-3 rounded-xl relative" role="alert">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                    </svg>
-                                    <span class="font-medium">{{ session('warning') }}</span>
-                                </div>
-                                <button @click="show = false" class="text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    @endif
-
                     {{ $slot }}
                 </div>
+
+                <!-- Footer -->
+                <footer class="relative z-10 py-4 px-6 border-t border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+                    <div class="text-center text-sm text-gray-500 dark:text-gray-400">
+                        &copy; {{ date('Y') }} With <span class="text-red-500">&hearts;</span> Kidz Tech Coding Club. All rights reserved.
+                    </div>
+                </footer>
             </main>
         </div>
     </div>
