@@ -6,7 +6,7 @@
             <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Attendance History</h1>
             <p class="text-slate-600 dark:text-slate-400 mt-1">View and manage your submitted attendance records</p>
         </div>
-        <a href="{{ route('tutor.attendance.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+        <a href="{{ route('tutor.attendance.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
@@ -43,7 +43,7 @@
         <!-- Tabs -->
         <div class="flex border-b border-slate-200 dark:border-slate-700">
             <a href="{{ route('tutor.attendance.index', ['tab' => 'my-students', 'month' => $month, 'status' => $status]) }}" 
-               class="flex-1 px-6 py-4 text-center font-medium transition-colors {{ $tab === 'my-students' ? 'text-[#4B51FF] border-b-2 border-[#4B51FF] bg-[#4B51FF]/5' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300' }}">
+               class="flex-1 px-6 py-4 text-center font-medium transition-colors {{ $tab === 'my-students' ? 'text-[#7978E9] border-b-2 border-[#7978E9] bg-[#7978E9]/5' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300' }}">
                 <div class="flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -52,7 +52,7 @@
                 </div>
             </a>
             <a href="{{ route('tutor.attendance.index', ['tab' => 'stand-in', 'month' => $month, 'status' => $status]) }}" 
-               class="flex-1 px-6 py-4 text-center font-medium transition-colors {{ $tab === 'stand-in' ? 'text-[#4B51FF] border-b-2 border-[#4B51FF] bg-[#4B51FF]/5' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300' }}">
+               class="flex-1 px-6 py-4 text-center font-medium transition-colors {{ $tab === 'stand-in' ? 'text-[#7978E9] border-b-2 border-[#7978E9] bg-[#7978E9]/5' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300' }}">
                 <div class="flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
@@ -73,12 +73,12 @@
                 <div class="flex items-center gap-2">
                     <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Month:</label>
                     <input type="month" name="month" value="{{ $month }}" 
-                           class="px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                           class="px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                 </div>
                 
                 <div class="flex items-center gap-2">
                     <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Status:</label>
-                    <select name="status" class="px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                    <select name="status" class="px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                         <option value="">All Status</option>
                         <option value="pending" {{ $status === 'pending' ? 'selected' : '' }}>Pending</option>
                         <option value="approved" {{ $status === 'approved' ? 'selected' : '' }}>Approved</option>
@@ -86,7 +86,7 @@
                     </select>
                 </div>
                 
-                <button type="submit" class="px-4 py-2 bg-[#4B51FF] text-white text-sm font-medium rounded-lg hover:bg-[#3D43E0] transition-colors">
+                <button type="submit" class="px-4 py-2 bg-[#7978E9] text-white text-sm font-medium rounded-lg hover:bg-[#3D43E0] transition-colors">
                     Filter
                 </button>
                 
@@ -126,14 +126,14 @@
                         @endif
                     </p>
                     @if($tab === 'stand-in')
-                        <a href="{{ route('tutor.attendance.create', ['standin' => 1]) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#4B51FF] to-[#22D3EE] text-white font-medium rounded-lg hover:opacity-90 transition-all">
+                        <a href="{{ route('tutor.attendance.create', ['standin' => 1]) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#7978E9] to-[#98BDFF] text-white font-medium rounded-lg hover:opacity-90 transition-all">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
                             Submit Stand-in Attendance
                         </a>
                     @else
-                        <a href="{{ route('tutor.attendance.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white font-medium rounded-lg hover:opacity-90 transition-all">
+                        <a href="{{ route('tutor.attendance.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-medium rounded-lg hover:opacity-90 transition-all">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
@@ -145,11 +145,11 @@
                 <div class="space-y-3">
                     @foreach($attendanceRecords as $attendance)
                         <a href="{{ route('tutor.attendance.show', $attendance) }}" 
-                           class="block p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-[#4B51FF]/20">
+                           class="block p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-[#7978E9]/20">
                             <div class="flex items-start justify-between gap-4">
                                 <div class="flex items-start gap-4">
                                     <!-- Student Avatar -->
-                                    <div class="w-12 h-12 bg-gradient-to-br from-[#4B51FF] to-[#22D3EE] rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-[#7978E9] to-[#98BDFF] rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                                         {{ strtoupper(substr($attendance->student->first_name, 0, 1)) }}{{ strtoupper(substr($attendance->student->last_name, 0, 1)) }}
                                     </div>
                                     <div>
@@ -217,13 +217,13 @@
 
     <!-- Quick Actions -->
     <div class="flex flex-wrap gap-4">
-        <a href="{{ route('tutor.attendance.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg">
+        <a href="{{ route('tutor.attendance.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             My Students
         </a>
-        <a href="{{ route('tutor.attendance.create', ['standin' => 1]) }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#4B51FF] to-[#22D3EE] text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg">
+        <a href="{{ route('tutor.attendance.create', ['standin' => 1]) }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#7978E9] to-[#98BDFF] text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
             </svg>

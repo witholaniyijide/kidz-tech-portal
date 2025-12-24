@@ -3,7 +3,7 @@
     <!-- Page Header -->
     <div class="mb-6">
         <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-2">
-            <a href="{{ route('tutor.reports.index') }}" class="hover:text-[#4B51FF]">Reports</a>
+            <a href="{{ route('tutor.reports.index') }}" class="hover:text-[#7978E9]">Reports</a>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             <span>{{ $report->student->first_name }} {{ $report->student->last_name }}</span>
         </div>
@@ -38,7 +38,7 @@
                 @if($report->status === 'draft')
                     <form action="{{ route('tutor.reports.submit', $report) }}" method="POST" onsubmit="return confirm('Submit for review?')">
                         @csrf
-                        <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white font-semibold rounded-xl hover:opacity-90 transition-all">
+                        <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-semibold rounded-xl hover:opacity-90 transition-all">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             Submit
                         </button>
@@ -55,12 +55,12 @@
             @if($report->courses && count($report->courses) > 0)
             <div class="glass-card rounded-2xl p-6">
                 <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-[#4B51FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    <svg class="w-5 h-5 text-[#7978E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                     Courses ({{ count($report->courses) }})
                 </h2>
                 <div class="flex flex-wrap gap-2">
                     @foreach($report->courses as $course)
-                        <span class="px-3 py-1.5 bg-[#4B51FF]/10 text-[#4B51FF] dark:text-[#22D3EE] rounded-full text-sm font-medium">{{ $course }}</span>
+                        <span class="px-3 py-1.5 bg-[#7978E9]/10 text-[#7978E9] dark:text-[#98BDFF] rounded-full text-sm font-medium">{{ $course }}</span>
                     @endforeach
                 </div>
             </div>
@@ -109,7 +109,7 @@
                         <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                             <span class="font-medium text-slate-900 dark:text-white">{{ $project['title'] }}</span>
                             @if(!empty($project['link']))
-                                <a href="{{ $project['link'] }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-[#4B51FF] hover:underline">
+                                <a href="{{ $project['link'] }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-[#7978E9] hover:underline">
                                     View
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 </a>
@@ -175,7 +175,7 @@
                 <div class="space-y-4">
                     @foreach($report->comments as $comment)
                         <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border-l-4 
-                            @if($comment->user_id === auth()->id()) border-[#4B51FF]
+                            @if($comment->user_id === auth()->id()) border-[#7978E9]
                             @else border-emerald-500 @endif">
                             <div class="flex items-center justify-between mb-2">
                                 <div class="flex items-center gap-2">

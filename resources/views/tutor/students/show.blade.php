@@ -11,7 +11,7 @@
                 </p>
             </div>
             <a href="{{ route('tutor.reports.create', ['student_id' => $student->id]) }}"
-                class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all font-medium">
+                class="px-6 py-3 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all font-medium">
                 Create Report
             </a>
         </div>
@@ -58,7 +58,7 @@
                                 <p class="text-sm text-gray-600 dark:text-gray-400 capitalize">Status: {{ $report->status }}</p>
                             </div>
                             <a href="{{ route('tutor.reports.show', $report) }}"
-                                class="text-purple-600 dark:text-purple-400 hover:underline text-sm">
+                                class="text-[#4B49AC] dark:text-[#98BDFF] hover:underline text-sm">
                                 View
                             </a>
                         </div>

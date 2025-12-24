@@ -58,7 +58,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Attendance Details -->
         <div class="lg:col-span-2 glass-card rounded-2xl shadow-lg overflow-hidden">
-            <div class="px-6 py-4 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF]">
+            <div class="px-6 py-4 bg-gradient-to-r from-[#4B49AC] to-[#7978E9]">
                 <h2 class="text-lg font-semibold text-white flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
@@ -69,7 +69,7 @@
             <div class="p-6 space-y-6">
                 <!-- Student Info -->
                 <div class="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                    <div class="w-14 h-14 bg-gradient-to-br from-[#4B51FF] to-[#22D3EE] rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    <div class="w-14 h-14 bg-gradient-to-br from-[#7978E9] to-[#98BDFF] rounded-full flex items-center justify-center text-white font-bold text-lg">
                         {{ strtoupper(substr($attendance->student->first_name, 0, 1)) }}{{ strtoupper(substr($attendance->student->last_name, 0, 1)) }}
                     </div>
                     <div>
@@ -204,7 +204,7 @@
                 </div>
                 <div class="p-4 space-y-4">
                     <div class="flex items-start gap-3">
-                        <div class="w-2 h-2 bg-[#4B51FF] rounded-full mt-2"></div>
+                        <div class="w-2 h-2 bg-[#7978E9] rounded-full mt-2"></div>
                         <div>
                             <p class="text-sm font-medium text-slate-900 dark:text-white">Submitted</p>
                             <p class="text-xs text-slate-500">{{ $attendance->created_at->format('M d, Y g:i A') }}</p>
@@ -243,7 +243,7 @@
             </svg>
             Back to History
         </a>
-        <a href="{{ route('tutor.attendance.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg">
+        <a href="{{ route('tutor.attendance.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>

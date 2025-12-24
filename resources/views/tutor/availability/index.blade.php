@@ -6,7 +6,7 @@
             <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Availability</h1>
             <p class="text-slate-600 dark:text-slate-400 mt-1">Set when you're available for classes</p>
         </div>
-        <button @click="showAddModal = true" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+        <button @click="showAddModal = true" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
@@ -18,7 +18,7 @@
     <div class="glass-card rounded-2xl shadow-lg overflow-hidden">
         <div class="flex border-b border-slate-200 dark:border-slate-700">
             <a href="{{ route('tutor.availability.index', ['tab' => 'weekly']) }}" 
-               class="flex-1 px-6 py-4 text-center font-medium transition-colors {{ $tab === 'weekly' ? 'text-[#4B51FF] border-b-2 border-[#4B51FF] bg-[#4B51FF]/5' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400' }}">
+               class="flex-1 px-6 py-4 text-center font-medium transition-colors {{ $tab === 'weekly' ? 'text-[#7978E9] border-b-2 border-[#7978E9] bg-[#7978E9]/5' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400' }}">
                 <div class="flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -27,7 +27,7 @@
                 </div>
             </a>
             <a href="{{ route('tutor.availability.index', ['tab' => 'date-specific']) }}" 
-               class="flex-1 px-6 py-4 text-center font-medium transition-colors {{ $tab === 'date-specific' ? 'text-[#4B51FF] border-b-2 border-[#4B51FF] bg-[#4B51FF]/5' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400' }}">
+               class="flex-1 px-6 py-4 text-center font-medium transition-colors {{ $tab === 'date-specific' ? 'text-[#7978E9] border-b-2 border-[#7978E9] bg-[#7978E9]/5' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400' }}">
                 <div class="flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -43,7 +43,7 @@
                 <!-- Weekly Hours Section -->
                 <div class="mb-6">
                     <div class="flex items-center gap-2 mb-2">
-                        <svg class="w-5 h-5 text-[#4B51FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-[#7978E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
                         <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Weekly hours</h2>
@@ -69,7 +69,7 @@
                         <div class="flex items-start gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0">
                             <!-- Day Circle -->
                             <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0
-                                {{ $hasAvailable ? 'bg-[#1D2A6D] text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400' }}">
+                                {{ $hasAvailable ? 'bg-[#4B49AC] text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400' }}">
                                 {{ $dayAbbr[$index] }}
                             </div>
 
@@ -78,7 +78,7 @@
                                 @if($isUnavailable)
                                     <div class="flex items-center gap-3">
                                         <span class="text-slate-500 dark:text-slate-400">Unavailable</span>
-                                        <button @click="addSlotForDay('{{ $day }}')" class="p-1 text-slate-400 hover:text-[#4B51FF] transition-colors" title="Add available hours">
+                                        <button @click="addSlotForDay('{{ $day }}')" class="p-1 text-slate-400 hover:text-[#7978E9] transition-colors" title="Add available hours">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                                             </svg>
@@ -87,7 +87,7 @@
                                 @elseif($daySlots->isEmpty())
                                     <div class="flex items-center gap-3">
                                         <span class="text-slate-500 dark:text-slate-400">Unavailable</span>
-                                        <button @click="addSlotForDay('{{ $day }}')" class="p-1 text-slate-400 hover:text-[#4B51FF] transition-colors" title="Add available hours">
+                                        <button @click="addSlotForDay('{{ $day }}')" class="p-1 text-slate-400 hover:text-[#7978E9] transition-colors" title="Add available hours">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                                             </svg>
@@ -123,14 +123,14 @@
                                                         </form>
                                                         
                                                         <!-- Add Another -->
-                                                        <button @click="addSlotForDay('{{ $day }}')" class="p-1.5 text-slate-400 hover:text-[#4B51FF] transition-colors" title="Add another slot">
+                                                        <button @click="addSlotForDay('{{ $day }}')" class="p-1.5 text-slate-400 hover:text-[#7978E9] transition-colors" title="Add another slot">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                                                             </svg>
                                                         </button>
                                                         
                                                         <!-- Duplicate to another day -->
-                                                        <button @click="openDuplicateModal({{ $slot->id }}, '{{ $day }}')" class="p-1.5 text-slate-400 hover:text-[#4B51FF] transition-colors" title="Copy to another day">
+                                                        <button @click="openDuplicateModal({{ $slot->id }}, '{{ $day }}')" class="p-1.5 text-slate-400 hover:text-[#7978E9] transition-colors" title="Copy to another day">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                                             </svg>
@@ -179,7 +179,7 @@
                     <form action="{{ route('tutor.availability.updateTimezone') }}" method="POST" class="flex items-center gap-3">
                         @csrf
                         <label class="text-sm text-slate-500 dark:text-slate-400">Timezone:</label>
-                        <select name="timezone" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                        <select name="timezone" onchange="this.form.submit()" class="px-3 py-1.5 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                             <option value="Africa/Lagos" {{ $timezone === 'Africa/Lagos' ? 'selected' : '' }}>West Africa Time (WAT)</option>
                             <option value="Africa/Johannesburg" {{ $timezone === 'Africa/Johannesburg' ? 'selected' : '' }}>South Africa Time (SAST)</option>
                             <option value="Europe/London" {{ $timezone === 'Europe/London' ? 'selected' : '' }}>London (GMT/BST)</option>
@@ -195,7 +195,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <div class="flex items-center gap-2 mb-2">
-                                <svg class="w-5 h-5 text-[#4B51FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-[#7978E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
                                 <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Date-specific hours</h2>
@@ -230,7 +230,7 @@
                             <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-[#4B51FF] text-white rounded-lg flex flex-col items-center justify-center">
+                                        <div class="w-10 h-10 bg-[#7978E9] text-white rounded-lg flex flex-col items-center justify-center">
                                             <span class="text-xs font-medium">{{ $dateObj->format('M') }}</span>
                                             <span class="text-sm font-bold leading-none">{{ $dateObj->format('d') }}</span>
                                         </div>
@@ -274,7 +274,7 @@
         <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Legend</h3>
         <div class="flex flex-wrap gap-4 text-sm">
             <div class="flex items-center gap-2">
-                <span class="w-3 h-3 bg-[#1D2A6D] rounded-full"></span>
+                <span class="w-3 h-3 bg-[#4B49AC] rounded-full"></span>
                 <span class="text-slate-600 dark:text-slate-400">Available day</span>
             </div>
             <div class="flex items-center gap-2">
@@ -308,11 +308,11 @@
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Type</label>
                             <div class="flex gap-4">
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="type" value="available" checked class="w-4 h-4 text-[#4B51FF]">
+                                    <input type="radio" name="type" value="available" checked class="w-4 h-4 text-[#7978E9]">
                                     <span class="text-sm text-slate-700 dark:text-slate-300">Available</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="type" value="unavailable" class="w-4 h-4 text-[#4B51FF]">
+                                    <input type="radio" name="type" value="unavailable" class="w-4 h-4 text-[#7978E9]">
                                     <span class="text-sm text-slate-700 dark:text-slate-300">Unavailable</span>
                                 </label>
                             </div>
@@ -321,7 +321,7 @@
                         <!-- Day / Date -->
                         <div x-show="!isDateSpecific">
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Day</label>
-                            <select name="day" x-model="selectedDay" class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                            <select name="day" x-model="selectedDay" class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                                 <option value="">Select a day</option>
                                 <option value="Sunday">Sunday</option>
                                 <option value="Monday">Monday</option>
@@ -335,18 +335,18 @@
 
                         <div x-show="isDateSpecific">
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Specific Date</label>
-                            <input type="date" name="specific_date" min="{{ date('Y-m-d') }}" class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                            <input type="date" name="specific_date" min="{{ date('Y-m-d') }}" class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                         </div>
 
                         <!-- Time Range -->
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Start Time</label>
-                                <input type="time" name="start_time" required class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                                <input type="time" name="start_time" required class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">End Time</label>
-                                <input type="time" name="end_time" required class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                                <input type="time" name="end_time" required class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                             </div>
                         </div>
 
@@ -364,7 +364,7 @@
                         <!-- Notes -->
                         <div>
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Notes (optional)</label>
-                            <input type="text" name="notes" placeholder="e.g., Only for advanced students" class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                            <input type="text" name="notes" placeholder="e.g., Only for advanced students" class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                         </div>
                     </div>
 
@@ -372,7 +372,7 @@
                         <button type="button" @click="showAddModal = false; isDateSpecific = false" class="px-4 py-2 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium">
                             Cancel
                         </button>
-                        <button type="submit" class="px-6 py-2 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white font-semibold rounded-xl hover:opacity-90 transition-all">
+                        <button type="submit" class="px-6 py-2 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-semibold rounded-xl hover:opacity-90 transition-all">
                             Add Hours
                         </button>
                     </div>
@@ -397,7 +397,7 @@
                     </select>
                     <div class="flex justify-end gap-3">
                         <button type="button" @click="showDuplicateModal = false" class="px-4 py-2 text-slate-600 dark:text-slate-400">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-[#4B51FF] text-white rounded-xl">Copy</button>
+                        <button type="submit" class="px-4 py-2 bg-[#7978E9] text-white rounded-xl">Copy</button>
                     </div>
                 </form>
             </div>

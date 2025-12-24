@@ -29,14 +29,14 @@
                            name="search"
                            value="{{ request('search') }}"
                            placeholder="Search notices..."
-                           class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF] focus:border-transparent">
+                           class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                 </div>
             </div>
 
             <!-- Priority Filter -->
             <div class="flex items-center gap-2">
                 <label for="priority" class="text-sm font-medium text-slate-700 dark:text-slate-300">Priority:</label>
-                <select id="priority" name="priority" onchange="this.form.submit()" class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#4B51FF]">
+                <select id="priority" name="priority" onchange="this.form.submit()" class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9]">
                     <option value="">All</option>
                     <option value="urgent" {{ request('priority') == 'urgent' ? 'selected' : '' }}>Urgent</option>
                     <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>High</option>
@@ -45,12 +45,12 @@
                 </select>
             </div>
 
-            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-[#1D2A6D] to-[#4B51FF] text-white rounded-xl hover:opacity-90 transition-opacity">
+            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white rounded-xl hover:opacity-90 transition-opacity">
                 Search
             </button>
 
             @if(request('search') || request('priority'))
-                <a href="{{ route('tutor.notices.index') }}" class="text-sm text-slate-500 hover:text-[#4B51FF]">Clear filters</a>
+                <a href="{{ route('tutor.notices.index') }}" class="text-sm text-slate-500 hover:text-[#7978E9]">Clear filters</a>
             @endif
         </form>
     </div>
@@ -82,7 +82,7 @@
                     $isRead = in_array($notice->id, $readNoticeIds);
                 @endphp
                 <a href="{{ route('tutor.notices.show', $notice) }}"
-                   class="block glass-card rounded-xl p-5 hover:shadow-lg transition-all group {{ !$isRead ? 'border-l-4 border-[#4B51FF]' : '' }}">
+                   class="block glass-card rounded-xl p-5 hover:shadow-lg transition-all group {{ !$isRead ? 'border-l-4 border-[#7978E9]' : '' }}">
                     <div class="flex items-start gap-4">
                         <!-- Priority Indicator -->
                         <div class="flex-shrink-0">
@@ -99,7 +99,7 @@
                                     </svg>
                                 </div>
                             @elseif($notice->priority === 'normal')
-                                <div class="w-12 h-12 bg-gradient-to-br from-[#1D2A6D] to-[#4B51FF] rounded-xl flex items-center justify-center shadow-lg">
+                                <div class="w-12 h-12 bg-gradient-to-br from-[#4B49AC] to-[#7978E9] rounded-xl flex items-center justify-center shadow-lg">
                                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
@@ -125,11 +125,11 @@
 
                                 <!-- Unread Badge -->
                                 @if(!$isRead)
-                                    <span class="px-2 py-0.5 text-xs font-semibold bg-[#4B51FF]/10 text-[#4B51FF] dark:bg-[#4B51FF]/20 rounded">New</span>
+                                    <span class="px-2 py-0.5 text-xs font-semibold bg-[#7978E9]/10 text-[#7978E9] dark:bg-[#7978E9]/20 rounded">New</span>
                                 @endif
 
                                 <!-- Title -->
-                                <h3 class="font-semibold text-slate-900 dark:text-white group-hover:text-[#4B51FF] transition-colors truncate">
+                                <h3 class="font-semibold text-slate-900 dark:text-white group-hover:text-[#7978E9] transition-colors truncate">
                                     {{ $notice->title }}
                                 </h3>
                             </div>
@@ -166,7 +166,7 @@
 
                         <!-- Arrow -->
                         <div class="flex-shrink-0 self-center">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-[#4B51FF] group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-[#7978E9] group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </div>

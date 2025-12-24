@@ -24,11 +24,11 @@
                         <img id="profile_photo_preview"
                             src="{{ $tutor->profile_photo ? asset('storage/' . $tutor->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($tutor->fullName()) . '&size=128&background=8B5CF6&color=fff' }}"
                             alt="Profile photo"
-                            class="w-32 h-32 rounded-full object-cover border-4 border-purple-500">
+                            class="w-32 h-32 rounded-full object-cover border-4 border-[#4B49AC]">
                     </div>
                     <div class="flex-1">
                         <input type="file" id="profile_photo" name="profile_photo" accept="image/*"
-                            class="block w-full text-sm text-gray-900 dark:text-white bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            class="block w-full text-sm text-gray-900 dark:text-white bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4B49AC]">
                         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">JPG, JPEG, PNG or WEBP. Max 2MB.</p>
                         @error('profile_photo')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -44,7 +44,7 @@
                         First Name <span class="text-red-500">*</span>
                     </label>
                     <input type="text" id="first_name" name="first_name" value="{{ old('first_name', $tutor->first_name) }}" required
-                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent">
                     @error('first_name')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
@@ -55,7 +55,7 @@
                         Last Name <span class="text-red-500">*</span>
                     </label>
                     <input type="text" id="last_name" name="last_name" value="{{ old('last_name', $tutor->last_name) }}" required
-                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent">
                     @error('last_name')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
@@ -69,7 +69,7 @@
                         Email <span class="text-red-500">*</span>
                     </label>
                     <input type="email" id="email" name="email" value="{{ old('email', $tutor->email) }}" required
-                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent">
                     @error('email')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
@@ -80,7 +80,7 @@
                         Phone <span class="text-red-500">*</span>
                     </label>
                     <input type="text" id="phone" name="phone" value="{{ old('phone', $tutor->phone) }}" required
-                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent">
                     @error('phone')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
@@ -94,7 +94,7 @@
                         Date of Birth
                     </label>
                     <input type="date" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', $tutor->date_of_birth?->format('Y-m-d')) }}"
-                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent">
                     @error('date_of_birth')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
@@ -105,7 +105,7 @@
                         Gender
                     </label>
                     <select id="gender" name="gender"
-                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent">
                         <option value="">Select gender</option>
                         <option value="male" {{ old('gender', $tutor->gender) === 'male' ? 'selected' : '' }}>Male</option>
                         <option value="female" {{ old('gender', $tutor->gender) === 'female' ? 'selected' : '' }}>Female</option>
@@ -124,7 +124,7 @@
                         State
                     </label>
                     <input type="text" id="state" name="state" value="{{ old('state', $tutor->state) }}"
-                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent">
                     @error('state')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
@@ -135,7 +135,7 @@
                         Location
                     </label>
                     <input type="text" id="location" name="location" value="{{ old('location', $tutor->location) }}"
-                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent">
                     @error('location')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
@@ -148,7 +148,7 @@
                     Address
                 </label>
                 <textarea id="address" name="address" rows="2"
-                    class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">{{ old('address', $tutor->address) }}</textarea>
+                    class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent">{{ old('address', $tutor->address) }}</textarea>
                 @error('address')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -160,7 +160,7 @@
                     Occupation
                 </label>
                 <input type="text" id="occupation" name="occupation" value="{{ old('occupation', $tutor->occupation) }}"
-                    class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent">
                 @error('occupation')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -172,7 +172,7 @@
                     Bio
                 </label>
                 <textarea id="bio" name="bio" rows="4" maxlength="2000"
-                    class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4B49AC] focus:border-transparent"
                     placeholder="Tell us about yourself...">{{ old('bio', $tutor->bio) }}</textarea>
                 @error('bio')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -186,7 +186,7 @@
                     Cancel
                 </a>
                 <button type="submit"
-                    class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all font-medium">
+                    class="px-6 py-3 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all font-medium">
                     Save Changes
                 </button>
             </div>
