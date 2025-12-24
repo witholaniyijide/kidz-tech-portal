@@ -100,7 +100,7 @@
             @if($report->projects && count($report->projects) > 0)
             <div class="glass-card rounded-2xl p-6">
                 <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    <svg class="w-5 h-5 text-[#7978E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                     Projects Completed ({{ count($report->projects) }})
                 </h2>
                 <div class="space-y-3">
@@ -147,7 +147,7 @@
             @if($report->assignments)
             <div class="glass-card rounded-2xl p-6">
                 <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <svg class="w-5 h-5 text-[#4B49AC]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                     Assignments Given
                 </h2>
                 <p class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{{ $report->assignments }}</p>
@@ -266,10 +266,10 @@
                     @endif
                     @if($report->imported_from_artifact)
                     <div class="flex items-center gap-3">
-                        <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <div class="w-2 h-2 bg-[#7978E9] rounded-full"></div>
                         <div>
                             <p class="text-slate-500 dark:text-slate-400">Source</p>
-                            <p class="font-medium text-purple-600 dark:text-purple-400">Imported from Artifact</p>
+                            <p class="font-medium text-[#7978E9] dark:text-[#98BDFF]">Imported from Artifact</p>
                         </div>
                     </div>
                     @endif
