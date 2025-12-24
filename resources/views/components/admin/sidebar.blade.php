@@ -1,5 +1,6 @@
 @props(['user' => null])
 
+{{-- Admin Purple Theme: #423A8E (Primary) with Accent: #00CCCD (Teal) / Supporting: #FFC107, #DC3545, #198754, #0D6EFD --}}
 <aside x-data="{
     collapsed: localStorage.getItem('adminSidebarCollapsed') === 'true',
     darkMode: localStorage.getItem('darkMode') !== null ? localStorage.getItem('darkMode') === 'true' : window.matchMedia('(prefers-color-scheme: dark)').matches,
