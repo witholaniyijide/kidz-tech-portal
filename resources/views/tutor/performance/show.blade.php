@@ -72,7 +72,7 @@
                             <span class="text-sm font-semibold text-slate-900 dark:text-white">{{ $assessment->professionalism_rating ?? '-' }}/10</span>
                         </div>
                         <div class="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                            <div class="h-full bg-purple-500 rounded-full transition-all duration-500" style="width: {{ ($assessment->professionalism_rating ?? 0) * 10 }}%"></div>
+                            <div class="h-full bg-[#7978E9] rounded-full transition-all duration-500" style="width: {{ ($assessment->professionalism_rating ?? 0) * 10 }}%"></div>
                         </div>
                     </div>
 
