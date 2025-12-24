@@ -194,11 +194,17 @@
                                             </div>
 
                                             {{-- Class Schedule --}}
-                                            @if($student->class_schedule && count($student->class_schedule) > 0)
+                                            @php
+                                                $studentSchedule = $student->class_schedule;
+                                                if (is_string($studentSchedule)) {
+                                                    $studentSchedule = json_decode($studentSchedule, true) ?? [];
+                                                }
+                                            @endphp
+                                            @if($studentSchedule && is_array($studentSchedule) && count($studentSchedule) > 0)
                                                 <div class="mb-3">
                                                     <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Schedule</div>
                                                     <div class="flex flex-wrap gap-1">
-                                                        @foreach($student->class_schedule as $schedule)
+                                                        @foreach($studentSchedule as $schedule)
                                                             @if(isset($schedule['day']) && isset($schedule['time']))
                                                                 <span class="inline-flex items-center px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs">
                                                                     {{ ucfirst($schedule['day']) }} @ {{ $schedule['time'] }}
