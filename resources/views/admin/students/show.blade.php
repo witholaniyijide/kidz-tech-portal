@@ -134,11 +134,17 @@
                     </div>
 
                     {{-- Class Schedule --}}
-                    @if($student->class_schedule && count($student->class_schedule) > 0)
+                    @php
+                        $classSchedule = $student->class_schedule;
+                        if (is_string($classSchedule)) {
+                            $classSchedule = json_decode($classSchedule, true) ?? [];
+                        }
+                    @endphp
+                    @if($classSchedule && is_array($classSchedule) && count($classSchedule) > 0)
                         <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Class Schedule</label>
                             <div class="flex flex-wrap gap-2">
-                                @foreach($student->class_schedule as $schedule)
+                                @foreach($classSchedule as $schedule)
                                     @if(isset($schedule['day']) && isset($schedule['time']))
                                         <span class="inline-flex items-center px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm">
                                             <span class="font-medium">{{ ucfirst($schedule['day']) }}</span>
