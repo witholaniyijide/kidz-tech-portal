@@ -109,11 +109,14 @@ class AdminTutorController extends Controller
 
             $tutor = Tutor::create($validated);
 
+            // Generate secure random password
+            $tempPassword = \Illuminate\Support\Str::random(12);
+
             // Create associated user account
             $user = User::create([
                 'name' => $validated['first_name'] . ' ' . $validated['last_name'],
                 'email' => $validated['email'],
-                'password' => Hash::make('password123'), // Default password
+                'password' => Hash::make($tempPassword),
                 'role' => 'tutor',
             ]);
 
@@ -127,11 +130,14 @@ class AdminTutorController extends Controller
                 'model_type' => Tutor::class,
                 'model_id' => $tutor->id,
             ]);
+
+            // Store temp password for flash message
+            session()->flash('temp_password', $tempPassword);
         });
 
         return redirect()
             ->route('admin.tutors.index')
-            ->with('success', 'Tutor created successfully. Default password: password123');
+            ->with('success', 'Tutor created successfully. Temporary password: ' . session('temp_password') . ' - Please share securely and advise them to change it immediately.');
     }
 
     /**
