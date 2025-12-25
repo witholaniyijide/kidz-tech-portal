@@ -18,9 +18,9 @@ class DirectorFinanceController extends Controller
     {
         $query = Payment::query();
 
-        // Filter by search
+        // Filter by search - sanitize to prevent SQL injection
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = str_replace(['%', '_'], ['\%', '\_'], $request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('description', 'like', "%{$search}%")
                   ->orWhere('reference_number', 'like', "%{$search}%");

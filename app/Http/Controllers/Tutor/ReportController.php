@@ -411,12 +411,14 @@ class ReportController extends Controller
                 ], 400);
             }
 
-            // Find student by name (partial match)
+            // Find student by name (partial match) - sanitize input to prevent SQL injection
             $studentName = trim($data['studentName']);
+            // Escape special SQL LIKE characters
+            $sanitizedName = str_replace(['%', '_'], ['\%', '\_'], $studentName);
             $student = $tutor->students()
-                ->where(function($q) use ($studentName) {
-                    $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$studentName}%"])
-                      ->orWhere('first_name', 'LIKE', "%{$studentName}%");
+                ->where(function($q) use ($sanitizedName) {
+                    $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$sanitizedName}%"])
+                      ->orWhere('first_name', 'LIKE', "%{$sanitizedName}%");
                 })
                 ->first();
 

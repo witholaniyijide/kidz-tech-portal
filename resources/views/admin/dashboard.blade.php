@@ -382,7 +382,7 @@
                                                 <span class="px-2 py-0.5 text-xs font-semibold bg-amber-100 text-amber-700 rounded-full">High</span>
                                             @endif
                                         </div>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{{ Str::limit($notice->content, 100) }}</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{{ Str::limit(strip_tags($notice->content), 100) }}</p>
                                         <p class="text-xs text-gray-500 mt-2">{{ $notice->created_at->diffForHumans() }}</p>
                                     </div>
                                 @endforeach
