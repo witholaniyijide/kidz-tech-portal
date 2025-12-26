@@ -881,17 +881,281 @@
     }
 }
 
-/* === DARK MODE SPECIFIC EFFECTS === */
+/* === COMPREHENSIVE DARK MODE THEME === */
+
+/* Deep Dark Mode Color Variables */
+:root {
+    --dark-bg-primary: #0f172a;
+    --dark-bg-secondary: #1e293b;
+    --dark-bg-tertiary: #334155;
+    --dark-bg-card: #1e293b;
+    --dark-bg-hover: #334155;
+    --dark-border: #475569;
+    --dark-text-primary: #f8fafc;
+    --dark-text-secondary: #cbd5e1;
+    --dark-text-muted: #94a3b8;
+    --dark-accent-glow: rgba(0, 204, 205, 0.15);
+}
+
+/* Dark Mode Base Styles */
+.dark {
+    color-scheme: dark;
+}
+
+.dark body {
+    background-color: var(--dark-bg-primary);
+    color: var(--dark-text-primary);
+}
+
+/* Dark Mode Smooth Transition for All Elements */
+*, *::before, *::after {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Glass Effects */
+.dark .glass-card {
+    background: rgba(30, 41, 59, 0.85);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+}
+
+.dark .glass-card-hover:hover {
+    background: rgba(51, 65, 85, 0.95);
+    transform: translateY(-6px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Dark Mode Card Glow Effects */
+.dark .card-glow:hover {
+    box-shadow:
+        0 0 30px rgba(0, 204, 205, 0.25),
+        0 0 60px rgba(66, 58, 142, 0.15),
+        0 10px 30px -10px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark Mode Stat Cards */
+.dark .stat-card {
+    background: linear-gradient(135deg, var(--dark-bg-secondary) 0%, var(--dark-bg-tertiary) 100%);
+    border: 1px solid var(--dark-border);
+}
+
+.dark .stat-card:hover {
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4), 0 0 20px var(--dark-accent-glow);
+}
+
+.dark .stat-card::before {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+}
+
+/* Dark Mode Input Styling */
+.dark .input-glow:focus {
+    border-color: #00CCCD;
+    box-shadow:
+        0 0 0 3px rgba(0, 204, 205, 0.2),
+        0 0 20px rgba(0, 204, 205, 0.1);
+}
+
+/* Dark Mode Table Styling */
+.dark .table-row-hover:hover {
+    background-color: rgba(51, 65, 85, 0.5);
+}
+
+/* Dark Mode Button Enhancements */
+.dark .btn-shine::before {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.dark .btn-pulse:hover {
+    animation: button-pulse-dark 1s infinite;
+}
+
+@keyframes button-pulse-dark {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 204, 205, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 15px rgba(0, 204, 205, 0);
+    }
+}
+
+/* Dark Mode Skeleton Loading */
+.dark .skeleton-loading {
+    background: linear-gradient(
+        90deg,
+        var(--dark-bg-tertiary) 25%,
+        var(--dark-bg-secondary) 50%,
+        var(--dark-bg-tertiary) 75%
+    );
+    background-size: 200% 100%;
+}
+
+/* Dark Mode Sidebar Enhancement */
+.dark .sidebar-item-hover:hover {
+    background: linear-gradient(90deg, rgba(0, 204, 205, 0.1), transparent);
+    border-left-color: #00CCCD;
+}
+
+/* Dark Mode Navigation */
+.dark .nav-link-hover::after {
+    background: linear-gradient(90deg, #00CCCD, #6366F1);
+}
+
+/* Dark Mode Text Effects */
+.dark .text-underline-animate::after {
+    background: linear-gradient(90deg, #00CCCD, #6366F1);
+}
+
+.dark .text-glow-hover:hover {
+    text-shadow:
+        0 0 10px rgba(0, 204, 205, 0.5),
+        0 0 20px rgba(99, 102, 241, 0.3),
+        0 0 30px rgba(0, 204, 205, 0.2);
+}
+
+/* Dark Mode List Items */
+.dark .list-item-slide::before {
+    background: linear-gradient(180deg, #00CCCD, #6366F1);
+}
+
+.dark .list-item-slide:hover {
+    background-color: rgba(51, 65, 85, 0.3);
+}
+
+/* Dark Mode Badges */
+.dark .badge-glow:hover {
+    box-shadow: 0 0 15px currentColor, 0 0 30px rgba(0, 204, 205, 0.2);
+}
+
+/* Dark Mode Overlays */
+.dark .img-overlay-reveal::before {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9));
+}
+
+/* Dark Mode Avatar */
+.dark .avatar-hover:hover {
+    border-color: #00CCCD;
+    box-shadow: 0 0 25px rgba(0, 204, 205, 0.4);
+}
+
+/* Dark Mode Progress Bars */
+.dark .progress-shimmer::after {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+/* === PORTAL-SPECIFIC DARK MODE THEMES === */
+
+/* Director Portal - Blue/Purple Deep Theme */
+.dark .director-card-hover:hover {
+    border-color: #6366F1;
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2), 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+/* Admin Portal - Purple/Teal Deep Theme */
+.dark .admin-card-hover:hover {
+    border-color: #00CCCD;
+    box-shadow: 0 10px 30px rgba(0, 204, 205, 0.2), 0 0 20px rgba(66, 58, 142, 0.15);
+}
+
+/* Manager Portal - Orange/Amber Deep Theme */
+.dark .manager-card-hover:hover {
+    border-color: #F59E0B;
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2), 0 0 20px rgba(245, 158, 11, 0.1);
+}
+
+/* Tutor Portal - Purple Deep Theme */
+.dark .tutor-card-hover:hover {
+    border-color: #7978E9;
+    box-shadow: 0 10px 30px rgba(121, 120, 233, 0.2), 0 0 20px rgba(75, 73, 172, 0.15);
+}
+
+/* Parent Portal - Orange Deep Theme */
+.dark .parent-card-hover:hover {
+    border-color: #F7B74A;
+    box-shadow: 0 10px 30px rgba(247, 183, 74, 0.2), 0 0 20px rgba(245, 166, 35, 0.1);
+}
+
+/* Student Portal - Orange Deep Theme */
+.dark .student-card-hover:hover {
+    border-color: #F7B74A;
+    box-shadow: 0 10px 30px rgba(247, 183, 74, 0.2), 0 0 20px rgba(245, 166, 35, 0.1);
+}
+
+/* === DARK MODE GRADIENT ENHANCEMENTS === */
+
+.dark .gradient-admin-primary {
+    background: linear-gradient(135deg, #5B4FCF 0%, #00B5B5 100%);
+}
+
+.dark .gradient-admin-secondary {
+    background: linear-gradient(135deg, #00B5B5 0%, #3B82F6 100%);
+}
+
+.dark .text-gradient-admin {
+    background: linear-gradient(to right, #7C75E3, #00E5E5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* === DARK MODE SCROLLBAR === */
+
+.dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: var(--dark-bg-secondary);
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: var(--dark-border);
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* === DARK MODE FORM ELEMENTS === */
+
+.dark input, .dark textarea, .dark select {
+    background-color: var(--dark-bg-secondary);
+    border-color: var(--dark-border);
+    color: var(--dark-text-primary);
+}
+
+.dark input:focus, .dark textarea:focus, .dark select:focus {
+    border-color: #00CCCD;
+    box-shadow: 0 0 0 3px rgba(0, 204, 205, 0.15);
+}
+
+.dark input::placeholder, .dark textarea::placeholder {
+    color: var(--dark-text-muted);
+}
+
+/* === DARK MODE NOTIFICATION DOT === */
+
+.dark .notification-dot::after {
+    background: #ef4444;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+/* === LEGACY SUPPORT - Media Query Based Dark Mode === */
 
 @media (prefers-color-scheme: dark) {
     .dark\:glass-card {
-        background: rgba(30, 41, 59, 0.8);
+        background: rgba(30, 41, 59, 0.85);
     }
 
     .dark\:card-glow:hover {
         box-shadow:
-            0 0 30px rgba(0, 204, 205, 0.3),
-            0 0 60px rgba(66, 58, 142, 0.2);
+            0 0 30px rgba(0, 204, 205, 0.25),
+            0 0 60px rgba(66, 58, 142, 0.15);
     }
 }
 
