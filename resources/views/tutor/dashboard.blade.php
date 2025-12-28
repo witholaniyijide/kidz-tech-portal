@@ -152,7 +152,7 @@
         </div>
 
         <!-- Tutor To-Do List -->
-        <div class="glass-card rounded-2xl shadow-lg overflow-hidden">
+        <div class="glass-card rounded-2xl shadow-lg overflow-hidden" x-data="{ showAddTodo: false }">
             <div class="px-6 py-4 bg-gradient-to-r from-[#7978E9] to-[#F3797E]">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -161,9 +161,35 @@
                         </svg>
                         <h2 class="text-lg font-semibold text-white">My To-Do List</h2>
                     </div>
-                    <span class="text-sm text-white/80">{{ now()->format('M j, Y') }}</span>
+                    <button @click="showAddTodo = !showAddTodo" class="flex items-center gap-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm rounded-lg transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Add
+                    </button>
                 </div>
             </div>
+
+            <!-- Add Todo Form -->
+            <div x-show="showAddTodo" x-collapse class="border-b border-slate-200 dark:border-slate-700 p-4 bg-slate-50 dark:bg-slate-800/50">
+                <form action="{{ route('tutor.todos.store') }}" method="POST" class="space-y-3">
+                    @csrf
+                    <input type="text" name="title" placeholder="What do you need to do?" required
+                        class="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-lg focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                    <div class="flex items-center gap-2">
+                        <select name="priority" class="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-lg focus:ring-2 focus:ring-[#7978E9]">
+                            <option value="low">Low Priority</option>
+                            <option value="medium" selected>Medium Priority</option>
+                            <option value="high">High Priority</option>
+                        </select>
+                        <input type="date" name="due_date" class="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-lg focus:ring-2 focus:ring-[#7978E9]">
+                        <button type="submit" class="px-4 py-2 bg-[#7978E9] text-white text-sm font-medium rounded-lg hover:bg-[#6968d8] transition-colors">
+                            Add
+                        </button>
+                    </div>
+                </form>
+            </div>
+
             <div class="p-4 max-h-80 overflow-y-auto">
                 <div class="space-y-3">
                     {{-- Pending/Draft Reports to Complete --}}
@@ -247,8 +273,43 @@
                         </a>
                     @endif
 
+                    {{-- Custom Todos --}}
+                    @if(isset($customTodos) && $customTodos->count() > 0)
+                        @foreach($customTodos as $todo)
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl group">
+                                <form action="{{ route('tutor.todos.toggle', $todo) }}" method="POST" class="flex-shrink-0">
+                                    @csrf
+                                    <button type="submit" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors
+                                        @if($todo->priority === 'high') bg-rose-100 dark:bg-rose-900/30 text-rose-500
+                                        @elseif($todo->priority === 'medium') bg-amber-100 dark:bg-amber-900/30 text-amber-500
+                                        @else bg-slate-100 dark:bg-slate-700 text-slate-400
+                                        @endif hover:bg-emerald-100 dark:hover:bg-emerald-900/30 hover:text-emerald-500">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-medium text-slate-800 dark:text-slate-200 text-sm truncate">{{ $todo->title }}</div>
+                                    @if($todo->due_date)
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">Due: {{ $todo->due_date->format('M j, Y') }}</div>
+                                    @endif
+                                </div>
+                                <form action="{{ route('tutor.todos.destroy', $todo) }}" method="POST" class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        @endforeach
+                    @endif
+
                     {{-- All caught up message --}}
-                    @if($pendingReportsCount == 0 && $studentsNeedingReports == 0 && $classesTodayCount == 0)
+                    @if($pendingReportsCount == 0 && $studentsNeedingReports == 0 && $classesTodayCount == 0 && (!isset($customTodos) || $customTodos->count() == 0))
                         <div class="text-center py-6 text-slate-500 dark:text-slate-400">
                             <div class="text-4xl mb-3">🎉</div>
                             <p class="font-medium">All caught up!</p>

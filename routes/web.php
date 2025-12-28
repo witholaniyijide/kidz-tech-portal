@@ -613,6 +613,12 @@ Route::prefix('tutor')
         Route::get('/dashboard', [App\Http\Controllers\Tutor\DashboardController::class, 'index'])
             ->name('dashboard');
 
+        // Tutor Todos
+        Route::post('/todos', [App\Http\Controllers\Tutor\DashboardController::class, 'storeTodo'])->name('todos.store');
+        Route::put('/todos/{todo}', [App\Http\Controllers\Tutor\DashboardController::class, 'updateTodo'])->name('todos.update');
+        Route::post('/todos/{todo}/toggle', [App\Http\Controllers\Tutor\DashboardController::class, 'toggleTodo'])->name('todos.toggle');
+        Route::delete('/todos/{todo}', [App\Http\Controllers\Tutor\DashboardController::class, 'deleteTodo'])->name('todos.destroy');
+
         // Attendance
         Route::get('/attendance', [App\Http\Controllers\Tutor\AttendanceController::class, 'index'])
             ->name('attendance.index');
