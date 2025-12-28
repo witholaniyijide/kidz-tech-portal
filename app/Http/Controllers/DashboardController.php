@@ -435,8 +435,8 @@ class DashboardController extends Controller
     
     private function adminDashboard()
     {
-        // Call the public admin method to get the structured data
-        return $this->admin();
+        // Redirect to the correct admin dashboard
+        return redirect()->route('admin.dashboard');
     }
     
     private function managerDashboard()

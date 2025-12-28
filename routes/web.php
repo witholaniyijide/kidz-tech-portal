@@ -64,6 +64,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Admin To-Do CRUD
+    Route::post('/todos', [App\Http\Controllers\Admin\AdminDashboardController::class, 'storeTodo'])->name('todos.store');
+    Route::put('/todos/{todo}', [App\Http\Controllers\Admin\AdminDashboardController::class, 'updateTodo'])->name('todos.update');
+    Route::post('/todos/{todo}/toggle', [App\Http\Controllers\Admin\AdminDashboardController::class, 'toggleTodo'])->name('todos.toggle');
+    Route::delete('/todos/{todo}', [App\Http\Controllers\Admin\AdminDashboardController::class, 'deleteTodo'])->name('todos.destroy');
     
     // Students (CRUD except delete)
     Route::get('/students', [App\Http\Controllers\Admin\AdminStudentController::class, 'index'])->name('students.index');

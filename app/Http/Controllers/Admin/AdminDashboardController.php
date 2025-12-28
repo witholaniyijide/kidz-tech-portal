@@ -10,8 +10,10 @@ use App\Models\DailyClassSchedule;
 use App\Models\Notice;
 use App\Models\TutorReport;
 use App\Models\ActivityLog;
+use App\Models\AdminTodo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 class AdminDashboardController extends Controller
@@ -96,6 +98,16 @@ class AdminDashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Admin To-Do List (custom user-created todos)
+        $adminTodos = [];
+        if (Schema::hasTable('admin_todos')) {
+            $adminTodos = AdminTodo::where('user_id', Auth::id())
+                ->orderBy('completed')
+                ->orderByRaw("FIELD(priority, 'high', 'medium', 'low')")
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
         return view('admin.dashboard', compact(
             'stats',
             'todayScheduleRecord',
@@ -105,7 +117,8 @@ class AdminDashboardController extends Controller
             'recentActivities',
             'notices',
             'recentStudents',
-            'recentTutors'
+            'recentTutors',
+            'adminTodos'
         ));
     }
 
@@ -181,5 +194,88 @@ class AdminDashboardController extends Controller
         }
 
         return response()->json(['format' => $format]);
+    }
+
+    /**
+     * Store a new admin todo.
+     */
+    public function storeTodo(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
+        ]);
+
+        AdminTodo::create([
+            'user_id' => Auth::id(),
+            'title' => $request->title,
+            'description' => $request->description,
+            'priority' => $request->priority,
+            'due_date' => $request->due_date,
+        ]);
+
+        return redirect()->route('admin.dashboard')->with('success', 'To-do item added successfully!');
+    }
+
+    /**
+     * Update an admin todo.
+     */
+    public function updateTodo(Request $request, AdminTodo $todo)
+    {
+        // Ensure the todo belongs to the current user
+        if ($todo->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $todo->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'priority' => $request->priority,
+            'due_date' => $request->due_date,
+        ]);
+
+        return redirect()->route('admin.dashboard')->with('success', 'To-do item updated successfully!');
+    }
+
+    /**
+     * Toggle todo completion status.
+     */
+    public function toggleTodo(AdminTodo $todo)
+    {
+        // Ensure the todo belongs to the current user
+        if ($todo->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $todo->update([
+            'completed' => !$todo->completed,
+            'completed_at' => !$todo->completed ? now() : null,
+        ]);
+
+        return redirect()->route('admin.dashboard')->with('success', $todo->completed ? 'To-do marked as complete!' : 'To-do marked as incomplete!');
+    }
+
+    /**
+     * Delete an admin todo.
+     */
+    public function deleteTodo(AdminTodo $todo)
+    {
+        // Ensure the todo belongs to the current user
+        if ($todo->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $todo->delete();
+
+        return redirect()->route('admin.dashboard')->with('success', 'To-do item deleted!');
     }
 }

@@ -204,7 +204,7 @@
                 </div>
 
                 {{-- Admin To-Do List --}}
-                <div class="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 rounded-2xl shadow-lg overflow-hidden">
+                <div x-data="{ showAddForm: false, editingTodo: null }" class="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 rounded-2xl shadow-lg overflow-hidden">
                     <div class="p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div class="bg-gradient-to-r from-[#00CCCD] to-[#423A8E] p-2 rounded-lg">
@@ -214,83 +214,189 @@
                             </div>
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white">To-Do List</h3>
                         </div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ now()->format('M j, Y') }}</span>
+                        <button @click="showAddForm = !showAddForm" class="p-2 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white rounded-lg hover:shadow-lg transition-all" title="Add To-Do">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </button>
                     </div>
-                    <div class="p-5 max-h-80 overflow-y-auto">
+
+                    {{-- Add Todo Form --}}
+                    <div x-show="showAddForm" x-transition class="p-4 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600">
+                        <form action="{{ route('admin.todos.store') }}" method="POST" class="space-y-3">
+                            @csrf
+                            <input type="text" name="title" placeholder="What needs to be done?" required class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#423A8E] focus:border-transparent">
+                            <div class="flex gap-2">
+                                <select name="priority" class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#423A8E]">
+                                    <option value="low">Low Priority</option>
+                                    <option value="medium" selected>Medium Priority</option>
+                                    <option value="high">High Priority</option>
+                                </select>
+                                <input type="date" name="due_date" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#423A8E]">
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="submit" class="flex-1 px-4 py-2 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white text-sm font-medium rounded-lg hover:shadow-lg">Add To-Do</button>
+                                <button type="button" @click="showAddForm = false" class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="p-5 max-h-96 overflow-y-auto">
                         <div class="space-y-3">
-                            {{-- Review Pending Attendance --}}
-                            @if(($stats['pendingAttendance'] ?? 0) > 0)
-                                <a href="{{ route('admin.attendance.index', ['status' => 'pending']) }}" class="flex items-center gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors">
-                                    <div class="w-7 h-7 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs">
-                                        ⏳
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="font-medium text-amber-800 dark:text-amber-300 text-sm">Review Attendance</div>
-                                        <div class="text-xs text-amber-600 dark:text-amber-400">{{ $stats['pendingAttendance'] }} pending approvals</div>
-                                    </div>
-                                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                    </svg>
-                                </a>
-                            @endif
+                            {{-- System-generated alerts --}}
+                            <div class="mb-4">
+                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">System Alerts</p>
 
-                            {{-- Post Today's Schedule --}}
-                            @if(!($schedulePosted ?? false) && !empty($todayClasses))
-                                <div class="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 rounded-xl">
-                                    <div class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
-                                        📤
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="font-medium text-blue-800 dark:text-blue-300 text-sm">Post Schedule</div>
-                                        <div class="text-xs text-blue-600 dark:text-blue-400">{{ count($todayClasses) }} classes ready</div>
-                                    </div>
-                                    <form action="{{ route('admin.schedules.post') }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600">Post</button>
-                                    </form>
-                                </div>
-                            @endif
+                                {{-- Review Pending Attendance --}}
+                                @if(($stats['pendingAttendance'] ?? 0) > 0)
+                                    <a href="{{ route('admin.attendance.index', ['status' => 'pending']) }}" class="flex items-center gap-3 p-3 mb-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors">
+                                        <div class="w-7 h-7 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="font-medium text-amber-800 dark:text-amber-300 text-sm">Review Attendance</div>
+                                            <div class="text-xs text-amber-600 dark:text-amber-400">{{ $stats['pendingAttendance'] }} pending approvals</div>
+                                        </div>
+                                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </a>
+                                @endif
 
-                            {{-- Check Reports --}}
-                            @if(($stats['pendingReports'] ?? 0) > 0)
-                                <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/30 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
-                                    <div class="w-7 h-7 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs">
-                                        📋
+                                {{-- Post Today's Schedule --}}
+                                @if(!($schedulePosted ?? false) && !empty($todayClasses))
+                                    <div class="flex items-center gap-3 p-3 mb-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 rounded-xl">
+                                        <div class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="font-medium text-blue-800 dark:text-blue-300 text-sm">Post Schedule</div>
+                                            <div class="text-xs text-blue-600 dark:text-blue-400">{{ count($todayClasses) }} classes ready</div>
+                                        </div>
+                                        <form action="{{ route('admin.schedules.post') }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600">Post</button>
+                                        </form>
                                     </div>
-                                    <div class="flex-1">
-                                        <div class="font-medium text-purple-800 dark:text-purple-300 text-sm">Review Reports</div>
-                                        <div class="text-xs text-purple-600 dark:text-purple-400">{{ $stats['pendingReports'] }} awaiting review</div>
-                                    </div>
-                                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                    </svg>
-                                </a>
-                            @endif
+                                @endif
 
-                            {{-- Students without tutor --}}
-                            @if(($stats['studentsWithoutTutor'] ?? 0) > 0)
-                                <a href="{{ route('admin.students.index', ['without_tutor' => 1]) }}" class="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
-                                    <div class="w-7 h-7 bg-red-500 rounded-full flex items-center justify-center text-white text-xs">
-                                        ⚠️
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="font-medium text-red-800 dark:text-red-300 text-sm">Assign Tutors</div>
-                                        <div class="text-xs text-red-600 dark:text-red-400">{{ $stats['studentsWithoutTutor'] }} students unassigned</div>
-                                    </div>
-                                    <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                    </svg>
-                                </a>
-                            @endif
+                                {{-- Check Reports --}}
+                                @if(($stats['pendingReports'] ?? 0) > 0)
+                                    <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 p-3 mb-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/30 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
+                                        <div class="w-7 h-7 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="font-medium text-purple-800 dark:text-purple-300 text-sm">Review Reports</div>
+                                            <div class="text-xs text-purple-600 dark:text-purple-400">{{ $stats['pendingReports'] }} awaiting review</div>
+                                        </div>
+                                        <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </a>
+                                @endif
 
-                            {{-- All caught up message --}}
-                            @if(($stats['pendingAttendance'] ?? 0) == 0 && ($schedulePosted ?? true) && ($stats['pendingReports'] ?? 0) == 0 && ($stats['studentsWithoutTutor'] ?? 0) == 0)
-                                <div class="text-center py-6 text-gray-500 dark:text-gray-400">
-                                    <div class="text-4xl mb-3">🎉</div>
-                                    <p class="font-medium">All caught up!</p>
-                                    <p class="text-sm">No pending tasks for today</p>
-                                </div>
-                            @endif
+                                {{-- Students without tutor --}}
+                                @if(($stats['studentsWithoutTutor'] ?? 0) > 0)
+                                    <a href="{{ route('admin.students.index', ['without_tutor' => 1]) }}" class="flex items-center gap-3 p-3 mb-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                                        <div class="w-7 h-7 bg-red-500 rounded-full flex items-center justify-center text-white text-xs">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="font-medium text-red-800 dark:text-red-300 text-sm">Assign Tutors</div>
+                                            <div class="text-xs text-red-600 dark:text-red-400">{{ $stats['studentsWithoutTutor'] }} students unassigned</div>
+                                        </div>
+                                        <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </a>
+                                @endif
+
+                                @if(($stats['pendingAttendance'] ?? 0) == 0 && ($schedulePosted ?? true) && ($stats['pendingReports'] ?? 0) == 0 && ($stats['studentsWithoutTutor'] ?? 0) == 0)
+                                    <div class="text-center py-3 text-gray-500 dark:text-gray-400 text-sm">
+                                        <span class="text-lg mr-1">✓</span> No system alerts
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Custom User Todos --}}
+                            <div>
+                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">My Tasks</p>
+
+                                @forelse($adminTodos ?? [] as $todo)
+                                    <div class="flex items-start gap-3 p-3 mb-2 {{ $todo->completed ? 'bg-gray-50 dark:bg-gray-700/30' : 'bg-white dark:bg-gray-700/50' }} border border-gray-200 dark:border-gray-600/30 rounded-xl group">
+                                        {{-- Toggle Checkbox --}}
+                                        <form action="{{ route('admin.todos.toggle', $todo) }}" method="POST" class="flex-shrink-0 mt-0.5">
+                                            @csrf
+                                            <button type="submit" class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
+                                                {{ $todo->completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-300 dark:border-gray-500 hover:border-[#423A8E]' }}">
+                                                @if($todo->completed)
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                @endif
+                                            </button>
+                                        </form>
+
+                                        {{-- Todo Content --}}
+                                        <div class="flex-1 min-w-0">
+                                            <div class="font-medium text-sm {{ $todo->completed ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-800 dark:text-white' }}">
+                                                {{ $todo->title }}
+                                            </div>
+                                            @if($todo->description)
+                                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{{ $todo->description }}</div>
+                                            @endif
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="px-1.5 py-0.5 text-xs rounded
+                                                    @if($todo->priority === 'high') bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400
+                                                    @elseif($todo->priority === 'medium') bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400
+                                                    @else bg-gray-100 text-gray-600 dark:bg-gray-600/30 dark:text-gray-400
+                                                    @endif">
+                                                    {{ ucfirst($todo->priority) }}
+                                                </span>
+                                                @if($todo->due_date)
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                        Due: {{ $todo->due_date->format('M j') }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        {{-- Actions --}}
+                                        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button type="button" @click="editingTodo = {{ $todo->id }}" class="p-1.5 text-gray-400 hover:text-[#423A8E] dark:hover:text-[#00CCCD] rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600" title="Edit">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                            </button>
+                                            <form action="{{ route('admin.todos.destroy', $todo) }}" method="POST" onsubmit="return confirm('Delete this to-do?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600" title="Delete">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    {{-- Edit Form (inline) --}}
+                                    <div x-show="editingTodo === {{ $todo->id }}" x-transition class="mb-2 p-3 bg-gray-50 dark:bg-gray-700/50 border border-[#423A8E]/30 rounded-xl">
+                                        <form action="{{ route('admin.todos.update', $todo) }}" method="POST" class="space-y-2">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="text" name="title" value="{{ $todo->title }}" required class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#423A8E]">
+                                            <div class="flex gap-2">
+                                                <select name="priority" class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                                    <option value="low" {{ $todo->priority === 'low' ? 'selected' : '' }}>Low</option>
+                                                    <option value="medium" {{ $todo->priority === 'medium' ? 'selected' : '' }}>Medium</option>
+                                                    <option value="high" {{ $todo->priority === 'high' ? 'selected' : '' }}>High</option>
+                                                </select>
+                                                <input type="date" name="due_date" value="{{ $todo->due_date?->format('Y-m-d') }}" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <button type="submit" class="flex-1 px-3 py-1.5 bg-[#423A8E] text-white text-sm rounded-lg hover:bg-[#352f73]">Save</button>
+                                                <button type="button" @click="editingTodo = null" class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-lg">Cancel</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                @empty
+                                    <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                                        <svg class="w-8 h-8 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                        <p class="text-sm">No personal tasks yet</p>
+                                        <button @click="showAddForm = true" class="mt-2 text-[#423A8E] dark:text-[#00CCCD] text-sm hover:underline">+ Add your first to-do</button>
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -413,34 +519,80 @@
                         <table class="w-full">
                             <thead class="bg-gray-50 dark:bg-gray-700/50">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Student</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tutor</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse($recentStudents ?? [] as $student)
+                                @forelse($recentStudents ?? [] as $index => $student)
+                                    @php
+                                        $studentInitials = strtoupper(substr($student->first_name ?? '', 0, 1) . substr($student->last_name ?? '', 0, 1));
+                                        $studentGradients = [
+                                            'bg-gradient-to-br from-blue-500 to-cyan-600',
+                                            'bg-gradient-to-br from-purple-500 to-pink-600',
+                                            'bg-gradient-to-br from-green-500 to-emerald-600',
+                                            'bg-gradient-to-br from-orange-500 to-amber-600',
+                                            'bg-gradient-to-br from-rose-500 to-red-600',
+                                        ];
+                                        $gradient = $studentGradients[$index % count($studentGradients)];
+                                    @endphp
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30">
                                         <td class="px-4 py-3">
-                                            <div class="font-medium text-gray-800 dark:text-white">{{ $student->first_name }} {{ $student->last_name }}</div>
-                                            <div class="text-xs text-gray-500">{{ $student->email }}</div>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                                            {{ $student->tutor->first_name ?? 'Unassigned' }}
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-9 h-9 {{ $gradient }} rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                                    {{ $studentInitials ?: 'S' }}
+                                                </div>
+                                                <div>
+                                                    <div class="font-medium text-gray-800 dark:text-white">{{ $student->first_name }} {{ $student->last_name }}</div>
+                                                    <div class="text-xs text-gray-500">{{ $student->email }}</div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="px-4 py-3">
-                                            <span class="px-2 py-1 text-xs font-semibold rounded-full 
-                                                @if($student->status === 'active') bg-emerald-100 text-emerald-700
-                                                @elseif($student->status === 'inactive') bg-gray-100 text-gray-700
-                                                @else bg-amber-100 text-amber-700
+                                            <div class="flex items-center gap-2">
+                                                @if($student->tutor)
+                                                    <div class="w-6 h-6 bg-[#423A8E]/20 dark:bg-[#00CCCD]/20 rounded-full flex items-center justify-center">
+                                                        <svg class="w-3.5 h-3.5 text-[#423A8E] dark:text-[#00CCCD]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ $student->tutor->first_name }}</span>
+                                                @else
+                                                    <div class="w-6 h-6 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                                        </svg>
+                                                    </div>
+                                                    <span class="text-sm text-gray-400 italic">Unassigned</span>
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full
+                                                @if($student->status === 'active') bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400
+                                                @elseif($student->status === 'inactive') bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400
+                                                @else bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400
                                                 @endif">
+                                                @if($student->status === 'active')
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10"/></svg>
+                                                @elseif($student->status === 'inactive')
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                @else
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z"/></svg>
+                                                @endif
                                                 {{ ucfirst($student->status) }}
                                             </span>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="3" class="px-4 py-8 text-center text-gray-500">No students yet</td>
+                                        <td colspan="3" class="px-4 py-8 text-center text-gray-500">
+                                            <svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                            </svg>
+                                            No students yet
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -465,34 +617,71 @@
                         <table class="w-full">
                             <thead class="bg-gray-50 dark:bg-gray-700/50">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tutor</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Students</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse($recentTutors ?? [] as $tutor)
+                                @forelse($recentTutors ?? [] as $index => $tutor)
+                                    @php
+                                        $tutorInitials = strtoupper(substr($tutor->first_name ?? '', 0, 1) . substr($tutor->last_name ?? '', 0, 1));
+                                        $tutorGradients = [
+                                            'bg-gradient-to-br from-indigo-500 to-purple-600',
+                                            'bg-gradient-to-br from-pink-500 to-rose-600',
+                                            'bg-gradient-to-br from-teal-500 to-cyan-600',
+                                            'bg-gradient-to-br from-violet-500 to-fuchsia-600',
+                                            'bg-gradient-to-br from-sky-500 to-blue-600',
+                                        ];
+                                        $gradient = $tutorGradients[$index % count($tutorGradients)];
+                                    @endphp
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30">
                                         <td class="px-4 py-3">
-                                            <div class="font-medium text-gray-800 dark:text-white">{{ $tutor->first_name }} {{ $tutor->last_name }}</div>
-                                            <div class="text-xs text-gray-500">{{ $tutor->email }}</div>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                                            {{ $tutor->students_count ?? 0 }} assigned
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-9 h-9 {{ $gradient }} rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                                    {{ $tutorInitials ?: 'T' }}
+                                                </div>
+                                                <div>
+                                                    <div class="font-medium text-gray-800 dark:text-white">{{ $tutor->first_name }} {{ $tutor->last_name }}</div>
+                                                    <div class="text-xs text-gray-500">{{ $tutor->email }}</div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="px-4 py-3">
-                                            <span class="px-2 py-1 text-xs font-semibold rounded-full 
-                                                @if($tutor->status === 'active') bg-emerald-100 text-emerald-700
-                                                @elseif($tutor->status === 'on_leave') bg-amber-100 text-amber-700
-                                                @else bg-gray-100 text-gray-700
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 bg-[#00CCCD]/20 dark:bg-[#00CCCD]/30 rounded-full flex items-center justify-center">
+                                                    <svg class="w-3.5 h-3.5 text-[#00CCCD]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    </svg>
+                                                </div>
+                                                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ $tutor->students_count ?? 0 }} assigned</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full
+                                                @if($tutor->status === 'active') bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400
+                                                @elseif($tutor->status === 'on_leave') bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400
+                                                @else bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400
                                                 @endif">
+                                                @if($tutor->status === 'active')
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10"/></svg>
+                                                @elseif($tutor->status === 'on_leave')
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                @else
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                @endif
                                                 {{ ucfirst(str_replace('_', ' ', $tutor->status)) }}
                                             </span>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="3" class="px-4 py-8 text-center text-gray-500">No tutors yet</td>
+                                        <td colspan="3" class="px-4 py-8 text-center text-gray-500">
+                                            <svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                            No tutors yet
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>
