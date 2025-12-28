@@ -4,7 +4,7 @@
     </x-slot>
     <x-slot name="title">{{ __('Message') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             <!-- Action Button -->
@@ -61,7 +61,7 @@
                     @foreach($message->replies->sortBy('created_at') as $reply)
                         <x-ui.glass-card>
                             <div class="flex items-start space-x-4">
-                                <div class="w-10 h-10 rounded-full {{ $reply->sender_id === auth()->id() ? 'bg-gradient-to-br from-blue-500 to-cyan-600' : 'bg-gradient-to-br from-purple-500 to-pink-600' }} flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                <div class="w-10 h-10 rounded-full {{ $reply->sender_id === auth()->id() ? 'bg-gradient-to-br from-[#4F46E5] to-[#818CF8]' : 'bg-gradient-to-br from-purple-500 to-pink-600' }} flex items-center justify-center text-white font-semibold flex-shrink-0">
                                     {{ strtoupper(substr($reply->sender->name, 0, 1)) }}
                                 </div>
                                 <div class="flex-1">
@@ -94,14 +94,14 @@
                     <div class="mb-4">
                         <textarea name="body" rows="4" required
                                   placeholder="Type your reply..."
-                                  class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('body') }}</textarea>
+                                  class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">{{ old('body') }}</textarea>
                         @error('body')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     <div class="flex justify-end">
                         <button type="submit" 
-                                class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
+                                class="px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white font-semibold rounded-lg hover:from-[#3730A3] hover:to-[#4F46E5] transition-all">
                             <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
                             </svg>

@@ -175,7 +175,7 @@
                                         <div class="mb-4">
                                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Director's Comment</label>
                                             <textarea name="director_comment" rows="4" placeholder="Add your remarks..." 
-                                                      class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500"></textarea>
+                                                      class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#4F46E5] focus:border-sky-500"></textarea>
                                         </div>
 
                                         <div class="space-y-2">
@@ -266,7 +266,7 @@
 
                 {{-- Summary Cards --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-5 text-white shadow-lg">
+                    <div class="bg-gradient-to-br from-[#4F46E5] to-[#818CF8] rounded-2xl p-5 text-white shadow-lg">
                         <div class="text-sm opacity-90 mb-1">Total Assessments</div>
                         <div class="text-3xl font-bold">{{ $stats['total'] ?? 0 }}</div>
                         <div class="text-xs opacity-75 mt-1">all time</div>

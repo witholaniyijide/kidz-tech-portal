@@ -5,7 +5,7 @@
 
     <x-slot name="title">{{ $student->first_name }} {{ $student->last_name }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Action Buttons -->
             <div class="flex justify-end space-x-3 mb-4">
@@ -30,7 +30,7 @@
                 <div class="lg:col-span-1">
                     <x-ui.glass-card>
                         <div class="text-center">
-                            <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold">
+                            <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-[#4F46E5] to-[#818CF8] flex items-center justify-center text-white text-3xl font-bold">
                                 {{ strtoupper(substr($student->first_name, 0, 1) . substr($student->last_name, 0, 1)) }}
                             </div>
                             <h3 class="mt-4 text-xl font-bold text-gray-900 dark:text-white">
@@ -118,7 +118,7 @@
                             @php $schedules = json_decode($student->class_schedule, true) ?? []; @endphp
                             @forelse($schedules as $schedule)
                                 <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                    <svg class="w-5 h-5 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 mr-3 text-[#4F46E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                     <span class="font-medium text-gray-900 dark:text-white">{{ $schedule['day'] ?? '' }}</span>

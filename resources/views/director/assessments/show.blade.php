@@ -5,8 +5,8 @@
 
     <x-slot name="title">Assessment Review</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-blue-400 dark:bg-blue-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-indigo-400 dark:bg-indigo-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
         <div class="absolute top-0 right-0 w-72 h-72 bg-purple-400 dark:bg-purple-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -55,7 +55,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Performance Score</label>
                                 <div class="flex items-center gap-2">
-                                    <div class="text-3xl font-bold text-blue-600">{{ $assessment->performance_score }}</div>
+                                    <div class="text-3xl font-bold text-[#4F46E5]">{{ $assessment->performance_score }}</div>
                                     <div class="text-sm text-gray-600 dark:text-gray-400">/100</div>
                                 </div>
                             </div>
@@ -155,7 +155,7 @@
                                     rows="4"
                                     maxlength="2000"
                                     placeholder="Add approval notes..."
-                                    class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                                    class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4F46E5] resize-none"></textarea>
                             </div>
                             <button
                                 type="submit"

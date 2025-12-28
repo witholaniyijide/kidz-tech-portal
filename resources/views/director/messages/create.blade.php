@@ -4,7 +4,7 @@
     </x-slot>
     <x-slot name="title">{{ __('Compose') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
 
             <!-- Action Button -->
@@ -47,7 +47,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To (Parent) *</label>
                             <select name="recipient_id" required 
-                                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                                 <option value="">Select a parent...</option>
                                 @foreach($parents as $parent)
                                     <option value="{{ $parent->id }}" {{ old('recipient_id') == $parent->id ? 'selected' : '' }}>
@@ -64,7 +64,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Regarding Student (Optional)</label>
                             <select name="student_id" 
-                                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                                 <option value="">Select a student...</option>
                                 @foreach($students as $student)
                                     <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
@@ -79,7 +79,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject *</label>
                             <input type="text" name="subject" value="{{ old('subject') }}" required
                                    placeholder="Message subject..."
-                                   class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                   class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                             @error('subject')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -91,7 +91,7 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message *</label>
                         <textarea name="body" rows="8" required
                                   placeholder="Type your message here..."
-                                  class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('body') }}</textarea>
+                                  class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">{{ old('body') }}</textarea>
                         @error('body')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -105,7 +105,7 @@
                             Cancel
                         </a>
                         <button type="submit" 
-                                class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
+                                class="px-6 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white font-semibold rounded-lg hover:from-[#3730A3] hover:to-[#4F46E5] transition-all">
                             <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                             </svg>

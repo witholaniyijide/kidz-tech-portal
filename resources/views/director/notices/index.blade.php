@@ -4,14 +4,14 @@
     </x-slot>
     <x-slot name="title">{{ __('Notices') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <!-- Filter Section -->
             <x-ui.glass-card class="mb-8">
                 <!-- Action Button -->
                 <div class="flex justify-end mb-4">
-                    <a href="{{ route('director.notices.create') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all">
+                    <a href="{{ route('director.notices.create') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] hover:from-[#3730A3] hover:to-[#4F46E5] text-white font-semibold rounded-lg transition-all">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                         Create Notice
                     </a>
@@ -19,11 +19,11 @@
                 <form method="GET" action="{{ route('director.notices.index') }}" class="flex flex-wrap gap-4 items-end">
                     <div class="flex-1 min-w-[200px]">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Title or content..." class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Title or content..." class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                     </div>
                     <div class="w-36">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
-                        <select name="priority" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <select name="priority" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                             <option value="">All</option>
                             <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Low</option>
                             <option value="normal" {{ request('priority') == 'normal' ? 'selected' : '' }}>Normal</option>
@@ -33,7 +33,7 @@
                     </div>
                     <div class="w-36">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <select name="status" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <select name="status" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                             <option value="">All</option>
                             <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
                             <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published</option>
@@ -41,7 +41,7 @@
                         </select>
                     </div>
                     <div class="flex gap-2">
-                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">Filter</button>
+                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-lg hover:from-[#3730A3] hover:to-[#4F46E5] transition-all">Filter</button>
                         <a href="{{ route('director.notices.index') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-all">Reset</a>
                     </div>
                 </form>
@@ -86,7 +86,7 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 ml-4">
-                            <a href="{{ route('director.notices.show', $notice) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400" title="View">
+                            <a href="{{ route('director.notices.show', $notice) }}" class="text-[#4F46E5] hover:text-[#3730A3] dark:text-[#818CF8]" title="View">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </a>
                             <a href="{{ route('director.notices.edit', $notice) }}" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400" title="Edit">

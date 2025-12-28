@@ -4,7 +4,7 @@
     </x-slot>
     <x-slot name="title">{{ $tutor->first_name }} {{ $tutor->last_name }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Action Buttons -->
             <div class="flex justify-end space-x-3 mb-4">
@@ -97,7 +97,7 @@
                         <div class="space-y-3">
                             @foreach($tutor->students->take(5) as $student)
                             <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white font-semibold">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#818CF8] flex items-center justify-center text-white font-semibold">
                                     {{ strtoupper(substr($student->first_name, 0, 1)) }}
                                 </div>
                                 <div class="ml-3 flex-1">
