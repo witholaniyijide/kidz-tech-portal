@@ -47,7 +47,7 @@
             </div>
 
             <div class="p-6">
-                <form method="POST" action="{{ route('parent.settings.profile') }}">
+                <form method="POST" action="{{ route('parent.settings.update-profile') }}">
                     @csrf
                     @method('PUT')
 
@@ -127,7 +127,7 @@
             </div>
 
             <div class="p-6">
-                <form method="POST" action="{{ route('parent.settings.password') }}">
+                <form method="POST" action="{{ route('parent.settings.update-password') }}">
                     @csrf
                     @method('PUT')
 
@@ -210,7 +210,7 @@
             </div>
 
             <div class="p-6">
-                <form method="POST" action="{{ route('parent.settings.notifications') }}">
+                <form method="POST" action="{{ route('parent.settings.update-notifications') }}">
                     @csrf
                     @method('PUT')
 
