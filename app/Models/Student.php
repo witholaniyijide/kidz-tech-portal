@@ -73,6 +73,44 @@ class Student extends Model
     ];
 
     /**
+     * Default attribute values for legacy fields
+     */
+    protected $attributes = [
+        'parent_name' => '',
+        'parent_email' => '',
+        'parent_phone' => '',
+        'parent_relationship' => '',
+    ];
+
+    /**
+     * Boot the model and register event handlers
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($student) {
+            // Auto-generate student_id if not provided
+            if (empty($student->student_id)) {
+                $student->student_id = 'STU-' . strtoupper(uniqid());
+            }
+
+            // Set default empty string for legacy NOT NULL fields if not set
+            $legacyFields = ['parent_name', 'parent_email', 'parent_phone', 'parent_relationship'];
+            foreach ($legacyFields as $field) {
+                if (!isset($student->$field)) {
+                    $student->$field = '';
+                }
+            }
+
+            // Set enrollment_date to today if not provided
+            if (empty($student->enrollment_date)) {
+                $student->enrollment_date = now();
+            }
+        });
+    }
+
+    /**
      * Get student's full name
      */
     public function getFullNameAttribute()
