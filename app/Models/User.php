@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'password_change_required',
         'phone',
         'status',
         'last_login',
@@ -51,6 +52,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'password_change_required' => 'boolean',
         'last_login' => 'datetime',
         'notify_email' => 'boolean',
         'notify_in_app' => 'boolean',

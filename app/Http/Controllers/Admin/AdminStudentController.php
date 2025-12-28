@@ -6,14 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\ActivityLog;
+use App\Services\ParentAccountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AdminStudentController extends Controller
 {
-    public function __construct()
+    protected ParentAccountService $parentAccountService;
+
+    public function __construct(ParentAccountService $parentAccountService)
     {
+        $this->parentAccountService = $parentAccountService;
+
         $this->middleware(['auth', 'verified']);
         $this->middleware(function ($request, $next) {
             if (!Auth::user()->hasRole('admin')) {
@@ -84,22 +89,22 @@ class AdminStudentController extends Controller
             'coding_experience' => 'nullable|string|max:500',
             'career_interest' => 'nullable|string|max:500',
             'status' => 'required|in:active,inactive,graduated,withdrawn',
-            
+
             // Class Information
             'class_link' => 'nullable|url|max:500',
             'google_classroom_link' => 'nullable|url|max:500',
             'tutor_id' => 'nullable|exists:tutors,id',
             'classes_per_week' => 'nullable|integer|min:1|max:7',
-            'total_periods' => 'nullable|integer|min:0',
+            'starting_course_level' => 'nullable|integer|min:1|max:12',
             'class_schedule' => 'nullable|array',
-            
+
             // Parent Information - Father
             'father_name' => 'nullable|string|max:255',
             'father_phone' => 'nullable|string|max:20',
             'father_email' => 'nullable|email|max:255',
             'father_occupation' => 'nullable|string|max:255',
             'father_location' => 'nullable|string|max:255',
-            
+
             // Parent Information - Mother
             'mother_name' => 'nullable|string|max:255',
             'mother_phone' => 'nullable|string|max:20',
@@ -108,7 +113,9 @@ class AdminStudentController extends Controller
             'mother_location' => 'nullable|string|max:255',
         ]);
 
-        DB::transaction(function() use ($validated) {
+        $student = null;
+
+        DB::transaction(function() use ($validated, &$student) {
             $student = Student::create($validated);
 
             // Log the action
@@ -121,9 +128,14 @@ class AdminStudentController extends Controller
             ]);
         });
 
+        // Create parent accounts after the transaction (so we have the student ID)
+        if ($student) {
+            $this->parentAccountService->createParentAccountsForStudent($student);
+        }
+
         return redirect()
             ->route('admin.students.index')
-            ->with('success', 'Student created successfully.');
+            ->with('success', 'Student created successfully. Parent accounts have been created and welcome emails sent.');
     }
 
     /**
@@ -166,16 +178,16 @@ class AdminStudentController extends Controller
             'google_classroom_link' => 'nullable|url|max:500',
             'tutor_id' => 'nullable|exists:tutors,id',
             'classes_per_week' => 'nullable|integer|min:1|max:7',
-            'total_periods' => 'nullable|integer|min:0',
+            'starting_course_level' => 'nullable|integer|min:1|max:12',
             'class_schedule' => 'nullable|array',
-            
+
             // Parent Information - Father
             'father_name' => 'nullable|string|max:255',
             'father_phone' => 'nullable|string|max:20',
             'father_email' => 'nullable|email|max:255',
             'father_occupation' => 'nullable|string|max:255',
             'father_location' => 'nullable|string|max:255',
-            
+
             // Parent Information - Mother
             'mother_name' => 'nullable|string|max:255',
             'mother_phone' => 'nullable|string|max:20',
@@ -183,6 +195,12 @@ class AdminStudentController extends Controller
             'mother_occupation' => 'nullable|string|max:255',
             'mother_location' => 'nullable|string|max:255',
         ]);
+
+        // Track if parent emails changed for creating new parent accounts
+        $fatherEmailChanged = !empty($validated['father_email']) &&
+            $validated['father_email'] !== $student->father_email;
+        $motherEmailChanged = !empty($validated['mother_email']) &&
+            $validated['mother_email'] !== $student->mother_email;
 
         DB::transaction(function() use ($student, $validated) {
             $student->update($validated);
@@ -196,6 +214,11 @@ class AdminStudentController extends Controller
                 'model_id' => $student->id,
             ]);
         });
+
+        // Create parent accounts if new parent emails were added
+        if ($fatherEmailChanged || $motherEmailChanged) {
+            $this->parentAccountService->createParentAccountsForStudent($student->fresh());
+        }
 
         return redirect()
             ->route('admin.students.show', $student)

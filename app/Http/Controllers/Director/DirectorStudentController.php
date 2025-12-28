@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\User;
+use App\Services\ParentAccountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,12 @@ use Illuminate\Validation\Rule;
 
 class DirectorStudentController extends Controller
 {
+    protected ParentAccountService $parentAccountService;
+
+    public function __construct(ParentAccountService $parentAccountService)
+    {
+        $this->parentAccountService = $parentAccountService;
+    }
     /**
      * Display a listing of students.
      */
@@ -84,18 +91,35 @@ class DirectorStudentController extends Controller
             'status' => 'required|in:active,inactive,graduated,withdrawn',
             'enrollment_date' => 'nullable|date',
             'current_level' => 'nullable|string|max:100',
+            'starting_course_level' => 'nullable|integer|min:1|max:12',
             'classes_per_week' => 'nullable|integer|min:1|max:7',
             'class_schedules' => 'nullable|array',
             'class_schedules.*.day' => 'required_with:class_schedules|string',
             'class_schedules.*.time' => 'required_with:class_schedules|string',
             'notes' => 'nullable|string|max:1000',
+
+            // Parent Information - Father
+            'father_name' => 'nullable|string|max:255',
+            'father_phone' => 'nullable|string|max:20',
+            'father_email' => 'nullable|email|max:255',
+            'father_occupation' => 'nullable|string|max:255',
+            'father_location' => 'nullable|string|max:255',
+
+            // Parent Information - Mother
+            'mother_name' => 'nullable|string|max:255',
+            'mother_phone' => 'nullable|string|max:20',
+            'mother_email' => 'nullable|email|max:255',
+            'mother_occupation' => 'nullable|string|max:255',
+            'mother_location' => 'nullable|string|max:255',
         ]);
+
+        $student = null;
 
         DB::beginTransaction();
         try {
             // Generate student ID
             $validated['student_id'] = 'STU-' . strtoupper(uniqid());
-            
+
             // Handle class schedule JSON
             if (isset($validated['class_schedules'])) {
                 $validated['class_schedule'] = json_encode($validated['class_schedules']);
@@ -104,15 +128,20 @@ class DirectorStudentController extends Controller
 
             $student = Student::create($validated);
 
-            // Link to parent if provided
+            // Link to parent if provided (existing parent)
             if ($request->filled('parent_id')) {
                 $student->guardians()->attach($request->parent_id);
             }
 
             DB::commit();
 
+            // Create parent accounts after the transaction (for newly entered parent info)
+            if ($student) {
+                $this->parentAccountService->createParentAccountsForStudent($student);
+            }
+
             return redirect()->route('director.students.index')
-                ->with('success', 'Student created successfully.');
+                ->with('success', 'Student created successfully. Parent accounts have been created and welcome emails sent.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', 'Failed to create student: ' . $e->getMessage());
@@ -160,12 +189,33 @@ class DirectorStudentController extends Controller
             'status' => 'required|in:active,inactive,graduated,withdrawn',
             'enrollment_date' => 'nullable|date',
             'current_level' => 'nullable|string|max:100',
+            'starting_course_level' => 'nullable|integer|min:1|max:12',
             'classes_per_week' => 'nullable|integer|min:1|max:7',
             'class_schedules' => 'nullable|array',
             'class_schedules.*.day' => 'required_with:class_schedules|string',
             'class_schedules.*.time' => 'required_with:class_schedules|string',
             'notes' => 'nullable|string|max:1000',
+
+            // Parent Information - Father
+            'father_name' => 'nullable|string|max:255',
+            'father_phone' => 'nullable|string|max:20',
+            'father_email' => 'nullable|email|max:255',
+            'father_occupation' => 'nullable|string|max:255',
+            'father_location' => 'nullable|string|max:255',
+
+            // Parent Information - Mother
+            'mother_name' => 'nullable|string|max:255',
+            'mother_phone' => 'nullable|string|max:20',
+            'mother_email' => 'nullable|email|max:255',
+            'mother_occupation' => 'nullable|string|max:255',
+            'mother_location' => 'nullable|string|max:255',
         ]);
+
+        // Track if parent emails changed for creating new parent accounts
+        $fatherEmailChanged = !empty($validated['father_email']) &&
+            $validated['father_email'] !== $student->father_email;
+        $motherEmailChanged = !empty($validated['mother_email']) &&
+            $validated['mother_email'] !== $student->mother_email;
 
         DB::beginTransaction();
         try {
@@ -177,7 +227,7 @@ class DirectorStudentController extends Controller
 
             $student->update($validated);
 
-            // Update parent link
+            // Update parent link (for existing parent selection)
             if ($request->filled('parent_id')) {
                 $student->guardians()->sync([$request->parent_id]);
             } else {
@@ -185,6 +235,11 @@ class DirectorStudentController extends Controller
             }
 
             DB::commit();
+
+            // Create parent accounts if new parent emails were added
+            if ($fatherEmailChanged || $motherEmailChanged) {
+                $this->parentAccountService->createParentAccountsForStudent($student->fresh());
+            }
 
             return redirect()->route('director.students.index')
                 ->with('success', 'Student updated successfully.');

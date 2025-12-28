@@ -107,23 +107,14 @@
                                 @error('parent_id') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Level</label>
-                                <select name="current_level" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Starting Course Level</label>
+                                <select name="starting_course_level" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                                     <option value="">Select Level</option>
-                                    <option value="Level 1 - Introduction to Computer Science" {{ old('current_level') == 'Level 1 - Introduction to Computer Science' ? 'selected' : '' }}>Level 1 - Introduction to Computer Science</option>
-                                    <option value="Level 2 - Coding and Fundamental Concepts" {{ old('current_level') == 'Level 2 - Coding and Fundamental Concepts' ? 'selected' : '' }}>Level 2 - Coding and Fundamental Concepts</option>
-                                    <option value="Level 3 - Scratch Programming" {{ old('current_level') == 'Level 3 - Scratch Programming' ? 'selected' : '' }}>Level 3 - Scratch Programming</option>
-                                    <option value="Level 4 - Artificial Intelligence" {{ old('current_level') == 'Level 4 - Artificial Intelligence' ? 'selected' : '' }}>Level 4 - Artificial Intelligence</option>
-                                    <option value="Level 5 - Graphics Design" {{ old('current_level') == 'Level 5 - Graphics Design' ? 'selected' : '' }}>Level 5 - Graphics Design</option>
-                                    <option value="Level 6 - Game Development" {{ old('current_level') == 'Level 6 - Game Development' ? 'selected' : '' }}>Level 6 - Game Development</option>
-                                    <option value="Level 7 - Mobile App Development" {{ old('current_level') == 'Level 7 - Mobile App Development' ? 'selected' : '' }}>Level 7 - Mobile App Development</option>
-                                    <option value="Level 8 - Website Development" {{ old('current_level') == 'Level 8 - Website Development' ? 'selected' : '' }}>Level 8 - Website Development</option>
-                                    <option value="Level 9 - Python Programming" {{ old('current_level') == 'Level 9 - Python Programming' ? 'selected' : '' }}>Level 9 - Python Programming</option>
-                                    <option value="Level 10 - Digital Literacy & Safety" {{ old('current_level') == 'Level 10 - Digital Literacy & Safety' ? 'selected' : '' }}>Level 10 - Digital Literacy & Safety</option>
-                                    <option value="Level 11 - Machine Learning" {{ old('current_level') == 'Level 11 - Machine Learning' ? 'selected' : '' }}>Level 11 - Machine Learning</option>
-                                    <option value="Level 12 - Robotics" {{ old('current_level') == 'Level 12 - Robotics' ? 'selected' : '' }}>Level 12 - Robotics</option>
+                                    @for($i = 1; $i <= 12; $i++)
+                                        <option value="{{ $i }}" {{ old('starting_course_level') == $i ? 'selected' : '' }}>Level {{ $i }}</option>
+                                    @endfor
                                 </select>
-                                @error('current_level') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                                @error('starting_course_level') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
@@ -163,6 +154,87 @@
                                 <input type="url" name="live_classroom_link" value="{{ old('live_classroom_link') }}" placeholder="https://meet.google.com/... or Zoom link"
                                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                                 @error('live_classroom_link') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Parent Information -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Parent/Guardian Information
+                        </h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            Enter parent details below. Parent accounts will be created automatically and login credentials sent via email.
+                        </p>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Father's Information -->
+                            <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
+                                <h4 class="font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                    <span class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mr-2 text-blue-600 text-lg">F</span>
+                                    Father's Information
+                                </h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                                        <input type="text" name="father_name" value="{{ old('father_name') }}"
+                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                                        <input type="tel" name="father_phone" value="{{ old('father_phone') }}"
+                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                                        <input type="email" name="father_email" value="{{ old('father_email') }}"
+                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Occupation</label>
+                                        <input type="text" name="father_occupation" value="{{ old('father_occupation') }}"
+                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
+                                        <input type="text" name="father_location" value="{{ old('father_location') }}"
+                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mother's Information -->
+                            <div class="p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-100 dark:border-pink-800">
+                                <h4 class="font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                    <span class="w-8 h-8 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mr-2 text-pink-600 text-lg">M</span>
+                                    Mother's Information
+                                </h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                                        <input type="text" name="mother_name" value="{{ old('mother_name') }}"
+                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                                        <input type="tel" name="mother_phone" value="{{ old('mother_phone') }}"
+                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                                        <input type="email" name="mother_email" value="{{ old('mother_email') }}"
+                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Occupation</label>
+                                        <input type="text" name="mother_occupation" value="{{ old('mother_occupation') }}"
+                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
+                                        <input type="text" name="mother_location" value="{{ old('mother_location') }}"
+                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
