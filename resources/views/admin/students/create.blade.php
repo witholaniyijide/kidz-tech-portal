@@ -152,11 +152,15 @@
                                     @endfor
                                 </select>
                             </div>
-                            {{-- Total Periods --}}
+                            {{-- Starting Course Level --}}
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total Periods</label>
-                                <input type="number" name="total_periods" value="{{ old('total_periods', 0) }}" min="0"
-                                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Starting Course Level</label>
+                                <select name="starting_course_level" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Select Level</option>
+                                    @for($i = 1; $i <= 12; $i++)
+                                        <option value="{{ $i }}" {{ old('starting_course_level') == $i ? 'selected' : '' }}>Level {{ $i }}</option>
+                                    @endfor
+                                </select>
                             </div>
                         </div>
 

@@ -34,6 +34,7 @@ class Student extends Model
         'google_classroom_link',
         'live_classroom_link',
         'current_level',
+        'starting_course_level',
         'tutor_id',
         'class_schedule',
         'classes_per_week',

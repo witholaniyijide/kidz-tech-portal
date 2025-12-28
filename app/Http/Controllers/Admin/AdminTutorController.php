@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\TutorAccountWelcomeMail;
+use App\Models\Role;
 use App\Models\Tutor;
 use App\Models\User;
 use App\Models\ActivityLog;
@@ -10,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class AdminTutorController extends Controller
@@ -101,7 +105,11 @@ class AdminTutorController extends Controller
             'status' => 'required|in:active,inactive,on_leave,resigned',
         ]);
 
-        DB::transaction(function() use ($validated, $request) {
+        $tutor = null;
+        $user = null;
+        $defaultPassword = 'password';
+
+        DB::transaction(function() use ($validated, $request, $defaultPassword, &$tutor, &$user) {
             // Handle profile photo upload
             if ($request->hasFile('profile_photo')) {
                 $validated['profile_photo'] = $request->file('profile_photo')->store('tutors/photos', 'public');
@@ -109,16 +117,20 @@ class AdminTutorController extends Controller
 
             $tutor = Tutor::create($validated);
 
-            // Generate secure random password
-            $tempPassword = \Illuminate\Support\Str::random(12);
-
-            // Create associated user account
+            // Create associated user account with default password
             $user = User::create([
                 'name' => $validated['first_name'] . ' ' . $validated['last_name'],
                 'email' => $validated['email'],
-                'password' => Hash::make($tempPassword),
-                'role' => 'tutor',
+                'password' => Hash::make($defaultPassword),
+                'password_change_required' => true,
+                'phone' => $validated['phone'] ?? null,
             ]);
+
+            // Assign tutor role via role_user pivot table
+            $tutorRole = Role::where('name', 'tutor')->first();
+            if ($tutorRole) {
+                $user->roles()->attach($tutorRole->id);
+            }
 
             $tutor->update(['user_id' => $user->id]);
 
@@ -130,14 +142,37 @@ class AdminTutorController extends Controller
                 'model_type' => Tutor::class,
                 'model_id' => $tutor->id,
             ]);
-
-            // Store temp password for flash message
-            session()->flash('temp_password', $tempPassword);
         });
+
+        // Send welcome email to tutor
+        if ($user && $tutor && !empty($user->email)) {
+            try {
+                $loginUrl = config('app.url') . '/login';
+                Mail::to($user->email)->send(new TutorAccountWelcomeMail(
+                    user: $user,
+                    tutor: $tutor,
+                    password: $defaultPassword,
+                    loginUrl: $loginUrl
+                ));
+
+                Log::info("Sent tutor welcome email", [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'tutor_id' => $tutor->id
+                ]);
+            } catch (\Exception $e) {
+                Log::error("Failed to send tutor welcome email", [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't throw - email failure shouldn't break account creation
+            }
+        }
 
         return redirect()
             ->route('admin.tutors.index')
-            ->with('success', 'Tutor created successfully. Temporary password: ' . session('temp_password') . ' - Please share securely and advise them to change it immediately.');
+            ->with('success', 'Tutor created successfully. A welcome email with login credentials has been sent to ' . $validated['email']);
     }
 
     /**
