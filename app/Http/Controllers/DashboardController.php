@@ -492,58 +492,8 @@ class DashboardController extends Controller
 
     private function tutorDashboard()
     {
-        $user = Auth::user();
-
-        // Get tutor record
-        $tutor = \App\Models\Tutor::where('user_id', $user->id)->first();
-
-        // Get assigned students count (you may need to adjust based on your student-tutor relationship)
-        $totalStudents = Student::count();
-        $activeStudents = Student::where('status', 'active')->count();
-
-        // Get reports submitted by this tutor
-        $myReports = Report::where('instructor_id', $user->id)->count();
-        $pendingReports = Report::where('instructor_id', $user->id)
-                               ->where('status', 'submitted')
-                               ->count();
-        $approvedReports = Report::where('instructor_id', $user->id)
-                                ->where('status', 'approved')
-                                ->count();
-
-        // Get today's attendance records submitted by this tutor
-        $todayAttendance = 0;
-        $presentToday = 0;
-
-        if ($tutor) {
-            $todayAttendance = AttendanceRecord::whereDate('class_date', Carbon::today())
-                                              ->where('tutor_id', $tutor->id)
-                                              ->count();
-
-            $presentToday = AttendanceRecord::whereDate('class_date', Carbon::today())
-                                           ->where('tutor_id', $tutor->id)
-                                           ->where('status', 'approved')
-                                           ->count();
-        }
-
-        // Recent students
-        $recentStudents = Student::latest()->take(8)->get();
-
-        // Recent reports by this tutor
-        $recentReports = Report::with('student')
-                              ->where('instructor_id', $user->id)
-                              ->latest()
-                              ->take(5)
-                              ->get();
-
-        // Upcoming sessions or tasks (placeholder - adjust based on your needs)
-        $upcomingSessions = [];
-
-        return view('dashboards.tutor', compact(
-            'tutor', 'totalStudents', 'activeStudents',
-            'myReports', 'pendingReports', 'approvedReports',
-            'todayAttendance', 'presentToday',
-            'recentStudents', 'recentReports', 'upcomingSessions'
-        ));
+        // Redirect to the correct tutor dashboard
+        return redirect()->route('tutor.dashboard');
     }
     
     private function parentDashboard()
