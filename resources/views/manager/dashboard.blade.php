@@ -424,9 +424,50 @@
                     </div>
                 </div>
 
-                {{-- Add Task Form --}}
+                {{-- Auto-generated Tasks --}}
+                <div class="space-y-2 mb-4">
+                    @if(isset($todos) && count($todos) > 0)
+                        @foreach($todos as $todo)
+                            <a href="{{ $todo['link'] }}" class="flex items-center gap-3 p-3 rounded-lg transition-all
+                                @if($todo['completed']) bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/30
+                                @elseif($todo['priority'] === 'high') bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/30 hover:bg-rose-100 dark:hover:bg-rose-900/30
+                                @elseif($todo['priority'] === 'medium') bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 hover:bg-amber-100 dark:hover:bg-amber-900/30
+                                @else bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800
+                                @endif">
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0
+                                    @if($todo['completed']) bg-green-500 text-white
+                                    @elseif($todo['priority'] === 'high') bg-rose-500 text-white
+                                    @elseif($todo['priority'] === 'medium') bg-amber-500 text-white
+                                    @else bg-slate-400 text-white
+                                    @endif">
+                                    @if($todo['completed'])
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                    @else
+                                        <span class="text-xs font-bold">{{ $todo['count'] }}</span>
+                                    @endif
+                                </div>
+                                <span class="flex-1 text-sm font-medium
+                                    @if($todo['completed']) text-green-700 dark:text-green-400 line-through
+                                    @elseif($todo['priority'] === 'high') text-rose-700 dark:text-rose-400
+                                    @elseif($todo['priority'] === 'medium') text-amber-700 dark:text-amber-400
+                                    @else text-slate-700 dark:text-slate-300
+                                    @endif">{{ $todo['text'] }}</span>
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        @endforeach
+                    @endif
+                </div>
+
+                {{-- Divider --}}
+                <div class="border-t border-slate-200 dark:border-slate-700 my-4"></div>
+
+                {{-- Add Custom Task Form --}}
                 <div class="flex gap-2 mb-4">
-                    <input type="text" id="newTaskInput" placeholder="Add a new task..."
+                    <input type="text" id="newTaskInput" placeholder="Add a custom task..."
                            class="flex-1 px-4 py-2 bg-white/50 dark:bg-gray-700/50 border border-white/20 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-[#C15F3C] focus:border-transparent">
                     <button id="addTaskBtn" class="px-4 py-2 bg-gradient-to-r from-[#C15F3C] to-[#DA7756] text-white rounded-lg hover:from-[#A34E30] hover:to-[#C15F3C] transition-all">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -435,8 +476,8 @@
                     </button>
                 </div>
 
-                {{-- Task List --}}
-                <div id="todoList" class="space-y-2 max-h-48 overflow-y-auto">
+                {{-- Custom Task List --}}
+                <div id="todoList" class="space-y-2 max-h-32 overflow-y-auto">
                     {{-- Tasks will be rendered here by JavaScript --}}
                 </div>
             </div>

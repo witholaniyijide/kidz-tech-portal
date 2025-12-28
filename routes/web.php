@@ -466,6 +466,10 @@ Route::prefix('director')
     ->middleware(['auth', 'verified', 'role:director'])
     ->name('director.')
     ->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [App\Http\Controllers\Director\DirectorDashboardController::class, 'index'])
+            ->name('dashboard');
+
         // Director Final Approval for Tutor Reports (Legacy - ReportApprovalController)
         // Keeping these routes for backward compatibility
         Route::get('/reports-legacy', [App\Http\Controllers\Director\ReportApprovalController::class, 'index'])
@@ -608,6 +612,12 @@ Route::prefix('tutor')
         // Dashboard
         Route::get('/dashboard', [App\Http\Controllers\Tutor\DashboardController::class, 'index'])
             ->name('dashboard');
+
+        // Tutor Todos
+        Route::post('/todos', [App\Http\Controllers\Tutor\DashboardController::class, 'storeTodo'])->name('todos.store');
+        Route::put('/todos/{todo}', [App\Http\Controllers\Tutor\DashboardController::class, 'updateTodo'])->name('todos.update');
+        Route::post('/todos/{todo}/toggle', [App\Http\Controllers\Tutor\DashboardController::class, 'toggleTodo'])->name('todos.toggle');
+        Route::delete('/todos/{todo}', [App\Http\Controllers\Tutor\DashboardController::class, 'deleteTodo'])->name('todos.destroy');
 
         // Attendance
         Route::get('/attendance', [App\Http\Controllers\Tutor\AttendanceController::class, 'index'])

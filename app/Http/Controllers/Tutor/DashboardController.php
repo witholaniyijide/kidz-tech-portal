@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Tutor;
 use App\Http\Controllers\Controller;
 use App\Models\DailyClassSchedule;
 use App\Models\Notice;
+use App\Models\TutorTodo;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
@@ -152,6 +154,13 @@ class DashboardController extends Controller
             ->take(3)
             ->get();
 
+        // Get custom todos for this tutor
+        $customTodos = TutorTodo::where('tutor_id', $tutor->id)
+            ->incomplete()
+            ->orderByPriority()
+            ->orderBy('due_date')
+            ->get();
+
         return view('tutor.dashboard', compact(
             'tutor',
             'students',
@@ -171,7 +180,95 @@ class DashboardController extends Controller
             'weekClasses',
             'classesTodayCount',
             'schedulePosted',
-            'recentNotices'
+            'recentNotices',
+            'customTodos'
         ));
+    }
+
+    /**
+     * Store a new custom todo.
+     */
+    public function storeTodo(Request $request)
+    {
+        $tutor = Auth::user()->tutor;
+
+        if (!$tutor) {
+            return back()->with('error', 'Tutor profile not found.');
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'priority' => 'in:low,medium,high',
+            'due_date' => 'nullable|date',
+        ]);
+
+        TutorTodo::create([
+            'tutor_id' => $tutor->id,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'priority' => $validated['priority'] ?? 'medium',
+            'due_date' => $validated['due_date'] ?? null,
+        ]);
+
+        return back()->with('success', 'Todo added successfully.');
+    }
+
+    /**
+     * Update an existing todo.
+     */
+    public function updateTodo(Request $request, TutorTodo $todo)
+    {
+        $tutor = Auth::user()->tutor;
+
+        if (!$tutor || $todo->tutor_id !== $tutor->id) {
+            return back()->with('error', 'Unauthorized.');
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'priority' => 'in:low,medium,high',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $todo->update($validated);
+
+        return back()->with('success', 'Todo updated successfully.');
+    }
+
+    /**
+     * Toggle todo completion status.
+     */
+    public function toggleTodo(TutorTodo $todo)
+    {
+        $tutor = Auth::user()->tutor;
+
+        if (!$tutor || $todo->tutor_id !== $tutor->id) {
+            return back()->with('error', 'Unauthorized.');
+        }
+
+        $todo->update([
+            'completed' => !$todo->completed,
+            'completed_at' => !$todo->completed ? now() : null,
+        ]);
+
+        return back()->with('success', 'Todo updated.');
+    }
+
+    /**
+     * Delete a todo.
+     */
+    public function deleteTodo(TutorTodo $todo)
+    {
+        $tutor = Auth::user()->tutor;
+
+        if (!$tutor || $todo->tutor_id !== $tutor->id) {
+            return back()->with('error', 'Unauthorized.');
+        }
+
+        $todo->delete();
+
+        return back()->with('success', 'Todo deleted.');
     }
 }

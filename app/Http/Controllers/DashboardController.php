@@ -18,7 +18,7 @@ class DashboardController extends Controller
     $user = Auth::user();
     
     if ($user->hasRole('director')) {
-        return $this->directorDashboard();
+        return redirect()->route('director.dashboard');
     } elseif ($user->hasRole('admin')) {
         return $this->adminDashboard();
     } elseif ($user->hasRole('manager')) {
@@ -27,8 +27,10 @@ class DashboardController extends Controller
         return $this->tutorDashboard();
     } elseif ($user->hasRole('parent')) {
         return redirect()->route('parent.dashboard');
+    } elseif ($user->hasRole('student')) {
+        return redirect()->route('student.dashboard');
     }
-    
+
     return view('dashboard');
 }
 

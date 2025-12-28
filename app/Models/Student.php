@@ -224,17 +224,161 @@ class Student extends Model
      */
     public function progressPercentage()
     {
-        // Return roadmap_progress if set, otherwise calculate from progress items
-        if ($this->roadmap_progress !== null) {
-            return $this->roadmap_progress;
+        // Calculate progress from reports
+        return $this->calculateProgressFromReports()['overall_percentage'];
+    }
+
+    /**
+     * Calculate course progress from approved reports.
+     * Returns array with completed courses, in-progress course, and percentage.
+     */
+    public function calculateProgressFromReports()
+    {
+        // Define the standard course order (levels)
+        $allCourses = [
+            'Level 1 - Introduction to Computer Science',
+            'Level 2 - Coding and Fundamental Concepts',
+            'Level 3 - Scratch Programming',
+            'Level 4 - Artificial Intelligence',
+            'Level 5 - Graphics Design',
+            'Level 6 - Game Development',
+            'Level 7 - Mobile App Development',
+            'Level 8 - Website Development',
+            'Level 9 - Python Programming',
+            'Level 10 - Digital Literacy & Safety',
+            'Level 11 - Machine Learning',
+            'Level 12 - Robotics',
+        ];
+
+        $totalCourses = count($allCourses);
+
+        // Get all approved reports for this student, ordered by date
+        $reports = $this->tutorReports()
+            ->whereIn('status', ['approved-by-manager', 'approved-by-director'])
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->get();
+
+        if ($reports->isEmpty()) {
+            return [
+                'completed_courses' => [],
+                'in_progress_course' => null,
+                'overall_percentage' => 0,
+                'total_courses' => $totalCourses,
+                'completed_count' => 0,
+            ];
         }
 
-        $total = $this->progress()->count();
-        if ($total === 0) {
-            return 0;
+        $completedCourses = [];
+        $inProgressCourse = null;
+
+        foreach ($reports as $report) {
+            $courses = $report->courses;
+            if (is_string($courses)) {
+                $courses = json_decode($courses, true) ?? [];
+            }
+            if (!is_array($courses)) {
+                $courses = [];
+            }
+
+            if (count($courses) > 0) {
+                // If multiple courses in one report, all but the last are completed
+                if (count($courses) > 1) {
+                    for ($i = 0; $i < count($courses) - 1; $i++) {
+                        if (!in_array($courses[$i], $completedCourses)) {
+                            $completedCourses[] = $courses[$i];
+                        }
+                    }
+                }
+                // The last course in the report is the current/in-progress one
+                $inProgressCourse = end($courses);
+            }
         }
 
-        $completed = $this->progress()->where('completed', true)->count();
-        return (int) (($completed / $total) * 100);
+        // Mark courses as completed if they were followed by another course in later reports
+        // If the in-progress course appears in an earlier report and then another course appears,
+        // it means that course was completed
+        $allCoursesFromReports = [];
+        foreach ($reports as $report) {
+            $courses = $report->courses;
+            if (is_string($courses)) {
+                $courses = json_decode($courses, true) ?? [];
+            }
+            if (is_array($courses)) {
+                foreach ($courses as $course) {
+                    if (!in_array($course, $allCoursesFromReports)) {
+                        $allCoursesFromReports[] = $course;
+                    }
+                }
+            }
+        }
+
+        // If there are multiple unique courses across all reports,
+        // all but the last one in the list are completed
+        if (count($allCoursesFromReports) > 1) {
+            for ($i = 0; $i < count($allCoursesFromReports) - 1; $i++) {
+                if (!in_array($allCoursesFromReports[$i], $completedCourses)) {
+                    $completedCourses[] = $allCoursesFromReports[$i];
+                }
+            }
+            $inProgressCourse = end($allCoursesFromReports);
+        }
+
+        // Calculate percentage: completed courses / total courses * 100
+        $completedCount = count($completedCourses);
+        $overallPercentage = $totalCourses > 0 ? (int) (($completedCount / $totalCourses) * 100) : 0;
+
+        return [
+            'completed_courses' => $completedCourses,
+            'in_progress_course' => $inProgressCourse,
+            'overall_percentage' => $overallPercentage,
+            'total_courses' => $totalCourses,
+            'completed_count' => $completedCount,
+        ];
+    }
+
+    /**
+     * Get course progress details for display.
+     */
+    public function getCourseProgressDetails()
+    {
+        $progress = $this->calculateProgressFromReports();
+
+        $allCourses = [
+            'Level 1 - Introduction to Computer Science',
+            'Level 2 - Coding and Fundamental Concepts',
+            'Level 3 - Scratch Programming',
+            'Level 4 - Artificial Intelligence',
+            'Level 5 - Graphics Design',
+            'Level 6 - Game Development',
+            'Level 7 - Mobile App Development',
+            'Level 8 - Website Development',
+            'Level 9 - Python Programming',
+            'Level 10 - Digital Literacy & Safety',
+            'Level 11 - Machine Learning',
+            'Level 12 - Robotics',
+        ];
+
+        $courseDetails = [];
+        foreach ($allCourses as $course) {
+            $status = 'not_started';
+            if (in_array($course, $progress['completed_courses'])) {
+                $status = 'completed';
+            } elseif ($course === $progress['in_progress_course']) {
+                $status = 'in_progress';
+            }
+
+            $courseDetails[] = [
+                'name' => $course,
+                'status' => $status,
+            ];
+        }
+
+        return [
+            'courses' => $courseDetails,
+            'overall_percentage' => $progress['overall_percentage'],
+            'completed_count' => $progress['completed_count'],
+            'in_progress_course' => $progress['in_progress_course'],
+        ];
     }
 }

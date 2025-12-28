@@ -89,12 +89,45 @@ class ManagerDashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Auto-generated to-do list
+        $todos = [
+            [
+                'text' => "Review {$stats['pendingReports']} pending report(s)",
+                'completed' => $stats['pendingReports'] == 0,
+                'link' => route('manager.reports.index', ['status' => 'submitted']),
+                'count' => $stats['pendingReports'],
+                'priority' => $stats['pendingReports'] > 5 ? 'high' : 'medium',
+            ],
+            [
+                'text' => "Review {$stats['pendingAssessments']} assessment(s)",
+                'completed' => $stats['pendingAssessments'] == 0,
+                'link' => route('manager.assessments.index'),
+                'count' => $stats['pendingAssessments'],
+                'priority' => $stats['pendingAssessments'] > 3 ? 'high' : 'medium',
+            ],
+            [
+                'text' => "Approve {$stats['pendingAttendance']} attendance record(s)",
+                'completed' => $stats['pendingAttendance'] == 0,
+                'link' => route('manager.attendance.index', ['status' => 'pending']),
+                'count' => $stats['pendingAttendance'],
+                'priority' => $stats['pendingAttendance'] > 10 ? 'high' : 'low',
+            ],
+            [
+                'text' => "Check today's class schedule",
+                'completed' => $todaySchedule !== null,
+                'link' => route('manager.schedule.index'),
+                'count' => $stats['todayClasses'],
+                'priority' => 'low',
+            ],
+        ];
+
         return view('manager.dashboard', compact(
             'stats',
             'todaySchedule',
             'recentReports',
             'recentAssessments',
-            'notices'
+            'notices',
+            'todos'
         ));
     }
 

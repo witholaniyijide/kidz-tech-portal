@@ -280,9 +280,21 @@
                 <div class="px-6 py-3 border-b border-slate-200 dark:border-slate-700">
                     <input type="text" x-model="skillSearch" placeholder="Search skills..." class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#7978E9]">
                 </div>
+                <!-- Skills by Course (filtered by selected courses) -->
                 <div class="overflow-y-auto p-6" style="max-height: calc(85vh - 200px);">
+                    <!-- Notice when no courses selected -->
+                    <template x-if="selectedCourses.length === 0">
+                        <div class="text-center py-8">
+                            <svg class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <p class="text-slate-500 dark:text-slate-400 font-medium">No courses selected</p>
+                            <p class="text-sm text-slate-400 dark:text-slate-500 mt-1">Please select courses first to see available skills</p>
+                        </div>
+                    </template>
+
                     @foreach($skillsDatabase as $course => $skills)
-                        <div class="mb-6">
+                        <div class="mb-6" x-show="selectedCourses.includes('{{ $course }}') && (getFilteredSkillsCount('{{ $course }}', @json($skills)) > 0 || skillSearch === '')">
                             <h4 class="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                                 <span class="w-2 h-2 bg-[#7978E9] rounded-full"></span>
                                 {{ $course }}
@@ -333,7 +345,12 @@ function reportForm() {
                 this.newSkillInput = '';
             }
         },
-        addProject() { this.projects.push({ title: '', link: '' }); }
+        addProject() { this.projects.push({ title: '', link: '' }); },
+
+        getFilteredSkillsCount(course, skills) {
+            if (!this.skillSearch) return skills.length;
+            return skills.filter(skill => skill.toLowerCase().includes(this.skillSearch.toLowerCase())).length;
+        }
     }
 }
 </script>
