@@ -115,6 +115,9 @@ class AdminStudentController extends Controller
 
         $student = null;
 
+        // Generate student ID
+        $validated['student_id'] = 'STU-' . strtoupper(uniqid());
+
         DB::transaction(function() use ($validated, &$student) {
             $student = Student::create($validated);
 
