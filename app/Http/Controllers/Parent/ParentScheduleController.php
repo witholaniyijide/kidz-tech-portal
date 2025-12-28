@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Parent;
 
 use App\Http\Controllers\Controller;
-use App\Models\Schedule;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,21 +27,7 @@ class ParentScheduleController extends Controller
         // Get schedules for all children or selected child
         $studentIds = $selectedChildId ? [$selectedChildId] : $children->pluck('id')->toArray();
 
-        // Try to get schedules from Schedule model if it exists
-        $schedules = collect();
-        try {
-            $schedules = Schedule::whereIn('student_id', $studentIds)
-                ->with(['student', 'tutor'])
-                ->orderByRaw("FIELD(day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
-                ->orderBy('start_time')
-                ->get()
-                ->groupBy('day_of_week');
-        } catch (\Exception $e) {
-            // If Schedule model doesn't exist, use class_schedule from Student
-            $schedules = collect();
-        }
-
-        // Build weekly schedule from student's class_schedule if no Schedule model
+        // Build weekly schedule from student's class_schedule
         $weeklySchedule = [];
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
