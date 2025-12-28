@@ -4,7 +4,7 @@
     </x-slot>
     <x-slot name="title">{{ __('Attendance Details') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <!-- Action Button -->
             <div class="flex justify-end mb-4">
@@ -45,7 +45,7 @@
                         @csrf
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Comment (Optional)</label>
-                            <textarea name="comment" rows="2" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                            <textarea name="comment" rows="2" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]"></textarea>
                         </div>
                         <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all">Approve Attendance</button>
                     </form>

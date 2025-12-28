@@ -5,9 +5,9 @@
 
     <x-slot name="title">Director Analytics</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 relative overflow-hidden">
-        {{-- Floating Orbs --}}
-        <div class="absolute top-0 left-0 w-72 h-72 bg-blue-400 dark:bg-blue-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 relative overflow-hidden">
+        {{-- Floating Orbs - Director Indigo Theme --}}
+        <div class="absolute top-0 left-0 w-72 h-72 bg-indigo-400 dark:bg-indigo-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
         <div class="absolute top-0 right-0 w-72 h-72 bg-purple-400 dark:bg-purple-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -19,7 +19,7 @@
                     <p class="text-gray-600 dark:text-gray-400">Executive insights and performance metrics</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('director.analytics.reports.export', ['month' => now()->format('Y-m')]) }}" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all flex items-center">
+                    <a href="{{ route('director.analytics.reports.export', ['month' => now()->format('Y-m')]) }}" class="px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -46,7 +46,7 @@
                                 Active: {{ $stats['active_students'] }} | Inactive: {{ $stats['inactive_students'] }}
                             </p>
                         </div>
-                        <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-[#4F46E5] to-[#818CF8] flex items-center justify-center">
                             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
@@ -124,7 +124,7 @@
                             </svg>
                         </div>
                     </div>
-                    <a href="{{ route('director.reports.index') }}" class="text-xs text-blue-600 dark:text-blue-400 hover:underline">View Pending →</a>
+                    <a href="{{ route('director.reports.index') }}" class="text-xs text-[#4F46E5] dark:text-[#818CF8] hover:underline">View Pending →</a>
                 </div>
 
                 {{-- System Activity --}}
@@ -141,7 +141,7 @@
                             </svg>
                         </div>
                     </div>
-                    <a href="{{ route('director.activity-logs.index') }}" class="text-xs text-blue-600 dark:text-blue-400 hover:underline">View All →</a>
+                    <a href="{{ route('director.activity-logs.index') }}" class="text-xs text-[#4F46E5] dark:text-[#818CF8] hover:underline">View All →</a>
                 </div>
             </div>
 
@@ -152,7 +152,7 @@
                 <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Enrollment & Growth</h2>
-                        <button onclick="toggleTable('enrollments')" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View Data Table</button>
+                        <button onclick="toggleTable('enrollments')" class="text-sm text-[#4F46E5] dark:text-[#818CF8] hover:underline">View Data Table</button>
                     </div>
                     <div class="h-80">
                         <canvas id="enrollmentsChart"></canvas>
@@ -167,7 +167,7 @@
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl">
                         <div class="flex justify-between items-center mb-6">
                             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Monthly Report Submissions</h2>
-                            <button onclick="toggleTable('reports')" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View Table</button>
+                            <button onclick="toggleTable('reports')" class="text-sm text-[#4F46E5] dark:text-[#818CF8] hover:underline">View Table</button>
                         </div>
                         <div class="h-64">
                             <canvas id="reportsMonthlyChart"></canvas>

@@ -4,20 +4,20 @@
     </x-slot>
     <x-slot name="title">{{ __('Sent') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
+    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
 
             <!-- Tabs -->
             <div class="flex space-x-4 mb-6">
                 <a href="{{ route('director.messages.index') }}" 
-                   class="px-4 py-2 rounded-lg font-medium {{ request()->routeIs('director.messages.index') ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300' }}">
+                   class="px-4 py-2 rounded-lg font-medium {{ request()->routeIs('director.messages.index') ? 'bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300' }}">
                     <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
                     </svg>
                     Inbox
                 </a>
                 <a href="{{ route('director.messages.sent') }}" 
-                   class="px-4 py-2 rounded-lg font-medium {{ request()->routeIs('director.messages.sent') ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300' }}">
+                   class="px-4 py-2 rounded-lg font-medium {{ request()->routeIs('director.messages.sent') ? 'bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300' }}">
                     <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                     </svg>
@@ -34,7 +34,7 @@
                             <div class="flex items-start justify-between">
                                 <div class="flex items-start space-x-3">
                                     <!-- Avatar -->
-                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#818CF8] flex items-center justify-center text-white font-semibold flex-shrink-0">
                                         {{ strtoupper(substr($message->recipient->name, 0, 1)) }}
                                     </div>
                                     <div class="flex-1 min-w-0">

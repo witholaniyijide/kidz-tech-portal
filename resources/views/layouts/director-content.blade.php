@@ -7,7 +7,7 @@
 
         <title>{{ $title ?? config('app.name', 'Laravel') }} - Director Portal</title>
 
-        <!-- Favicon -->
+        <!-- Favicon - Director Indigo Theme -->
         <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}"
               onerror="this.href='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%234F46E5%22 width=%22100%22 height=%22100%22 rx=%2220%22/%3E%3Ctext x=%2250%22 y=%2265%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial, sans-serif%22 font-weight=%22bold%22%3EK%3C/text%3E%3C/svg%3E'">
 
@@ -28,6 +28,13 @@
         <!-- Hide Alpine.js elements until loaded -->
         <style>
             [x-cloak] { display: none !important; }
+
+            /* Director Indigo/Purple Theme Colors */
+            :root {
+                --director-primary: #4F46E5;
+                --director-primary-light: #818CF8;
+                --director-primary-dark: #3730A3;
+            }
         </style>
 
         @stack('styles')
@@ -70,7 +77,7 @@
                             <!-- Search -->
                             <div class="hidden md:block relative">
                                 <input type="text" placeholder="Search..."
-                                       class="w-64 pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-64 pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent">
                                 <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
@@ -133,7 +140,7 @@
                                     @click="open = !open"
                                     class="flex items-center gap-3 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
                                 >
-                                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#818CF8] flex items-center justify-center text-white font-bold text-sm shadow-lg">
                                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                     </div>
                                     <div class="text-left hidden md:block">

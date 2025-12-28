@@ -66,7 +66,7 @@
                     {{-- Month Filter --}}
                     <div>
                         <label for="month" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Month</label>
-                        <select name="month" id="month" class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <select name="month" id="month" class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent">
                             <option value="">All Months</option>
                             @foreach($months as $month)
                                 <option value="{{ $month }}" {{ request('month') == $month ? 'selected' : '' }}>
@@ -79,7 +79,7 @@
                     {{-- Tutor Filter --}}
                     <div>
                         <label for="tutor_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tutor</label>
-                        <select name="tutor_id" id="tutor_id" class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <select name="tutor_id" id="tutor_id" class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent">
                             <option value="">All Tutors</option>
                             @foreach($tutors as $tutor)
                                 <option value="{{ $tutor->id }}" {{ request('tutor_id') == $tutor->id ? 'selected' : '' }}>
@@ -92,7 +92,7 @@
                     {{-- Student Filter --}}
                     <div>
                         <label for="student_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Student</label>
-                        <select name="student_id" id="student_id" class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <select name="student_id" id="student_id" class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent">
                             <option value="">All Students</option>
                             @foreach($students as $student)
                                 <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
@@ -104,7 +104,7 @@
 
                     {{-- Filter Buttons --}}
                     <div class="md:col-span-3 flex gap-3">
-                        <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all font-medium flex items-center">
+                        <button type="submit" class="px-6 py-3 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all font-medium flex items-center">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                             </svg>
@@ -179,7 +179,7 @@
                                             </div>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <a href="{{ route('director.reports.show', $report) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all font-medium text-sm">
+                                            <a href="{{ route('director.reports.show', $report) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all font-medium text-sm">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />

@@ -19,7 +19,7 @@
                 <div class="flex items-center justify-between flex-wrap">
                     <div>
                         <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                            Welcome back, <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">{{ Auth::user()->name }}</span>!
+                            Welcome back, <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#818CF8]">{{ Auth::user()->name }}</span>!
                         </h3>
                         <p class="text-gray-600 dark:text-gray-300 text-lg">Here's what's happening with your organization today.</p>
                     </div>
@@ -105,7 +105,7 @@
                                                 $formattedTime = $class['time'];
                                             }
                                         @endphp
-                                        <span class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ $formattedTime }}</span>
+                                        <span class="text-sm font-bold text-[#4F46E5] dark:text-[#818CF8]">{{ $formattedTime }}</span>
                                     </div>
                                     <div class="flex-1 ml-4">
                                         <p class="font-medium text-gray-900 dark:text-white">{{ $class['student'] }}</p>
@@ -245,7 +245,7 @@
 
                             <!-- Modal Footer -->
                             <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <button @click="showModal = false" class="w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all">
+                                <button @click="showModal = false" class="w-full px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white font-semibold rounded-lg hover:from-[#3730A3] hover:to-[#4F46E5] transition-all">
                                     Close
                                 </button>
                             </div>
@@ -314,7 +314,7 @@
                 >
                     <div class="mb-6">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 mr-2 text-[#4F46E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                             </svg>
                             Today's To-Do List
@@ -331,12 +331,12 @@
                                     x-model="todo.completed"
                                     @change="saveTodos()"
                                     @keydown="handleKeydown($event, index)"
-                                    class="mt-0.5 w-5 h-5 text-blue-500 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                    class="mt-0.5 w-5 h-5 text-[#4F46E5] border-gray-300 dark:border-gray-600 rounded focus:ring-[#4F46E5] focus:ring-2 cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#4F46E5] focus-visible:ring-offset-2"
                                     :aria-label="'Mark task as ' + (todo.completed ? 'incomplete' : 'complete')"
                                 >
                                 <label
                                     :for="'todo-' + index"
-                                    class="flex-1 ml-3 text-gray-800 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors cursor-pointer text-sm"
+                                    class="flex-1 ml-3 text-gray-800 dark:text-gray-200 group-hover:text-[#4F46E5] dark:group-hover:text-[#818CF8] transition-colors cursor-pointer text-sm"
                                     :class="{ 'line-through opacity-50': todo.completed }"
                                     x-text="todo.text"
                                 ></label>
@@ -354,7 +354,7 @@
                         </template>
 
                         <div x-show="todos.length === 0" class="text-center py-8">
-                            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center opacity-50">
+                            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#818CF8] flex items-center justify-center opacity-50">
                                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                 </svg>
@@ -369,12 +369,12 @@
                             type="text"
                             x-model="newTodo"
                             placeholder="Add a new task..."
-                            class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500"
+                            class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
                             aria-label="New task input"
                         >
                         <button
                             type="submit"
-                            class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500"
+                            class="px-5 py-2.5 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5] focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
                             aria-label="Add task"
                         >
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -383,9 +383,9 @@
                         </button>
                     </form>
 
-                    <div class="p-3 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 border border-blue-200 dark:border-blue-700">
+                    <div class="p-3 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 border border-indigo-200 dark:border-indigo-700">
                         <p class="text-xs text-gray-700 dark:text-gray-300 flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <svg class="w-4 h-4 mr-2 text-[#4F46E5] dark:text-[#818CF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             Tasks are saved automatically in your browser
@@ -402,7 +402,7 @@
                     <x-ui.glass-card>
                         <div class="flex items-center justify-between mb-4">
                             <x-ui.section-title>Notice Board</x-ui.section-title>
-                            <a href="{{ route('director.notices.create') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium">+ Create Notice</a>
+                            <a href="{{ route('director.notices.create') }}" class="text-sm text-[#4F46E5] dark:text-[#818CF8] hover:underline font-medium">+ Create Notice</a>
                         </div>
                         <div class="space-y-4 max-h-80 overflow-y-auto">
                             @if(($notices ?? collect())->isEmpty())
@@ -431,7 +431,7 @@
                                         <p class="text-xs text-gray-500 mt-2">{{ $notice->created_at->diffForHumans() }}</p>
                                     </div>
                                 @endforeach
-                                <a href="{{ route('director.notices.index') }}" class="block text-center mt-4 text-blue-600 dark:text-blue-400 hover:underline text-sm">View All Notices →</a>
+                                <a href="{{ route('director.notices.index') }}" class="block text-center mt-4 text-[#4F46E5] dark:text-[#818CF8] hover:underline text-sm">View All Notices →</a>
                             @endif
                         </div>
                     </x-ui.glass-card>
@@ -464,7 +464,7 @@
                 <x-ui.glass-card>
                     <div class="flex items-center justify-between mb-4">
                         <x-ui.section-title>Recent Activity</x-ui.section-title>
-                        <a href="{{ route('director.activity-logs.index') }}" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400">View All</a>
+                        <a href="{{ route('director.activity-logs.index') }}" class="text-sm text-[#4F46E5] hover:text-[#3730A3] dark:text-[#818CF8]">View All</a>
                     </div>
                     <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Latest updates and actions</p>
                     <div class="space-y-4 max-h-64 overflow-y-auto">
@@ -528,12 +528,12 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     <a href="{{ route('director.students.index') }}" class="group">
                         <div class="rounded-xl bg-white/10 dark:bg-gray-900/10 p-6 text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
-                            <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                            <div class="w-16 h-16 mx-auto mb-3 rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#818CF8] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                                 </svg>
                             </div>
-                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-blue-600">Students</span>
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-[#4F46E5]">Students</span>
                         </div>
                     </a>
 
