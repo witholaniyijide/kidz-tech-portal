@@ -162,6 +162,52 @@
                 </div>
             </div>
 
+            {{-- Availability Calendar --}}
+            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                <div class="px-6 py-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+                    <h3 class="text-lg font-semibold">Weekly Availability</h3>
+                </div>
+                <div class="p-6">
+                    @php
+                        $availabilities = $tutor->availabilities ?? collect();
+                        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                        $availabilityByDay = $availabilities->groupBy('day_of_week');
+                    @endphp
+
+                    @if($availabilities->isEmpty())
+                        <div class="text-center py-8">
+                            <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <p class="text-gray-500 dark:text-gray-400">No availability set</p>
+                        </div>
+                    @else
+                        <div class="grid grid-cols-7 gap-2">
+                            @foreach($days as $day)
+                                <div class="text-center">
+                                    <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">{{ substr($day, 0, 3) }}</div>
+                                    @if(isset($availabilityByDay[$day]) && $availabilityByDay[$day]->count() > 0)
+                                        <div class="space-y-1">
+                                            @foreach($availabilityByDay[$day] as $slot)
+                                                <div class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded text-xs">
+                                                    {{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }}
+                                                    -
+                                                    {{ \Carbon\Carbon::parse($slot->end_time)->format('g:i A') }}
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded text-xs">
+                                            -
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             {{-- Assigned Students --}}
             @if($tutor->students && $tutor->students->count() > 0)
                 <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden">
