@@ -115,7 +115,7 @@ class ManagerDashboardController extends Controller
             [
                 'text' => "Check today's class schedule",
                 'completed' => $todaySchedule !== null,
-                'link' => route('manager.schedule.index'),
+                'link' => route('manager.attendance.calendar'),
                 'count' => $stats['todayClasses'],
                 'priority' => 'low',
             ],
