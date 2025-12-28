@@ -45,6 +45,74 @@
         :currentStage="$student->roadmap_stage ?? 'Intro to CS'"
         :progress="$student->progressPercentage()" />
 
+    <!-- Course Progress from Reports -->
+    @if(isset($courseProgress) && isset($courseProgress['courses']))
+    <x-ui.glass-card>
+        <div class="mb-6">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Course Progress</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Track your advancement through the curriculum based on your reports</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach($courseProgress['courses'] as $course)
+                <div class="p-4 rounded-xl border transition-all duration-200 hover:shadow-lg
+                    @if($course['status'] === 'completed')
+                        bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800
+                    @elseif($course['status'] === 'in_progress')
+                        bg-gradient-to-br from-blue-50 to-sky-50 dark:from-blue-900/20 dark:to-sky-900/20 border-blue-200 dark:border-blue-800
+                    @else
+                        bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700
+                    @endif">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0">
+                            @if($course['status'] === 'completed')
+                                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                            @elseif($course['status'] === 'in_progress')
+                                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center animate-pulse">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                    </svg>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $course['name'] }}</p>
+                            <p class="text-xs mt-1
+                                @if($course['status'] === 'completed') text-green-600 dark:text-green-400
+                                @elseif($course['status'] === 'in_progress') text-blue-600 dark:text-blue-400
+                                @else text-gray-500 dark:text-gray-400
+                                @endif">
+                                @if($course['status'] === 'completed') ✓ Completed
+                                @elseif($course['status'] === 'in_progress') In Progress
+                                @else Not Started
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        @if($courseProgress['in_progress_course'])
+            <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                <p class="text-sm text-blue-700 dark:text-blue-300">
+                    <span class="font-semibold">Currently Working On:</span> {{ $courseProgress['in_progress_course'] }}
+                </p>
+            </div>
+        @endif
+    </x-ui.glass-card>
+    @endif
+
     <!-- Progress Timeline -->
     <x-ui.glass-card>
         <div class="mb-6">

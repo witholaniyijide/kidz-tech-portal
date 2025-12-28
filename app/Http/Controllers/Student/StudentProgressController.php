@@ -20,18 +20,28 @@ class StudentProgressController extends Controller
         // Find the student record by email
         $student = Student::where('email', $user->email)->firstOrFail();
 
-        // Get all progress items for this student
+        // Get course progress from reports
+        $courseProgress = $student->getCourseProgressDetails();
+
+        // Calculate counts
+        $completedCount = $courseProgress['completed_count'];
+        $inProgressCount = $courseProgress['in_progress_course'] ? 1 : 0;
+        $totalPoints = $completedCount * 100; // 100 points per completed course
+
+        // Get all progress items for this student (legacy support)
         $progressItems = $student->progress()
             ->orderBy('completed', 'asc')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
-        // Authorize that the user can view progress items
-        foreach ($progressItems as $progress) {
-            $this->authorize('view', $progress);
-        }
-
-        return view('student.progress.index', compact('student', 'progressItems'));
+        return view('student.progress.index', compact(
+            'student',
+            'progressItems',
+            'courseProgress',
+            'completedCount',
+            'inProgressCount',
+            'totalPoints'
+        ));
     }
 
     /**
