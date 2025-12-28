@@ -466,6 +466,10 @@ Route::prefix('director')
     ->middleware(['auth', 'verified', 'role:director'])
     ->name('director.')
     ->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [App\Http\Controllers\Director\DirectorDashboardController::class, 'index'])
+            ->name('dashboard');
+
         // Director Final Approval for Tutor Reports (Legacy - ReportApprovalController)
         // Keeping these routes for backward compatibility
         Route::get('/reports-legacy', [App\Http\Controllers\Director\ReportApprovalController::class, 'index'])
