@@ -73,6 +73,31 @@ class Student extends Model
     ];
 
     /**
+     * Default attribute values for legacy fields
+     */
+    protected $attributes = [
+        'parent_name' => null,
+        'parent_email' => null,
+        'parent_phone' => null,
+        'parent_relationship' => null,
+    ];
+
+    /**
+     * Boot the model and register event handlers
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($student) {
+            // Auto-generate student_id if not provided
+            if (empty($student->student_id)) {
+                $student->student_id = 'STU-' . strtoupper(uniqid());
+            }
+        });
+    }
+
+    /**
      * Get student's full name
      */
     public function getFullNameAttribute()
