@@ -441,6 +441,12 @@ class DashboardController extends Controller
     
     private function managerDashboard()
     {
+        // Redirect to the correct manager dashboard
+        return redirect()->route('manager.dashboard');
+    }
+
+    private function managerDashboardOld()
+    {
         $totalStudents = Student::count();
         $activeStudents = Student::where('status', 'active')->count();
         $inactiveStudents = Student::where('status', 'inactive')->count();

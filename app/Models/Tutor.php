@@ -68,6 +68,30 @@ class Tutor extends Model
         return $this->hasMany(TutorReport::class);
     }
 
+    /**
+     * Alias for reports - used by manager views
+     */
+    public function monthlyReports()
+    {
+        return $this->hasMany(TutorReport::class);
+    }
+
+    /**
+     * Get tutor assessments
+     */
+    public function tutorAssessments()
+    {
+        return $this->hasMany(TutorAssessment::class);
+    }
+
+    /**
+     * Alias for tutorAssessments - for assessments relationship
+     */
+    public function assessments()
+    {
+        return $this->hasMany(TutorAssessment::class);
+    }
+
     public function notifications()
     {
         return $this->hasMany(TutorNotification::class);

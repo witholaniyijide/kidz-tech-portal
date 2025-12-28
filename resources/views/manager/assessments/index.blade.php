@@ -52,40 +52,44 @@
 
                     <form @submit.prevent="saveAssessment()">
                         {{-- Selection Grid --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                            {{-- Tutor --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                            {{-- Student --}}
                             <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Tutor *</label>
-                                <select x-model="formData.tutor_id" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
-                                    <option value="">Select tutor</option>
-                                    @foreach($tutors as $tutor)
-                                        <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Student *</label>
+                                <select x-model="formData.student_id" @change="selectStudent()" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
+                                    <option value="">Select student</option>
+                                    @foreach($students ?? [] as $student)
+                                        <option value="{{ $student->id }}" data-tutor-id="{{ $student->tutor_id }}" data-tutor-name="{{ $student->tutor ? $student->tutor->first_name . ' ' . $student->tutor->last_name : 'No Tutor Assigned' }}">
+                                            {{ $student->first_name }} {{ $student->last_name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
 
-                            {{-- Assessment Period --}}
+                            {{-- Tutor (Auto-selected) --}}
                             <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Assessment Period *</label>
-                                <input type="text" x-model="formData.assessment_month" required placeholder="e.g., November 2024"
-                                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Assigned Tutor</label>
+                                <div class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-600">
+                                    <span x-text="selectedTutorName || 'Select a student first'" :class="selectedTutorName ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'"></span>
+                                    <input type="hidden" x-model="formData.tutor_id">
+                                </div>
                             </div>
 
-                            {{-- Year --}}
+                            {{-- Date Class Taken --}}
                             <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Year</label>
-                                <select x-model="formData.year" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:border-[#C15F3C] focus:ring-[#C15F3C]">
-                                    <option value="{{ date('Y') - 1 }}">{{ date('Y') - 1 }}</option>
-                                    <option value="{{ date('Y') }}" selected>{{ date('Y') }}</option>
-                                    <option value="{{ date('Y') + 1 }}">{{ date('Y') + 1 }}</option>
-                                </select>
-                            </div>
-
-                            {{-- Week --}}
-                            <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Week</label>
-                                <input type="number" x-model="formData.week" min="1" max="53" placeholder="Week number"
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Date Class Taken *</label>
+                                <input type="date" x-model="formData.class_date" @change="updateWeekFromDate()" required
                                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
+                            </div>
+                        </div>
+
+                        {{-- Week Display --}}
+                        <div class="mb-6 p-4 bg-[#C15F3C]/10 dark:bg-[#C15F3C]/20 rounded-xl" x-show="formData.class_date">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-[#C15F3C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span class="font-medium text-[#C15F3C] dark:text-[#DA7756]" x-text="weekDisplay"></span>
                             </div>
                         </div>
 
@@ -183,18 +187,29 @@
                 {{-- Header with Week Navigator --}}
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
                     <div>
-                        <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">Dashboard - Week <span x-text="weekView"></span></h2>
-                        <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">Tutor assessments grouped by week</p>
+                        <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">Dashboard</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm" x-text="dashboardWeekDisplay"></p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <label class="text-gray-500 font-medium text-sm">Week</label>
-                        <input type="number" x-model="weekView" min="1" max="52" class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg w-24 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
+                    <div class="flex items-center gap-2">
+                        <button @click="changeWeek(-1)" class="p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all">
+                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <div class="px-4 py-2 bg-gradient-to-r from-[#C15F3C] to-[#DA7756] text-white rounded-lg font-medium min-w-[200px] text-center">
+                            <span x-text="'Week ' + weekView + ' (' + weekDateRange + ')'"></span>
+                        </div>
+                        <button @click="changeWeek(1)" class="p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all">
+                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
                 {{-- Filters --}}
                 <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-4 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
                             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Filter by Tutor</label>
                             <select x-model="dashFilterTutor" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C]">
@@ -211,10 +226,6 @@
                                 <option value="draft">Draft</option>
                                 <option value="approved-by-manager">Awaiting Director</option>
                             </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Filter by Period</label>
-                            <input type="text" x-model="dashFilterMonth" placeholder="e.g., November 2024" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C]">
                         </div>
                         <div class="flex items-end">
                             <button @click="clearDashFilters()" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all">
@@ -410,6 +421,11 @@
                 editing: null,
                 session: 1,
                 weekView: {{ date('W') }},
+                weekYear: {{ date('Y') }},
+                weekDateRange: '',
+                dashboardWeekDisplay: '',
+                selectedTutorName: '',
+                weekDisplay: '',
 
                 stats: {
                     total: {{ $stats['total'] }},
@@ -419,10 +435,11 @@
                 },
 
                 formData: {
+                    student_id: '',
                     tutor_id: '',
-                    assessment_month: '',
-                    year: {{ date('Y') }},
+                    class_date: '',
                     week: {{ date('W') }},
+                    year: {{ date('Y') }},
                     performance_score: '',
                     strengths: '',
                     weaknesses: '',
@@ -446,7 +463,6 @@
 
                 dashFilterTutor: '',
                 dashFilterStatus: '',
-                dashFilterMonth: '',
 
                 toast: {
                     show: false,
@@ -458,6 +474,66 @@
                     this.criteria.forEach(c => {
                         this.checkedCriteria[c.id] = false;
                     });
+                    this.updateWeekDateRange();
+                },
+
+                // Get week date range in format "Dec 21 - Dec 27"
+                getWeekDateRange(weekNum, year) {
+                    const simple = new Date(year, 0, 1 + (weekNum - 1) * 7);
+                    const dow = simple.getDay();
+                    const startDate = new Date(simple);
+                    startDate.setDate(simple.getDate() - dow + 1); // Monday
+                    const endDate = new Date(startDate);
+                    endDate.setDate(startDate.getDate() + 6); // Sunday
+
+                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    return `${months[startDate.getMonth()]} ${startDate.getDate()} - ${months[endDate.getMonth()]} ${endDate.getDate()}`;
+                },
+
+                updateWeekDateRange() {
+                    this.weekDateRange = this.getWeekDateRange(this.weekView, this.weekYear);
+                    this.dashboardWeekDisplay = `Tutor assessments for Week ${this.weekView} (${this.weekDateRange})`;
+                },
+
+                changeWeek(delta) {
+                    this.weekView += delta;
+                    if (this.weekView < 1) {
+                        this.weekView = 52;
+                        this.weekYear--;
+                    } else if (this.weekView > 52) {
+                        this.weekView = 1;
+                        this.weekYear++;
+                    }
+                    this.updateWeekDateRange();
+                },
+
+                // Select student and auto-fill tutor
+                selectStudent() {
+                    const select = document.querySelector('select[x-model="formData.student_id"]');
+                    const option = select.options[select.selectedIndex];
+                    if (option && option.value) {
+                        this.formData.tutor_id = option.dataset.tutorId || '';
+                        this.selectedTutorName = option.dataset.tutorName || 'No Tutor Assigned';
+                    } else {
+                        this.formData.tutor_id = '';
+                        this.selectedTutorName = '';
+                    }
+                },
+
+                // Update week from selected date
+                updateWeekFromDate() {
+                    if (this.formData.class_date) {
+                        const date = new Date(this.formData.class_date);
+                        const oneJan = new Date(date.getFullYear(), 0, 1);
+                        const numberOfDays = Math.floor((date - oneJan) / (24 * 60 * 60 * 1000));
+                        const weekNum = Math.ceil((date.getDay() + 1 + numberOfDays) / 7);
+
+                        this.formData.week = weekNum;
+                        this.formData.year = date.getFullYear();
+
+                        const weekRange = this.getWeekDateRange(weekNum, date.getFullYear());
+                        this.weekDisplay = `Week ${weekNum} (${weekRange})`;
+                    }
                 },
 
                 showToast(message, type = 'success') {
@@ -467,15 +543,18 @@
 
                 resetForm() {
                     this.formData = {
+                        student_id: '',
                         tutor_id: '',
-                        assessment_month: '',
-                        year: new Date().getFullYear(),
+                        class_date: '',
                         week: parseInt('{{ date("W") }}'),
+                        year: new Date().getFullYear(),
                         performance_score: '',
                         strengths: '',
                         weaknesses: '',
                         recommendations: ''
                     };
+                    this.selectedTutorName = '';
+                    this.weekDisplay = '';
                     this.criteria.forEach(c => {
                         this.checkedCriteria[c.id] = false;
                     });
@@ -486,12 +565,16 @@
                 clearDashFilters() {
                     this.dashFilterTutor = '';
                     this.dashFilterStatus = '';
-                    this.dashFilterMonth = '';
                 },
 
                 async saveAssessment() {
-                    if (!this.formData.tutor_id || !this.formData.assessment_month) {
-                        this.showToast('Please select a tutor and enter assessment period', 'error');
+                    if (!this.formData.student_id || !this.formData.class_date) {
+                        this.showToast('Please select a student and enter class date', 'error');
+                        return;
+                    }
+
+                    if (!this.formData.tutor_id) {
+                        this.showToast('Selected student has no assigned tutor', 'error');
                         return;
                     }
 
@@ -504,6 +587,7 @@
                             },
                             body: JSON.stringify({
                                 ...this.formData,
+                                assessment_month: this.weekDisplay,
                                 session: this.session,
                                 criteria_assessed: Object.keys(this.checkedCriteria).filter(k => this.checkedCriteria[k]),
                                 criteria_ratings: this.ratings

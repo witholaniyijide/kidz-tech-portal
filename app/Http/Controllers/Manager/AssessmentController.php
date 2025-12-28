@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Manager;
 use App\Http\Controllers\Controller;
 use App\Models\TutorAssessment;
 use App\Models\Tutor;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -52,7 +53,13 @@ class AssessmentController extends Controller
         // Get active tutors for filter
         $tutors = Tutor::where('status', 'active')->orderBy('first_name')->get();
 
-        return view('manager.assessments.index', compact('assessments', 'stats', 'tutors'));
+        // Get active students with their tutors for the form
+        $students = Student::with('tutor')
+            ->where('status', 'active')
+            ->orderBy('first_name')
+            ->get();
+
+        return view('manager.assessments.index', compact('assessments', 'stats', 'tutors', 'students'));
     }
 
     /**
@@ -72,7 +79,11 @@ class AssessmentController extends Controller
     {
         $validated = $request->validate([
             'tutor_id' => 'required|exists:tutors,id',
+            'student_id' => 'nullable|exists:students,id',
             'assessment_month' => 'required|string|max:50',
+            'class_date' => 'nullable|date',
+            'week' => 'nullable|integer|min:1|max:53',
+            'year' => 'nullable|integer',
             'performance_score' => 'nullable|integer|min:0|max:100',
             'professionalism_rating' => 'nullable|integer|min:1|max:5',
             'communication_rating' => 'nullable|integer|min:1|max:5',
@@ -81,12 +92,27 @@ class AssessmentController extends Controller
             'weaknesses' => 'nullable|string|max:2000',
             'recommendations' => 'nullable|string|max:2000',
             'manager_comment' => 'nullable|string|max:2000',
+            'session' => 'nullable|integer|min:1|max:3',
+            'criteria_assessed' => 'nullable|array',
+            'criteria_ratings' => 'nullable|array',
         ]);
 
         $validated['manager_id'] = Auth::id();
         $validated['status'] = 'draft';
 
+        // Store criteria as JSON if provided
+        if (isset($validated['criteria_assessed'])) {
+            $validated['criteria_assessed'] = json_encode($validated['criteria_assessed']);
+        }
+        if (isset($validated['criteria_ratings'])) {
+            $validated['criteria_ratings'] = json_encode($validated['criteria_ratings']);
+        }
+
         TutorAssessment::create($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Assessment created successfully.']);
+        }
 
         return redirect()
             ->route('manager.assessments.index')
