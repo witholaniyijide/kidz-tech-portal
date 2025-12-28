@@ -1,165 +1,321 @@
 <x-app-layout>
-    <x-slot name="header">
-        {{ __('Student Details') }}
-    </x-slot>
-
+    <x-slot name="header">{{ __('Student Details') }}</x-slot>
     <x-slot name="title">{{ $student->first_name }} {{ $student->last_name }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Action Buttons -->
-            <div class="flex justify-end space-x-3 mb-4">
-                <a href="{{ route('director.students.edit', $student) }}"
-                   class="inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg transition-all duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                    </svg>
-                    Edit
-                </a>
-                <a href="{{ route('director.students.index') }}"
-                   class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition-all duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                    Back
-                </a>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
+
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            {{-- Flash Messages --}}
+            @if(session('success'))
+                <div class="mb-6 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-400 text-emerald-800 dark:text-emerald-400 px-6 py-4 rounded-xl">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            {{-- Header --}}
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                        {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                            {{ $student->first_name }} {{ $student->other_name }} {{ $student->last_name }}
+                        </h1>
+                        <p class="text-gray-600 dark:text-gray-400">{{ $student->email ?? 'No email provided' }}</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <a href="{{ route('director.students.edit', $student) }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        Edit
+                    </a>
+                    <a href="{{ route('director.students.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        Back
+                    </a>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Left Column - Profile -->
-                <div class="lg:col-span-1">
-                    <x-ui.glass-card>
-                        <div class="text-center">
-                            <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-[#4F46E5] to-[#818CF8] flex items-center justify-center text-white text-3xl font-bold">
-                                {{ strtoupper(substr($student->first_name, 0, 1) . substr($student->last_name, 0, 1)) }}
-                            </div>
-                            <h3 class="mt-4 text-xl font-bold text-gray-900 dark:text-white">
-                                {{ $student->first_name }} {{ $student->last_name }}
-                            </h3>
-                            <p class="text-gray-500 dark:text-gray-400">{{ $student->student_id }}</p>
-                            <div class="mt-2">
-                                <x-ui.status-badge :status="$student->status" />
-                            </div>
-                        </div>
+            {{-- Status Badge --}}
+            <div class="mb-6">
+                <span class="inline-flex px-4 py-2 text-sm font-semibold rounded-full
+                    @if($student->status === 'active') bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400
+                    @elseif($student->status === 'inactive') bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300
+                    @elseif($student->status === 'graduated') bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400
+                    @else bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400
+                    @endif">
+                    {{ ucfirst($student->status) }}
+                </span>
+            </div>
 
-                        <div class="mt-6 space-y-4">
-                            @if($student->email)
-                            <div class="flex items-center text-gray-600 dark:text-gray-300">
-                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                </svg>
-                                {{ $student->email }}
-                            </div>
-                            @endif
-                            @if($student->phone)
-                            <div class="flex items-center text-gray-600 dark:text-gray-300">
-                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                                </svg>
-                                {{ $student->phone }}
-                            </div>
-                            @endif
-                            @if($student->date_of_birth)
-                            <div class="flex items-center text-gray-600 dark:text-gray-300">
-                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                {{ \Carbon\Carbon::parse($student->date_of_birth)->format('M d, Y') }}
-                                ({{ \Carbon\Carbon::parse($student->date_of_birth)->age }} years old)
-                            </div>
-                            @endif
-                            @if($student->address)
-                            <div class="flex items-start text-gray-600 dark:text-gray-300">
-                                <svg class="w-5 h-5 mr-3 mt-0.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                {{ $student->address }}
-                            </div>
-                            @endif
-                        </div>
-                    </x-ui.glass-card>
+            {{-- Student Info --}}
+            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
+                    <h3 class="text-lg font-semibold">Student Information</h3>
                 </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Full Name</label>
+                            <p class="text-gray-900 dark:text-white font-medium">{{ $student->first_name }} {{ $student->other_name }} {{ $student->last_name }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Email</label>
+                            <p class="text-gray-900 dark:text-white">{{ $student->email ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Phone</label>
+                            <p class="text-gray-900 dark:text-white">{{ $student->phone ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Date of Birth</label>
+                            <p class="text-gray-900 dark:text-white">
+                                @if($student->date_of_birth)
+                                    {{ $student->date_of_birth->format('M j, Y') }} ({{ $student->date_of_birth->age }} years old)
+                                @else
+                                    -
+                                @endif
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Gender</label>
+                            <p class="text-gray-900 dark:text-white">{{ ucfirst($student->gender ?? '-') }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Address</label>
+                            <p class="text-gray-900 dark:text-white">{{ $student->address ?? '-' }}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Coding Experience</label>
+                            <p class="text-gray-900 dark:text-white">{{ $student->coding_experience ?? '-' }}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Career Interest</label>
+                            <p class="text-gray-900 dark:text-white">{{ $student->career_interest ?? '-' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Right Column - Details -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Academic Info -->
-                    <x-ui.glass-card>
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Academic Information</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Current Level</p>
-                                <p class="font-medium text-gray-900 dark:text-white">{{ $student->current_level ?? 'Not set' }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Enrollment Date</p>
-                                <p class="font-medium text-gray-900 dark:text-white">
-                                    {{ $student->enrollment_date ? \Carbon\Carbon::parse($student->enrollment_date)->format('M d, Y') : 'Not set' }}
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Assigned Tutor</p>
-                                <p class="font-medium text-gray-900 dark:text-white">
-                                    {{ $student->tutor ? $student->tutor->first_name . ' ' . $student->tutor->last_name : 'Unassigned' }}
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Classes Per Week</p>
-                                <p class="font-medium text-gray-900 dark:text-white">{{ $student->classes_per_week ?? 'Not set' }}</p>
+            {{-- Class Info --}}
+            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                <div class="px-6 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                    <h3 class="text-lg font-semibold">Class Information</h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Tutor Assigned</label>
+                            <p class="text-gray-900 dark:text-white font-medium">
+                                @if($student->tutor)
+                                    {{ $student->tutor->first_name }} {{ $student->tutor->last_name }}
+                                @else
+                                    <span class="text-gray-400 italic">Unassigned</span>
+                                @endif
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Starting Course Level</label>
+                            <p class="text-gray-900 dark:text-white">{{ $student->starting_course_level ? 'Level ' . $student->starting_course_level : '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Current Level</label>
+                            <p class="text-gray-900 dark:text-white">{{ $student->current_level ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Classes Per Week</label>
+                            <p class="text-gray-900 dark:text-white">{{ $student->classes_per_week ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Enrollment Date</label>
+                            <p class="text-gray-900 dark:text-white">{{ $student->enrollment_date?->format('M j, Y') ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Google Classroom</label>
+                            @if($student->google_classroom_link)
+                                <a href="{{ $student->google_classroom_link }}" target="_blank" class="text-[#423A8E] dark:text-[#00CCCD] hover:underline truncate block">View Link</a>
+                            @else
+                                <p class="text-gray-400">-</p>
+                            @endif
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Live Classroom</label>
+                            @if($student->live_classroom_link)
+                                <a href="{{ $student->live_classroom_link }}" target="_blank" class="text-[#423A8E] dark:text-[#00CCCD] hover:underline truncate block">View Link</a>
+                            @else
+                                <p class="text-gray-400">-</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Class Schedule --}}
+                    @php
+                        $classSchedule = $student->class_schedule;
+                        if (is_string($classSchedule)) {
+                            $classSchedule = json_decode($classSchedule, true) ?? [];
+                        }
+                    @endphp
+                    @if($classSchedule && is_array($classSchedule) && count($classSchedule) > 0)
+                        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Class Schedule</label>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($classSchedule as $schedule)
+                                    @if(isset($schedule['day']) && isset($schedule['time']))
+                                        <span class="inline-flex items-center px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm">
+                                            <span class="font-medium">{{ ucfirst($schedule['day']) }}</span>
+                                            <span class="mx-1">-</span>
+                                            <span>{{ $schedule['time'] }}</span>
+                                        </span>
+                                    @endif
+                                @endforeach
                             </div>
                         </div>
-                    </x-ui.glass-card>
-
-                    <!-- Class Schedule -->
-                    @if($student->class_schedule)
-                    <x-ui.glass-card>
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Class Schedule</h4>
-                        <div class="space-y-2">
-                            @php $schedules = json_decode($student->class_schedule, true) ?? []; @endphp
-                            @forelse($schedules as $schedule)
-                                <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                    <svg class="w-5 h-5 mr-3 text-[#4F46E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <span class="font-medium text-gray-900 dark:text-white">{{ $schedule['day'] ?? '' }}</span>
-                                    <span class="mx-2 text-gray-400">at</span>
-                                    <span class="text-gray-600 dark:text-gray-300">{{ $schedule['time'] ?? '' }}</span>
-                                </div>
-                            @empty
-                                <p class="text-gray-500 dark:text-gray-400">No schedule set</p>
-                            @endforelse
-                        </div>
-                    </x-ui.glass-card>
                     @endif
+                </div>
+            </div>
 
-                    <!-- Guardian Info -->
+            {{-- Parent Info --}}
+            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                <div class="px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white">
+                    <h3 class="text-lg font-semibold">Parent Information</h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {{-- Father --}}
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <span class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mr-2 text-blue-600 text-lg">F</span>
+                                Father
+                            </h4>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Name</span>
+                                    <span class="text-gray-900 dark:text-white">{{ $student->father_name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Phone</span>
+                                    <span class="text-gray-900 dark:text-white">{{ $student->father_phone ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Email</span>
+                                    <span class="text-gray-900 dark:text-white">{{ $student->father_email ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Occupation</span>
+                                    <span class="text-gray-900 dark:text-white">{{ $student->father_occupation ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Location</span>
+                                    <span class="text-gray-900 dark:text-white">{{ $student->father_location ?? '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- Mother --}}
+                        <div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <span class="w-8 h-8 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mr-2 text-pink-600 text-lg">M</span>
+                                Mother
+                            </h4>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Name</span>
+                                    <span class="text-gray-900 dark:text-white">{{ $student->mother_name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Phone</span>
+                                    <span class="text-gray-900 dark:text-white">{{ $student->mother_phone ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Email</span>
+                                    <span class="text-gray-900 dark:text-white">{{ $student->mother_email ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Occupation</span>
+                                    <span class="text-gray-900 dark:text-white">{{ $student->mother_occupation ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Location</span>
+                                    <span class="text-gray-900 dark:text-white">{{ $student->mother_location ?? '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Linked Guardian Accounts --}}
                     @if($student->guardians->count() > 0)
-                    <x-ui.glass-card>
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Parent/Guardian</h4>
-                        @foreach($student->guardians as $guardian)
-                            <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-semibold">
-                                    {{ strtoupper(substr($guardian->name, 0, 1)) }}
-                                </div>
-                                <div class="ml-3">
-                                    <p class="font-medium text-gray-900 dark:text-white">{{ $guardian->name }}</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $guardian->email }}</p>
-                                </div>
+                        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Linked Parent Accounts</label>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($student->guardians as $guardian)
+                                    <span class="inline-flex items-center px-3 py-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg text-sm">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        {{ $guardian->name }} ({{ $guardian->pivot->relationship ?? 'guardian' }})
+                                    </span>
+                                @endforeach
                             </div>
-                        @endforeach
-                    </x-ui.glass-card>
-                    @endif
-
-                    <!-- Notes -->
-                    @if($student->notes)
-                    <x-ui.glass-card>
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Notes</h4>
-                        <p class="text-gray-600 dark:text-gray-300">{{ $student->notes }}</p>
-                    </x-ui.glass-card>
+                        </div>
                     @endif
                 </div>
             </div>
 
+            {{-- Notes --}}
+            @if($student->notes)
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Notes</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 dark:text-gray-300 whitespace-pre-line">{{ $student->notes }}</p>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Recent Attendance --}}
+            @if($student->attendances && $student->attendances->count() > 0)
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Attendance</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-3">
+                            @foreach($student->attendances->take(5) as $attendance)
+                                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white">{{ $attendance->topic ?? 'No topic' }}</div>
+                                        <div class="text-sm text-gray-500">{{ $attendance->class_date?->format('M j, Y') }} - {{ $attendance->duration }} mins</div>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                        @if($attendance->status === 'approved') bg-emerald-100 text-emerald-700
+                                        @elseif($attendance->status === 'pending') bg-amber-100 text-amber-700
+                                        @else bg-red-100 text-red-700
+                                        @endif">
+                                        {{ ucfirst($attendance->status) }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
+
+    @push('styles')
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+    </style>
+    @endpush
 </x-app-layout>
