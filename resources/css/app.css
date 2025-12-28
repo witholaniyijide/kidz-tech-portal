@@ -908,10 +908,27 @@
 }
 
 /* Dark Mode Smooth Transition for All Elements */
+html {
+    transition: background-color 0.3s ease-in-out;
+}
+
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+    transition: background-color 0.4s ease-in-out,
+                border-color 0.4s ease-in-out,
+                color 0.4s ease-in-out,
+                fill 0.4s ease-in-out,
+                stroke 0.4s ease-in-out,
+                box-shadow 0.4s ease-in-out !important;
+}
+
+/* Normal state transitions (less aggressive) */
 *, *::before, *::after {
-    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-    transition-duration: 200ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
 }
 
 /* Dark Mode Glass Effects */

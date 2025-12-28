@@ -141,6 +141,14 @@ class Student extends Model
     }
 
     /**
+     * Alias for tutorReports - used by manager views
+     */
+    public function monthlyReports()
+    {
+        return $this->hasMany(TutorReport::class);
+    }
+
+    /**
      * Get only director-approved tutor reports for this student.
      * These are visible to parents in the parent dashboard.
      */

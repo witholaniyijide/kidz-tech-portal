@@ -233,7 +233,7 @@
                     </div>
                     <div>
                         <p class="text-gray-500">Last Login</p>
-                        <p class="font-semibold text-gray-900 dark:text-white">{{ $user->last_login_at?->diffForHumans() ?? 'N/A' }}</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">{{ $user->last_login?->diffForHumans() ?? 'N/A' }}</p>
                     </div>
                 </div>
             </div>

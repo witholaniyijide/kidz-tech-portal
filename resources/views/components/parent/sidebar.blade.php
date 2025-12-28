@@ -10,9 +10,17 @@
         window.dispatchEvent(new Event('parent-sidebar-toggled'));
     },
     toggleDarkMode() {
+        // Add transitioning class for smooth animation
+        document.documentElement.classList.add('theme-transitioning');
+
         this.darkMode = !this.darkMode;
         localStorage.setItem('darkMode', this.darkMode);
         this.applyDarkMode();
+
+        // Remove transitioning class after animation completes
+        setTimeout(() => {
+            document.documentElement.classList.remove('theme-transitioning');
+        }, 400);
     },
     applyDarkMode() {
         if (this.darkMode) {

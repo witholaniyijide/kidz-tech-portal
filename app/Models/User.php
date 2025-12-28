@@ -51,6 +51,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'last_login' => 'datetime',
         'notify_email' => 'boolean',
         'notify_in_app' => 'boolean',
         'notify_daily_summary' => 'boolean',
