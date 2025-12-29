@@ -62,7 +62,7 @@ class ManagerDashboardController extends Controller
 
         // Get today's schedule (not cached - real-time)
         $todaySchedule = DailyClassSchedule::where('schedule_date', Carbon::today())
-            ->where('status', 'published')
+            ->where('status', 'posted')
             ->first();
 
         // Get recent submitted reports (last 10)
@@ -137,7 +137,7 @@ class ManagerDashboardController extends Controller
     private function getTodayClassesCount()
     {
         $todaySchedule = DailyClassSchedule::where('schedule_date', Carbon::today())
-            ->where('status', 'published')
+            ->where('status', 'posted')
             ->first();
 
         if (!$todaySchedule || !$todaySchedule->classes) {
