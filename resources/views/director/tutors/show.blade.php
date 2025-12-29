@@ -1,154 +1,301 @@
 <x-app-layout>
-    <x-slot name="header">
-        {{ __('Tutor Details') }}
-    </x-slot>
-    <x-slot name="title">{{ $tutor->first_name }} {{ $tutor->last_name }}</x-slot>
+    <x-slot name="header">{{ __('Tutor Details') }}</x-slot>
+    <x-slot name="title">{{ __('Director - Tutor Details') }}</x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Action Buttons -->
-            <div class="flex justify-end space-x-3 mb-4">
-                <a href="{{ route('director.tutors.edit', $tutor) }}" class="inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg transition-all">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    Edit
-                </a>
-                <a href="{{ route('director.tutors.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition-all">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                    Back
-                </a>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-4 sm:py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float hidden sm:block"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float hidden sm:block" style="animation-delay: 2s;"></div>
+
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            @if(session('success'))
+                <div class="mb-6 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-400 text-emerald-800 dark:text-emerald-400 px-4 sm:px-6 py-4 rounded-xl text-sm">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            {{-- Header --}}
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    @if($tutor->profile_photo)
+                        <img src="{{ Storage::url($tutor->profile_photo) }}" alt="Profile" class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl object-cover shadow-lg">
+                    @else
+                        <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-[#00CCCD] to-blue-500 rounded-xl sm:rounded-2xl flex items-center justify-center text-white font-bold text-lg sm:text-2xl shadow-lg">
+                            {{ strtoupper(substr($tutor->first_name, 0, 1)) }}{{ strtoupper(substr($tutor->last_name, 0, 1)) }}
+                        </div>
+                    @endif
+                    <div>
+                        <h1 class="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                            {{ $tutor->first_name }} {{ $tutor->last_name }}
+                        </h1>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm sm:text-base">{{ $tutor->email }}</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <a href="{{ route('director.tutors.edit', $tutor) }}" class="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                        <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Edit</span>
+                    </a>
+                    <a href="{{ route('director.tutors.index') }}" class="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm">
+                        <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        <span class="hidden sm:inline">Back</span>
+                    </a>
+                </div>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Profile Card -->
-                <div class="lg:col-span-1">
-                    <x-ui.glass-card>
-                        <div class="text-center">
-                            <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white text-3xl font-bold">
-                                {{ strtoupper(substr($tutor->first_name, 0, 1) . substr($tutor->last_name, 0, 1)) }}
-                            </div>
-                            <h3 class="mt-4 text-xl font-bold text-gray-900 dark:text-white">{{ $tutor->first_name }} {{ $tutor->last_name }}</h3>
-                            <p class="text-gray-500 dark:text-gray-400">{{ $tutor->tutor_id }}</p>
-                            <div class="mt-2"><x-ui.status-badge :status="$tutor->status" /></div>
+
+            {{-- Status & Stats --}}
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow">
+                    <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Status</div>
+                    <span class="inline-flex px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-full
+                        @if($tutor->status === 'active') bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400
+                        @elseif($tutor->status === 'inactive') bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300
+                        @elseif($tutor->status === 'on_leave') bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400
+                        @else bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400
+                        @endif">
+                        {{ ucfirst(str_replace('_', ' ', $tutor->status)) }}
+                    </span>
+                </div>
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow">
+                    <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Students</div>
+                    <div class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{{ $tutor->students->count() }}</div>
+                </div>
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow">
+                    <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Classes</div>
+                    <div class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{{ $tutor->attendances->count() ?? 0 }}</div>
+                </div>
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow">
+                    <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Joined</div>
+                    <div class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{{ $tutor->created_at->format('M Y') }}</div>
+                </div>
+            </div>
+
+            {{-- Personal Info --}}
+            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
+                    <h3 class="text-base sm:text-lg font-semibold">Personal Information</h3>
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Full Name</label>
+                            <p class="text-gray-900 dark:text-white font-medium text-sm sm:text-base">{{ $tutor->first_name }} {{ $tutor->last_name }}</p>
                         </div>
-
-                        <div class="mt-6 space-y-4">
-                            @if($tutor->email)
-                            <div class="flex items-center text-gray-600 dark:text-gray-300">
-                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                                {{ $tutor->email }}
-                            </div>
-                            @endif
-                            @if($tutor->phone)
-                            <div class="flex items-center text-gray-600 dark:text-gray-300">
-                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                                {{ $tutor->phone }}
-                            </div>
-                            @endif
-                            @if($tutor->specialization)
-                            <div class="flex items-center text-gray-600 dark:text-gray-300">
-                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                                {{ $tutor->specialization }}
-                            </div>
-                            @endif
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Email</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base break-all">{{ $tutor->email }}</p>
                         </div>
-                    </x-ui.glass-card>
-
-                    <!-- Stats -->
-                    <x-ui.glass-card class="mt-6">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Statistics</h4>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-400">Total Students</span>
-                                <span class="font-semibold text-gray-900 dark:text-white">{{ $totalStudents }}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-400">Total Reports</span>
-                                <span class="font-semibold text-gray-900 dark:text-white">{{ $totalReports }}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 dark:text-gray-400">Pending Reports</span>
-                                <span class="font-semibold text-yellow-600">{{ $pendingReports }}</span>
-                            </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Phone</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->phone ?? '-' }}</p>
                         </div>
-                    </x-ui.glass-card>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Gender</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ ucfirst($tutor->gender ?? '-') }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Date of Birth</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->date_of_birth?->format('M j, Y') ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Location</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->location ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Occupation</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->occupation ?? '-' }}</p>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Bio</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->bio ?? '-' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    <!-- Weekly Availability -->
-                    <x-ui.glass-card class="mt-6">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Weekly Availability</h4>
-                        @php
-                            $availabilities = $tutor->availabilities ?? collect();
-                            $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                            $fullDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                            $availabilityByDay = $availabilities->groupBy('day_of_week');
-                        @endphp
+            {{-- Emergency Contact --}}
+            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-orange-500 to-red-600 text-white">
+                    <h3 class="text-base sm:text-lg font-semibold">Emergency Contact</h3>
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Contact Person</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->emergency_contact_name ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Relationship</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->emergency_contact_relationship ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Phone</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->emergency_contact_phone ?? '-' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                        @if($availabilities->isEmpty())
-                            <p class="text-gray-500 dark:text-gray-400 text-center py-4">No availability set</p>
-                        @else
-                            <div class="grid grid-cols-7 gap-1 text-center">
-                                @foreach($days as $index => $day)
-                                    <div>
-                                        <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">{{ $day }}</div>
-                                        @if(isset($availabilityByDay[$fullDays[$index]]) && $availabilityByDay[$fullDays[$index]]->count() > 0)
-                                            @foreach($availabilityByDay[$fullDays[$index]] as $slot)
-                                                <div class="px-1 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded text-xs mb-1">
-                                                    {{ \Carbon\Carbon::parse($slot->start_time)->format('g:i') }}
+            {{-- Payment Details --}}
+            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white">
+                    <h3 class="text-base sm:text-lg font-semibold">Payment Details</h3>
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Bank Name</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->bank_name ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Account Number</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->account_number ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Account Name</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->account_name ?? '-' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Availability Calendar --}}
+            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+                    <h3 class="text-base sm:text-lg font-semibold">Weekly Availability</h3>
+                </div>
+                <div class="p-4 sm:p-6">
+                    @php
+                        $availabilities = $tutor->availabilities ?? collect();
+                        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                        $availabilityByDay = $availabilities->groupBy('day_of_week');
+                    @endphp
+
+                    @if($availabilities->isEmpty())
+                        <div class="text-center py-6 sm:py-8">
+                            <svg class="w-10 h-10 sm:w-12 sm:h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">No availability set</p>
+                        </div>
+                    @else
+                        <div class="grid grid-cols-7 gap-1 sm:gap-2 overflow-x-auto">
+                            @foreach($days as $day)
+                                <div class="text-center min-w-[60px]">
+                                    <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">{{ substr($day, 0, 3) }}</div>
+                                    @if(isset($availabilityByDay[$day]) && $availabilityByDay[$day]->count() > 0)
+                                        <div class="space-y-1">
+                                            @foreach($availabilityByDay[$day] as $slot)
+                                                <div class="px-1 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded text-[10px] sm:text-xs">
+                                                    {{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }}
                                                 </div>
                                             @endforeach
-                                        @else
-                                            <div class="text-xs text-gray-400">-</div>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
-                    </x-ui.glass-card>
-                </div>
-
-                <!-- Details -->
-                <div class="lg:col-span-2 space-y-6">
-                    <x-ui.glass-card>
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Professional Information</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Hire Date</p>
-                                <p class="font-medium text-gray-900 dark:text-white">{{ $tutor->hire_date ? \Carbon\Carbon::parse($tutor->hire_date)->format('M d, Y') : 'Not set' }}</p>
-                            </div>
-                        </div>
-                        @if($tutor->bio)
-                        <div class="mt-4">
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Bio</p>
-                            <p class="text-gray-600 dark:text-gray-300 mt-1">{{ $tutor->bio }}</p>
-                        </div>
-                        @endif
-                    </x-ui.glass-card>
-
-                    <!-- Assigned Students -->
-                    <x-ui.glass-card>
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Assigned Students ({{ $tutor->students->count() }})</h4>
-                        @if($tutor->students->count() > 0)
-                        <div class="space-y-3">
-                            @foreach($tutor->students->take(5) as $student)
-                            <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#818CF8] flex items-center justify-center text-white font-semibold">
-                                    {{ strtoupper(substr($student->first_name, 0, 1)) }}
+                                        </div>
+                                    @else
+                                        <div class="px-1 py-1 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded text-xs">
+                                            -
+                                        </div>
+                                    @endif
                                 </div>
-                                <div class="ml-3 flex-1">
-                                    <p class="font-medium text-gray-900 dark:text-white">{{ $student->first_name }} {{ $student->last_name }}</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $student->current_level ?? 'No level set' }}</p>
-                                </div>
-                                <x-ui.status-badge :status="$student->status" />
-                            </div>
                             @endforeach
                         </div>
-                        @if($tutor->students->count() > 5)
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-3">And {{ $tutor->students->count() - 5 }} more...</p>
-                        @endif
-                        @else
-                        <p class="text-gray-500 dark:text-gray-400">No students assigned yet.</p>
-                        @endif
-                    </x-ui.glass-card>
+                    @endif
                 </div>
             </div>
+
+            {{-- Assigned Students --}}
+            @if($tutor->students && $tutor->students->count() > 0)
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden">
+                    <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Assigned Students ({{ $tutor->students->count() }})</h3>
+                    </div>
+                    <div class="p-4 sm:p-6">
+                        <div class="space-y-3 sm:space-y-4">
+                            @foreach($tutor->students as $student)
+                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 sm:p-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <div class="flex items-start gap-3 sm:gap-4">
+                                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
+                                            {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 mb-2">
+                                                <a href="{{ route('director.students.show', $student) }}" class="font-semibold text-gray-900 dark:text-white hover:text-[#423A8E] dark:hover:text-[#00CCCD] text-sm sm:text-base">
+                                                    {{ $student->first_name }} {{ $student->last_name }}
+                                                </a>
+                                                <span class="px-2 py-0.5 text-xs font-medium rounded-full self-start
+                                                    @if($student->status === 'active') bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400
+                                                    @else bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300
+                                                    @endif">
+                                                    {{ ucfirst($student->status) }}
+                                                </span>
+                                            </div>
+
+                                            <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                                {{ $student->classes_per_week ?? 0 }} classes/week
+                                            </div>
+
+                                            {{-- Class Schedule --}}
+                                            @php
+                                                $studentSchedule = $student->class_schedule;
+                                                if (is_string($studentSchedule)) {
+                                                    $studentSchedule = json_decode($studentSchedule, true) ?? [];
+                                                }
+                                            @endphp
+                                            @if($studentSchedule && is_array($studentSchedule) && count($studentSchedule) > 0)
+                                                <div class="mb-2 sm:mb-3">
+                                                    <div class="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Schedule</div>
+                                                    <div class="flex flex-wrap gap-1">
+                                                        @foreach($studentSchedule as $schedule)
+                                                            @if(isset($schedule['day']) && isset($schedule['time']))
+                                                                <span class="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-[10px] sm:text-xs">
+                                                                    {{ ucfirst($schedule['day']) }} @ {{ $schedule['time'] }}
+                                                                </span>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
+
+                                            {{-- Links --}}
+                                            <div class="flex flex-wrap gap-2 sm:gap-3">
+                                                @if($student->class_link)
+                                                    <a href="{{ $student->class_link }}" target="_blank" class="inline-flex items-center text-[10px] sm:text-xs text-[#423A8E] dark:text-[#00CCCD] hover:underline">
+                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                        </svg>
+                                                        Class Link
+                                                    </a>
+                                                @endif
+                                                @if($student->google_classroom_link)
+                                                    <a href="{{ $student->google_classroom_link }}" target="_blank" class="inline-flex items-center text-[10px] sm:text-xs text-green-600 dark:text-green-400 hover:underline">
+                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                                        </svg>
+                                                        Classroom
+                                                    </a>
+                                                @endif
+                                                @if(!$student->class_link && !$student->google_classroom_link)
+                                                    <span class="text-[10px] sm:text-xs text-gray-400 italic">No links set</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
+
+    @push('styles')
+    <style>
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+    </style>
+    @endpush
 </x-app-layout>

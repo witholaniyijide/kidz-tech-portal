@@ -1,90 +1,140 @@
 <x-app-layout>
-    <x-slot name="header">
-        {{ __('Add New Student') }}
-    </x-slot>
+    <x-slot name="header">{{ __('Add New Student') }}</x-slot>
+    <x-slot name="title">{{ __('Director - Add Student') }}</x-slot>
 
-    <x-slot name="title">{{ __('Add Student') }}</x-slot>
+    <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-4 sm:py-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float hidden sm:block"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float hidden sm:block" style="animation-delay: 2s;"></div>
 
-    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <!-- Action Button -->
-            <div class="flex justify-end mb-4">
-                <a href="{{ route('director.students.index') }}"
-                   class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition-all duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            {{-- Header --}}
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Add New Student</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">Fill in the student information below</p>
+                </div>
+                <a href="{{ route('director.students.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm sm:text-base">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
                     Back to List
                 </a>
             </div>
-            <x-ui.glass-card>
-                <form method="POST" action="{{ route('director.students.store') }}" x-data="studentForm()">
-                    @csrf
 
-                    <!-- Personal Information -->
-                    <div class="mb-8">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            Personal Information
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {{-- Validation Errors --}}
+            @if($errors->any())
+                <div class="mb-6 bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-800 dark:text-red-400 px-4 sm:px-6 py-4 rounded-xl text-sm">
+                    <ul class="list-disc list-inside">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('director.students.store') }}" method="POST" x-data="studentForm()">
+                @csrf
+
+                {{-- SECTION 1: Student Info --}}
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                    <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
+                        <h3 class="text-base sm:text-lg font-semibold">Section 1: Student Information</h3>
+                    </div>
+                    <div class="p-4 sm:p-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                            {{-- First Name --}}
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name *</label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name <span class="text-red-500">*</span></label>
                                 <input type="text" name="first_name" value="{{ old('first_name') }}" required
-                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                @error('first_name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
                             </div>
+                            {{-- Other Name --}}
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name *</label>
-                                <input type="text" name="last_name" value="{{ old('last_name') }}" required
-                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                @error('last_name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Other Name</label>
+                                <input type="text" name="other_name" value="{{ old('other_name') }}"
+                                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
                             </div>
+                            {{-- Last Name --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name <span class="text-red-500">*</span></label>
+                                <input type="text" name="last_name" value="{{ old('last_name') }}" required
+                                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
+                            </div>
+                            {{-- Email --}}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                                 <input type="email" name="email" value="{{ old('email') }}"
-                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                @error('email') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
-                                <input type="text" name="phone" value="{{ old('phone') }}"
-                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                @error('phone') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-                            </div>
+                            {{-- Date of Birth --}}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Birth</label>
-                                <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}"
-                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                @error('date_of_birth') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                                <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}" x-model="dob" @change="calculateAge()"
+                                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
                             </div>
+                            {{-- Age (Auto-calculated) --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Age</label>
+                                <input type="text" x-model="age" readonly
+                                       class="w-full px-3 sm:px-4 py-2 bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-600 dark:text-white rounded-lg text-sm sm:text-base">
+                            </div>
+                            {{-- Gender --}}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender</label>
-                                <select name="gender" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                <select name="gender" class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
                                     <option value="">Select Gender</option>
-                                    <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
-                                    <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
-                                    <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
+                                    <option value="male" {{ old('gender') === 'male' ? 'selected' : '' }}>Male</option>
+                                    <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Female</option>
+                                    <option value="other" {{ old('gender') === 'other' ? 'selected' : '' }}>Other</option>
                                 </select>
-                                @error('gender') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
-                                <textarea name="address" rows="2"
-                                          class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">{{ old('address') }}</textarea>
-                                @error('address') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                            {{-- Coding Experience --}}
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Coding Experience</label>
+                                <textarea name="coding_experience" rows="2" class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">{{ old('coding_experience') }}</textarea>
+                            </div>
+                            {{-- Career Interest --}}
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Career Interest</label>
+                                <textarea name="career_interest" rows="2" class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">{{ old('career_interest') }}</textarea>
+                            </div>
+                            {{-- Status --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status <span class="text-red-500">*</span></label>
+                                <select name="status" required class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
+                                    <option value="active" {{ old('status', 'active') === 'active' ? 'selected' : '' }}>Active</option>
+                                    <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                    <option value="graduated" {{ old('status') === 'graduated' ? 'selected' : '' }}>Graduated</option>
+                                    <option value="withdrawn" {{ old('status') === 'withdrawn' ? 'selected' : '' }}>Withdrawn</option>
+                                </select>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Academic Information -->
-                    <div class="mb-8">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            Academic Information
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {{-- SECTION 2: Class Information --}}
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                    <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                        <h3 class="text-base sm:text-lg font-semibold">Section 2: Class Information</h3>
+                    </div>
+                    <div class="p-4 sm:p-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                            {{-- Class Link --}}
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assigned Tutor</label>
-                                <select name="tutor_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class Link (Zoom/Meet)</label>
+                                <input type="url" name="class_link" value="{{ old('class_link') }}" placeholder="https://..."
+                                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                            </div>
+                            {{-- Google Classroom Link --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Google Classroom Link</label>
+                                <input type="url" name="google_classroom_link" value="{{ old('google_classroom_link') }}" placeholder="https://classroom.google.com/..."
+                                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                            </div>
+                            {{-- Tutor In Charge --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tutor In Charge</label>
+                                <select name="tutor_id" class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
                                     <option value="">Select Tutor</option>
                                     @foreach($tutors as $tutor)
                                         <option value="{{ $tutor->id }}" {{ old('tutor_id') == $tutor->id ? 'selected' : '' }}>
@@ -92,229 +142,211 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('tutor_id') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
+                            {{-- Classes Per Week --}}
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Parent/Guardian</label>
-                                <select name="parent_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                    <option value="">Select Parent</option>
-                                    @foreach($parents as $parent)
-                                        <option value="{{ $parent->id }}" {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
-                                            {{ $parent->name }} ({{ $parent->email }})
-                                        </option>
-                                    @endforeach
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Classes Per Week</label>
+                                <select name="classes_per_week" class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                                    @for($i = 1; $i <= 7; $i++)
+                                        <option value="{{ $i }}" {{ old('classes_per_week', 2) == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                    @endfor
                                 </select>
-                                @error('parent_id') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
+                            {{-- Starting Course Level --}}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Starting Course Level</label>
-                                <select name="starting_course_level" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                <select name="starting_course_level" class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
                                     <option value="">Select Level</option>
                                     @for($i = 1; $i <= 12; $i++)
                                         <option value="{{ $i }}" {{ old('starting_course_level') == $i ? 'selected' : '' }}>Level {{ $i }}</option>
                                     @endfor
                                 </select>
-                                @error('starting_course_level') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
-                                <select name="status" required class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
-                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                                    <option value="graduated" {{ old('status') == 'graduated' ? 'selected' : '' }}>Graduated</option>
-                                    <option value="withdrawn" {{ old('status') == 'withdrawn' ? 'selected' : '' }}>Withdrawn</option>
-                                </select>
-                                @error('status') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-                            </div>
+                            {{-- Enrollment Date --}}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Enrollment Date</label>
                                 <input type="date" name="enrollment_date" value="{{ old('enrollment_date', date('Y-m-d')) }}"
-                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                @error('enrollment_date') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Classes Per Week</label>
-                                <select name="classes_per_week" x-model="classesPerWeek" @change="updateScheduleSlots()"
-                                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                    <option value="">Select</option>
-                                    @for($i = 1; $i <= 7; $i++)
-                                        <option value="{{ $i }}">{{ $i }} {{ $i == 1 ? 'class' : 'classes' }}</option>
-                                    @endfor
-                                </select>
-                                @error('classes_per_week') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Google Classroom Link</label>
-                                <input type="url" name="google_classroom_link" value="{{ old('google_classroom_link') }}" placeholder="https://classroom.google.com/..."
-                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                @error('google_classroom_link') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Live Classroom Link</label>
-                                <input type="url" name="live_classroom_link" value="{{ old('live_classroom_link') }}" placeholder="https://meet.google.com/... or Zoom link"
-                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                @error('live_classroom_link') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Parent Information -->
-                    <div class="mb-8">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            Parent/Guardian Information
-                        </h3>
+                        {{-- Dynamic Class Schedule --}}
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Class Schedule</label>
+                            <div class="space-y-3" id="scheduleContainer">
+                                <template x-for="(schedule, index) in schedules" :key="index">
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                        <select x-model="schedule.day" :name="'class_schedule['+index+'][day]'" class="w-full sm:w-auto px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                                            <option value="">Day</option>
+                                            <option value="monday">Monday</option>
+                                            <option value="tuesday">Tuesday</option>
+                                            <option value="wednesday">Wednesday</option>
+                                            <option value="thursday">Thursday</option>
+                                            <option value="friday">Friday</option>
+                                            <option value="saturday">Saturday</option>
+                                            <option value="sunday">Sunday</option>
+                                        </select>
+                                        <input type="time" x-model="schedule.time" :name="'class_schedule['+index+'][time]'"
+                                               class="w-full sm:w-auto px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                                        <button type="button" @click="removeSchedule(index)" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg self-end sm:self-auto">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                            <button type="button" @click="addSchedule()" class="mt-3 text-sm text-[#423A8E] dark:text-[#00CCCD] hover:underline">
+                                + Add Schedule Slot
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- SECTION 3: Parent Information --}}
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                    <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white">
+                        <h3 class="text-base sm:text-lg font-semibold">Section 3: Parent Information</h3>
+                    </div>
+                    <div class="p-4 sm:p-6">
                         <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                             Enter parent details below. Parent accounts will be created automatically and login credentials sent via email.
                         </p>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <!-- Father's Information -->
-                            <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
-                                <h4 class="font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-                                    <span class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mr-2 text-blue-600 text-lg">F</span>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+                            {{-- Father's Information --}}
+                            <div>
+                                <h4 class="text-md font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                    <span class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mr-2 text-blue-600 text-sm">👨</span>
                                     Father's Information
                                 </h4>
                                 <div class="space-y-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
                                         <input type="text" name="father_name" value="{{ old('father_name') }}"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
                                         <input type="tel" name="father_phone" value="{{ old('father_phone') }}"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                                         <input type="email" name="father_email" value="{{ old('father_email') }}"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Occupation</label>
                                         <input type="text" name="father_occupation" value="{{ old('father_occupation') }}"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
                                         <input type="text" name="father_location" value="{{ old('father_location') }}"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Mother's Information -->
-                            <div class="p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-100 dark:border-pink-800">
-                                <h4 class="font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-                                    <span class="w-8 h-8 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mr-2 text-pink-600 text-lg">M</span>
+                            {{-- Mother's Information --}}
+                            <div>
+                                <h4 class="text-md font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                    <span class="w-8 h-8 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mr-2 text-pink-600 text-sm">👩</span>
                                     Mother's Information
                                 </h4>
                                 <div class="space-y-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
                                         <input type="text" name="mother_name" value="{{ old('mother_name') }}"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
                                         <input type="tel" name="mother_phone" value="{{ old('mother_phone') }}"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                                         <input type="email" name="mother_email" value="{{ old('mother_email') }}"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Occupation</label>
                                         <input type="text" name="mother_occupation" value="{{ old('mother_occupation') }}"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
                                         <input type="text" name="mother_location" value="{{ old('mother_location') }}"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                               class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Class Schedule -->
-                    <div class="mb-8" x-show="classesPerWeek > 0">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            Class Schedule
-                        </h3>
-                        <div class="space-y-4">
-                            <template x-for="(slot, index) in scheduleSlots" :key="index">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                            Day <span x-text="index + 1"></span>
-                                        </label>
-                                        <select :name="'class_schedules[' + index + '][day]'" x-model="slot.day"
-                                                class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                            <option value="">Select Day</option>
-                                            <option value="Monday">Monday</option>
-                                            <option value="Tuesday">Tuesday</option>
-                                            <option value="Wednesday">Wednesday</option>
-                                            <option value="Thursday">Thursday</option>
-                                            <option value="Friday">Friday</option>
-                                            <option value="Saturday">Saturday</option>
-                                            <option value="Sunday">Sunday</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time</label>
-                                        <input type="time" :name="'class_schedules[' + index + '][time]'" x-model="slot.time"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="mb-8">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            Additional Notes
-                        </h3>
-                        <textarea name="notes" rows="3" placeholder="Any additional notes about the student..."
-                                  class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">{{ old('notes') }}</textarea>
-                        @error('notes') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-                    </div>
-
-                    <!-- Submit -->
-                    <div class="flex justify-end space-x-4">
-                        <a href="{{ route('director.students.index') }}" 
-                           class="px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-all">
-                            Cancel
-                        </a>
-                        <button type="submit" 
-                                class="px-6 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-lg hover:from-[#3730A3] hover:to-[#4F46E5] transition-all">
-                            Create Student
-                        </button>
-                    </div>
-                </form>
-            </x-ui.glass-card>
+                {{-- Submit Button --}}
+                <div class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
+                    <a href="{{ route('director.students.index') }}" class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium text-center text-sm sm:text-base">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-8 py-3 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all font-medium text-sm sm:text-base">
+                        Create Student
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
+    @push('scripts')
     <script>
         function studentForm() {
             return {
-                classesPerWeek: {{ old('classes_per_week', 0) }},
-                scheduleSlots: [],
-                updateScheduleSlots() {
-                    const count = parseInt(this.classesPerWeek) || 0;
-                    this.scheduleSlots = [];
-                    for (let i = 0; i < count; i++) {
-                        this.scheduleSlots.push({ day: '', time: '' });
+                dob: '{{ old('date_of_birth') }}',
+                age: '',
+                schedules: [{ day: '', time: '' }],
+
+                calculateAge() {
+                    if (!this.dob) {
+                        this.age = '';
+                        return;
+                    }
+                    const today = new Date();
+                    const birthDate = new Date(this.dob);
+                    let age = today.getFullYear() - birthDate.getFullYear();
+                    const m = today.getMonth() - birthDate.getMonth();
+                    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+                    this.age = age + ' years';
+                },
+
+                addSchedule() {
+                    this.schedules.push({ day: '', time: '' });
+                },
+
+                removeSchedule(index) {
+                    if (this.schedules.length > 1) {
+                        this.schedules.splice(index, 1);
                     }
                 },
+
                 init() {
-                    this.updateScheduleSlots();
+                    this.calculateAge();
                 }
-            }
+            };
         }
     </script>
+    @endpush
+
+    @push('styles')
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+    </style>
+    @endpush
 </x-app-layout>
