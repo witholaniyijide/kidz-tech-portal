@@ -150,9 +150,9 @@
                         <label for="class_date" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                             Class Date <span class="text-red-500">*</span>
                         </label>
-                        <input type="date" id="class_date" name="class_date" 
-                               value="{{ old('class_date', date('Y-m-d')) }}" 
-                               required 
+                        <input type="date" id="class_date" name="class_date"
+                               value="{{ old('class_date', date('Y-m-d')) }}"
+                               required
                                max="{{ date('Y-m-d') }}"
                                class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                         @error('class_date')
@@ -163,15 +163,100 @@
                     <!-- Class Time -->
                     <div>
                         <label for="class_time" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                            Class Time <span class="text-red-500">*</span>
+                            Actual Class Time <span class="text-red-500">*</span>
                         </label>
-                        <input type="time" id="class_time" name="class_time" 
-                               value="{{ old('class_time') }}" 
+                        <input type="time" id="class_time" name="class_time"
+                               value="{{ old('class_time') }}"
                                required
                                class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                         @error('class_time')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
+                    </div>
+                </div>
+
+                <!-- Rescheduled Class Toggle -->
+                <div x-data="{ isRescheduled: {{ old('is_rescheduled', 'false') }} }">
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" name="is_rescheduled" value="1"
+                               x-model="isRescheduled"
+                               {{ old('is_rescheduled') ? 'checked' : '' }}
+                               class="w-5 h-5 rounded text-[#7978E9] focus:ring-[#7978E9] border-slate-300 dark:border-slate-600">
+                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">
+                            This class was rescheduled from its originally scheduled time
+                        </span>
+                    </label>
+                    <p class="mt-1 ml-8 text-xs text-slate-500 dark:text-slate-400">
+                        Check this if you held the class at a different time than what was scheduled
+                    </p>
+
+                    <!-- Rescheduled Details (only shown when toggled) -->
+                    <div x-show="isRescheduled" x-collapse class="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl space-y-4">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div>
+                                <h4 class="font-semibold text-amber-800 dark:text-amber-300">Rescheduled Class Details</h4>
+                                <p class="text-sm text-amber-700 dark:text-amber-400 mt-1">
+                                    Provide the original scheduled time and reason for rescheduling.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Original Scheduled Time -->
+                            <div>
+                                <label for="original_scheduled_time" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                    Original Scheduled Time <span class="text-red-500">*</span>
+                                </label>
+                                <input type="time" id="original_scheduled_time" name="original_scheduled_time"
+                                       value="{{ old('original_scheduled_time') }}"
+                                       :required="isRescheduled"
+                                       class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                                @error('original_scheduled_time')
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Reschedule Reason -->
+                            <div>
+                                <label for="reschedule_reason" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                    Reason for Rescheduling <span class="text-red-500">*</span>
+                                </label>
+                                <select id="reschedule_reason" name="reschedule_reason"
+                                        :required="isRescheduled"
+                                        class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                                    <option value="">Select a reason</option>
+                                    <option value="student_request" {{ old('reschedule_reason') === 'student_request' ? 'selected' : '' }}>Student/Parent requested</option>
+                                    <option value="tutor_schedule_conflict" {{ old('reschedule_reason') === 'tutor_schedule_conflict' ? 'selected' : '' }}>Tutor schedule conflict</option>
+                                    <option value="technical_issues" {{ old('reschedule_reason') === 'technical_issues' ? 'selected' : '' }}>Technical issues earlier</option>
+                                    <option value="student_late" {{ old('reschedule_reason') === 'student_late' ? 'selected' : '' }}>Student was late/unavailable</option>
+                                    <option value="tutor_emergency" {{ old('reschedule_reason') === 'tutor_emergency' ? 'selected' : '' }}>Tutor emergency</option>
+                                    <option value="power_internet_outage" {{ old('reschedule_reason') === 'power_internet_outage' ? 'selected' : '' }}>Power/Internet outage</option>
+                                    <option value="manager_approved" {{ old('reschedule_reason') === 'manager_approved' ? 'selected' : '' }}>Pre-approved by Manager</option>
+                                    <option value="other" {{ old('reschedule_reason') === 'other' ? 'selected' : '' }}>Other reason</option>
+                                </select>
+                                @error('reschedule_reason')
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Additional Reschedule Notes -->
+                        <div>
+                            <label for="reschedule_notes" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                Additional Details (optional)
+                            </label>
+                            <input type="text" id="reschedule_notes" name="reschedule_notes"
+                                   value="{{ old('reschedule_notes') }}"
+                                   maxlength="255"
+                                   placeholder="Any additional context for the reschedule..."
+                                   class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                            @error('reschedule_notes')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 

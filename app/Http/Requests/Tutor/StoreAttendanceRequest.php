@@ -28,6 +28,10 @@ class StoreAttendanceRequest extends FormRequest
             'duration_minutes' => 'required|integer|min:15|max:240',
             'topic' => 'nullable|string|max:255',
             'notes' => 'nullable|string|max:2000',
+            'is_rescheduled' => 'nullable',
+            'original_scheduled_time' => 'nullable|required_if:is_rescheduled,1,true',
+            'reschedule_reason' => 'nullable|required_if:is_rescheduled,1,true|string|max:100',
+            'reschedule_notes' => 'nullable|string|max:255',
         ];
     }
 
@@ -47,6 +51,8 @@ class StoreAttendanceRequest extends FormRequest
             'duration_minutes.required' => 'Duration is required.',
             'duration_minutes.min' => 'Duration must be at least 15 minutes.',
             'duration_minutes.max' => 'Duration cannot exceed 240 minutes (4 hours).',
+            'original_scheduled_time.required_if' => 'Original scheduled time is required for rescheduled classes.',
+            'reschedule_reason.required_if' => 'Reason for rescheduling is required.',
         ];
     }
 }

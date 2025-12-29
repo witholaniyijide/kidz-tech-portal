@@ -24,6 +24,10 @@ class AttendanceRecord extends Model
         'is_stand_in',
         'stand_in_reason',
         'is_late',
+        'is_rescheduled',
+        'original_scheduled_time',
+        'reschedule_reason',
+        'reschedule_notes',
     ];
 
     protected $casts = [
@@ -32,6 +36,7 @@ class AttendanceRecord extends Model
         'approved_at' => 'datetime',
         'is_stand_in' => 'boolean',
         'is_late' => 'boolean',
+        'is_rescheduled' => 'boolean',
     ];
 
     public function student()
