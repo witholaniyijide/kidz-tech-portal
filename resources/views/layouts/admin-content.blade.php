@@ -2,7 +2,8 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+        <meta name="viewport" content="width=1024">
+        <link rel="manifest" href="{{ asset('manifest.json') }}">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -64,75 +65,22 @@
         <!-- Flash Messages -->
         <x-ui.flash-messages />
 
-        <div x-data="{
-            sidebarOpen: false,
-            collapsed: window.innerWidth >= 768 ? localStorage.getItem('adminSidebarCollapsed') === 'true' : false,
-            isMobile: window.innerWidth < 768,
-            init() {
-                this.handleResize();
-                window.addEventListener('resize', () => this.handleResize());
-                window.addEventListener('admin-sidebar-toggled', () => {
-                    if (!this.isMobile) {
-                        this.collapsed = localStorage.getItem('adminSidebarCollapsed') === 'true';
-                    }
-                });
-            },
-            handleResize() {
-                this.isMobile = window.innerWidth < 768;
-                if (!this.isMobile) {
-                    this.sidebarOpen = false;
-                }
-            },
-            toggleSidebar() {
-                if (this.isMobile) {
-                    this.sidebarOpen = !this.sidebarOpen;
-                } else {
-                    this.collapsed = !this.collapsed;
-                    localStorage.setItem('adminSidebarCollapsed', this.collapsed);
-                    window.dispatchEvent(new Event('admin-sidebar-toggled'));
-                }
-            },
-            closeSidebar() {
-                if (this.isMobile) {
-                    this.sidebarOpen = false;
-                }
-            }
-        }" class="flex min-h-screen">
-
-            <!-- Mobile Overlay -->
-            <div x-show="sidebarOpen && isMobile"
-                 x-transition:enter="transition-opacity ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 x-transition:leave="transition-opacity ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 @click="closeSidebar()"
-                 class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
-                 x-cloak>
-            </div>
+        <div x-data="{ collapsed: localStorage.getItem('adminSidebarCollapsed') === 'true' }"
+             x-init="window.addEventListener('admin-sidebar-toggled', () => { collapsed = localStorage.getItem('adminSidebarCollapsed') === 'true'; })"
+             class="flex min-h-screen">
 
             <!-- Admin Sidebar -->
             <x-admin.sidebar />
 
             <!-- Main Content Area -->
-            <div :class="isMobile ? 'ml-0' : (collapsed ? 'ml-20' : 'ml-64')"
+            <div :class="collapsed ? 'ml-20' : 'ml-64'"
                  class="flex-1 flex flex-col min-h-screen transition-all duration-300">
 
                 <!-- Top Bar -->
                 <header class="sticky top-0 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 safe-area-top">
                     <div class="flex items-center justify-between h-14 md:h-16 px-4 md:px-6">
-                        <!-- Left: Hamburger + Title -->
+                        <!-- Left: Title -->
                         <div class="flex items-center gap-3">
-                            <!-- Mobile Hamburger Menu -->
-                            <button @click="toggleSidebar()"
-                                    class="md:hidden p-2 -ml-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target"
-                                    aria-label="Toggle menu">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                                </svg>
-                            </button>
-
                             <!-- Page Title -->
                             <div class="min-w-0">
                                 @if (isset($header))
@@ -291,5 +239,14 @@
         </div>
 
         @stack('scripts')
+
+        <!-- Service Worker Registration for PWA -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js').catch(() => {});
+                });
+            }
+        </script>
     </body>
 </html>

@@ -1,0 +1,26 @@
+{
+    "name": "KidzTech Portal",
+    "short_name": "KidzTech",
+    "description": "KidzTech Coding Club - Educational Platform for Kids",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4F46E5",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/images/logo_light.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/images/logo_light.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["education", "kids"],
+    "lang": "en-US"
+}
