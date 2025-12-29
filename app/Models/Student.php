@@ -76,10 +76,10 @@ class Student extends Model
      * Default attribute values for legacy fields
      */
     protected $attributes = [
-        'parent_name' => null,
-        'parent_email' => null,
-        'parent_phone' => null,
-        'parent_relationship' => null,
+        'parent_name' => '',
+        'parent_email' => '',
+        'parent_phone' => '',
+        'parent_relationship' => '',
     ];
 
     /**
@@ -93,6 +93,19 @@ class Student extends Model
             // Auto-generate student_id if not provided
             if (empty($student->student_id)) {
                 $student->student_id = 'STU-' . strtoupper(uniqid());
+            }
+
+            // Set default empty string for legacy NOT NULL fields if not set
+            $legacyFields = ['parent_name', 'parent_email', 'parent_phone', 'parent_relationship'];
+            foreach ($legacyFields as $field) {
+                if (!isset($student->$field)) {
+                    $student->$field = '';
+                }
+            }
+
+            // Set enrollment_date to today if not provided
+            if (empty($student->enrollment_date)) {
+                $student->enrollment_date = now();
             }
         });
     }

@@ -96,6 +96,7 @@ class AdminStudentController extends Controller
             'tutor_id' => 'nullable|exists:tutors,id',
             'classes_per_week' => 'nullable|integer|min:1|max:7',
             'starting_course_level' => 'nullable|integer|min:1|max:12',
+            'enrollment_date' => 'nullable|date',
             'class_schedule' => 'nullable|array',
 
             // Parent Information - Father
@@ -182,6 +183,7 @@ class AdminStudentController extends Controller
             'tutor_id' => 'nullable|exists:tutors,id',
             'classes_per_week' => 'nullable|integer|min:1|max:7',
             'starting_course_level' => 'nullable|integer|min:1|max:12',
+            'enrollment_date' => 'nullable|date',
             'class_schedule' => 'nullable|array',
 
             // Parent Information - Father

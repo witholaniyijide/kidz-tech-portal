@@ -112,6 +112,14 @@
                             <p class="text-gray-900 dark:text-white">{{ $student->classes_per_week ?? '-' }}</p>
                         </div>
                         <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Starting Course Level</label>
+                            <p class="text-gray-900 dark:text-white">{{ $student->starting_course_level ? 'Level ' . $student->starting_course_level : '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Enrollment Date</label>
+                            <p class="text-gray-900 dark:text-white">{{ $student->enrollment_date?->format('M j, Y') ?? '-' }}</p>
+                        </div>
+                        <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Total / Completed Periods</label>
                             <p class="text-gray-900 dark:text-white">{{ $student->completed_periods ?? 0 }} / {{ $student->total_periods ?? 0 }}</p>
                         </div>
