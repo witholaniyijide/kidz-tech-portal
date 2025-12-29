@@ -100,7 +100,7 @@
                                 <li>View your child's monthly progress reports</li>
                                 <li>Track their coding journey and achievements</li>
                                 <li>Stay updated on their class schedule</li>
-                                <li>Communicate with tutors</li>
+                                <li>Communicate with the Director</li>
                             </ul>
 
                             <p style="margin: 20px 0 0 0; font-size: 14px; color: #6b7280; line-height: 1.6;">

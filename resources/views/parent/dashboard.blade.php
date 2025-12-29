@@ -15,7 +15,7 @@
                                            {{ $selectedChild->id === $child->id
                                               ? 'bg-parent-gradient text-white shadow-lg'
                                               : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
-                                <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-semibold">
+                                <div class="w-8 h-8 rounded-full {{ $selectedChild->id === $child->id ? 'bg-white/20 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white' }} flex items-center justify-center text-sm font-semibold">
                                     {{ substr($child->first_name, 0, 1) }}
                                 </div>
                                 <span class="text-sm font-medium">{{ $child->first_name }}</span>

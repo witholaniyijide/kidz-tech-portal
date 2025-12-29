@@ -62,6 +62,9 @@ class Student extends Model
         'allow_parent_notifications',
         'preferred_contact_method',
         'visible_to_parent',
+        'course_statuses',
+        'class_reminder_enabled',
+        'class_reminder_minutes',
     ];
 
     protected $casts = [
@@ -70,6 +73,8 @@ class Student extends Model
         'class_schedule' => 'array',
         'allow_parent_notifications' => 'boolean',
         'visible_to_parent' => 'boolean',
+        'course_statuses' => 'array',
+        'class_reminder_enabled' => 'boolean',
     ];
 
     /**
@@ -374,6 +379,98 @@ class Student extends Model
             'total_courses' => $totalCourses,
             'completed_count' => $completedCount,
         ];
+    }
+
+    /**
+     * Get the curriculum courses with their statuses.
+     * Returns array with status for each course: completed, ongoing, not_started
+     */
+    public function getCurriculumWithStatuses(): array
+    {
+        $allCourses = [
+            1 => 'Introduction to Computer Science',
+            2 => 'Coding & Fundamental Concepts',
+            3 => 'Scratch Programming',
+            4 => 'Artificial Intelligence',
+            5 => 'Graphic Design',
+            6 => 'Game Development',
+            7 => 'Mobile App Development',
+            8 => 'Website Development',
+            9 => 'Python Programming',
+            10 => 'Digital Literacy & Safety/Security',
+            11 => 'Machine Learning',
+            12 => 'Robotics',
+        ];
+
+        // Get stored course statuses or calculate from starting_course_level and reports
+        $courseStatuses = $this->course_statuses;
+
+        // If no course_statuses stored, calculate from starting_course_level and progress reports
+        if (empty($courseStatuses)) {
+            $courseStatuses = $this->calculateCourseStatuses();
+        }
+
+        $result = [];
+        foreach ($allCourses as $id => $title) {
+            $status = $courseStatuses[$id] ?? 'not_started';
+            $result[] = [
+                'id' => $id,
+                'title' => $title,
+                'status' => $status,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Calculate course statuses based on starting_course_level and approved reports.
+     */
+    public function calculateCourseStatuses(): array
+    {
+        $statuses = [];
+
+        // Get starting course level (default is 1)
+        $startingLevel = $this->starting_course_level ?? 1;
+
+        // Mark all courses before starting level as completed (they were done before joining)
+        for ($i = 1; $i < $startingLevel; $i++) {
+            $statuses[$i] = 'completed';
+        }
+
+        // Get progress from approved reports
+        $progress = $this->calculateProgressFromReports();
+
+        // Mark courses from reports as completed or ongoing
+        foreach ($progress['completed_courses'] as $courseName) {
+            // Extract level number from course name
+            if (preg_match('/Level\s*(\d+)/i', $courseName, $matches)) {
+                $level = (int) $matches[1];
+                $statuses[$level] = 'completed';
+            }
+        }
+
+        // Mark current course as ongoing
+        if ($progress['in_progress_course']) {
+            if (preg_match('/Level\s*(\d+)/i', $progress['in_progress_course'], $matches)) {
+                $level = (int) $matches[1];
+                $statuses[$level] = 'ongoing';
+            }
+        }
+
+        // If no in-progress course, mark starting level as ongoing (if not already completed)
+        if (!$progress['in_progress_course'] && !isset($statuses[$startingLevel])) {
+            $statuses[$startingLevel] = 'ongoing';
+        }
+
+        // Mark remaining courses as not_started
+        for ($i = 1; $i <= 12; $i++) {
+            if (!isset($statuses[$i])) {
+                $statuses[$i] = 'not_started';
+            }
+        }
+
+        return $statuses;
     }
 
     /**

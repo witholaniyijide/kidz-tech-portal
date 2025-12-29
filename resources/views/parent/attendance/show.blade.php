@@ -72,7 +72,7 @@
                                     {{ $attendance->tutor->first_name ?? '' }} {{ $attendance->tutor->last_name ?? '' }}
                                 </p>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $attendance->tutor->email ?? '' }}
+                                    Assigned Tutor
                                 </p>
                             </div>
                         </div>

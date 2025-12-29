@@ -131,37 +131,41 @@ class ParentDashboardController extends Controller
      */
     private function getCurriculumRoadmap(Student $student): array
     {
-        $courses = [
-            ['id' => 1, 'title' => 'Introduction to Computer Science', 'icon' => 'computer'],
-            ['id' => 2, 'title' => 'Coding & Fundamental Concepts', 'icon' => 'code'],
-            ['id' => 3, 'title' => 'Scratch Programming', 'icon' => 'puzzle'],
-            ['id' => 4, 'title' => 'Artificial Intelligence', 'icon' => 'brain'],
-            ['id' => 5, 'title' => 'Graphic Design', 'icon' => 'palette'],
-            ['id' => 6, 'title' => 'Game Development', 'icon' => 'gamepad'],
-            ['id' => 7, 'title' => 'Mobile App Development', 'icon' => 'smartphone'],
-            ['id' => 8, 'title' => 'Website Development', 'icon' => 'globe'],
-            ['id' => 9, 'title' => 'Python Programming', 'icon' => 'terminal'],
-            ['id' => 10, 'title' => 'Digital Literacy & Safety/Security', 'icon' => 'shield'],
-            ['id' => 11, 'title' => 'Machine Learning', 'icon' => 'cpu'],
-            ['id' => 12, 'title' => 'Robotics', 'icon' => 'robot'],
+        $icons = [
+            1 => 'computer',
+            2 => 'code',
+            3 => 'puzzle',
+            4 => 'brain',
+            5 => 'palette',
+            6 => 'gamepad',
+            7 => 'smartphone',
+            8 => 'globe',
+            9 => 'terminal',
+            10 => 'shield',
+            11 => 'cpu',
+            12 => 'robot',
         ];
 
-        // Get current stage from student
-        $currentStage = $student->roadmap_stage ?? 1;
-        $progress = $student->roadmap_progress ?? 0;
+        // Get course statuses from student model (uses starting_course_level and reports)
+        $curriculumWithStatuses = $student->getCurriculumWithStatuses();
 
-        // Mark courses as completed, current, or upcoming
-        foreach ($courses as $key => $course) {
-            if ($course['id'] < $currentStage) {
-                $courses[$key]['status'] = 'completed';
-                $courses[$key]['progress'] = 100;
-            } elseif ($course['id'] == $currentStage) {
-                $courses[$key]['status'] = 'current';
-                $courses[$key]['progress'] = $progress;
-            } else {
-                $courses[$key]['status'] = 'upcoming';
-                $courses[$key]['progress'] = 0;
-            }
+        $courses = [];
+        foreach ($curriculumWithStatuses as $course) {
+            $status = $course['status'];
+            // Map status to display status
+            $displayStatus = match($status) {
+                'completed' => 'completed',
+                'ongoing' => 'current',
+                default => 'upcoming',
+            };
+
+            $courses[] = [
+                'id' => $course['id'],
+                'title' => $course['title'],
+                'icon' => $icons[$course['id']] ?? 'book',
+                'status' => $displayStatus,
+                'progress' => $displayStatus === 'completed' ? 100 : ($displayStatus === 'current' ? ($student->roadmap_progress ?? 0) : 0),
+            ];
         }
 
         return $courses;
