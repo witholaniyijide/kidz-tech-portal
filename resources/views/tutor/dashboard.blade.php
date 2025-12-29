@@ -4,7 +4,7 @@
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
-                Welcome back, {{ $tutor->first_name }}!
+                Welcome back, {{ $tutor->first_name ?? 'Tutor' }}!
             </h1>
             <p class="text-slate-600 dark:text-slate-400 mt-1">
                 Here's your teaching overview for {{ now()->format('l, F j, Y') }}

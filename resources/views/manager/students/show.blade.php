@@ -137,17 +137,18 @@
 
         {{-- Sidebar --}}
         <div class="space-y-6">
-            {{-- Progress Overview --}}
+            {{-- Classes Overview --}}
             <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Progress Overview</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Course Progress</h3>
                 @php
-                    $progress = $student->total_periods > 0 ? round(($student->completed_periods / $student->total_periods) * 100) : 0;
+                    $classesPerMonth = ($student->classes_per_week ?? 1) * 4;
+                    $courseProgress = $student->progressPercentage();
                 @endphp
                 <div class="text-center mb-4">
                     <div class="relative w-32 h-32 mx-auto">
                         <svg class="w-32 h-32 transform -rotate-90">
                             <circle cx="64" cy="64" r="56" stroke="currentColor" stroke-width="12" fill="none" class="text-gray-200 dark:text-gray-700"></circle>
-                            <circle cx="64" cy="64" r="56" stroke="url(#progressGradient)" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="{{ 351.86 }}" stroke-dashoffset="{{ 351.86 - (351.86 * $progress / 100) }}"></circle>
+                            <circle cx="64" cy="64" r="56" stroke="url(#progressGradient)" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="{{ 351.86 }}" stroke-dashoffset="{{ 351.86 - (351.86 * $courseProgress / 100) }}"></circle>
                             <defs>
                                 <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                                     <stop offset="0%" stop-color="#C15F3C" />
@@ -156,18 +157,18 @@
                             </defs>
                         </svg>
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ $progress }}%</span>
+                            <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ $courseProgress }}%</span>
                         </div>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 text-center">
                     <div>
-                        <p class="text-2xl font-bold text-[#C15F3C]">{{ $student->completed_periods ?? 0 }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Completed</p>
+                        <p class="text-2xl font-bold text-[#C15F3C]">{{ $student->classes_per_week ?? 1 }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Classes/Week</p>
                     </div>
                     <div>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $student->total_periods ?? 0 }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Total Periods</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $classesPerMonth }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Est. Classes/Month</p>
                     </div>
                 </div>
             </div>

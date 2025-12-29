@@ -268,8 +268,20 @@ class Student extends Model
      */
     public function progressPercentage()
     {
-        // Calculate progress from reports
-        return $this->calculateProgressFromReports()['overall_percentage'];
+        // Get course statuses which accounts for starting_course_level
+        $courseStatuses = $this->calculateCourseStatuses();
+
+        // Count completed courses
+        $completedCount = 0;
+        foreach ($courseStatuses as $status) {
+            if ($status === 'completed') {
+                $completedCount++;
+            }
+        }
+
+        // Calculate percentage (12 total courses)
+        $totalCourses = 12;
+        return $totalCourses > 0 ? (int) (($completedCount / $totalCourses) * 100) : 0;
     }
 
     /**

@@ -120,8 +120,8 @@
                             <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $student->enrollment_date?->format('M j, Y') ?? '-' }}</p>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Total / Completed Periods</label>
-                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $student->completed_periods ?? 0 }} / {{ $student->total_periods ?? 0 }}</p>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Est. Classes per Month</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ ($student->classes_per_week ?? 1) * 4 }} classes</p>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Class Link</label>
