@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Parent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Certification;
+use App\Models\Message;
 use App\Models\Student;
 use App\Models\StudentProgress;
 use App\Models\TutorReport;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -116,37 +118,92 @@ class ParentChildrenController extends Controller
      */
     private function getCurriculumRoadmap(Student $student): array
     {
-        $courses = [
-            ['id' => 1, 'title' => 'Introduction to Computer Science', 'icon' => 'computer'],
-            ['id' => 2, 'title' => 'Coding & Fundamental Concepts', 'icon' => 'code'],
-            ['id' => 3, 'title' => 'Scratch Programming', 'icon' => 'puzzle'],
-            ['id' => 4, 'title' => 'Artificial Intelligence', 'icon' => 'brain'],
-            ['id' => 5, 'title' => 'Graphic Design', 'icon' => 'palette'],
-            ['id' => 6, 'title' => 'Game Development', 'icon' => 'gamepad'],
-            ['id' => 7, 'title' => 'Mobile App Development', 'icon' => 'smartphone'],
-            ['id' => 8, 'title' => 'Website Development', 'icon' => 'globe'],
-            ['id' => 9, 'title' => 'Python Programming', 'icon' => 'terminal'],
-            ['id' => 10, 'title' => 'Digital Literacy & Safety/Security', 'icon' => 'shield'],
-            ['id' => 11, 'title' => 'Machine Learning', 'icon' => 'cpu'],
-            ['id' => 12, 'title' => 'Robotics', 'icon' => 'robot'],
+        $icons = [
+            1 => 'computer',
+            2 => 'code',
+            3 => 'puzzle',
+            4 => 'brain',
+            5 => 'palette',
+            6 => 'gamepad',
+            7 => 'smartphone',
+            8 => 'globe',
+            9 => 'terminal',
+            10 => 'shield',
+            11 => 'cpu',
+            12 => 'robot',
         ];
 
-        $currentStage = $student->roadmap_stage ?? 1;
-        $progress = $student->roadmap_progress ?? 0;
+        // Get course statuses from student model (uses starting_course_level and reports)
+        $curriculumWithStatuses = $student->getCurriculumWithStatuses();
 
-        foreach ($courses as $key => $course) {
-            if ($course['id'] < $currentStage) {
-                $courses[$key]['status'] = 'completed';
-                $courses[$key]['progress'] = 100;
-            } elseif ($course['id'] == $currentStage) {
-                $courses[$key]['status'] = 'current';
-                $courses[$key]['progress'] = $progress;
-            } else {
-                $courses[$key]['status'] = 'upcoming';
-                $courses[$key]['progress'] = 0;
-            }
+        $courses = [];
+        foreach ($curriculumWithStatuses as $course) {
+            $status = $course['status'];
+            // Map status to display status
+            $displayStatus = match($status) {
+                'completed' => 'completed',
+                'ongoing' => 'current',
+                default => 'upcoming',
+            };
+
+            $courses[] = [
+                'id' => $course['id'],
+                'title' => $course['title'],
+                'icon' => $icons[$course['id']] ?? 'book',
+                'status' => $displayStatus,
+                'progress' => $displayStatus === 'completed' ? 100 : ($displayStatus === 'current' ? ($student->roadmap_progress ?? 0) : 0),
+            ];
         }
 
         return $courses;
+    }
+
+    /**
+     * Request a new course for a child.
+     */
+    public function requestCourse(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'course_name' => 'required|string|max:255',
+            'message' => 'nullable|string|max:1000',
+        ]);
+
+        $user = Auth::user();
+        $student = Student::findOrFail($request->student_id);
+
+        // Verify parent owns this student
+        abort_unless($user->isGuardianOf($student), 403, 'Unauthorized');
+
+        // Find director to send message to
+        $director = User::whereHas('roles', function ($query) {
+            $query->where('name', 'director');
+        })->first();
+
+        if (!$director) {
+            return response()->json(['error' => 'No director found to send message to'], 500);
+        }
+
+        // Build message body
+        $body = "I want to request a new course for my child:\n\n";
+        $body .= "Student: " . $student->first_name . " " . $student->last_name . "\n";
+        $body .= "Requested Course: " . $request->course_name . "\n";
+        if ($request->message) {
+            $body .= "\nAdditional Message:\n" . $request->message;
+        }
+
+        // Create message to director
+        Message::create([
+            'sender_id' => $user->id,
+            'recipient_id' => $director->id,
+            'student_id' => $student->id,
+            'subject' => 'New Course Request: ' . $request->course_name . ' for ' . $student->first_name,
+            'body' => $body,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Your course request has been sent to the Director.'
+        ]);
     }
 }

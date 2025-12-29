@@ -18,7 +18,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Tutor</label>
                         <p class="text-gray-900 dark:text-white font-medium">{{ $report->tutor->fullName() }}</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $report->tutor->email }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Assigned Tutor</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Report Month</label>

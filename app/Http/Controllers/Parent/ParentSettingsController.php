@@ -30,9 +30,8 @@ class ParentSettingsController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'phone' => ['nullable', 'string', 'regex:/^(070|080|081|090|091)\d{8}$/'],
-        ], [
-            'phone.regex' => 'Phone must be a valid Nigerian phone number (e.g., 08012345678)',
+            'phone' => ['nullable', 'string', 'max:20'],
+            'phone_country_code' => ['nullable', 'string', 'max:10'],
         ]);
 
         $user->update($validated);

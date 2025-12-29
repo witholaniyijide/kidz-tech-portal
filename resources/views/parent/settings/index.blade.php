@@ -86,19 +86,40 @@
                             @enderror
                         </div>
 
-                        {{-- Phone --}}
+                        {{-- Phone with Country Code --}}
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Phone Number
                             </label>
-                            <input type="text"
-                                   id="phone"
-                                   name="phone"
-                                   value="{{ old('phone', $user->phone) }}"
-                                   placeholder="e.g., 08012345678"
-                                   class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-colors">
-                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Nigerian phone number format (e.g., 08012345678)</p>
+                            <div class="flex">
+                                <select name="phone_country_code"
+                                        id="phone_country_code"
+                                        class="rounded-l-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-colors w-28">
+                                    <option value="+234" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+234' ? 'selected' : '' }}>+234 (NG)</option>
+                                    <option value="+44" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+44' ? 'selected' : '' }}>+44 (UK)</option>
+                                    <option value="+1" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+1' ? 'selected' : '' }}>+1 (US)</option>
+                                    <option value="+233" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+233' ? 'selected' : '' }}>+233 (GH)</option>
+                                    <option value="+27" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+27' ? 'selected' : '' }}>+27 (ZA)</option>
+                                    <option value="+254" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+254' ? 'selected' : '' }}>+254 (KE)</option>
+                                    <option value="+256" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+256' ? 'selected' : '' }}>+256 (UG)</option>
+                                    <option value="+91" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+91' ? 'selected' : '' }}>+91 (IN)</option>
+                                    <option value="+971" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+971' ? 'selected' : '' }}>+971 (UAE)</option>
+                                    <option value="+49" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+49' ? 'selected' : '' }}>+49 (DE)</option>
+                                    <option value="+33" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+33' ? 'selected' : '' }}>+33 (FR)</option>
+                                    <option value="+61" {{ old('phone_country_code', $user->phone_country_code ?? '+234') == '+61' ? 'selected' : '' }}>+61 (AU)</option>
+                                </select>
+                                <input type="text"
+                                       id="phone"
+                                       name="phone"
+                                       value="{{ old('phone', $user->phone) }}"
+                                       placeholder="e.g., 8012345678"
+                                       class="flex-1 rounded-r-lg border-l-0 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-colors">
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select your country code and enter your phone number</p>
                             @error('phone')
+                                <p class="mt-1 text-sm text-rose-600 dark:text-rose-400" role="alert">{{ $message }}</p>
+                            @enderror
+                            @error('phone_country_code')
                                 <p class="mt-1 text-sm text-rose-600 dark:text-rose-400" role="alert">{{ $message }}</p>
                             @enderror
                         </div>

@@ -94,9 +94,7 @@
                             <p class="font-medium text-gray-800 dark:text-white">
                                 {{ $student->tutor->first_name }} {{ $student->tutor->last_name }}
                             </p>
-                            @if($student->tutor->email)
-                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $student->tutor->email }}</p>
-                            @endif
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Assigned Tutor</p>
                         </div>
                     </div>
                 @else
@@ -189,7 +187,16 @@
 
         <!-- Curriculum Roadmap -->
         <div class="glass-card rounded-2xl p-6">
-            <h3 class="text-lg font-heading font-bold text-gray-800 dark:text-white mb-6">Curriculum Roadmap</h3>
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-heading font-bold text-gray-800 dark:text-white">Curriculum Roadmap</h3>
+                <button onclick="openRequestCourseModal({{ $student->id }}, '{{ $student->first_name }} {{ $student->last_name }}')"
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-sky-700 dark:text-sky-400 bg-sky-100 dark:bg-sky-900/30 rounded-lg hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Request New Course
+                </button>
+            </div>
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 @foreach($curriculumRoadmap as $course)
                     <div class="relative">
@@ -297,4 +304,114 @@
             </div>
         </div>
     </div>
+
+    <!-- Request New Course Modal -->
+    <div id="requestCourseModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeRequestCourseModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-sky-100 dark:bg-sky-900/30 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+                                Request New Course
+                            </h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                For: <span id="requestCourseStudentName" class="font-medium"></span>
+                            </p>
+                            <div class="mt-4 space-y-4">
+                                <div>
+                                    <label for="requestCourseName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Course Name
+                                    </label>
+                                    <input type="text" id="requestCourseName"
+                                           class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-sky-500 focus:border-sky-500"
+                                           placeholder="e.g., Advanced Python, Data Science, etc.">
+                                </div>
+                                <div>
+                                    <label for="requestCourseMessage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Additional Message (Optional)
+                                    </label>
+                                    <textarea id="requestCourseMessage" rows="3"
+                                              class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-sky-500 focus:border-sky-500"
+                                              placeholder="Why are you interested in this course?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                    <button type="button" onclick="submitCourseRequest()"
+                            class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-sky-600 text-base font-medium text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Send Request
+                    </button>
+                    <button type="button" onclick="closeRequestCourseModal()"
+                            class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 sm:mt-0 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="requestCourseStudentId" value="">
+
+    @push('scripts')
+    <script>
+        function openRequestCourseModal(studentId, studentName) {
+            document.getElementById('requestCourseStudentId').value = studentId;
+            document.getElementById('requestCourseStudentName').textContent = studentName;
+            document.getElementById('requestCourseName').value = '';
+            document.getElementById('requestCourseMessage').value = '';
+            document.getElementById('requestCourseModal').classList.remove('hidden');
+        }
+
+        function closeRequestCourseModal() {
+            document.getElementById('requestCourseModal').classList.add('hidden');
+        }
+
+        function submitCourseRequest() {
+            const studentId = document.getElementById('requestCourseStudentId').value;
+            const courseName = document.getElementById('requestCourseName').value.trim();
+            const message = document.getElementById('requestCourseMessage').value.trim();
+
+            if (!courseName) {
+                alert('Please enter a course name.');
+                return;
+            }
+
+            fetch('{{ route("parent.children.request-course") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    course_name: courseName,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeRequestCourseModal();
+                } else {
+                    alert(data.error || 'An error occurred. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+    </script>
+    @endpush
 </x-parent-layout>

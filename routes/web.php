@@ -181,6 +181,8 @@ Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('
         ->name('children.index');
     Route::get('/children/{student}', [App\Http\Controllers\Parent\ParentChildrenController::class, 'show'])
         ->name('children.show');
+    Route::post('/children/request-course', [App\Http\Controllers\Parent\ParentChildrenController::class, 'requestCourse'])
+        ->name('children.request-course');
 
     // Performance
     Route::get('/performance', [App\Http\Controllers\Parent\ParentPerformanceController::class, 'index'])
@@ -233,6 +235,10 @@ Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('
     // Schedule
     Route::get('/schedule', [App\Http\Controllers\Parent\ParentScheduleController::class, 'index'])
         ->name('schedule.index');
+    Route::post('/schedule/request-change', [App\Http\Controllers\Parent\ParentScheduleController::class, 'requestScheduleChange'])
+        ->name('schedule.request-change');
+    Route::post('/schedule/toggle-reminder', [App\Http\Controllers\Parent\ParentScheduleController::class, 'toggleClassReminder'])
+        ->name('schedule.toggle-reminder');
 
     // Payments
     Route::get('/payments', [App\Http\Controllers\Parent\ParentPaymentController::class, 'index'])

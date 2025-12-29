@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'password_change_required',
         'phone',
+        'phone_country_code',
         'status',
         'last_login',
         'profile_photo',
