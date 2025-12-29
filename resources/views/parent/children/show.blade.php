@@ -18,13 +18,13 @@
         <div class="glass-card rounded-2xl p-6">
             <div class="flex flex-col md:flex-row md:items-center gap-6">
                 <!-- Avatar -->
-                <div class="w-24 h-24 rounded-2xl bg-parent-gradient flex items-center justify-center text-white shadow-xl overflow-hidden">
+                <div class="w-24 h-24 rounded-2xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center shadow-xl overflow-hidden">
                     @if($student->profile_photo)
                         <img src="{{ asset('storage/' . $student->profile_photo) }}"
                              alt="{{ $student->full_name }}"
                              class="w-full h-full object-cover">
                     @else
-                        <span class="text-4xl font-heading font-bold">{{ substr($student->first_name, 0, 1) }}</span>
+                        <span class="text-4xl font-heading font-bold text-gray-900 dark:text-white">{{ substr($student->first_name, 0, 1) }}</span>
                     @endif
                 </div>
 
@@ -53,7 +53,7 @@
                     </div>
                 </div>
 
-                <!-- Progress Circle -->
+                <!-- Progress Circle & Performance Link -->
                 <div class="text-center">
                     <div class="relative w-24 h-24">
                         <svg class="w-24 h-24 transform -rotate-90">
@@ -74,6 +74,13 @@
                         </div>
                     </div>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Overall Progress</p>
+                    <a href="{{ route('parent.performance.index', ['student_id' => $student->id]) }}"
+                       class="inline-flex items-center mt-3 px-4 py-2 text-sm font-medium text-white bg-sky-500 hover:bg-sky-600 rounded-lg transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        View Performance
+                    </a>
                 </div>
             </div>
         </div>

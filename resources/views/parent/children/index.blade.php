@@ -10,13 +10,13 @@
                        class="glass-card rounded-2xl p-6 hover-lift block group">
                         <!-- Child Header -->
                         <div class="flex items-center space-x-4 mb-4">
-                            <div class="w-16 h-16 rounded-2xl bg-parent-gradient flex items-center justify-center text-white shadow-lg overflow-hidden">
+                            <div class="w-16 h-16 rounded-2xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center shadow-lg overflow-hidden">
                                 @if($child->profile_photo)
                                     <img src="{{ asset('storage/' . $child->profile_photo) }}"
                                          alt="{{ $child->full_name }}"
                                          class="w-full h-full object-cover">
                                 @else
-                                    <span class="text-2xl font-heading font-bold">{{ substr($child->first_name, 0, 1) }}</span>
+                                    <span class="text-2xl font-heading font-bold text-gray-900 dark:text-white">{{ substr($child->first_name, 0, 1) }}</span>
                                 @endif
                             </div>
                             <div class="flex-1">

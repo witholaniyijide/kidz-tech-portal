@@ -19,10 +19,12 @@ class DashboardController extends Controller
     public function index()
     {
         // Get the authenticated tutor
-        $tutor = Auth::user()->tutor;
+        $user = Auth::user();
+        $tutor = $user ? $user->tutor : null;
 
         if (!$tutor) {
-            abort(403, 'You do not have a tutor profile.');
+            return redirect()->route('login')
+                ->with('error', 'You do not have a tutor profile associated with your account. Please contact the administrator.');
         }
 
         // Cache dashboard stats for 5 minutes

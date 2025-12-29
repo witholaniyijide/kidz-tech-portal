@@ -3,25 +3,56 @@
     <x-slot name="subtitle">Track your children's coding journey</x-slot>
 
     <div class="space-y-6">
-        <!-- Child Selector (if multiple children) -->
+        <!-- Children Overview (if multiple children) -->
         @if($children->count() > 1)
-            <div class="glass-card rounded-2xl p-4">
-                <div class="flex items-center justify-between flex-wrap gap-3">
-                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Viewing:</span>
-                    <div class="flex items-center space-x-2 flex-wrap gap-2">
-                        @foreach($children as $child)
-                            <button onclick="switchChild({{ $child->id }})"
-                                    class="flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200
-                                           {{ $selectedChild->id === $child->id
-                                              ? 'bg-parent-gradient text-white shadow-lg'
-                                              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
-                                <div class="w-8 h-8 rounded-full {{ $selectedChild->id === $child->id ? 'bg-white/20 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white' }} flex items-center justify-center text-sm font-semibold">
+            <div class="glass-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-heading font-bold text-gray-800 dark:text-white">My Children</h3>
+                    <a href="{{ route('parent.children.index') }}" class="text-sm text-sky-600 dark:text-sky-400 hover:underline">View All</a>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-{{ min($children->count(), 3) }} gap-4">
+                    @foreach($children as $child)
+                        @php
+                            $childProgress = $child->progressPercentage();
+                        @endphp
+                        <div onclick="switchChild({{ $child->id }})"
+                             class="cursor-pointer p-4 rounded-xl border-2 transition-all duration-200 hover:shadow-lg
+                                    {{ $selectedChild->id === $child->id
+                                       ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20'
+                                       : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-sky-300' }}">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 rounded-xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center text-lg font-bold text-gray-900 dark:text-white">
                                     {{ substr($child->first_name, 0, 1) }}
                                 </div>
-                                <span class="text-sm font-medium">{{ $child->first_name }}</span>
-                            </button>
-                        @endforeach
-                    </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-semibold text-gray-800 dark:text-white truncate">{{ $child->first_name }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Stage {{ $child->roadmap_stage ?? 1 }} of 12</p>
+                                </div>
+                                @if($selectedChild->id === $child->id)
+                                    <span class="px-2 py-1 text-xs font-medium bg-sky-500 text-white rounded-full">Selected</span>
+                                @endif
+                            </div>
+                            <div class="mt-3">
+                                <div class="flex items-center justify-between text-xs mb-1">
+                                    <span class="text-gray-500 dark:text-gray-400">Progress</span>
+                                    <span class="font-semibold text-sky-600 dark:text-sky-400">{{ $childProgress }}%</span>
+                                </div>
+                                <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-sky-500 rounded-full transition-all" style="width: {{ $childProgress }}%"></div>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex gap-2">
+                                <a href="{{ route('parent.children.show', $child) }}" onclick="event.stopPropagation()"
+                                   class="flex-1 px-3 py-1.5 text-xs font-medium text-center rounded-lg border border-sky-500 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-colors">
+                                    Profile
+                                </a>
+                                <a href="{{ route('parent.performance.index', ['student_id' => $child->id]) }}" onclick="event.stopPropagation()"
+                                   class="flex-1 px-3 py-1.5 text-xs font-medium text-center rounded-lg bg-sky-500 text-white hover:bg-sky-600 transition-colors">
+                                    Performance
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         @endif
@@ -31,13 +62,13 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <!-- Child Info -->
                 <div class="flex items-center space-x-4">
-                    <div class="w-20 h-20 rounded-2xl bg-parent-gradient flex items-center justify-center text-white shadow-xl overflow-hidden">
+                    <div class="w-20 h-20 rounded-2xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center shadow-xl overflow-hidden">
                         @if($selectedChild->profile_photo)
                             <img src="{{ asset('storage/' . $selectedChild->profile_photo) }}"
                                  alt="{{ $selectedChild->full_name }}"
                                  class="w-full h-full object-cover">
                         @else
-                            <span class="text-3xl font-heading font-bold">{{ substr($selectedChild->first_name, 0, 1) }}</span>
+                            <span class="text-3xl font-heading font-bold text-gray-900 dark:text-white">{{ substr($selectedChild->first_name, 0, 1) }}</span>
                         @endif
                     </div>
                     <div>
@@ -146,10 +177,10 @@
         <!-- Curriculum Roadmap -->
         <div class="glass-card rounded-2xl p-6">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-heading font-bold text-gray-800 dark:text-white">Curriculum Roadmap</h3>
-                <a href="{{ route('parent.performance.index') }}"
+                <h3 class="text-xl font-heading font-bold text-gray-800 dark:text-white">{{ $selectedChild->first_name }}'s Curriculum Roadmap</h3>
+                <a href="{{ route('parent.children.show', $selectedChild) }}"
                    class="text-sm text-sky-600 dark:text-sky-400 hover:underline">
-                    View Details
+                    View Profile
                 </a>
             </div>
 
