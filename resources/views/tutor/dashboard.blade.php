@@ -1,10 +1,11 @@
 <x-tutor-layout>
+@if($tutor)
 <div class="space-y-8">
     <!-- Page Header -->
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
-                Welcome back, {{ $tutor->first_name ?? 'Tutor' }}!
+                Welcome back, {{ $tutor->first_name }}!
             </h1>
             <p class="text-slate-600 dark:text-slate-400 mt-1">
                 Here's your teaching overview for {{ now()->format('l, F j, Y') }}
@@ -588,6 +589,25 @@
         </div>
     </div>
 </div>
+@else
+<div class="flex items-center justify-center min-h-[60vh]">
+    <div class="text-center p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg max-w-md">
+        <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Tutor Profile Not Found</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-4">Your account does not have a tutor profile associated with it. Please contact the administrator to set up your tutor profile.</p>
+        <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-[#4B49AC] text-white rounded-lg hover:bg-[#3d3b8a] transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"/>
+            </svg>
+            Return to Login
+        </a>
+    </div>
+</div>
+@endif
 
 @push('styles')
 <style>
