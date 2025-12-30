@@ -403,9 +403,9 @@
                                 <div class="flex items-start justify-between gap-4">
                                     <div class="flex-1 min-w-0">
                                         <h4 class="font-semibold text-slate-900 dark:text-white truncate">
-                                            {{ $report->title ?? $report->student->first_name . ' - ' . $report->month }}
+                                            {{ $report->title ?? ($report->student?->first_name ?? 'Unknown Student') . ' - ' . $report->month }}
                                         </h4>
-                                        <p class="text-sm text-slate-500 mt-1">{{ $report->student->first_name }} {{ $report->student->last_name }}</p>
+                                        <p class="text-sm text-slate-500 mt-1">{{ $report->student?->first_name ?? 'Unknown' }} {{ $report->student?->last_name ?? '' }}</p>
                                         <p class="text-xs text-slate-400 mt-1">{{ $report->created_at->diffForHumans() }}</p>
                                     </div>
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
@@ -521,7 +521,7 @@
                             <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                                 <div class="flex items-start justify-between gap-4">
                                     <div>
-                                        <p class="font-semibold text-slate-900 dark:text-white">{{ $attendance->student->first_name }} {{ $attendance->student->last_name }}</p>
+                                        <p class="font-semibold text-slate-900 dark:text-white">{{ $attendance->student?->first_name ?? 'Unknown' }} {{ $attendance->student?->last_name ?? '' }}</p>
                                         <p class="text-sm text-slate-500 mt-1">{{ $attendance->class_date->format('M d, Y') }} • {{ $attendance->duration_minutes }} mins</p>
                                         @if($attendance->topic)
                                             <p class="text-sm text-slate-400 mt-1">{{ Str::limit($attendance->topic, 40) }}</p>
