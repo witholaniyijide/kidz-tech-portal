@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Parent;
 
 use App\Http\Controllers\Controller;
+use App\Models\DailyClassSchedule;
 use App\Models\Message;
 use App\Models\Student;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,7 +31,7 @@ class ParentScheduleController extends Controller
         // Get schedules for all children or selected child
         $studentIds = $selectedChildId ? [$selectedChildId] : $children->pluck('id')->toArray();
 
-        // Build weekly schedule from student's class_schedule
+        // Build weekly schedule from student's class_schedule (default schedule)
         $weeklySchedule = [];
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -55,6 +57,7 @@ class ParentScheduleController extends Controller
                                 'course' => $schedule['course'] ?? $child->current_course ?? 'Coding Class',
                                 'class_link' => $child->class_link,
                                 'google_classroom_link' => $child->google_classroom_link,
+                                'from_daily_schedule' => false,
                             ];
                         }
                     }
@@ -62,16 +65,89 @@ class ParentScheduleController extends Controller
             }
         }
 
-        // Today's classes
+        // Check if admin has posted today's schedule
         $today = now()->format('l');
-        $todayClasses = $weeklySchedule[$today] ?? [];
+        $todayPostedSchedule = DailyClassSchedule::where('schedule_date', Carbon::today())
+            ->where('status', 'posted')
+            ->first();
+
+        $schedulePosted = false;
+        $todayClasses = [];
+
+        if ($todayPostedSchedule && $todayPostedSchedule->classes) {
+            $schedulePosted = true;
+            // Filter classes for this parent's children from posted schedule
+            $postedClasses = collect($todayPostedSchedule->classes)->filter(function ($class) use ($studentIds) {
+                return isset($class['student_id']) && in_array($class['student_id'], $studentIds);
+            });
+
+            // Use posted classes for today (these take priority)
+            foreach ($postedClasses as $class) {
+                $child = $children->firstWhere('id', $class['student_id']);
+                if ($child) {
+                    $todayClasses[] = [
+                        'student' => $child,
+                        'tutor' => $child->tutor,
+                        'time' => isset($class['class_time']) ? Carbon::parse($class['class_time'])->format('g:i A') : 'TBD',
+                        'duration' => $class['duration'] ?? '1 hour',
+                        'course' => $class['course'] ?? $child->current_course ?? 'Coding Class',
+                        'class_link' => $class['class_link'] ?? $child->class_link,
+                        'google_classroom_link' => $child->google_classroom_link,
+                        'from_daily_schedule' => true,
+                    ];
+                }
+            }
+        } else {
+            // Fall back to default weekly schedule for today
+            $todayClasses = $weeklySchedule[$today] ?? [];
+        }
+
+        // Get this week's posted schedules for the weekly view
+        $weekStart = Carbon::now()->startOfWeek();
+        $weekEnd = Carbon::now()->endOfWeek();
+
+        $weekPostedSchedules = DailyClassSchedule::whereBetween('schedule_date', [$weekStart, $weekEnd])
+            ->where('status', 'posted')
+            ->get();
+
+        // Override weekly schedule with posted schedules where available
+        foreach ($weekPostedSchedules as $postedSchedule) {
+            if ($postedSchedule->classes) {
+                $dayName = $postedSchedule->schedule_date->format('l');
+                $postedClasses = collect($postedSchedule->classes)->filter(function ($class) use ($studentIds) {
+                    return isset($class['student_id']) && in_array($class['student_id'], $studentIds);
+                });
+
+                if ($postedClasses->isNotEmpty()) {
+                    // Replace default schedule with posted schedule for this day
+                    $weeklySchedule[$dayName] = [];
+                    foreach ($postedClasses as $class) {
+                        $child = $children->firstWhere('id', $class['student_id']);
+                        if ($child) {
+                            $weeklySchedule[$dayName][] = [
+                                'student' => $child,
+                                'tutor' => $child->tutor,
+                                'time' => isset($class['class_time']) ? Carbon::parse($class['class_time'])->format('g:i A') : 'TBD',
+                                'duration' => $class['duration'] ?? '1 hour',
+                                'course' => $class['course'] ?? $child->current_course ?? 'Coding Class',
+                                'class_link' => $class['class_link'] ?? $child->class_link,
+                                'google_classroom_link' => $child->google_classroom_link,
+                                'from_daily_schedule' => true,
+                                'schedule_date' => $postedSchedule->schedule_date->format('M d'),
+                            ];
+                        }
+                    }
+                }
+            }
+        }
 
         return view('parent.schedule.index', compact(
             'children',
             'weeklySchedule',
             'todayClasses',
             'selectedChildId',
-            'today'
+            'today',
+            'schedulePosted'
         ));
     }
 
