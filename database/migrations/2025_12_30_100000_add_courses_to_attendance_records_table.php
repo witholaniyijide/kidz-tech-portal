@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('attendance_records', function (Blueprint $table) {
-            $table->json('courses_covered')->nullable()->after('topic');
-            $table->boolean('is_late_submission')->default(false)->after('is_late');
+            if (!Schema::hasColumn('attendance_records', 'courses_covered')) {
+                $table->json('courses_covered')->nullable()->after('topic');
+            }
         });
     }
 
@@ -23,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('attendance_records', function (Blueprint $table) {
-            $table->dropColumn(['courses_covered', 'is_late_submission']);
+            if (Schema::hasColumn('attendance_records', 'courses_covered')) {
+                $table->dropColumn('courses_covered');
+            }
         });
     }
 };
