@@ -51,8 +51,8 @@ class ParentMessageController extends Controller
      */
     public function create()
     {
-        // Parents can only message the Director
-        $directors = User::where('role', 'director')->get();
+        // Parents can only message the Director (using Spatie Permissions)
+        $directors = User::role('director')->get();
 
         return view('parent.messages.create', compact('directors'));
     }
@@ -68,9 +68,9 @@ class ParentMessageController extends Controller
             'body' => 'required|string',
         ]);
 
-        // Verify recipient is a director
+        // Verify recipient is a director (using Spatie Permissions)
         $recipient = User::findOrFail($request->recipient_id);
-        if ($recipient->role !== 'director') {
+        if (!$recipient->hasRole('director')) {
             return back()->with('error', 'You can only send messages to the Director.');
         }
 

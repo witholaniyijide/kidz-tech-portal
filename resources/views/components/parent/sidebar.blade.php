@@ -26,12 +26,15 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
     <div class="p-4 border-b border-gray-200 dark:border-slate-700">
         <div class="flex items-center" :class="collapsed ? 'justify-center' : 'justify-between'">
             <a href="{{ route('parent.dashboard') }}" class="flex-shrink-0 flex items-center justify-center">
-                <img x-show="!darkMode" src="{{ asset('images/logo_light.png') }}" alt="KidzTech Logo"
+                <img x-cloak x-show="!darkMode" src="{{ asset('images/logo_light.png') }}" alt="KidzTech Logo"
                      :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
                      class="object-contain transition-all duration-300" onerror="this.style.display='none'">
-                <img x-show="darkMode" src="{{ asset('images/logo_dark.png') }}" alt="KidzTech Logo"
+                <img x-cloak x-show="darkMode" src="{{ asset('images/logo_dark.png') }}" alt="KidzTech Logo"
                      :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
                      class="object-contain transition-all duration-300" onerror="this.style.display='none'">
+                {{-- Fallback logo that shows immediately, hides once Alpine initializes --}}
+                <img x-data x-init="$el.remove()" src="{{ asset('images/logo_light.png') }}" alt="KidzTech Logo"
+                     class="w-16 h-16 object-contain" onerror="this.style.display='none'">
             </a>
             <button @click="toggleCollapse()" x-show="!collapsed"
                     class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400">
