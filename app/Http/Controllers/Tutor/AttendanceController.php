@@ -154,6 +154,9 @@ class AttendanceController extends Controller
         $deadline = $classDate->copy()->endOfDay(); // Midnight of class date
         $isLate = now()->gt($deadline);
 
+        // Check if this is a rescheduled class
+        $isRescheduled = $request->boolean('is_rescheduled', false);
+
         // Create attendance record
         $attendance = AttendanceRecord::create([
             'student_id' => $request->student_id,
@@ -167,6 +170,10 @@ class AttendanceController extends Controller
             'stand_in_reason' => $isActuallyStandIn ? $request->stand_in_reason : null,
             'status' => 'pending',
             'is_late' => $isLate,
+            'is_rescheduled' => $isRescheduled,
+            'original_scheduled_time' => $isRescheduled ? $request->original_scheduled_time : null,
+            'reschedule_reason' => $isRescheduled ? $request->reschedule_reason : null,
+            'reschedule_notes' => $isRescheduled ? $request->reschedule_notes : null,
         ]);
 
         $message = $isActuallyStandIn 
