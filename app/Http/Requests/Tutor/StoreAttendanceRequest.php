@@ -26,6 +26,8 @@ class StoreAttendanceRequest extends FormRequest
             'class_date' => 'required|date|before_or_equal:today',
             'class_time' => 'required',
             'duration_minutes' => 'required|integer|min:15|max:240',
+            'courses_covered' => 'required|array|min:1',
+            'courses_covered.*' => 'string|max:100',
             'topic' => 'nullable|string|max:255',
             'notes' => 'nullable|string|max:2000',
             'is_rescheduled' => 'nullable',
@@ -51,6 +53,8 @@ class StoreAttendanceRequest extends FormRequest
             'duration_minutes.required' => 'Duration is required.',
             'duration_minutes.min' => 'Duration must be at least 15 minutes.',
             'duration_minutes.max' => 'Duration cannot exceed 240 minutes (4 hours).',
+            'courses_covered.required' => 'Please select at least one course covered.',
+            'courses_covered.min' => 'Please select at least one course covered.',
             'original_scheduled_time.required_if' => 'Original scheduled time is required for rescheduled classes.',
             'reschedule_reason.required_if' => 'Reason for rescheduling is required.',
         ];

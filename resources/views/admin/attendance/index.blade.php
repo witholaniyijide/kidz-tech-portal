@@ -190,13 +190,18 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @foreach($attendances as $attendance)
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors {{ $attendance->status === 'pending' ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors {{ $attendance->status === 'pending' ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }} {{ ($attendance->is_late || $attendance->is_late_submission) && $attendance->status === 'pending' ? 'border-l-4 border-red-400' : '' }}">
                                         <td class="px-4 py-4">
                                             <div class="flex items-center">
                                                 <div class="w-8 h-8 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-full flex items-center justify-center text-white font-bold text-xs mr-2">
                                                     {{ strtoupper(substr($attendance->student->first_name ?? 'U', 0, 1)) }}
                                                 </div>
-                                                <span class="font-medium text-gray-900 dark:text-white">{{ $attendance->student->first_name ?? 'Unknown' }} {{ $attendance->student->last_name ?? '' }}</span>
+                                                <div>
+                                                    <span class="font-medium text-gray-900 dark:text-white">{{ $attendance->student->first_name ?? 'Unknown' }} {{ $attendance->student->last_name ?? '' }}</span>
+                                                    @if($attendance->is_stand_in)
+                                                        <span class="ml-1 text-xs text-blue-600 dark:text-blue-400">(Stand-in)</span>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </td>
                                         <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -204,9 +209,20 @@
                                         </td>
                                         <td class="px-4 py-4">
                                             <div class="text-sm text-gray-900 dark:text-white">{{ $attendance->class_date?->format('M j, Y') }}</div>
-                                            <div class="text-xs text-gray-500">{{ $attendance->duration ?? 60 }} mins</div>
+                                            <div class="text-xs text-gray-500">
+                                                @if($attendance->class_time)
+                                                    {{ $attendance->class_time->format('g:i A') }} • {{ $attendance->duration_minutes ?? 60 }} mins
+                                                @else
+                                                    {{ $attendance->duration_minutes ?? 60 }} mins
+                                                @endif
+                                            </div>
                                         </td>
                                         <td class="px-4 py-4">
+                                            @if($attendance->courses_covered && count($attendance->courses_covered) > 0)
+                                                <div class="text-xs text-[#423A8E] dark:text-[#00CCCD] font-medium truncate max-w-xs" title="{{ implode(', ', $attendance->courses_covered) }}">
+                                                    {{ Str::limit(implode(', ', $attendance->courses_covered), 30) }}
+                                                </div>
+                                            @endif
                                             <div class="text-sm text-gray-900 dark:text-white max-w-xs truncate">{{ $attendance->topic ?? '-' }}</div>
                                         </td>
                                         <td class="px-4 py-4">
@@ -214,12 +230,23 @@
                                             <div class="text-sm text-gray-900 dark:text-white">{{ $attendance->created_at->format('M j, Y') }}</div>
                                             <div class="text-xs text-gray-500">{{ $attendance->created_at->format('g:i A') }}</div>
                                             <div class="text-xs text-gray-400">{{ $attendance->created_at->diffForHumans() }}</div>
+                                            @if(($attendance->is_late || $attendance->is_late_submission) && $attendance->status === 'pending')
+                                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    Late Submission
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="px-4 py-4">
                                             @if($attendance->status === 'approved')
-                                                @if($attendance->is_late)
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                                                        Late ⚠️
+                                                @if($attendance->is_late || $attendance->is_late_submission)
+                                                    <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        Late ✓
                                                     </span>
                                                 @else
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
@@ -227,9 +254,20 @@
                                                     </span>
                                                 @endif
                                             @else
-                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 animate-pulse">
-                                                    Pending
-                                                </span>
+                                                @if($attendance->is_late || $attendance->is_late_submission)
+                                                    <div class="flex flex-col gap-1">
+                                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 animate-pulse">
+                                                            Pending
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                                            ⚠️ Late
+                                                        </span>
+                                                    </div>
+                                                @else
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 animate-pulse">
+                                                        Pending
+                                                    </span>
+                                                @endif
                                             @endif
                                         </td>
                                         <td class="px-4 py-4">

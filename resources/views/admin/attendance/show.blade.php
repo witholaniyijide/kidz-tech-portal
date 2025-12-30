@@ -94,20 +94,52 @@
                     <div class="p-6 space-y-4">
                         <div class="flex justify-between">
                             <span class="text-gray-500 dark:text-gray-400">Class Date</span>
-                            <span class="font-medium text-gray-900 dark:text-white">{{ $attendance->class_date?->format('M j, Y') }}</span>
+                            <span class="font-medium text-gray-900 dark:text-white">{{ $attendance->class_date?->format('l, M j, Y') }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500 dark:text-gray-400">Class Time</span>
+                            <span class="font-medium text-gray-900 dark:text-white">
+                                @if($attendance->class_time)
+                                    {{ $attendance->class_time->format('g:i A') }}
+                                @else
+                                    Not specified
+                                @endif
+                            </span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-500 dark:text-gray-400">Duration</span>
-                            <span class="font-medium text-gray-900 dark:text-white">{{ $attendance->duration ?? 60 }} minutes</span>
+                            <span class="font-medium text-gray-900 dark:text-white">{{ $attendance->duration_minutes ?? 60 }} minutes</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-500 dark:text-gray-400">Course Level</span>
-                            <span class="font-medium text-gray-900 dark:text-white">Level {{ $attendance->course_level ?? '-' }}</span>
+                            <span class="text-gray-500 dark:text-gray-400">Class Ended</span>
+                            <span class="font-medium text-gray-900 dark:text-white">
+                                @if($attendance->class_time && $attendance->duration_minutes)
+                                    {{ $attendance->class_time->copy()->addMinutes($attendance->duration_minutes)->format('g:i A') }}
+                                @else
+                                    -
+                                @endif
+                            </span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500 dark:text-gray-400">Attendance #</span>
-                            <span class="font-medium text-gray-900 dark:text-white">{{ $attendance->attendance_number ?? '-' }}</span>
-                        </div>
+                        @if($attendance->class_time && $attendance->duration_minutes)
+                            <div class="flex justify-between">
+                                <span class="text-gray-500 dark:text-gray-400">Time Range</span>
+                                <span class="font-medium text-[#423A8E] dark:text-[#00CCCD]">
+                                    {{ $attendance->class_time->format('g:i A') }} - {{ $attendance->class_time->copy()->addMinutes($attendance->duration_minutes)->format('g:i A') }}
+                                </span>
+                            </div>
+                        @endif
+                        @if($attendance->courses_covered && count($attendance->courses_covered) > 0)
+                            <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <span class="text-gray-500 dark:text-gray-400 text-sm">Course(s) Covered</span>
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    @foreach($attendance->courses_covered as $course)
+                                        <span class="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-[#423A8E]/10 text-[#423A8E] dark:bg-[#00CCCD]/20 dark:text-[#00CCCD]">
+                                            {{ $course }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                         <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
                             <span class="text-gray-500 dark:text-gray-400 text-sm">Topic Covered</span>
                             <p class="mt-1 text-gray-900 dark:text-white">{{ $attendance->topic ?? 'No topic specified' }}</p>

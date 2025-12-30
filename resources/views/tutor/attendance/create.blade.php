@@ -266,10 +266,10 @@
                         Duration (minutes) <span class="text-red-500">*</span>
                     </label>
                     <div class="flex items-center gap-2">
-                        <input type="number" id="duration_minutes" name="duration_minutes" 
-                               value="{{ old('duration_minutes', 60) }}" 
-                               required 
-                               min="15" 
+                        <input type="number" id="duration_minutes" name="duration_minutes"
+                               value="{{ old('duration_minutes', 60) }}"
+                               required
+                               min="15"
                                max="240"
                                class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
                         <div class="flex gap-1">
@@ -285,16 +285,67 @@
                     <p class="mt-1 text-xs text-slate-500">Enter duration between 15 and 240 minutes</p>
                 </div>
 
+                <!-- Course(s) Covered -->
+                <div x-data="{ selectedCourses: {{ json_encode(old('courses_covered', [])) }} }">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        Course(s) Covered <span class="text-red-500">*</span>
+                    </label>
+                    <p class="text-xs text-slate-500 mb-2">Select the course(s) you covered in this class. You can select multiple courses if needed.</p>
+
+                    <div class="space-y-2 max-h-64 overflow-y-auto p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                        @php
+                            $courses = [
+                                1 => '01 - Introduction to Computer Science',
+                                2 => '02 - Coding & Fundamental Concepts',
+                                3 => '03 - Scratch Programming',
+                                4 => '04 - Artificial Intelligence',
+                                5 => '05 - Graphic Design',
+                                6 => '06 - Game Development',
+                                7 => '07 - Mobile App Development',
+                                8 => '08 - Website Development',
+                                9 => '09 - Python Programming',
+                                10 => '10 - Digital Literacy & Safety/Security',
+                                11 => '11 - Machine Learning',
+                                12 => '12 - Robotics',
+                            ];
+                        @endphp
+                        @foreach($courses as $id => $courseName)
+                            <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-white dark:hover:bg-slate-700 cursor-pointer transition-colors">
+                                <input type="checkbox"
+                                       name="courses_covered[]"
+                                       value="{{ $courseName }}"
+                                       x-model="selectedCourses"
+                                       {{ in_array($courseName, old('courses_covered', [])) ? 'checked' : '' }}
+                                       class="w-4 h-4 rounded text-[#7978E9] focus:ring-[#7978E9] border-slate-300 dark:border-slate-600">
+                                <span class="text-sm text-slate-700 dark:text-slate-300">{{ $courseName }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    <div class="mt-2 flex items-center gap-2" x-show="selectedCourses.length > 0">
+                        <span class="text-xs text-slate-500">Selected:</span>
+                        <span class="text-xs font-medium text-[#7978E9]" x-text="selectedCourses.length + ' course(s)'"></span>
+                    </div>
+
+                    @error('courses_covered')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                    @error('courses_covered.*')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Topic -->
                 <div>
                     <label for="topic" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                        Topic Covered
+                        Topic Covered (Details)
                     </label>
-                    <input type="text" id="topic" name="topic" 
-                           value="{{ old('topic') }}" 
+                    <input type="text" id="topic" name="topic"
+                           value="{{ old('topic') }}"
                            maxlength="255"
-                           placeholder="e.g., Introduction to Python, Scratch Animation"
+                           placeholder="e.g., Variables and Data Types, Creating First Animation"
                            class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                    <p class="mt-1 text-xs text-slate-500">Specific topic or lesson within the selected course(s)</p>
                     @error('topic')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
