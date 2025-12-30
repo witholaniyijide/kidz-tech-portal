@@ -187,7 +187,7 @@
                 @endif
                 <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400">Current Stage</p>
-                    <p class="font-medium text-gray-800 dark:text-white">Stage {{ $student->roadmap_stage ?? 1 }} of 12</p>
+                    <p class="font-medium text-gray-800 dark:text-white">Stage {{ $currentStage ?? 1 }} of 12</p>
                 </div>
             </div>
         </div>
