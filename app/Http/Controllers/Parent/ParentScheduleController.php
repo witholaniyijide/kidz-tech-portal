@@ -88,7 +88,7 @@ class ParentScheduleController extends Controller
                     $todayClasses[] = [
                         'student' => $child,
                         'tutor' => $child->tutor,
-                        'time' => isset($class['class_time']) ? Carbon::parse($class['class_time'])->format('g:i A') : 'TBD',
+                        'time' => isset($class['time']) ? Carbon::parse($class['time'])->format('g:i A') : 'TBD',
                         'duration' => $class['duration'] ?? '1 hour',
                         'course' => $class['course'] ?? $child->current_course ?? 'Coding Class',
                         'class_link' => $class['class_link'] ?? $child->class_link,
@@ -127,7 +127,7 @@ class ParentScheduleController extends Controller
                             $weeklySchedule[$dayName][] = [
                                 'student' => $child,
                                 'tutor' => $child->tutor,
-                                'time' => isset($class['class_time']) ? Carbon::parse($class['class_time'])->format('g:i A') : 'TBD',
+                                'time' => isset($class['time']) ? Carbon::parse($class['time'])->format('g:i A') : 'TBD',
                                 'duration' => $class['duration'] ?? '1 hour',
                                 'course' => $class['course'] ?? $child->current_course ?? 'Coding Class',
                                 'class_link' => $class['class_link'] ?? $child->class_link,
