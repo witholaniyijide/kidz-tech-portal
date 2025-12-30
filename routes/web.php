@@ -661,6 +661,8 @@ Route::prefix('tutor')
             ->name('reports.whatsapp');
         Route::post('reports/import-artifact', [App\Http\Controllers\Tutor\ReportController::class, 'importFromArtifact'])
             ->name('reports.import-artifact');
+        Route::post('reports/custom-skill', [App\Http\Controllers\Tutor\ReportController::class, 'storeCustomSkill'])
+            ->name('reports.custom-skill');
         Route::post('reports/{report}/comments', [App\Http\Controllers\Tutor\CommentController::class, 'store'])
             ->name('reports.comments.store');
 

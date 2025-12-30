@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tutor;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tutor\StoreReportRequest;
 use App\Http\Requests\Tutor\UpdateReportRequest;
+use App\Models\CustomSkill;
 use App\Models\Student;
 use App\Models\TutorNotification;
 use App\Models\TutorReport;
@@ -22,6 +23,27 @@ class ReportController extends Controller
     public function __construct()
     {
         $this->skillsDatabase = $this->getSkillsDatabase();
+        $this->mergeCustomSkills();
+    }
+
+    /**
+     * Merge custom skills from database into skills database.
+     */
+    protected function mergeCustomSkills(): void
+    {
+        $customSkills = CustomSkill::all();
+
+        foreach ($customSkills as $skill) {
+            $course = $skill->course ?: 'Custom Skills';
+
+            if (!isset($this->skillsDatabase[$course])) {
+                $this->skillsDatabase[$course] = [];
+            }
+
+            if (!in_array($skill->name, $this->skillsDatabase[$course])) {
+                $this->skillsDatabase[$course][] = $skill->name;
+            }
+        }
     }
 
     /**
@@ -98,7 +120,10 @@ class ReportController extends Controller
             try {
                 $encoded = $request->get('import');
                 $decoded = urldecode(base64_decode($encoded));
-                $importData = json_decode($decoded, true);
+                $rawData = json_decode($decoded, true);
+
+                // Transform artifact camelCase keys to snake_case for Laravel
+                $importData = $this->transformArtifactData($rawData);
             } catch (\Exception $e) {
                 // Invalid import data, ignore
             }
@@ -521,6 +546,33 @@ class ReportController extends Controller
     }
 
     /**
+     * Store a new custom skill.
+     */
+    public function storeCustomSkill(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'course' => 'nullable|string|max:255',
+        ]);
+
+        $skill = CustomSkill::firstOrCreate(
+            [
+                'name' => $validated['name'],
+                'course' => $validated['course'] ?? null,
+            ],
+            [
+                'created_by' => Auth::id(),
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'skill' => $skill,
+            'message' => 'Skill saved successfully',
+        ]);
+    }
+
+    /**
      * Get all available courses.
      */
     protected function getCourses(): array
@@ -538,6 +590,30 @@ class ReportController extends Controller
             'Digital Literacy & Safety',
             'Machine Learning',
             'Robotics',
+        ];
+    }
+
+    /**
+     * Transform artifact data from camelCase to snake_case.
+     */
+    protected function transformArtifactData(?array $data): ?array
+    {
+        if (!$data) {
+            return null;
+        }
+
+        return [
+            'student_id' => $data['student_id'] ?? null,
+            'month' => $data['month'] ?? null,
+            'year' => $data['year'] ?? now()->year,
+            'courses' => $data['courses'] ?? [],
+            'skills_mastered' => $data['skillsMastered'] ?? $data['skills_mastered'] ?? [],
+            'new_skills' => $data['newSkills'] ?? $data['new_skills'] ?? [],
+            'projects' => $data['projects'] ?? [],
+            'areas_for_improvement' => $data['areasForImprovement'] ?? $data['areas_for_improvement'] ?? '',
+            'goals_next_month' => $data['goalsNextMonth'] ?? $data['goals_next_month'] ?? '',
+            'assignments' => $data['assignments'] ?? '',
+            'comments_observation' => $data['comments'] ?? $data['comments_observation'] ?? '',
         ];
     }
 
