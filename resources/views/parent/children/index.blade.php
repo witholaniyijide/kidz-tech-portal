@@ -68,7 +68,7 @@
                         <!-- View Profile Button -->
                         <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                             <span class="text-sm text-gray-500 dark:text-gray-400">
-                                Stage {{ $child->roadmap_stage ?? 1 }} of 12
+                                Stage {{ $child->current_stage ?? 1 }} of 12
                             </span>
                             <span class="flex items-center text-sm font-medium text-sky-600 dark:text-sky-400 group-hover:translate-x-1 transition-transform">
                                 View Profile

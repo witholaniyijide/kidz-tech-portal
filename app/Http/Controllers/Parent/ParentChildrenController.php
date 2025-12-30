@@ -27,10 +27,37 @@ class ParentChildrenController extends Controller
             ->get()
             ->map(function ($child) {
                 $child->progress_percentage = $child->progressPercentage();
+                // Calculate current stage based on course statuses
+                $child->current_stage = $this->calculateCurrentStage($child);
                 return $child;
             });
 
         return view('parent.children.index', compact('children'));
+    }
+
+    /**
+     * Calculate the current stage based on course statuses.
+     */
+    private function calculateCurrentStage(Student $student): int
+    {
+        $courseStatuses = $student->getCurriculumWithStatuses();
+
+        // Find the current (ongoing) course
+        foreach ($courseStatuses as $course) {
+            if ($course['status'] === 'ongoing') {
+                return $course['id'];
+            }
+        }
+
+        // If no ongoing course, find the last completed + 1
+        $lastCompleted = 0;
+        foreach ($courseStatuses as $course) {
+            if ($course['status'] === 'completed') {
+                $lastCompleted = max($lastCompleted, $course['id']);
+            }
+        }
+
+        return min($lastCompleted + 1, 12);
     }
 
     /**
@@ -52,6 +79,9 @@ class ParentChildrenController extends Controller
 
         // Get progress percentage
         $progressPercentage = $student->progressPercentage();
+
+        // Calculate current stage dynamically
+        $currentStage = $this->calculateCurrentStage($student);
 
         // Get all progress milestones
         $milestones = StudentProgress::where('student_id', $student->id)
@@ -79,6 +109,7 @@ class ParentChildrenController extends Controller
         return view('parent.children.show', compact(
             'student',
             'progressPercentage',
+            'currentStage',
             'milestones',
             'reports',
             'certifications',

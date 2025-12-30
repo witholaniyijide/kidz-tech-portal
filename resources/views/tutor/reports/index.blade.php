@@ -174,7 +174,7 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-center gap-3 mb-2">
                                 <a href="{{ route('tutor.reports.show', $report) }}" class="text-lg font-semibold text-slate-900 dark:text-white hover:text-[#7978E9] dark:hover:text-[#98BDFF] transition-colors truncate">
-                                    {{ $report->student->first_name }} {{ $report->student->last_name }} - {{ $report->month }} {{ $report->year }}
+                                    {{ $report->student?->first_name ?? 'Unknown' }} {{ $report->student?->last_name ?? '' }} - {{ $report->month }} {{ $report->year }}
                                 </a>
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
                                     @if($report->status === 'draft') bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400

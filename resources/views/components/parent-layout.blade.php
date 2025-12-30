@@ -55,6 +55,10 @@
             box-shadow: 0 10px 25px -5px rgba(245, 166, 35, 0.4);
         }
 
+        .bg-parent-gradient {
+            background: linear-gradient(135deg, #F5A623 0%, #F7B74A 100%);
+        }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(245, 166, 35, 0.1); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #F5A623 0%, #F7B74A 100%); border-radius: 10px; }

@@ -6,12 +6,20 @@
             <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Availability</h1>
             <p class="text-slate-600 dark:text-slate-400 mt-1">Set when you're available for classes</p>
         </div>
-        <button @click="showAddModal = true" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            + Hours
-        </button>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('tutor.schedule.today') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                My Schedule
+            </a>
+            <button @click="showAddModal = true" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                + Hours
+            </button>
+        </div>
     </div>
 
     <!-- Tabs -->
