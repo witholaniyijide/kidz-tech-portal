@@ -674,6 +674,16 @@ Route::prefix('tutor')
         Route::get('/schedule/today', [App\Http\Controllers\Tutor\ScheduleController::class, 'today'])
             ->name('schedule.today');
 
+        // Monthly Class Schedules
+        Route::get('/monthly-schedule', [App\Http\Controllers\Tutor\MonthlyScheduleController::class, 'index'])
+            ->name('monthly-schedule.index');
+        Route::post('/monthly-schedule/generate', [App\Http\Controllers\Tutor\MonthlyScheduleController::class, 'generate'])
+            ->name('monthly-schedule.generate');
+        Route::get('/monthly-schedule/{student}/edit', [App\Http\Controllers\Tutor\MonthlyScheduleController::class, 'edit'])
+            ->name('monthly-schedule.edit');
+        Route::put('/monthly-schedule/{student}', [App\Http\Controllers\Tutor\MonthlyScheduleController::class, 'update'])
+            ->name('monthly-schedule.update');
+
         // Availability
         Route::get('/availability', [App\Http\Controllers\Tutor\AvailabilityController::class, 'index'])
             ->name('availability.index');

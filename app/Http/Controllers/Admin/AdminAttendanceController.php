@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceRecord;
+use App\Models\MonthlyClassSchedule;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\ActivityLog;
@@ -96,6 +97,9 @@ class AdminAttendanceController extends Controller
                 'approved_at' => now(),
             ]);
 
+            // Update monthly class schedule count
+            $this->updateMonthlyScheduleCount($attendance);
+
             ActivityLog::create([
                 'user_id' => Auth::id(),
                 'action' => 'approved',
@@ -116,10 +120,14 @@ class AdminAttendanceController extends Controller
         DB::transaction(function() use ($attendance) {
             $attendance->update([
                 'is_late' => true,
+                'is_late_submission' => true,
                 'status' => 'approved',
                 'approved_by' => Auth::id(),
                 'approved_at' => now(),
             ]);
+
+            // Update monthly class schedule count
+            $this->updateMonthlyScheduleCount($attendance);
 
             ActivityLog::create([
                 'user_id' => Auth::id(),
@@ -131,6 +139,37 @@ class AdminAttendanceController extends Controller
         });
 
         return redirect()->back()->with('success', 'Attendance marked as late and approved.');
+    }
+
+    /**
+     * Update the monthly class schedule completed count.
+     */
+    protected function updateMonthlyScheduleCount(AttendanceRecord $attendance)
+    {
+        if (!$attendance->class_date || !$attendance->tutor_id || !$attendance->student_id) {
+            return;
+        }
+
+        $year = $attendance->class_date->year;
+        $month = $attendance->class_date->month;
+
+        // Find the monthly schedule record
+        $schedule = MonthlyClassSchedule::where('student_id', $attendance->student_id)
+            ->where('year', $year)
+            ->where('month', $month)
+            ->first();
+
+        if ($schedule) {
+            // Recalculate the completed classes count from approved attendance records
+            $completedCount = AttendanceRecord::where('tutor_id', $schedule->tutor_id)
+                ->where('student_id', $attendance->student_id)
+                ->where('status', 'approved')
+                ->whereMonth('class_date', $month)
+                ->whereYear('class_date', $year)
+                ->count();
+
+            $schedule->update(['completed_classes' => $completedCount]);
+        }
     }
 
     /**
@@ -191,6 +230,13 @@ class AdminAttendanceController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
+        // Get monthly schedules for all students in the date range
+        $monthlySchedules = MonthlyClassSchedule::whereIn('student_id', $attendances->pluck('student_id')->unique())
+            ->where('year', $start->year)
+            ->where('month', $start->month)
+            ->get()
+            ->keyBy('student_id');
+
         // Create CSV content
         $filename = "attendance_export_{$start->format('Y-m-d')}_to_{$end->format('Y-m-d')}.csv";
 
@@ -199,7 +245,7 @@ class AdminAttendanceController extends Controller
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
-        $callback = function() use ($attendances, $start, $end) {
+        $callback = function() use ($attendances, $monthlySchedules, $start, $end) {
             $file = fopen('php://output', 'w');
 
             // Add BOM for Excel UTF-8 compatibility
@@ -210,14 +256,15 @@ class AdminAttendanceController extends Controller
                 'Date',
                 'Student Name',
                 'Tutor Name',
-                'Class Start',
+                'Class Time',
+                'Duration (mins)',
                 'Class End',
                 'Status',
                 'Late Submission',
-                'Topic Covered',
-                'Student Performance',
-                'Homework Given',
-                'Comments',
+                'Courses Covered',
+                'Topic',
+                'Notes',
+                'Monthly Classes (Completed/Total)',
                 'Submitted At',
                 'Approved By',
                 'Approved At',
@@ -225,18 +272,33 @@ class AdminAttendanceController extends Controller
 
             // CSV Data
             foreach ($attendances as $attendance) {
+                $monthlySchedule = $monthlySchedules->get($attendance->student_id);
+                $monthlyCount = $monthlySchedule
+                    ? "{$monthlySchedule->completed_classes}/{$monthlySchedule->total_classes}"
+                    : '-';
+
+                $classTime = $attendance->class_time?->format('H:i') ?? '';
+                $classEnd = ($attendance->class_time && $attendance->duration_minutes)
+                    ? $attendance->class_time->copy()->addMinutes($attendance->duration_minutes)->format('H:i')
+                    : '';
+
+                $coursesCovered = is_array($attendance->courses_covered)
+                    ? implode('; ', $attendance->courses_covered)
+                    : '';
+
                 fputcsv($file, [
                     $attendance->class_date?->format('Y-m-d'),
                     ($attendance->student?->first_name ?? '') . ' ' . ($attendance->student?->last_name ?? ''),
                     ($attendance->tutor?->first_name ?? '') . ' ' . ($attendance->tutor?->last_name ?? ''),
-                    $attendance->class_start_time ?? '',
-                    $attendance->class_end_time ?? '',
+                    $classTime,
+                    $attendance->duration_minutes ?? 60,
+                    $classEnd,
                     ucfirst($attendance->status),
-                    $attendance->is_late ? 'Yes' : 'No',
-                    $attendance->topic_covered ?? '',
-                    $attendance->student_performance ?? '',
-                    $attendance->homework_given ?? '',
-                    $attendance->comments ?? '',
+                    ($attendance->is_late || $attendance->is_late_submission) ? 'Yes' : 'No',
+                    $coursesCovered,
+                    $attendance->topic ?? '',
+                    $attendance->notes ?? '',
+                    $monthlyCount,
                     $attendance->created_at?->format('Y-m-d H:i'),
                     $attendance->approver ? ($attendance->approver->name ?? 'Unknown') : '',
                     $attendance->approved_at?->format('Y-m-d H:i'),

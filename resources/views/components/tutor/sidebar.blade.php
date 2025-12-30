@@ -94,6 +94,16 @@ class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col tran
             <span x-show="!collapsed" x-transition class="ml-3 font-medium">Availability</span>
         </a>
 
+        <a href="{{ route('tutor.monthly-schedule.index') }}"
+           class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
+                  {{ request()->routeIs('tutor.monthly-schedule.*') ? 'bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50' }}"
+           :title="collapsed ? 'Monthly Schedule' : ''">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+            </svg>
+            <span x-show="!collapsed" x-transition class="ml-3 font-medium">Monthly Schedule</span>
+        </a>
+
         <a href="{{ route('tutor.reports.index') }}"
            class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
                   {{ request()->routeIs('tutor.reports.*') ? 'bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50' }}"
