@@ -100,7 +100,7 @@ class ParentCertificateController extends Controller
     /**
      * Validate a certificate by its ID.
      */
-    public function validate(Request $request)
+    public function validateCertificate(Request $request)
     {
         $certificateId = $request->input('certificate_id');
 
