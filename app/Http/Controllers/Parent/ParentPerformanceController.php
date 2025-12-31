@@ -167,11 +167,17 @@ class ParentPerformanceController extends Controller
 
         $milestones = [];
 
-        // Get current stage (default to 1)
-        $currentStage = $student->roadmap_stage ?? 1;
+        // Get current level (use current_level, then roadmap_stage, then starting_course_level as fallback)
+        $currentLevel = $student->current_level
+            ?? $student->roadmap_stage
+            ?? $student->starting_course_level
+            ?? 1;
 
-        // All stages before the current one are considered completed
-        for ($i = 1; $i < $currentStage; $i++) {
+        // All stages before the current level are considered completed
+        // If current_level is 5, they've completed 1-4, currently on 5
+        $completedLevels = max(0, $currentLevel - 1);
+
+        for ($i = 1; $i <= $completedLevels; $i++) {
             if (isset($curriculumStages[$i])) {
                 $milestones[] = [
                     'id' => $i,
@@ -224,22 +230,25 @@ class ParentPerformanceController extends Controller
             12 => 'Robotics',
         ];
 
-        // Get current stage (default to 1)
-        $currentStage = $student->roadmap_stage ?? 1;
+        // Get current level (use current_level, then roadmap_stage, then starting_course_level as fallback)
+        $currentLevel = $student->current_level
+            ?? $student->roadmap_stage
+            ?? $student->starting_course_level
+            ?? 1;
 
         // Check if student has a custom next milestone set
         if ($student->roadmap_next_milestone) {
             return [
                 'title' => $student->roadmap_next_milestone,
-                'description' => 'Stage ' . $currentStage . ' of 12',
-                'stage' => $currentStage,
-                'progress' => round(($currentStage / 12) * 100),
+                'description' => 'Stage ' . $currentLevel . ' of 12',
+                'stage' => $currentLevel,
+                'progress' => round(($currentLevel / 12) * 100),
             ];
         }
 
         // Primary: Use curriculum stage as the next milestone
-        if ($currentStage <= 12 && isset($curriculumStages[$currentStage])) {
-            $description = 'Stage ' . $currentStage . ' of 12';
+        if ($currentLevel <= 12 && isset($curriculumStages[$currentLevel])) {
+            $description = 'Stage ' . $currentLevel . ' of 12';
 
             // Optionally enhance with goals from latest report
             $latestReport = TutorReport::where('student_id', $student->id)
@@ -252,15 +261,15 @@ class ParentPerformanceController extends Controller
             }
 
             return [
-                'title' => $curriculumStages[$currentStage],
+                'title' => $curriculumStages[$currentLevel],
                 'description' => $description,
-                'stage' => $currentStage,
-                'progress' => round((($currentStage - 1) / 12) * 100),
+                'stage' => $currentLevel,
+                'progress' => round((($currentLevel - 1) / 12) * 100),
             ];
         }
 
         // Student has completed all stages
-        if ($currentStage > 12) {
+        if ($currentLevel > 12) {
             return [
                 'title' => 'Curriculum Completed!',
                 'description' => 'All 12 stages completed - Advanced learning continues',

@@ -37,10 +37,22 @@ class ScheduleController extends Controller
                 return isset($class['student_id']) && in_array($class['student_id'], $studentIds);
             });
 
-            // Enrich with student data
+            // Enrich with student data and fallback class time
             $todayClasses = $todayClasses->map(function ($class) use ($students) {
                 $student = $students->firstWhere('id', $class['student_id']);
                 $class['student'] = $student;
+
+                // If time is not set, get it from student's class_schedule
+                if (empty($class['time']) && $student && $student->class_schedule && is_array($student->class_schedule)) {
+                    $today = Carbon::today()->format('l'); // Day name (e.g., "Monday")
+                    foreach ($student->class_schedule as $schedule) {
+                        if (isset($schedule['day']) && $schedule['day'] === $today && isset($schedule['time'])) {
+                            $class['time'] = $schedule['time'];
+                            break;
+                        }
+                    }
+                }
+
                 return $class;
             });
         }
@@ -65,6 +77,18 @@ class ScheduleController extends Controller
                     $class['schedule_date'] = $schedule->schedule_date;
                     $student = $students->firstWhere('id', $class['student_id']);
                     $class['student'] = $student;
+
+                    // If time is not set, get it from student's class_schedule
+                    if (empty($class['time']) && $student && $student->class_schedule && is_array($student->class_schedule)) {
+                        $dayName = Carbon::parse($schedule->schedule_date)->format('l');
+                        foreach ($student->class_schedule as $studentSchedule) {
+                            if (isset($studentSchedule['day']) && $studentSchedule['day'] === $dayName && isset($studentSchedule['time'])) {
+                                $class['time'] = $studentSchedule['time'];
+                                break;
+                            }
+                        }
+                    }
+
                     $weekClasses->push($class);
                 }
             }

@@ -71,13 +71,28 @@ class AvailabilityController extends Controller
                 foreach ($filteredClasses as $class) {
                     $class['schedule_date'] = $schedule->schedule_date;
                     $class['day_name'] = Carbon::parse($schedule->schedule_date)->format('l');
-                    
-                    // Get student name
+
+                    // Get student name and fallback class time from student schedule
                     if (isset($class['student_id'])) {
                         $student = $students->firstWhere('id', $class['student_id']);
-                        $class['student_name'] = $student ? $student->first_name . ' ' . $student->last_name : 'Student';
+                        if ($student) {
+                            $class['student_name'] = $student->first_name . ' ' . $student->last_name;
+
+                            // If class_time is not set, get it from student's class_schedule
+                            if (empty($class['class_time']) && $student->class_schedule && is_array($student->class_schedule)) {
+                                $dayName = $class['day_name'];
+                                foreach ($student->class_schedule as $studentSchedule) {
+                                    if (isset($studentSchedule['day']) && $studentSchedule['day'] === $dayName && isset($studentSchedule['time'])) {
+                                        $class['class_time'] = $studentSchedule['time'];
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            $class['student_name'] = 'Student';
+                        }
                     }
-                    
+
                     $scheduledClasses->push($class);
                 }
             }

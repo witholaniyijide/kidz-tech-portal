@@ -610,17 +610,21 @@
                             })
                         });
 
-                        if (response.ok) {
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
                             this.showToast('Assessment saved successfully!');
                             this.resetForm();
                             this.view = 'dashboard';
                             setTimeout(() => window.location.reload(), 1000);
                         } else {
-                            this.showToast('Failed to save assessment', 'error');
+                            const errorMsg = data.message || 'Failed to save assessment';
+                            console.error('Server error:', data);
+                            this.showToast(errorMsg, 'error');
                         }
                     } catch (e) {
                         console.error('Save error:', e);
-                        this.showToast('Failed to save assessment', 'error');
+                        this.showToast('Network error: ' + e.message, 'error');
                     }
                 }
             };

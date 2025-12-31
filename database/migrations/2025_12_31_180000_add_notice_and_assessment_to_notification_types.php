@@ -22,13 +22,13 @@ return new class extends Migration
             ->update(['type' => 'info']);
 
         DB::table('tutor_notifications')
-            ->whereNotIn('type', ['info', 'alert', 'report', 'attendance', 'system'])
+            ->whereNotIn('type', ['info', 'alert', 'schedule', 'payment', 'system'])
             ->update(['type' => 'info']);
 
         // Now safely modify the ENUM columns
         DB::statement("ALTER TABLE manager_notifications MODIFY COLUMN type ENUM('info', 'alert', 'report', 'attendance', 'system', 'notice', 'assessment') DEFAULT 'info'");
         DB::statement("ALTER TABLE director_notifications MODIFY COLUMN type ENUM('info', 'alert', 'report', 'attendance', 'system', 'notice', 'assessment') DEFAULT 'info'");
-        DB::statement("ALTER TABLE tutor_notifications MODIFY COLUMN type ENUM('info', 'alert', 'report', 'attendance', 'system', 'notice', 'assessment') DEFAULT 'info'");
+        DB::statement("ALTER TABLE tutor_notifications MODIFY COLUMN type ENUM('info', 'alert', 'schedule', 'payment', 'system', 'notice', 'assessment') DEFAULT 'info'");
     }
 
     /**
@@ -43,6 +43,6 @@ return new class extends Migration
         DB::statement("ALTER TABLE director_notifications MODIFY COLUMN type ENUM('info', 'alert', 'report', 'attendance', 'system') DEFAULT 'info'");
 
         // Revert tutor_notifications
-        DB::statement("ALTER TABLE tutor_notifications MODIFY COLUMN type ENUM('info', 'alert', 'report', 'attendance', 'system') DEFAULT 'info'");
+        DB::statement("ALTER TABLE tutor_notifications MODIFY COLUMN type ENUM('info', 'alert', 'schedule', 'payment', 'system') DEFAULT 'info'");
     }
 };

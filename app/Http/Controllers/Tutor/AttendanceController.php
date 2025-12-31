@@ -76,15 +76,33 @@ class AttendanceController extends Controller
                 ->pluck('id')
                 ->toArray();
 
-            $totalMonthlyClasses = AttendanceRecord::where('student_id', $attendance->student_id)
-                ->whereYear('class_date', $attendance->class_date->year)
-                ->whereMonth('class_date', $attendance->class_date->month)
-                ->count();
+            // Calculate expected monthly classes based on student's schedule
+            $student = $attendance->student;
+            $expectedMonthlyClasses = 0;
+
+            if ($student && $student->class_schedule && is_array($student->class_schedule)) {
+                // Count classes per week from student's schedule
+                $classesPerWeek = count($student->class_schedule);
+
+                // Calculate number of weeks in the month
+                $monthStart = Carbon::create($attendance->class_date->year, $attendance->class_date->month, 1);
+                $monthEnd = $monthStart->copy()->endOfMonth();
+                $weeksInMonth = ceil($monthEnd->diffInDays($monthStart) / 7);
+
+                // Expected classes = classes per week * weeks in month
+                $expectedMonthlyClasses = $classesPerWeek * $weeksInMonth;
+            } else {
+                // Fallback to counting actual attendance records if schedule not available
+                $expectedMonthlyClasses = AttendanceRecord::where('student_id', $attendance->student_id)
+                    ->whereYear('class_date', $attendance->class_date->year)
+                    ->whereMonth('class_date', $attendance->class_date->month)
+                    ->count();
+            }
 
             // Find position of this attendance in the approved list
             $position = array_search($attendance->id, $monthlyApproved);
             $attendance->monthly_position = $attendance->status === 'approved' ? ($position !== false ? $position + 1 : 0) : 0;
-            $attendance->monthly_total = $totalMonthlyClasses;
+            $attendance->monthly_total = $expectedMonthlyClasses;
         }
 
         // Get stats
