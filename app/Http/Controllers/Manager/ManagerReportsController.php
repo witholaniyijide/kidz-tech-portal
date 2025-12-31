@@ -47,12 +47,17 @@ class ManagerReportsController extends Controller
 
         // Get statistics for the view
         $stats = [
-            'total' => Report::whereIn('status', ['submitted', 'submitted_to_manager', 'approved_by_manager'])->count(),
+            'total' => Report::whereIn('status', ['submitted', 'submitted_to_manager', 'approved_by_manager', 'approved_by_director'])->count(),
             'pending' => Report::whereIn('status', ['submitted', 'submitted_to_manager'])->count(),
             'approved' => Report::where('status', 'approved_by_manager')->count(),
+            'completed' => Report::where('status', 'approved_by_director')->count(),
         ];
 
-        return view('manager.reports.index', compact('reports', 'stats'));
+        // Get unique months and years for filters
+        $months = Report::select('month')->distinct()->orderBy('month')->pluck('month');
+        $years = Report::select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
+
+        return view('manager.reports.index', compact('reports', 'stats', 'months', 'years'));
     }
 
     /**

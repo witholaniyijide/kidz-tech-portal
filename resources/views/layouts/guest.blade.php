@@ -78,7 +78,7 @@
 
                 <!-- Welcome Text -->
                 <div class="text-center mb-8">
-                    <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">
+                    <h1 class="text-4xl md:text-5xl font-bold text-blue-600 dark:text-blue-400">
                         Welcome
                     </h1>
                 </div>

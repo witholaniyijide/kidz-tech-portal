@@ -140,6 +140,46 @@ class DirectorReportController extends Controller
     }
 
     /**
+     * Reject the report.
+     */
+    public function reject(Request $request, TutorReport $report)
+    {
+        // Authorize
+        $this->authorize('approve', $report);
+
+        // Validate the request
+        $validated = $request->validate([
+            'director_comment' => 'required|string|max:2000',
+        ]);
+
+        try {
+            // Update report status
+            $report->update([
+                'status' => 'returned',
+                'director_comment' => $validated['director_comment'],
+                'director_reviewed_at' => now(),
+                'director_id' => Auth::id(),
+            ]);
+
+            // Log the action
+            $this->approvalService->logDirectorAction(
+                Auth::user(),
+                'rejected_report',
+                TutorReport::class,
+                $report->id
+            );
+
+            return redirect()
+                ->route('director.reports.index')
+                ->with('success', 'Report has been rejected and returned to the tutor for revision.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to reject report: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Add a comment to the report.
      */
     public function comment(Request $request, TutorReport $report)

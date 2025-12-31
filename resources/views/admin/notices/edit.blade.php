@@ -83,7 +83,7 @@
                         <h3 class="text-lg font-semibold">Settings</h3>
                     </div>
                     @php
-                        $visibleTo = old('visible_to', is_array($notice->visible_to) ? $notice->visible_to : json_decode($notice->visible_to ?? '[]', true) ?: []);
+                        $visibleTo = old('visible_to', is_array($notice->visible_to) ? $notice->visible_to : (json_decode($notice->visible_to ?? '[]', true) ?: []));
                     @endphp
                     <div class="p-6 space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
