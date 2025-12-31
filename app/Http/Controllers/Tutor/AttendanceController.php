@@ -61,6 +61,32 @@ class AttendanceController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        // Add monthly attendance counter for each record
+        foreach ($attendanceRecords as $attendance) {
+            $classMonth = $attendance->class_date->format('Y-m');
+
+            // Get all approved attendance for this student in the same month
+            $monthlyApproved = AttendanceRecord::where('student_id', $attendance->student_id)
+                ->where('status', 'approved')
+                ->whereYear('class_date', $attendance->class_date->year)
+                ->whereMonth('class_date', $attendance->class_date->month)
+                ->whereDate('class_date', '<=', $attendance->class_date)
+                ->orderBy('class_date', 'asc')
+                ->orderBy('class_time', 'asc')
+                ->pluck('id')
+                ->toArray();
+
+            $totalMonthlyClasses = AttendanceRecord::where('student_id', $attendance->student_id)
+                ->whereYear('class_date', $attendance->class_date->year)
+                ->whereMonth('class_date', $attendance->class_date->month)
+                ->count();
+
+            // Find position of this attendance in the approved list
+            $position = array_search($attendance->id, $monthlyApproved);
+            $attendance->monthly_position = $attendance->status === 'approved' ? ($position !== false ? $position + 1 : 0) : 0;
+            $attendance->monthly_total = $totalMonthlyClasses;
+        }
+
         // Get stats
         $stats = [
             'total' => AttendanceRecord::where('tutor_id', $tutor->id)

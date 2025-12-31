@@ -19,7 +19,7 @@
             </div>
             <x-ui.glass-card>
                 @php
-                    $existingSchedules = json_decode($student->class_schedule ?? '[]', true) ?: [];
+                    $existingSchedules = is_array($student->class_schedule) ? $student->class_schedule : (json_decode($student->class_schedule ?? '[]', true) ?: []);
                 @endphp
                 <form method="POST" action="{{ route('director.students.update', $student) }}" x-data="studentForm()">
                     @csrf

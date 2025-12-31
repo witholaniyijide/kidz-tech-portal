@@ -721,14 +721,34 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Notifications Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications/mark-all-read', function() {
-        Auth::user()->unreadNotifications->markAsRead();
+        if (Auth::user()->hasRole('manager')) {
+            \App\Models\ManagerNotification::where('user_id', Auth::id())->update(['is_read' => true]);
+        } elseif (Auth::user()->hasRole('director')) {
+            \App\Models\DirectorNotification::where('user_id', Auth::id())->update(['is_read' => true]);
+        } else {
+            Auth::user()->unreadNotifications->markAsRead();
+        }
         return redirect()->back()->with('success', 'All notifications marked as read');
     })->name('notifications.markAllRead');
-    
+
     Route::post('/notifications/{id}/mark-read', function($id) {
-        Auth::user()->notifications()->where('id', $id)->first()->markAsRead();
+        Auth::user()->notifications()->where('id', $id)->first()?->markAsRead();
         return response()->json(['success' => true]);
     })->name('notifications.markRead');
+
+    Route::post('/notifications/{role}/{id}/mark-read', function($role, $id) {
+        if ($role === 'manager' && Auth::user()->hasRole('manager')) {
+            \App\Models\ManagerNotification::where('id', $id)->where('user_id', Auth::id())->update(['is_read' => true]);
+        } elseif ($role === 'director' && Auth::user()->hasRole('director')) {
+            \App\Models\DirectorNotification::where('id', $id)->where('user_id', Auth::id())->update(['is_read' => true]);
+        } elseif ($role === 'tutor') {
+            $tutorId = Auth::user()->tutor?->id;
+            if ($tutorId) {
+                \App\Models\TutorNotification::where('id', $id)->where('tutor_id', $tutorId)->update(['is_read' => true]);
+            }
+        }
+        return response()->json(['success' => true]);
+    })->name('notifications.customMarkRead');
 });
 
 // Classes Routes (Placeholder)
