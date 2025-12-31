@@ -105,12 +105,7 @@ class ParentDashboardController extends Controller
             ];
         }
 
-        // Otherwise, calculate from progress
-        $lastCompleted = StudentProgress::where('student_id', $student->id)
-            ->where('completed', true)
-            ->orderBy('completed_at', 'desc')
-            ->first();
-
+        // Check StudentProgress for incomplete milestones
         $nextMilestone = StudentProgress::where('student_id', $student->id)
             ->where('completed', false)
             ->orderBy('id')
@@ -120,6 +115,66 @@ class ParentDashboardController extends Controller
             return [
                 'title' => $nextMilestone->title,
                 'description' => $nextMilestone->description,
+            ];
+        }
+
+        // Get the latest approved report and derive next milestone from it
+        $latestReport = TutorReport::where('student_id', $student->id)
+            ->where('status', 'approved-by-director')
+            ->orderBy('approved_by_director_at', 'desc')
+            ->first();
+
+        if ($latestReport) {
+            // Get goals for next month if available
+            if ($latestReport->goals_next_month) {
+                return [
+                    'title' => 'Next Goals',
+                    'description' => $latestReport->goals_next_month,
+                ];
+            }
+
+            // Get new skills being learned
+            $newSkills = is_array($latestReport->new_skills) ? $latestReport->new_skills : [];
+            if (!empty($newSkills)) {
+                $skillsPreview = implode(', ', array_slice($newSkills, 0, 2));
+                return [
+                    'title' => 'Master New Skills',
+                    'description' => 'Currently learning: ' . $skillsPreview . (count($newSkills) > 2 ? '...' : ''),
+                ];
+            }
+
+            // Get courses from the latest report
+            $currentCourses = is_array($latestReport->courses) ? $latestReport->courses : [];
+            if (!empty($currentCourses)) {
+                $currentCourse = is_array($currentCourses[0]) ? ($currentCourses[0]['name'] ?? $currentCourses[0]) : $currentCourses[0];
+                return [
+                    'title' => 'Continue ' . $currentCourse,
+                    'description' => 'Build on current progress',
+                ];
+            }
+        }
+
+        // Fall back to course progression
+        $currentStage = $student->roadmap_stage ?? 1;
+        $courses = [
+            1 => 'Introduction to Computer Science',
+            2 => 'Coding & Fundamental Concepts',
+            3 => 'Scratch Programming',
+            4 => 'Artificial Intelligence',
+            5 => 'Graphic Design',
+            6 => 'Game Development',
+            7 => 'Mobile App Development',
+            8 => 'Website Development',
+            9 => 'Python Programming',
+            10 => 'Digital Literacy & Safety/Security',
+            11 => 'Machine Learning',
+            12 => 'Robotics',
+        ];
+
+        if (isset($courses[$currentStage])) {
+            return [
+                'title' => "Complete {$courses[$currentStage]}",
+                'description' => isset($courses[$currentStage + 1]) ? "Next: {$courses[$currentStage + 1]}" : 'Final stage!',
             ];
         }
 

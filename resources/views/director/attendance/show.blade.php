@@ -36,6 +36,17 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400">Submitted At</p>
                         <p class="font-medium text-gray-900 dark:text-white">{{ $attendance->created_at->format('M d, Y H:i') }}</p>
                     </div>
+                    @if($attendance->is_late_submission)
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Submission Status</p>
+                        <p class="inline-flex items-center text-red-600 dark:text-red-400 font-medium">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Late Submission
+                        </p>
+                    </div>
+                    @endif
                 </div>
 
                 @if($attendance->status == 'pending')

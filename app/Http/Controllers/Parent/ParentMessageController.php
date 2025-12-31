@@ -51,12 +51,17 @@ class ParentMessageController extends Controller
      */
     public function create()
     {
-        // Parents can only message the Director (using roles relationship)
-        $directors = User::whereHas('roles', function ($query) {
+        // Parents can only message the Director - get the first director
+        $director = User::whereHas('roles', function ($query) {
             $query->where('name', 'director');
-        })->get();
+        })->first();
 
-        return view('parent.messages.create', compact('directors'));
+        if (!$director) {
+            return redirect()->route('parent.messages.index')
+                ->with('error', 'No director available to receive messages.');
+        }
+
+        return view('parent.messages.create', compact('director'));
     }
 
     /**
