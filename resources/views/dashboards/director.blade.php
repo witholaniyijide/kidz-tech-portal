@@ -399,12 +399,12 @@
 
                 <!-- Notice Board -->
                 <div class="lg:col-span-2">
-                    <x-ui.glass-card>
-                        <div class="flex items-center justify-between mb-4">
+                    <x-ui.glass-card class="h-full flex flex-col" style="max-height: 420px;">
+                        <div class="flex items-center justify-between mb-4 flex-shrink-0">
                             <x-ui.section-title>Notice Board</x-ui.section-title>
                             <a href="{{ route('director.notices.create') }}" class="text-sm text-[#4F46E5] dark:text-[#818CF8] hover:underline font-medium">+ Create Notice</a>
                         </div>
-                        <div class="space-y-4 max-h-80 overflow-y-auto">
+                        <div class="space-y-4 flex-1 overflow-y-auto">
                             @if(($notices ?? collect())->isEmpty())
                                 <div class="text-center py-8 text-gray-500 dark:text-gray-400">
                                     <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -438,10 +438,10 @@
                 </div>
 
                 <!-- Student Distribution Chart -->
-                <x-ui.glass-card>
+                <x-ui.glass-card class="h-full" style="max-height: 420px;">
                     <x-ui.section-title>Student Distribution</x-ui.section-title>
                     <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">By status</p>
-                    <div class="h-80">
+                    <div class="h-72">
                         <canvas id="studentDistributionChart"></canvas>
                     </div>
                 </x-ui.glass-card>

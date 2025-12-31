@@ -39,13 +39,18 @@
                            class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors {{ !$message->read_at ? 'bg-amber-50 dark:bg-amber-900/10' : '' }}">
                             <div class="flex items-start justify-between">
                                 <div class="flex items-start space-x-4">
-                                    <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 font-semibold flex-shrink-0">
-                                        {{ substr($message->sender->name ?? 'D', 0, 1) }}
+                                    @php
+                                        $senderIsDirector = $message->sender && $message->sender->hasRole('director');
+                                        $senderDisplayName = $senderIsDirector ? 'Coding Director' : ($message->sender->name ?? 'Director');
+                                        $senderInitial = $senderIsDirector ? 'CD' : substr($message->sender->name ?? 'D', 0, 1);
+                                    @endphp
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center text-white font-semibold flex-shrink-0 text-xs">
+                                        {{ $senderInitial }}
                                     </div>
                                     <div class="min-w-0">
                                         <div class="flex items-center gap-2">
                                             <p class="font-medium text-gray-900 dark:text-white">
-                                                {{ $message->sender->name ?? 'Director' }}
+                                                {{ $senderDisplayName }}
                                             </p>
                                             @if(!$message->read_at)
                                                 <span class="px-2 py-0.5 text-xs font-medium bg-[#F5A623] text-white rounded-full">New</span>
