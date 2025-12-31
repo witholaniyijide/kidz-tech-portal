@@ -79,46 +79,74 @@ class AssessmentController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'tutor_id' => 'required|exists:tutors,id',
-            'student_id' => 'nullable|exists:students,id',
-            'assessment_month' => 'required|string|max:50',
-            'class_date' => 'nullable|date',
-            'week' => 'nullable|integer|min:1|max:53',
-            'year' => 'nullable|integer',
-            'performance_score' => 'nullable|integer|min:0|max:100',
-            'professionalism_rating' => 'nullable|integer|min:1|max:5',
-            'communication_rating' => 'nullable|integer|min:1|max:5',
-            'punctuality_rating' => 'nullable|integer|min:1|max:5',
-            'strengths' => 'nullable|string|max:2000',
-            'weaknesses' => 'nullable|string|max:2000',
-            'recommendations' => 'nullable|string|max:2000',
-            'manager_comment' => 'nullable|string|max:2000',
-            'session' => 'nullable|integer|min:1|max:3',
-            'criteria_assessed' => 'nullable|array',
-            'criteria_ratings' => 'nullable|array',
-        ]);
+        try {
+            $validated = $request->validate([
+                'tutor_id' => 'required|exists:tutors,id',
+                'student_id' => 'nullable|exists:students,id',
+                'assessment_month' => 'required|string|max:50',
+                'class_date' => 'nullable|date',
+                'week' => 'nullable|integer|min:1|max:53',
+                'year' => 'nullable|integer',
+                'performance_score' => 'nullable|integer|min:0|max:100',
+                'professionalism_rating' => 'nullable|integer|min:1|max:5',
+                'communication_rating' => 'nullable|integer|min:1|max:5',
+                'punctuality_rating' => 'nullable|integer|min:1|max:5',
+                'strengths' => 'nullable|string|max:2000',
+                'weaknesses' => 'nullable|string|max:2000',
+                'recommendations' => 'nullable|string|max:2000',
+                'manager_comment' => 'nullable|string|max:2000',
+                'session' => 'nullable|integer|min:1|max:3',
+                'criteria_assessed' => 'nullable|array',
+                'criteria_ratings' => 'nullable|array',
+            ]);
 
-        $validated['manager_id'] = Auth::id();
-        $validated['status'] = 'draft';
+            $validated['manager_id'] = Auth::id();
+            $validated['status'] = 'draft';
 
-        // Store criteria as JSON if provided
-        if (isset($validated['criteria_assessed'])) {
-            $validated['criteria_assessed'] = json_encode($validated['criteria_assessed']);
+            // Store criteria as JSON if provided
+            if (isset($validated['criteria_assessed'])) {
+                $validated['criteria_assessed'] = json_encode($validated['criteria_assessed']);
+            }
+            if (isset($validated['criteria_ratings'])) {
+                $validated['criteria_ratings'] = json_encode($validated['criteria_ratings']);
+            }
+
+            TutorAssessment::create($validated);
+
+            if ($request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'Assessment created successfully.']);
+            }
+
+            return redirect()
+                ->route('manager.assessments.index')
+                ->with('success', 'Assessment created successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            \Log::error('Assessment creation failed: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'data' => $request->all()
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to create assessment: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to create assessment: ' . $e->getMessage())
+                ->withInput();
         }
-        if (isset($validated['criteria_ratings'])) {
-            $validated['criteria_ratings'] = json_encode($validated['criteria_ratings']);
-        }
-
-        TutorAssessment::create($validated);
-
-        if ($request->wantsJson()) {
-            return response()->json(['success' => true, 'message' => 'Assessment created successfully.']);
-        }
-
-        return redirect()
-            ->route('manager.assessments.index')
-            ->with('success', 'Assessment created successfully.');
     }
 
     /**

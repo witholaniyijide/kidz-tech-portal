@@ -231,6 +231,15 @@ class TutorReport extends Model
     }
 
     /**
+     * Check if director can approve this report.
+     */
+    public function canDirectorApprove()
+    {
+        // Director can approve reports that are submitted or approved by manager
+        return in_array($this->status, ['submitted', 'approved', 'submitted_to_manager', 'approved_by_manager']);
+    }
+
+    /**
      * Get all audit logs for this report.
      */
     public function audits()

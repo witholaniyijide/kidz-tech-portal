@@ -56,10 +56,18 @@ class ParentDashboardController extends Controller
         }
         $overallProgress = $children->count() > 0 ? round($totalProgress / $children->count()) : 0;
 
-        // Get milestones completed across all children
-        $milestonesCompleted = StudentProgress::whereIn('student_id', $studentIds)
-            ->where('completed', true)
-            ->count();
+        // Get milestones completed based on current curriculum level
+        // For now, we'll use the selected child's current level
+        // If no current_level, use starting_course_level as a fallback
+        $milestonesCompleted = $selectedChild->current_level
+            ?? $selectedChild->starting_course_level
+            ?? 0;
+
+        // If current_level is set, count it as that many completed
+        // (e.g., if current_level is 5, they've completed levels 1-4, currently on 5, so 4 completed)
+        if ($milestonesCompleted > 0) {
+            $milestonesCompleted = max(0, $milestonesCompleted - 1);
+        }
 
         // Get last report date
         $lastReport = TutorReport::whereIn('student_id', $studentIds)
