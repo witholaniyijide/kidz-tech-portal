@@ -51,23 +51,13 @@ class ParentCertificateController extends Controller
 
     /**
      * Display a specific certification.
+     * Note: Disabled - Parents receive certificates via email (PDF).
+     * This view functionality is not needed in the portal.
      */
     public function show(Certification $certification)
     {
-        $user = Auth::user();
-
-        // Ensure this certification belongs to one of the parent's children
-        $student = Student::find($certification->student_id);
-
-        abort_unless(
-            $student && ($user->isGuardianOf($student) || $user->hasRole('admin')),
-            403,
-            'Unauthorized: You can only view certifications for your own children.'
-        );
-
-        $certification->load(['student', 'uploader']);
-
-        return view('parent.certifications.show', compact('certification'));
+        // Redirect to download instead
+        return redirect()->route('parent.certifications.download', $certification);
     }
 
     /**
@@ -146,31 +136,12 @@ class ParentCertificateController extends Controller
 
     /**
      * View certificate (for viewing in browser).
+     * Note: Disabled - Parents receive certificates via email (PDF).
+     * This view functionality is not needed in the portal.
      */
     public function view(Certification $certification)
     {
-        $user = Auth::user();
-
-        // Ensure this certification belongs to one of the parent's children
-        $student = Student::find($certification->student_id);
-
-        abort_unless(
-            $student && ($user->isGuardianOf($student) || $user->hasRole('admin')),
-            403,
-            'Unauthorized: You can only view certifications for your own children.'
-        );
-
-        // Check if file exists
-        if (!Storage::disk('public')->exists($certification->file_path)) {
-            abort(404, 'Certificate file not found.');
-        }
-
-        // Get the file content
-        $file = Storage::disk('public')->get($certification->file_path);
-        $mimeType = Storage::disk('public')->mimeType($certification->file_path);
-
-        return response($file)
-            ->header('Content-Type', $mimeType)
-            ->header('Content-Disposition', 'inline');
+        // Redirect to download instead
+        return redirect()->route('parent.certifications.download', $certification);
     }
 }

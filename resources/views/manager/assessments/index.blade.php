@@ -264,6 +264,13 @@
                                         <a href="{{ route('manager.assessments.edit', $assessment) }}" class="text-xs px-3 py-1.5 border border-[#C15F3C] text-[#C15F3C] rounded-lg hover:bg-[#C15F3C]/10 dark:hover:bg-[#C15F3C]/20 transition-colors">
                                             Edit
                                         </a>
+                                        <form action="{{ route('manager.assessments.destroy', $assessment) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this draft assessment?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-xs px-3 py-1.5 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                                Delete
+                                            </button>
+                                        </form>
                                         <form action="{{ route('manager.assessments.submit', $assessment) }}" method="POST" class="inline">
                                             @csrf
                                             <button type="submit" class="text-xs px-3 py-1.5 bg-gradient-to-r from-[#C15F3C] to-[#DA7756] text-white rounded-lg hover:from-[#A34E30] hover:to-[#C15F3C] transition-colors">

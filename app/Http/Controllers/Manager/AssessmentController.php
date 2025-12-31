@@ -267,4 +267,28 @@ class AssessmentController extends Controller
             ->route('manager.assessments.show', $assessment)
             ->with('success', 'Comment added successfully.');
     }
+
+    /**
+     * Delete a draft assessment.
+     */
+    public function destroy(TutorAssessment $assessment)
+    {
+        // Only allow deleting draft assessments
+        if ($assessment->status !== 'draft') {
+            return redirect()
+                ->route('manager.assessments.index')
+                ->with('error', 'Only draft assessments can be deleted.');
+        }
+
+        // Ensure this manager created the assessment
+        if ($assessment->manager_id !== Auth::id()) {
+            abort(403, 'Unauthorized to delete this assessment.');
+        }
+
+        $assessment->delete();
+
+        return redirect()
+            ->route('manager.assessments.index')
+            ->with('success', 'Draft assessment deleted successfully.');
+    }
 }
