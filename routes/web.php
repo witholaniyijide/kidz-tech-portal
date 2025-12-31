@@ -496,6 +496,8 @@ Route::prefix('director')
             ->name('reports.show');
         Route::post('/reports/{report}/approve', [App\Http\Controllers\Director\DirectorReportController::class, 'approve'])
             ->name('reports.approve');
+        Route::post('/reports/{report}/reject', [App\Http\Controllers\Director\DirectorReportController::class, 'reject'])
+            ->name('reports.reject');
         Route::post('/reports/{report}/comment', [App\Http\Controllers\Director\DirectorReportController::class, 'comment'])
             ->name('reports.comment');
         Route::get('/reports/{report}/pdf', [App\Http\Controllers\Director\DirectorReportController::class, 'exportPdf'])
