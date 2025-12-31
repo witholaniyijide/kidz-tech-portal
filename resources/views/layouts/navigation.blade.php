@@ -232,7 +232,8 @@ class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 s
                             @forelse($notifications as $notification)
                                 @if(Auth::user()->hasRole('manager') || Auth::user()->hasRole('director'))
                                     <a href="{{ $notification->meta['link'] ?? '#' }}"
-                                       class="block px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition">
+                                       class="block px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition"
+                                       onclick="markCustomNotificationAsRead('{{ Auth::user()->hasRole('manager') ? 'manager' : 'director' }}', {{ $notification->id }})">
                                         <div class="font-semibold mb-1">{{ $notification->title ?? 'Notification' }}</div>
                                         <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{{ Str::limit($notification->body, 80) }}</div>
                                         <div class="text-xs text-gray-500 dark:text-gray-400">{{ $notification->created_at->diffForHumans() }}</div>
@@ -392,6 +393,16 @@ class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 s
 <script>
     function markAsRead(notificationId) {
         fetch(`/notifications/${notificationId}/mark-read`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        });
+    }
+
+    function markCustomNotificationAsRead(role, notificationId) {
+        fetch(`/notifications/${role}/${notificationId}/mark-read`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
