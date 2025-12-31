@@ -39,7 +39,7 @@ class DirectorAssessmentController extends Controller
         $this->authorize('viewAny', TutorAssessment::class);
 
         // Get all assessments that are relevant to director (manager-approved or director-approved)
-        $query = TutorAssessment::with(['tutor', 'manager', 'director'])
+        $query = TutorAssessment::with(['tutor', 'manager', 'director', 'student'])
             ->whereIn('status', ['approved-by-manager', 'approved-by-director'])
             ->orderBy('created_at', 'desc');
 
@@ -141,7 +141,7 @@ class DirectorAssessmentController extends Controller
         $this->authorize('view', $assessment);
 
         // Load relationships
-        $assessment->load(['tutor', 'manager', 'director']);
+        $assessment->load(['tutor', 'manager', 'director', 'student']);
 
         return view('director.assessments.show', compact('assessment'));
     }

@@ -89,7 +89,7 @@ class AdminNoticeController extends Controller
 
         $validated['posted_by'] = Auth::id();
         $visibleToRoles = $validated['visible_to'];
-        $validated['visible_to'] = json_encode($validated['visible_to']);
+        // Note: Don't json_encode visible_to - the Notice model cast handles this automatically
 
         DB::transaction(function() use ($validated, $visibleToRoles) {
             $notice = Notice::create($validated);
@@ -145,7 +145,7 @@ class AdminNoticeController extends Controller
         ]);
 
         $visibleToRoles = $validated['visible_to'];
-        $validated['visible_to'] = json_encode($validated['visible_to']);
+        // Note: Don't json_encode visible_to - the Notice model cast handles this automatically
 
         DB::transaction(function() use ($notice, $validated, $visibleToRoles) {
             $wasPublished = $notice->status === 'published';

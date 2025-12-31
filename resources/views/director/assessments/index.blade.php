@@ -102,10 +102,15 @@
                                     <div class="flex items-start justify-between mb-3">
                                         <div>
                                             <div class="font-semibold text-gray-800 dark:text-white text-lg">
-                                                {{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}
+                                                Tutor: {{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}
                                             </div>
+                                            @if($assessment->student)
+                                                <div class="text-sky-600 dark:text-sky-400 text-sm font-medium mt-1">
+                                                    Student: {{ $assessment->student->first_name }} {{ $assessment->student->last_name }}
+                                                </div>
+                                            @endif
                                             <div class="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                                                {{ $assessment->assessment_month }} · Session {{ $assessment->session ?? 1 }}
+                                                {{ $assessment->assessment_month }} · Session {{ $assessment->session ?? 1 }} @if($assessment->class_date) · {{ $assessment->class_date->format('M d, Y') }} @endif
                                             </div>
                                         </div>
                                         <span class="px-3 py-1 text-xs font-semibold bg-amber-500 text-white rounded-full">Pending Review</span>
@@ -159,9 +164,16 @@
                                     @endif
 
                                     @if($assessment->recommendations)
-                                        <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800/30">
+                                        <div class="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800/30">
                                             <div class="font-semibold text-blue-800 dark:text-blue-300 mb-1 text-sm">Manager Recommendations:</div>
                                             <div class="text-blue-700 dark:text-blue-200 text-sm">{{ $assessment->recommendations }}</div>
+                                        </div>
+                                    @endif
+
+                                    @if($assessment->manager_comment)
+                                        <div class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800/30">
+                                            <div class="font-semibold text-purple-800 dark:text-purple-300 mb-1 text-sm">Manager Comment:</div>
+                                            <div class="text-purple-700 dark:text-purple-200 text-sm">{{ $assessment->manager_comment }}</div>
                                         </div>
                                     @endif
                                 </div>
