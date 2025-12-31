@@ -12,13 +12,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // For manager_notifications
+        // Update any invalid type values to 'info' before modifying enum
+        DB::table('manager_notifications')
+            ->whereNotIn('type', ['info', 'alert', 'report', 'attendance', 'system'])
+            ->update(['type' => 'info']);
+
+        DB::table('director_notifications')
+            ->whereNotIn('type', ['info', 'alert', 'report', 'attendance', 'system'])
+            ->update(['type' => 'info']);
+
+        DB::table('tutor_notifications')
+            ->whereNotIn('type', ['info', 'alert', 'report', 'attendance', 'system'])
+            ->update(['type' => 'info']);
+
+        // Now safely modify the ENUM columns
         DB::statement("ALTER TABLE manager_notifications MODIFY COLUMN type ENUM('info', 'alert', 'report', 'attendance', 'system', 'notice', 'assessment') DEFAULT 'info'");
-
-        // For director_notifications
         DB::statement("ALTER TABLE director_notifications MODIFY COLUMN type ENUM('info', 'alert', 'report', 'attendance', 'system', 'notice', 'assessment') DEFAULT 'info'");
-
-        // For tutor_notifications
         DB::statement("ALTER TABLE tutor_notifications MODIFY COLUMN type ENUM('info', 'alert', 'report', 'attendance', 'system', 'notice', 'assessment') DEFAULT 'info'");
     }
 
