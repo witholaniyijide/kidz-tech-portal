@@ -66,6 +66,14 @@ class TutorAssessment extends Model
     }
 
     /**
+     * Get the student that this assessment is for.
+     */
+    public function student()
+    {
+        return $this->belongsTo(Student::class);
+    }
+
+    /**
      * Scope to get only draft assessments.
      */
     public function scopeDraft($query)
