@@ -188,7 +188,14 @@ class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 s
                             </svg>
                             @php
                                 try {
-                                    $unreadCount = Auth::user()->unreadNotifications->count();
+                                    // Use custom notification models based on user role
+                                    if (Auth::user()->hasRole('manager')) {
+                                        $unreadCount = \App\Models\ManagerNotification::where('user_id', Auth::id())->where('is_read', false)->count();
+                                    } elseif (Auth::user()->hasRole('director')) {
+                                        $unreadCount = \App\Models\DirectorNotification::where('user_id', Auth::id())->where('is_read', false)->count();
+                                    } else {
+                                        $unreadCount = Auth::user()->unreadNotifications->count();
+                                    }
                                 } catch (\Exception $e) {
                                     $unreadCount = 0;
                                 }
@@ -209,19 +216,35 @@ class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 s
 
                             @php
                                 try {
-                                    $notifications = Auth::user()->unreadNotifications->take(10);
+                                    // Use custom notification models based on user role
+                                    if (Auth::user()->hasRole('manager')) {
+                                        $notifications = \App\Models\ManagerNotification::where('user_id', Auth::id())->where('is_read', false)->latest()->take(10)->get();
+                                    } elseif (Auth::user()->hasRole('director')) {
+                                        $notifications = \App\Models\DirectorNotification::where('user_id', Auth::id())->where('is_read', false)->latest()->take(10)->get();
+                                    } else {
+                                        $notifications = Auth::user()->unreadNotifications->take(10);
+                                    }
                                 } catch (\Exception $e) {
                                     $notifications = collect();
                                 }
                             @endphp
 
                             @forelse($notifications as $notification)
-                                <a href="{{ $notification->data['report_id'] ?? '#' }}"
-                                   class="block px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition"
-                                   onclick="markAsRead('{{ $notification->id }}')">
-                                    <div class="font-semibold mb-1">{{ $notification->data['student_name'] ?? 'Report Update' }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ $notification->created_at->diffForHumans() }}</div>
-                                </a>
+                                @if(Auth::user()->hasRole('manager') || Auth::user()->hasRole('director'))
+                                    <a href="{{ $notification->meta['link'] ?? '#' }}"
+                                       class="block px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition">
+                                        <div class="font-semibold mb-1">{{ $notification->title ?? 'Notification' }}</div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{{ Str::limit($notification->body, 80) }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ $notification->created_at->diffForHumans() }}</div>
+                                    </a>
+                                @else
+                                    <a href="{{ $notification->data['report_id'] ?? '#' }}"
+                                       class="block px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition"
+                                       onclick="markAsRead('{{ $notification->id }}')">
+                                        <div class="font-semibold mb-1">{{ $notification->data['student_name'] ?? 'Report Update' }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ $notification->created_at->diffForHumans() }}</div>
+                                    </a>
+                                @endif
                             @empty
                                 <div class="px-6 py-12 text-sm text-gray-500 dark:text-gray-400 text-center">
                                     <svg class="w-16 h-16 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

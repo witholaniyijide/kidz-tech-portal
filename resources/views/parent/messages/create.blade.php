@@ -17,26 +17,26 @@
             <form method="POST" action="{{ route('parent.messages.store') }}" class="space-y-6">
                 @csrf
 
-                <!-- Recipient -->
+                <!-- Recipient (Fixed to Director) -->
                 <div>
-                    <label for="recipient_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        To <span class="text-red-500">*</span>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        To
                     </label>
-                    <select id="recipient_id" name="recipient_id" required
-                            class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-[#F5A623] focus:border-[#F5A623]">
-                        <option value="">Select recipient</option>
-                        @foreach($directors as $director)
-                            <option value="{{ $director->id }}" {{ old('recipient_id') == $director->id ? 'selected' : '' }}>
-                                {{ $director->name }} (Director)
-                            </option>
-                        @endforeach
-                    </select>
+                    <div class="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center text-white font-bold mr-3">
+                                {{ strtoupper(substr($director->name, 0, 1)) }}
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">{{ $director->name }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Director</p>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="recipient_id" value="{{ $director->id }}">
                     @error('recipient_id')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        Note: Parents can only send messages to the Director.
-                    </p>
                 </div>
 
                 <!-- Subject -->

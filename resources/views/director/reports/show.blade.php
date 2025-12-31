@@ -109,63 +109,153 @@
                         </div>
                     </div>
 
-                    {{-- Progress Summary --}}
-                    @if($report->progress_summary)
+                    {{-- Courses Section --}}
+                    @if($report->courses && count($report->courses) > 0)
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                             </svg>
-                            Progress Summary
+                            Courses ({{ count($report->courses) }})
                         </h3>
-                        <div class="prose dark:prose-invert max-w-none">
-                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $report->progress_summary }}</p>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($report->courses as $course)
+                                <span class="px-3 py-1.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-full text-sm font-medium">{{ $course }}</span>
+                            @endforeach
                         </div>
                     </div>
                     @endif
 
-                    {{-- Strengths --}}
-                    @if($report->strengths)
+                    {{-- Skills Mastered Section --}}
+                    @if($report->skills_mastered && count($report->skills_mastered) > 0)
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                            <svg class="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
                             </svg>
-                            Strengths
+                            Skills Mastered ({{ count($report->skills_mastered) }})
                         </h3>
-                        <div class="prose dark:prose-invert max-w-none">
-                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $report->strengths }}</p>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($report->skills_mastered as $skill)
+                                <span class="px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-sm">{{ $skill }}</span>
+                            @endforeach
                         </div>
                     </div>
                     @endif
 
-                    {{-- Weaknesses --}}
-                    @if($report->weaknesses)
+                    {{-- New Skills Section --}}
+                    @if($report->new_skills && count($report->new_skills) > 0)
+                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            New Skills Learned
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($report->new_skills as $skill)
+                                <span class="px-3 py-1.5 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 rounded-full text-sm">{{ $skill }}</span>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Projects Section --}}
+                    @if($report->projects && count($report->projects) > 0)
+                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                            Projects Completed
+                        </h3>
+                        <div class="space-y-3">
+                            @foreach($report->projects as $project)
+                                @if(!empty($project['title']))
+                                <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ $project['title'] }}</span>
+                                    @if(!empty($project['link']))
+                                        @if(filter_var($project['link'], FILTER_VALIDATE_URL))
+                                            <a href="{{ $project['link'] }}" target="_blank" class="ml-2 inline-flex items-center gap-1 text-sm text-indigo-600 hover:underline">
+                                                View
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </a>
+                                        @else
+                                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $project['link'] }}</p>
+                                        @endif
+                                    @endif
+                                </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Areas for Improvement --}}
+                    @if($report->areas_for_improvement)
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
                             <svg class="w-5 h-5 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                             </svg>
                             Areas for Improvement
                         </h3>
                         <div class="prose dark:prose-invert max-w-none">
-                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $report->weaknesses }}</p>
+                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $report->areas_for_improvement }}</p>
                         </div>
                     </div>
                     @endif
 
-                    {{-- Next Steps --}}
-                    @if($report->next_steps)
+                    {{-- Goals for Next Month --}}
+                    @if($report->goals_next_month)
+                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                            </svg>
+                            Goals for Next Month
+                        </h3>
+                        <div class="prose dark:prose-invert max-w-none">
+                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $report->goals_next_month }}</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Assignments --}}
+                    @if($report->assignments)
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
                             <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                             </svg>
-                            Next Steps
+                            Assignments Given
                         </h3>
                         <div class="prose dark:prose-invert max-w-none">
-                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $report->next_steps }}</p>
+                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $report->assignments }}</p>
                         </div>
+                    </div>
+                    @endif
+
+                    {{-- Comments & Observations --}}
+                    @if($report->comments_observation)
+                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                            </svg>
+                            Comments & Observations
+                        </h3>
+                        <div class="prose dark:prose-invert max-w-none">
+                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $report->comments_observation }}</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Legacy Progress Summary --}}
+                    @if($report->progress_summary)
+                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Progress Summary</h3>
+                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $report->progress_summary }}</p>
                     </div>
                     @endif
 
