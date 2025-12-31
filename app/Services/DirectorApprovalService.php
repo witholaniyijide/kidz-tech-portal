@@ -244,13 +244,8 @@ class DirectorApprovalService
                     ]);
                 }
 
-                // Send Laravel Notification to Tutor (queued)
-                $assessment->tutor->notify(new AssessmentApprovedNotification($assessment));
-
-                // Notify all managers
-                foreach ($managers as $manager) {
-                    $manager->notify(new AssessmentApprovedNotification($assessment));
-                }
+                // Note: We're using custom notification models (TutorNotification, ManagerNotification)
+                // instead of Laravel's notification system since Tutor model doesn't have Notifiable trait
 
                 Log::info('Director approved tutor assessment', [
                     'assessment_id' => $assessment->id,
