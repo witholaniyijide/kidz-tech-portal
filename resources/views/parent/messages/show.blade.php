@@ -17,12 +17,15 @@
                 <div class="flex items-center">
                     @php
                         $otherParty = $message->sender_id === auth()->id() ? $message->recipient : $message->sender;
+                        $isDirector = $otherParty && $otherParty->hasRole('director');
+                        $displayName = $isDirector ? 'Coding Director' : ($otherParty->name ?? 'Unknown');
+                        $displayInitial = $isDirector ? 'CD' : strtoupper(substr($otherParty->name ?? 'U', 0, 1));
                     @endphp
                     <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold mr-3">
-                        {{ strtoupper(substr($otherParty->name ?? 'U', 0, 1)) }}
+                        {{ $displayInitial }}
                     </div>
                     <div>
-                        <h1 class="text-lg font-bold text-white">{{ $otherParty->name ?? 'Unknown' }}</h1>
+                        <h1 class="text-lg font-bold text-white">{{ $displayName }}</h1>
                         <p class="text-sm text-white/80">{{ $message->subject }}</p>
                     </div>
                 </div>
@@ -51,8 +54,12 @@
 
                                 <!-- Sender Name (for received messages) -->
                                 @if(!$isOwnMessage)
+                                    @php
+                                        $senderIsDirector = $msg->sender && $msg->sender->hasRole('director');
+                                        $senderName = $senderIsDirector ? 'Coding Director' : ($msg->sender->name ?? 'Unknown');
+                                    @endphp
                                     <p class="text-xs font-semibold text-sky-600 dark:text-sky-400 mb-1">
-                                        {{ $msg->sender->name ?? 'Unknown' }}
+                                        {{ $senderName }}
                                     </p>
                                 @endif
 

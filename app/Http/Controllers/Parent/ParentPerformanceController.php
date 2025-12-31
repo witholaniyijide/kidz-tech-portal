@@ -149,99 +149,8 @@ class ParentPerformanceController extends Controller
      */
     private function getMilestonesAchieved(Student $student): array
     {
-        $milestones = StudentProgress::where('student_id', $student->id)
-            ->where('completed', true)
-            ->orderBy('completed_at', 'desc')
-            ->get()
-            ->map(function ($milestone) {
-                return [
-                    'id' => $milestone->id,
-                    'title' => $milestone->title,
-                    'description' => $milestone->description,
-                    'points' => $milestone->points,
-                    'completed_at' => $milestone->completed_at ? $milestone->completed_at->format('M d, Y') : null,
-                ];
-            })
-            ->toArray();
-
-        return $milestones;
-    }
-
-    /**
-     * Get the next recommended milestone.
-     */
-    private function getNextMilestone(Student $student): ?array
-    {
-        // Check if student has a custom next milestone set
-        if ($student->roadmap_next_milestone) {
-            return [
-                'title' => $student->roadmap_next_milestone,
-                'description' => 'Continue your learning journey',
-                'stage' => $student->roadmap_stage ?? 1,
-            ];
-        }
-
-        // Get next incomplete milestone from StudentProgress
-        $nextMilestone = StudentProgress::where('student_id', $student->id)
-            ->where('completed', false)
-            ->orderBy('id')
-            ->first();
-
-        if ($nextMilestone) {
-            return [
-                'id' => $nextMilestone->id,
-                'title' => $nextMilestone->title,
-                'description' => $nextMilestone->description,
-                'points' => $nextMilestone->points,
-            ];
-        }
-
-        // Get the latest approved report and derive next milestone from it
-        $latestReport = TutorReport::where('student_id', $student->id)
-            ->where('status', 'approved-by-director')
-            ->orderBy('approved_by_director_at', 'desc')
-            ->first();
-
-        if ($latestReport) {
-            // Get courses from the latest report
-            $currentCourses = is_array($latestReport->courses) ? $latestReport->courses : [];
-
-            // Get new skills being learned
-            $newSkills = is_array($latestReport->new_skills) ? $latestReport->new_skills : [];
-
-            // Get goals for next month if available
-            if ($latestReport->goals_next_month) {
-                return [
-                    'title' => 'Continue Learning',
-                    'description' => $latestReport->goals_next_month,
-                    'source' => 'report',
-                ];
-            }
-
-            // If there are new skills being learned, use that as the milestone
-            if (!empty($newSkills)) {
-                $skillsPreview = implode(', ', array_slice($newSkills, 0, 2));
-                return [
-                    'title' => 'Master New Skills',
-                    'description' => 'Currently learning: ' . $skillsPreview . (count($newSkills) > 2 ? '...' : ''),
-                    'source' => 'report',
-                ];
-            }
-
-            // If there are courses, show progress on current course
-            if (!empty($currentCourses)) {
-                $currentCourse = is_array($currentCourses[0]) ? ($currentCourses[0]['name'] ?? $currentCourses[0]) : $currentCourses[0];
-                return [
-                    'title' => 'Continue ' . $currentCourse,
-                    'description' => 'Build on current progress',
-                    'source' => 'report',
-                ];
-            }
-        }
-
-        // Fall back to course progression if no report data
-        $currentStage = $student->roadmap_stage ?? 1;
-        $courses = [
+        // Define all curriculum stages
+        $curriculumStages = [
             1 => 'Introduction to Computer Science',
             2 => 'Coding & Fundamental Concepts',
             3 => 'Scratch Programming',
@@ -256,17 +165,117 @@ class ParentPerformanceController extends Controller
             12 => 'Robotics',
         ];
 
-        $nextCourse = $courses[$currentStage + 1] ?? null;
+        $milestones = [];
 
-        if ($nextCourse) {
+        // Get current stage (default to 1)
+        $currentStage = $student->roadmap_stage ?? 1;
+
+        // All stages before the current one are considered completed
+        for ($i = 1; $i < $currentStage; $i++) {
+            if (isset($curriculumStages[$i])) {
+                $milestones[] = [
+                    'id' => $i,
+                    'title' => $curriculumStages[$i],
+                    'description' => 'Stage ' . $i . ' of 12 completed',
+                    'points' => $i * 100, // 100 points per stage
+                    'completed_at' => null, // We don't have exact dates for curriculum stages
+                ];
+            }
+        }
+
+        // Also include any explicitly completed StudentProgress milestones
+        $progressMilestones = StudentProgress::where('student_id', $student->id)
+            ->where('completed', true)
+            ->orderBy('completed_at', 'desc')
+            ->get()
+            ->map(function ($milestone) {
+                return [
+                    'id' => 'p-' . $milestone->id,
+                    'title' => $milestone->title,
+                    'description' => $milestone->description,
+                    'points' => $milestone->points,
+                    'completed_at' => $milestone->completed_at ? $milestone->completed_at->format('M d, Y') : null,
+                ];
+            })
+            ->toArray();
+
+        // Merge and return (curriculum stages first, then custom milestones)
+        return array_merge(array_reverse($milestones), $progressMilestones);
+    }
+
+    /**
+     * Get the next recommended milestone.
+     */
+    private function getNextMilestone(Student $student): ?array
+    {
+        // Define all curriculum stages
+        $curriculumStages = [
+            1 => 'Introduction to Computer Science',
+            2 => 'Coding & Fundamental Concepts',
+            3 => 'Scratch Programming',
+            4 => 'Artificial Intelligence',
+            5 => 'Graphic Design',
+            6 => 'Game Development',
+            7 => 'Mobile App Development',
+            8 => 'Website Development',
+            9 => 'Python Programming',
+            10 => 'Digital Literacy & Safety/Security',
+            11 => 'Machine Learning',
+            12 => 'Robotics',
+        ];
+
+        // Get current stage (default to 1)
+        $currentStage = $student->roadmap_stage ?? 1;
+
+        // Check if student has a custom next milestone set
+        if ($student->roadmap_next_milestone) {
             return [
-                'title' => "Complete {$courses[$currentStage]}",
-                'description' => "Next: {$nextCourse}",
+                'title' => $student->roadmap_next_milestone,
+                'description' => 'Stage ' . $currentStage . ' of 12',
                 'stage' => $currentStage,
+                'progress' => round(($currentStage / 12) * 100),
             ];
         }
 
-        return null;
+        // Primary: Use curriculum stage as the next milestone
+        if ($currentStage <= 12 && isset($curriculumStages[$currentStage])) {
+            $description = 'Stage ' . $currentStage . ' of 12';
+
+            // Optionally enhance with goals from latest report
+            $latestReport = TutorReport::where('student_id', $student->id)
+                ->where('status', 'approved-by-director')
+                ->orderBy('approved_by_director_at', 'desc')
+                ->first();
+
+            if ($latestReport && $latestReport->goals_next_month) {
+                $description = $latestReport->goals_next_month;
+            }
+
+            return [
+                'title' => $curriculumStages[$currentStage],
+                'description' => $description,
+                'stage' => $currentStage,
+                'progress' => round((($currentStage - 1) / 12) * 100),
+            ];
+        }
+
+        // Student has completed all stages
+        if ($currentStage > 12) {
+            return [
+                'title' => 'Curriculum Completed!',
+                'description' => 'All 12 stages completed - Advanced learning continues',
+                'stage' => 12,
+                'progress' => 100,
+            ];
+        }
+
+        // Fallback - shouldn't normally be reached
+        return [
+            'title' => $curriculumStages[1],
+            'description' => 'Stage 1 of 12',
+            'stage' => 1,
+            'progress' => 0,
+        ];
     }
 
     /**

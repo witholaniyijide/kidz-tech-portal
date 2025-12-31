@@ -25,11 +25,11 @@
                     <div class="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
                         <div class="flex items-center">
                             <div class="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center text-white font-bold mr-3">
-                                {{ strtoupper(substr($director->name, 0, 1)) }}
+                                CD
                             </div>
                             <div>
-                                <p class="font-medium text-gray-900 dark:text-white">{{ $director->name }}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Director</p>
+                                <p class="font-medium text-gray-900 dark:text-white">Coding Director</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">KidzTech Academy</p>
                             </div>
                         </div>
                     </div>

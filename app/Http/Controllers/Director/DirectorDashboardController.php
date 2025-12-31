@@ -40,15 +40,19 @@ class DirectorDashboardController extends Controller
 
         $pendingApprovals = Report::where('status', 'submitted')->count();
 
-        // Attendance stats
-        $todayAttendance = AttendanceRecord::whereDate('class_date', Carbon::today())
-                                          ->where('status', 'present')
-                                          ->count();
+        // Attendance stats - Calculate from approved records this month
+        $currentMonthApproved = AttendanceRecord::where('status', 'approved')
+            ->whereMonth('class_date', Carbon::now()->month)
+            ->whereYear('class_date', Carbon::now()->year)
+            ->count();
 
-        $totalAttendanceToday = AttendanceRecord::whereDate('class_date', Carbon::today())->count();
+        $currentMonthTotal = AttendanceRecord::whereMonth('class_date', Carbon::now()->month)
+            ->whereYear('class_date', Carbon::now()->year)
+            ->count();
 
-        $attendanceRate = $totalAttendanceToday > 0
-            ? round(($todayAttendance / $totalAttendanceToday) * 100, 1)
+        // Attendance rate = approved / total submitted this month
+        $attendanceRate = $currentMonthTotal > 0
+            ? round(($currentMonthApproved / $currentMonthTotal) * 100, 1)
             : 0;
 
         // Monthly Revenue - dynamic from payments
@@ -76,9 +80,11 @@ class DirectorDashboardController extends Controller
             $date = Carbon::today()->subDays($i);
             $attendanceLabels[] = $date->format('D');
             $total = AttendanceRecord::whereDate('class_date', $date)->count();
-            $present = AttendanceRecord::whereDate('class_date', $date)->where('status', 'present')->count();
-            $attendanceData['present'][] = $total > 0 ? round(($present / $total) * 100) : 0;
-            $attendanceData['absent'][] = $total > 0 ? round((($total - $present) / $total) * 100) : 0;
+            $approved = AttendanceRecord::whereDate('class_date', $date)->where('status', 'approved')->count();
+            $pending = AttendanceRecord::whereDate('class_date', $date)->where('status', 'pending')->count();
+            // Show approved as "attended" and pending/rejected as "pending"
+            $attendanceData['present'][] = $total > 0 ? round(($approved / $total) * 100) : 0;
+            $attendanceData['absent'][] = $total > 0 ? round((($total - $approved) / $total) * 100) : 0;
         }
 
         // Student distribution by status
