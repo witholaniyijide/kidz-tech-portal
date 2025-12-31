@@ -322,18 +322,34 @@
                     {{-- Tutors List --}}
                     <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5">
                         <h3 class="font-semibold mb-4 text-gray-800 dark:text-white text-lg">Active Tutors ({{ $tutors->count() }})</h3>
-                        <div class="space-y-2 max-h-64 overflow-y-auto">
+                        <div class="space-y-3 max-h-96 overflow-y-auto">
                             @foreach($tutors as $tutor)
-                                <div class="flex justify-between items-center p-3 bg-gray-50/50 dark:bg-gray-700/50 rounded-lg">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-[#C15F3C] to-[#DA7756] flex items-center justify-center text-white font-bold text-sm">
-                                            {{ strtoupper(substr($tutor->first_name, 0, 1)) }}
+                                <div class="p-3 bg-gray-50/50 dark:bg-gray-700/50 rounded-lg">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-[#C15F3C] to-[#DA7756] flex items-center justify-center text-white font-bold text-sm">
+                                                {{ strtoupper(substr($tutor->first_name, 0, 1)) }}
+                                            </div>
+                                            <span class="font-medium text-gray-800 dark:text-white">{{ $tutor->first_name }} {{ $tutor->last_name }}</span>
                                         </div>
-                                        <span class="font-medium text-gray-800 dark:text-white">{{ $tutor->first_name }} {{ $tutor->last_name }}</span>
+                                        <span class="px-2 py-1 text-xs rounded-full {{ $tutor->status === 'active' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' }}">
+                                            {{ ucfirst($tutor->status) }}
+                                        </span>
                                     </div>
-                                    <span class="px-2 py-1 text-xs rounded-full {{ $tutor->status === 'active' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' }}">
-                                        {{ ucfirst($tutor->status) }}
-                                    </span>
+                                    @php
+                                        $tutorStudents = $students->where('tutor_id', $tutor->id);
+                                    @endphp
+                                    @if($tutorStudents->count() > 0)
+                                        <div class="flex flex-wrap gap-1 mt-2">
+                                            @foreach($tutorStudents as $student)
+                                                <span class="px-2 py-0.5 text-xs bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-500 rounded-full">
+                                                    {{ $student->first_name }} {{ $student->last_name }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="text-xs text-gray-400 dark:text-gray-500 italic mt-2">No students assigned</div>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>

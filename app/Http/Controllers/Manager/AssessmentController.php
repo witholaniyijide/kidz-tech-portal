@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\TutorAssessment;
 use App\Models\Tutor;
 use App\Models\Student;
+use App\Models\DirectorNotification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -193,7 +195,26 @@ class AssessmentController extends Controller
                 'approved_by_manager_at' => now(),
             ]);
 
-            // TODO: Notify director
+            // Notify all directors
+            $directors = User::whereHas('roles', function($q) {
+                $q->where('name', 'director');
+            })->get();
+
+            $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'Unknown Tutor';
+
+            foreach ($directors as $director) {
+                DirectorNotification::create([
+                    'user_id' => $director->id,
+                    'title' => 'New Assessment Pending Approval',
+                    'body' => "Assessment for {$tutorName} ({$assessment->assessment_month}) is pending your approval.",
+                    'type' => 'assessment',
+                    'is_read' => false,
+                    'meta' => [
+                        'assessment_id' => $assessment->id,
+                        'link' => route('director.assessments.show', $assessment->id),
+                    ],
+                ]);
+            }
         });
 
         return redirect()
