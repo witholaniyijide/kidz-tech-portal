@@ -9,6 +9,7 @@ use App\Models\DirectorActivityLog;
 use App\Models\Student;
 use App\Models\StudentProgress;
 use App\Models\ParentNotification;
+use App\Models\Notice;
 use App\Policies\TutorReportPolicy;
 use App\Policies\TutorAvailabilityPolicy;
 use App\Policies\TutorAssessmentPolicy;
@@ -17,6 +18,7 @@ use App\Policies\StudentPolicy;
 use App\Policies\StudentProgressPolicy;
 use App\Policies\ParentNotificationPolicy;
 use App\Policies\StudentReportPolicy;
+use App\Policies\NoticePolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -35,6 +37,7 @@ class AuthServiceProvider extends ServiceProvider
         Student::class => StudentPolicy::class,
         StudentProgress::class => StudentProgressPolicy::class,
         ParentNotification::class => ParentNotificationPolicy::class,
+        Notice::class => NoticePolicy::class,
     ];
 
     /**

@@ -106,6 +106,8 @@ class DirectorNoticeController extends Controller
      */
     public function edit(Notice $notice)
     {
+        $this->authorize('update', $notice);
+
         return view('director.notices.edit', compact('notice'));
     }
 
@@ -114,6 +116,8 @@ class DirectorNoticeController extends Controller
      */
     public function update(Request $request, Notice $notice)
     {
+        $this->authorize('update', $notice);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -155,6 +159,8 @@ class DirectorNoticeController extends Controller
      */
     public function destroy(Notice $notice)
     {
+        $this->authorize('delete', $notice);
+
         try {
             $noticeId = $notice->id;
             $noticeTitle = $notice->title;
