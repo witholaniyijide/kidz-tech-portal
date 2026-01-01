@@ -92,7 +92,7 @@ class ReportController extends Controller
             'total' => TutorReport::where('tutor_id', $tutor->id)->count(),
             'draft' => TutorReport::where('tutor_id', $tutor->id)->where('status', 'draft')->count(),
             'submitted' => TutorReport::where('tutor_id', $tutor->id)->where('status', 'submitted')->count(),
-            'approved' => TutorReport::where('tutor_id', $tutor->id)->whereIn('status', ['approved', 'director_approved'])->count(),
+            'approved' => TutorReport::where('tutor_id', $tutor->id)->whereIn('status', ['approved-by-manager', 'approved-by-director'])->count(),
             'returned' => TutorReport::where('tutor_id', $tutor->id)->where('status', 'returned')->count(),
         ];
 

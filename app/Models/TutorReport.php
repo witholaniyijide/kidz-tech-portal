@@ -143,7 +143,7 @@ class TutorReport extends Model
      */
     public function scopeApprovedByManager($query)
     {
-        return $query->where('status', 'approved');
+        return $query->where('status', 'approved-by-manager');
     }
 
     /**
@@ -151,7 +151,7 @@ class TutorReport extends Model
      */
     public function scopeApprovedByDirector($query)
     {
-        return $query->where('status', 'director_approved');
+        return $query->where('status', 'approved-by-director');
     }
 
     /**
@@ -167,7 +167,7 @@ class TutorReport extends Model
      */
     public function isManagerApproved()
     {
-        return in_array($this->status, ['approved', 'director_approved']);
+        return in_array($this->status, ['approved-by-manager', 'approved-by-director']);
     }
 
     /**
@@ -175,7 +175,7 @@ class TutorReport extends Model
      */
     public function isDirectorApproved()
     {
-        return $this->status === 'director_approved';
+        return $this->status === 'approved-by-director';
     }
 
     /**
@@ -236,7 +236,7 @@ class TutorReport extends Model
     public function canDirectorApprove()
     {
         // Director can approve reports that are submitted or approved by manager
-        return in_array($this->status, ['submitted', 'approved', 'submitted_to_manager', 'approved_by_manager']);
+        return in_array($this->status, ['submitted', 'approved-by-manager']);
     }
 
     /**
