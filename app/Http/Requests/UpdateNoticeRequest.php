@@ -16,7 +16,8 @@ class UpdateNoticeRequest extends FormRequest
         // Only the author or an admin/director can edit
         return $this->user() && (
             $this->user()->id === $notice->posted_by ||
-            in_array($this->user()->role, ['admin', 'director'])
+            $this->user()->hasRole('admin') ||
+            $this->user()->hasRole('director')
         );
     }
 
@@ -44,7 +45,7 @@ class UpdateNoticeRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // If user is a manager, ensure they're not creating director-only notices
-            if ($this->user()->role === 'manager') {
+            if ($this->user()->hasRole('manager')) {
                 $visibleTo = $this->input('visible_to', []);
 
                 // Managers cannot create director-only notices
