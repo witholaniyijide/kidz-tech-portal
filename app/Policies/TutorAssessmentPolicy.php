@@ -42,8 +42,10 @@ class TutorAssessmentPolicy
      */
     public function create(User $user): bool
     {
-        // Only managers and admins can create assessments
-        return $user->hasRole('manager') || $user->hasRole('admin');
+        // Only managers can create assessments
+        // Directors have ultimate power but typically managers create
+        // Admins can view only
+        return $user->hasRole('manager') || $user->hasRole('director');
     }
 
     /**
@@ -51,13 +53,18 @@ class TutorAssessmentPolicy
      */
     public function update(User $user, TutorAssessment $assessment): bool
     {
-        // Only managers can update draft or submitted assessments
+        // Managers can update draft or submitted assessments
         if ($user->hasRole('manager') && in_array($assessment->status, ['draft', 'submitted'])) {
             return true;
         }
 
-        // Admins can update any assessment
-        return $user->hasRole('admin');
+        // Directors have ultimate power - can update any assessment at any stage
+        if ($user->hasRole('director')) {
+            return true;
+        }
+
+        // Admins can only VIEW, not update
+        return false;
     }
 
     /**
@@ -70,16 +77,12 @@ class TutorAssessmentPolicy
             return true;
         }
 
-        // Directors can give final approval to manager-approved assessments
-        if ($user->hasRole('director') && in_array($assessment->status, ['submitted', 'approved-by-manager'])) {
+        // Directors have ultimate power - can approve assessments at any stage
+        if ($user->hasRole('director')) {
             return true;
         }
 
-        // Admins can approve at any stage
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-
+        // Admins can only VIEW, not approve
         return false;
     }
 
@@ -106,12 +109,17 @@ class TutorAssessmentPolicy
      */
     public function delete(User $user, TutorAssessment $assessment): bool
     {
-        // Only managers can delete draft assessments
+        // Managers can delete draft assessments
         if ($user->hasRole('manager') && $assessment->status === 'draft') {
             return true;
         }
 
-        // Admins can delete any assessment
+        // Directors have ultimate power - can delete any assessment
+        if ($user->hasRole('director')) {
+            return true;
+        }
+
+        // Admins can also delete (for system maintenance)
         return $user->hasRole('admin');
     }
 }

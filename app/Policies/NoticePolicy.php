@@ -47,8 +47,13 @@ class NoticePolicy
             return true;
         }
 
-        // Directors and Managers can only update their own notices
-        if ($user->hasRole('director') || $user->hasRole('manager')) {
+        // Directors have ultimate power - can update any notice
+        if ($user->hasRole('director')) {
+            return true;
+        }
+
+        // Managers can only update their own notices
+        if ($user->hasRole('manager')) {
             return $notice->posted_by === $user->id;
         }
 
@@ -65,8 +70,13 @@ class NoticePolicy
             return true;
         }
 
-        // Directors and Managers can only delete their own notices
-        if ($user->hasRole('director') || $user->hasRole('manager')) {
+        // Directors have ultimate power - can delete any notice
+        if ($user->hasRole('director')) {
+            return true;
+        }
+
+        // Managers can only delete their own notices
+        if ($user->hasRole('manager')) {
             return $notice->posted_by === $user->id;
         }
 
