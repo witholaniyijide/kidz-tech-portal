@@ -107,18 +107,19 @@ class ReportApprovalController extends Controller
             'director_comment' => 'nullable|string|max:2000',
         ]);
 
-        // Check if report is in manager-approved status
-        if ($report->status !== 'approved-by-manager') {
-            return redirect()
-                ->route('director.reports.index')
-                ->with('error', 'This report cannot be approved at this time.');
-        }
-
         // Check for idempotency - don't approve already approved reports
         if ($report->status === 'approved-by-director') {
             return redirect()
                 ->route('director.reports.index')
                 ->with('info', 'This report has already been approved.');
+        }
+
+        // Check if report is in manager-approved status
+        // Only reports approved by manager should reach director for final approval
+        if ($report->status !== 'approved-by-manager') {
+            return redirect()
+                ->route('director.reports.index')
+                ->with('error', 'This report cannot be approved at this time. It must be approved by a manager first. Current status: ' . $report->status);
         }
 
         // Update the report within a transaction

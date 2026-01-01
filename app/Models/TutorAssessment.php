@@ -36,6 +36,7 @@ class TutorAssessment extends Model
     ];
 
     protected $casts = [
+        'class_date' => 'date',
         'approved_by_manager_at' => 'datetime',
         'approved_by_director_at' => 'datetime',
         'performance_score' => 'integer',

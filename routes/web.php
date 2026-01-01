@@ -455,6 +455,8 @@ Route::prefix('manager')
             ->name('assessments.submit');
         Route::post('/assessments/{assessment}/comment', [App\Http\Controllers\Manager\AssessmentController::class, 'comment'])
             ->name('assessments.comment');
+        Route::delete('/assessments/{assessment}', [App\Http\Controllers\Manager\AssessmentController::class, 'destroy'])
+            ->name('assessments.destroy');
 
         // Settings
         Route::get('/settings', [App\Http\Controllers\Manager\ManagerSettingsController::class, 'index'])

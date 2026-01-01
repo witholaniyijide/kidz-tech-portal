@@ -121,22 +121,36 @@ class ParentDashboardController extends Controller
             12 => 'Robotics',
         ];
 
-        // Get current stage (default to 1)
-        $currentStage = $student->roadmap_stage ?? 1;
+        // Get actual course statuses based on starting_course_level and approved reports
+        $curriculumWithStatuses = $student->getCurriculumWithStatuses();
 
-        // Return custom roadmap_next_milestone if set
-        if ($student->roadmap_next_milestone) {
+        // Find the first course that is not completed (either ongoing or upcoming)
+        $nextCourse = null;
+        foreach ($curriculumWithStatuses as $course) {
+            if ($course['status'] !== 'completed') {
+                $nextCourse = $course;
+                break;
+            }
+        }
+
+        // If no next course found, all courses are completed
+        if (!$nextCourse) {
             return [
-                'title' => $student->roadmap_next_milestone,
-                'description' => 'Stage ' . $currentStage . ' of 12',
-                'stage' => $currentStage,
+                'title' => 'Curriculum Completed!',
+                'description' => 'All 12 stages completed. Congratulations!',
+                'stage' => 12,
             ];
         }
 
-        // Primary: Use curriculum stage as the next milestone
-        if ($currentStage <= 12 && isset($curriculumStages[$currentStage])) {
-            $description = 'Stage ' . $currentStage . ' of 12';
+        // Get next course details
+        $currentStage = $nextCourse['id'];
+        $title = $nextCourse['title'];
+        $description = 'Stage ' . $currentStage . ' of 12';
 
+        // If custom roadmap_next_milestone is set, use it as description
+        if ($student->roadmap_next_milestone) {
+            $description = $student->roadmap_next_milestone;
+        } else {
             // Optionally enhance with goals from latest report
             $latestReport = TutorReport::where('student_id', $student->id)
                 ->where('status', 'approved-by-director')
@@ -146,28 +160,12 @@ class ParentDashboardController extends Controller
             if ($latestReport && $latestReport->goals_next_month) {
                 $description = $latestReport->goals_next_month;
             }
-
-            return [
-                'title' => $curriculumStages[$currentStage],
-                'description' => $description,
-                'stage' => $currentStage,
-            ];
         }
 
-        // Student has completed all stages
-        if ($currentStage > 12) {
-            return [
-                'title' => 'Curriculum Completed!',
-                'description' => 'All 12 stages completed',
-                'stage' => 12,
-            ];
-        }
-
-        // Fallback
         return [
-            'title' => $curriculumStages[1],
-            'description' => 'Stage 1 of 12',
-            'stage' => 1,
+            'title' => $title,
+            'description' => $description,
+            'stage' => $currentStage,
         ];
     }
 

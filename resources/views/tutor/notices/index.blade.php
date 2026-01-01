@@ -81,8 +81,7 @@
                 @php
                     $isRead = in_array($notice->id, $readNoticeIds);
                 @endphp
-                <a href="{{ route('tutor.notices.show', $notice) }}"
-                   class="block glass-card rounded-xl p-5 hover:shadow-lg transition-all group {{ !$isRead ? 'border-l-4 border-[#7978E9]' : '' }}">
+                <div class="glass-card rounded-xl p-5 hover:shadow-lg transition-all {{ !$isRead ? 'border-l-4 border-[#7978E9]' : '' }}">
                     <div class="flex items-start gap-4">
                         <!-- Priority Indicator -->
                         <div class="flex-shrink-0">
@@ -114,7 +113,7 @@
                         </div>
 
                         <!-- Notice Content -->
-                        <div class="flex-1 min-w-0">
+                        <a href="{{ route('tutor.notices.show', $notice) }}" class="flex-1 min-w-0 group/notice">
                             <div class="flex items-center gap-2 flex-wrap mb-2">
                                 <!-- Priority Badge -->
                                 @if($notice->priority === 'urgent')
@@ -129,7 +128,7 @@
                                 @endif
 
                                 <!-- Title -->
-                                <h3 class="font-semibold text-slate-900 dark:text-white group-hover:text-[#7978E9] transition-colors truncate">
+                                <h3 class="font-semibold text-slate-900 dark:text-white group-hover/notice:text-[#7978E9] transition-colors truncate">
                                     {{ $notice->title }}
                                 </h3>
                             </div>
@@ -162,16 +161,27 @@
                                     {{ $notice->published_at ? $notice->published_at->diffForHumans() : $notice->created_at->diffForHumans() }}
                                 </span>
                             </div>
-                        </div>
+                        </a>
 
-                        <!-- Arrow -->
-                        <div class="flex-shrink-0 self-center">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-[#7978E9] group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
+                        <!-- Action Buttons -->
+                        <div class="flex-shrink-0 self-center flex items-center gap-2">
+                            @if(!$isRead)
+                                <button onclick="markAsRead({{ $notice->id }}, this)"
+                                        class="px-3 py-1.5 text-xs font-medium bg-[#7978E9]/10 text-[#7978E9] hover:bg-[#7978E9]/20 dark:bg-[#7978E9]/20 dark:hover:bg-[#7978E9]/30 rounded-lg transition-colors"
+                                        title="Mark as read">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </button>
+                            @endif
+                            <a href="{{ route('tutor.notices.show', $notice) }}" class="text-slate-400 hover:text-[#7978E9] transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
                         </div>
                     </div>
-                </a>
+                </div>
             @endforeach
         </div>
 
@@ -191,5 +201,70 @@
         overflow: hidden;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+function markAsRead(noticeId, button) {
+    // Disable button during request
+    button.disabled = true;
+    button.classList.add('opacity-50', 'cursor-not-allowed');
+
+    fetch(`{{ url('/tutor/notices') }}/${noticeId}/read`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove the button and update the card
+            const card = button.closest('.glass-card');
+            if (card) {
+                // Remove left border
+                card.classList.remove('border-l-4', 'border-[#7978E9]');
+
+                // Remove "New" badge
+                const newBadge = card.querySelector('.bg-\\[\\#7978E9\\]\\/10');
+                if (newBadge) {
+                    newBadge.remove();
+                }
+
+                // Remove mark as read button
+                button.remove();
+
+                // Update unread count
+                const unreadCountElement = document.querySelector('.bg-amber-100');
+                if (unreadCountElement) {
+                    const countMatch = unreadCountElement.textContent.match(/\d+/);
+                    if (countMatch) {
+                        const currentCount = parseInt(countMatch[0]);
+                        const newCount = Math.max(0, currentCount - 1);
+                        if (newCount === 0) {
+                            unreadCountElement.parentElement.remove();
+                        } else {
+                            unreadCountElement.innerHTML = `
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                </svg>
+                                <span class="font-medium">${newCount} unread ${newCount === 1 ? 'notice' : 'notices'}</span>
+                            `;
+                        }
+                    }
+                }
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error marking notice as read:', error);
+        button.disabled = false;
+        button.classList.remove('opacity-50', 'cursor-not-allowed');
+        alert('Failed to mark notice as read. Please try again.');
+    });
+}
+</script>
 @endpush
 </x-tutor-layout>

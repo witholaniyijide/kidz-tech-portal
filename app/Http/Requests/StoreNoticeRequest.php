@@ -12,7 +12,11 @@ class StoreNoticeRequest extends FormRequest
     public function authorize(): bool
     {
         // Only managers, admins, and directors can create notices
-        return $this->user() && in_array($this->user()->role, ['manager', 'admin', 'director']);
+        return $this->user() && (
+            $this->user()->hasRole('manager') ||
+            $this->user()->hasRole('admin') ||
+            $this->user()->hasRole('director')
+        );
     }
 
     /**
@@ -39,7 +43,7 @@ class StoreNoticeRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // If user is a manager, ensure they're not creating director-only notices
-            if ($this->user()->role === 'manager') {
+            if ($this->user()->hasRole('manager')) {
                 $visibleTo = $this->input('visible_to', []);
 
                 // Managers cannot create director-only notices

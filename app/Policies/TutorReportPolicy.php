@@ -84,16 +84,12 @@ class TutorReportPolicy
             return true;
         }
 
-        // Directors can give final approval to manager-approved reports
-        if ($user->hasRole('director') && $report->status === 'approved-by-manager') {
+        // Directors have ultimate power - can approve reports at any stage
+        if ($user->hasRole('director')) {
             return true;
         }
 
-        // Admins can approve at any stage
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-
+        // Admins can only VIEW, not approve
         return false;
     }
 
@@ -107,16 +103,12 @@ class TutorReportPolicy
             return true;
         }
 
-        // Directors can send back manager-approved reports
-        if ($user->hasRole('director') && $report->status === 'approved-by-manager') {
+        // Directors have ultimate power - can send back reports at any stage
+        if ($user->hasRole('director')) {
             return true;
         }
 
-        // Admins can send back at any stage
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-
+        // Admins can only VIEW, not send back for correction
         return false;
     }
 
@@ -130,7 +122,12 @@ class TutorReportPolicy
             return true;
         }
 
-        // Admins can delete any report
+        // Directors have ultimate power - can delete any report
+        if ($user->hasRole('director')) {
+            return true;
+        }
+
+        // Admins can also delete (for system maintenance)
         return $user->hasRole('admin');
     }
 
