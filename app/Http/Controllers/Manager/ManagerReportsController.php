@@ -98,14 +98,14 @@ class ManagerReportsController extends Controller
     public function approve(Request $request, Report $report)
     {
         // Validate that the report is in a state that can be approved by manager
-        if (!in_array($report->status, ['submitted', 'submitted_to_manager'])) {
+        if ($report->status !== 'submitted') {
             return redirect()
                 ->route('manager.reports.show', $report)
                 ->with('error', 'This report cannot be approved at this time.');
         }
 
         // Update report status to approved by manager
-        $report->status = 'approved_by_manager';
+        $report->status = 'approved-by-manager';
 
         // Optionally add approval comment
         if ($request->has('approval_comment') && $request->approval_comment) {
