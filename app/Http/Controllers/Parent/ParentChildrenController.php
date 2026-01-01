@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Parent;
 
 use App\Http\Controllers\Controller;
-use App\Models\Certification;
 use App\Models\Message;
 use App\Models\Student;
 use App\Models\StudentProgress;
@@ -94,12 +93,6 @@ class ParentChildrenController extends Controller
             ->take(5)
             ->get();
 
-        // Get certifications
-        $certifications = Certification::where('student_id', $student->id)
-            ->where('status', 'active')
-            ->orderBy('issue_date', 'desc')
-            ->get();
-
         // Get curriculum roadmap
         $curriculumRoadmap = $this->getCurriculumRoadmap($student);
 
@@ -112,7 +105,6 @@ class ParentChildrenController extends Controller
             'currentStage',
             'milestones',
             'reports',
-            'certifications',
             'curriculumRoadmap',
             'classSchedule'
         ));
