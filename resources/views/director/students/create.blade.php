@@ -162,6 +162,13 @@
                                     @endfor
                                 </select>
                             </div>
+                            {{-- Current Level --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Level</label>
+                                <input type="text" name="current_level" value="{{ old('current_level') }}" placeholder="e.g., Scratch Level 3, Python Basics"
+                                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Student's current progress level or course name</p>
+                            </div>
                             {{-- Enrollment Date --}}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Enrollment Date</label>
