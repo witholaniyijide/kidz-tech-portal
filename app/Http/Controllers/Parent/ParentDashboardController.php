@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Parent;
 
 use App\Http\Controllers\Controller;
-use App\Models\Certification;
 use App\Models\ParentNotification;
 use App\Models\Student;
 use App\Models\StudentProgress;
@@ -38,14 +37,6 @@ class ParentDashboardController extends Controller
             ->where('status', 'approved-by-director')
             ->with(['student', 'tutor'])
             ->orderBy('approved_by_director_at', 'desc')
-            ->take(5)
-            ->get();
-
-        // Get recent certifications for all children
-        $recentCertifications = Certification::whereIn('student_id', $studentIds)
-            ->where('status', 'active')
-            ->with(['student'])
-            ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
@@ -90,7 +81,6 @@ class ParentDashboardController extends Controller
             'children',
             'selectedChild',
             'recentReports',
-            'recentCertifications',
             'overallProgress',
             'milestonesCompleted',
             'lastReport',

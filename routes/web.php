@@ -200,18 +200,6 @@ Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('
     Route::get('/reports/{student}/{report}/print', [App\Http\Controllers\Parent\ParentReportController::class, 'print'])
         ->name('reports.print');
 
-    // Certifications
-    Route::get('/certifications', [App\Http\Controllers\Parent\ParentCertificateController::class, 'index'])
-        ->name('certifications.index');
-    Route::get('/certifications/{certification}', [App\Http\Controllers\Parent\ParentCertificateController::class, 'show'])
-        ->name('certifications.show');
-    Route::get('/certifications/{certification}/download', [App\Http\Controllers\Parent\ParentCertificateController::class, 'download'])
-        ->name('certifications.download');
-    Route::get('/certifications/{certification}/view', [App\Http\Controllers\Parent\ParentCertificateController::class, 'view'])
-        ->name('certifications.view');
-    Route::post('/certifications/validate', [App\Http\Controllers\Parent\ParentCertificateController::class, 'validate'])
-        ->name('certifications.validate');
-
     // Notifications
     Route::get('/notifications', [App\Http\Controllers\Parent\ParentNotificationController::class, 'index'])
         ->name('notifications.index');
