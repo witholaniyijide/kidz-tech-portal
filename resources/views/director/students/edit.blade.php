@@ -121,6 +121,13 @@
                                 @error('starting_course_level') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Level</label>
+                                <input type="text" name="current_level" value="{{ old('current_level', $student->current_level) }}" placeholder="e.g., Scratch Level 3, Python Basics"
+                                       class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Student's current progress level or course name</p>
+                                @error('current_level') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
                                 <select name="status" required class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                                     <option value="active" {{ old('status', $student->status) == 'active' ? 'selected' : '' }}>Active</option>
