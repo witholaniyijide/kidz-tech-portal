@@ -96,6 +96,8 @@ class DirectorStudentController extends Controller
             'class_schedules' => 'nullable|array',
             'class_schedules.*.day' => 'required_with:class_schedules|string',
             'class_schedules.*.time' => 'required_with:class_schedules|string',
+            'google_classroom_link' => 'nullable|url|max:500',
+            'live_classroom_link' => 'nullable|url|max:500',
             'notes' => 'nullable|string|max:1000',
 
             // Parent Information - Father
@@ -194,6 +196,8 @@ class DirectorStudentController extends Controller
             'class_schedules' => 'nullable|array',
             'class_schedules.*.day' => 'required_with:class_schedules|string',
             'class_schedules.*.time' => 'required_with:class_schedules|string',
+            'google_classroom_link' => 'nullable|url|max:500',
+            'live_classroom_link' => 'nullable|url|max:500',
             'notes' => 'nullable|string|max:1000',
 
             // Parent Information - Father
