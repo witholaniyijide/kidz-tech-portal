@@ -9,12 +9,12 @@
             <div class="flex items-center gap-4 flex-wrap">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by child:</span>
                 <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('parent.reports') }}"
+                    <a href="{{ route('parent.reports.index') }}"
                        class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ !$selectedChild ? 'bg-gradient-to-r from-sky-500 to-cyan-400 text-white shadow-lg' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                         All Children
                     </a>
                     @foreach($children as $child)
-                        <a href="{{ route('parent.reports', ['child' => $child->id]) }}"
+                        <a href="{{ route('parent.reports.index', ['child' => $child->id]) }}"
                            class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ $selectedChild && $selectedChild->id === $child->id ? 'bg-gradient-to-r from-sky-500 to-cyan-400 text-white shadow-lg' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                             {{ $child->first_name }}
                         </a>

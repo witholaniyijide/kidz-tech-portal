@@ -1,3 +1,4 @@
+{{-- CACHE-CLEAR-REQUIRED: {{ now()->format('Y-m-d-H-i-s') }} --}}
 <x-manager-layout title="Tutor Assessments">
     <div x-data="assessmentApp()" x-init="init()">
         {{-- Sub Navigation Tabs --}}
@@ -59,7 +60,14 @@
                                 <select x-model="formData.student_id" @change="selectStudent()" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
                                     <option value="">Select student</option>
                                     @foreach($students ?? [] as $student)
-                                        <option value="{{ $student->id }}" data-tutor-id="{{ $student->tutor_id }}" data-tutor-name="{{ $student->tutor ? $student->tutor->first_name . ' ' . $student->tutor->last_name : 'No Tutor Assigned' }}">
+                                        @php
+                                            $tutorName = $student->tutor
+                                                ? $student->tutor->first_name . ' ' . $student->tutor->last_name
+                                                : 'No Tutor Assigned';
+                                        @endphp
+                                        <option value="{{ $student->id }}"
+                                                data-tutor-id="{{ $student->tutor_id }}"
+                                                data-tutor-name="{{ $tutorName }}">
                                             {{ $student->first_name }} {{ $student->last_name }}
                                         </option>
                                     @endforeach
@@ -237,7 +245,9 @@
 
                 {{-- Assessment Cards --}}
                 <div class="space-y-4">
-                    @forelse($assessments->filter(fn($a) => in_array($a->status, ['draft', 'submitted', 'approved-by-manager'])) as $assessment)
+                    @forelse($assessments->filter(function ($a) {
+                        return in_array($a->status, ['draft', 'submitted', 'approved-by-manager']);
+                    }) as $assessment)
                         <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 border-l-4 {{ $assessment->status === 'draft' ? 'border-l-amber-400' : 'border-l-[#C15F3C]' }}">
                             <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
                                 <div class="flex-1">
@@ -372,7 +382,9 @@
                 </div>
 
                 <div class="space-y-4">
-                    @forelse($assessments->filter(fn($a) => $a->status === 'approved-by-director') as $assessment)
+                    @forelse($assessments->filter(function ($a) {
+                        return $a->status === 'approved-by-director';
+                    }) as $assessment)
                         <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 border-l-4 border-l-emerald-500">
                             <div class="flex flex-wrap justify-between items-start gap-4">
                                 <div class="flex-1">
@@ -436,6 +448,23 @@
         </div>
     </div>
 
+    @php
+        // Prepare criteria data for JavaScript (moved out of @json for Blade compatibility)
+        $criteriaForJs = $criteria->map(function($c) {
+            $penaltyLabels = [];
+            foreach ($c->penalty_rules ?? [] as $rating => $rule) {
+                if (isset($rule['label'])) {
+                    $penaltyLabels[] = $rule['label'];
+                }
+            }
+            return [
+                'id' => $c->code,
+                'name' => $c->name,
+                'penalty' => implode(', ', $penaltyLabels) ?: 'No penalty',
+                'options' => $c->options,
+            ];
+        })->values()->toArray();
+    @endphp
     @push('scripts')
     <script>
         function assessmentApp() {
@@ -470,20 +499,7 @@
                 },
 
                 // 8 Assessment Criteria from database
-                criteria: @json($criteria->map(function($c) {
-                    $penaltyLabels = [];
-                    foreach ($c->penalty_rules ?? [] as $rating => $rule) {
-                        if (isset($rule['label'])) {
-                            $penaltyLabels[] = $rule['label'];
-                        }
-                    }
-                    return [
-                        'id' => $c->code,
-                        'name' => $c->name,
-                        'penalty' => implode(', ', $penaltyLabels) ?: 'No penalty',
-                        'options' => $c->options,
-                    ];
-                })),
+                criteria: @json($criteriaForJs),
 
                 checkedCriteria: {},
                 ratings: {},
@@ -573,8 +589,8 @@
                         student_id: '',
                         tutor_id: '',
                         class_date: '',
-                        week: parseInt('{{ date("W") }}'),
-                        year: new Date().getFullYear(),
+                        week: {{ date('W') }},
+                        year: {{ date('Y') }},
                         performance_score: '',
                         strengths: '',
                         weaknesses: '',

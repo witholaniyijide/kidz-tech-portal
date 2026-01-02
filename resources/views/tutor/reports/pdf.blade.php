@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Progress Report - {{ $report->student->fullName() }}</title>
+    {{-- Cache-busted: {{ now()->timestamp }} - Force Blade recompile for production --}}
     <style>
         * {
             margin: 0;
