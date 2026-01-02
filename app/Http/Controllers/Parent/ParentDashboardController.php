@@ -20,14 +20,30 @@ class ParentDashboardController extends Controller
         $user = Auth::user();
 
         // Get all children of this parent using guardian_student relationship
-        $children = $user->guardiansOf()->with(['tutor'])->get();
+        $children = $user->guardiansOf()->with(['tutor'])->get()
+            ->map(function ($child) {
+                // Calculate current stage based on curriculum progress
+                $child->current_stage = $this->calculateCurrentStage($child);
+                return $child;
+            });
 
         if ($children->isEmpty()) {
             return view('parent.no-children');
         }
 
-        // Get first child as default selected child (can switch later)
-        $selectedChild = $children->first();
+        // Get selected child from session, or use first child as default
+        $selectedChildId = session('selected_child_id');
+        $selectedChild = null;
+
+        if ($selectedChildId) {
+            $selectedChild = $children->firstWhere('id', $selectedChildId);
+        }
+
+        // If not found in session or session child not in parent's children, use first child
+        if (!$selectedChild) {
+            $selectedChild = $children->first();
+            session(['selected_child_id' => $selectedChild->id]);
+        }
 
         // Get student IDs
         $studentIds = $children->pluck('id');
@@ -234,5 +250,30 @@ class ParentDashboardController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    /**
+     * Calculate the current stage based on course statuses.
+     */
+    private function calculateCurrentStage(Student $student): int
+    {
+        $courseStatuses = $student->getCurriculumWithStatuses();
+
+        // Find the current (ongoing) course
+        foreach ($courseStatuses as $course) {
+            if ($course['status'] === 'ongoing') {
+                return $course['id'];
+            }
+        }
+
+        // If no ongoing course, find the last completed + 1
+        $lastCompleted = 0;
+        foreach ($courseStatuses as $course) {
+            if ($course['status'] === 'completed') {
+                $lastCompleted = max($lastCompleted, $course['id']);
+            }
+        }
+
+        return min($lastCompleted + 1, 12);
     }
 }
