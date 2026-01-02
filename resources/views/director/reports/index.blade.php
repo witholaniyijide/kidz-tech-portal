@@ -150,17 +150,17 @@
                                             <div class="flex items-center">
                                                 <div>
                                                     <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                                        {{ $report->student->fullName() }}
+                                                        {{ $report->student ? $report->student->fullName() : 'Student Deleted' }}
                                                     </div>
                                                     <div class="text-sm text-gray-600 dark:text-gray-400">
-                                                        Age {{ $report->student->age }}
+                                                        {{ $report->student ? 'Age ' . $report->student->age : 'N/A' }}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <div class="text-sm text-gray-900 dark:text-white">{{ $report->tutor->fullName() }}</div>
-                                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ $report->tutor->email }}</div>
+                                            <div class="text-sm text-gray-900 dark:text-white">{{ $report->tutor ? $report->tutor->fullName() : 'Tutor Deleted' }}</div>
+                                            <div class="text-sm text-gray-600 dark:text-gray-400">{{ $report->tutor ? $report->tutor->email : 'N/A' }}</div>
                                         </td>
                                         <td class="px-6 py-4">
                                             <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $report->month }}</div>
