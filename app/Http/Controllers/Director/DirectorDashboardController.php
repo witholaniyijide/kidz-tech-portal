@@ -145,7 +145,7 @@ class DirectorDashboardController extends Controller
 
         // To-do list - dynamic based on pending items
         $pendingAttendance = AttendanceRecord::where('status', 'pending')->count();
-        $pendingAssessments = TutorAssessment::where('status', 'approved-by-manager')->count();
+        $pendingAssessments = TutorAssessment::whereIn('status', ['pending_review', 'approved-by-manager'])->count();
 
         $todos = [
             [

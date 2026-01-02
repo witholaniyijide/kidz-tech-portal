@@ -89,6 +89,11 @@ class DirectorAssessmentController extends Controller
             ->orderBy('year', 'desc')
             ->pluck('year');
 
+        // Get students for filter
+        $students = \App\Models\Student::where('status', 'active')
+            ->orderBy('first_name')
+            ->get();
+
         // Get assessment criteria
         $criteria = AssessmentCriteria::active()->ordered()->get();
 
@@ -111,6 +116,7 @@ class DirectorAssessmentController extends Controller
             'months',
             'years',
             'tutors',
+            'students',
             'criteria',
             'stats',
             'chartData'
