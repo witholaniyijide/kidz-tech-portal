@@ -112,7 +112,9 @@
                 ],
             ];
 
-            $currentStageIndex = collect($stages)->search(fn($stage) => $stage['name'] === ($student->roadmap_stage ?? 'Intro to CS'));
+            $currentStageIndex = collect($stages)->search(function ($stage) use ($student) {
+                return $stage['name'] === ($student->roadmap_stage ?? 'Intro to CS');
+            });
             if ($currentStageIndex === false) {
                 $currentStageIndex = 0;
             }

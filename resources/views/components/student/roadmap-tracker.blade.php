@@ -58,7 +58,9 @@
         ],
     ];
 
-    $currentStageIndex = collect($stages)->search(fn($stage) => $stage['name'] === $currentStage);
+    $currentStageIndex = collect($stages)->search(function ($stage) use ($currentStage) {
+        return $stage['name'] === $currentStage;
+    });
     if ($currentStageIndex === false) {
         $currentStageIndex = 0;
     }

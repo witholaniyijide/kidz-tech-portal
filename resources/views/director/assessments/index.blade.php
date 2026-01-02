@@ -94,7 +94,9 @@
 
                 {{-- Pending Assessments --}}
                 <div x-show="managementTab === 'pending'" class="space-y-4">
-                    @forelse($assessments->filter(fn($a) => $a->status === 'approved-by-manager') as $assessment)
+                    @forelse($assessments->filter(function ($a) {
+                        return $a->status === 'approved-by-manager';
+                    }) as $assessment)
                         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5 border-l-4 border-amber-400">
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                 {{-- Left: Assessment Info --}}
@@ -220,7 +222,9 @@
 
                 {{-- Completed Assessments --}}
                 <div x-show="managementTab === 'completed'" class="space-y-4">
-                    @forelse($assessments->filter(fn($a) => $a->status === 'approved-by-director') as $assessment)
+                    @forelse($assessments->filter(function ($a) {
+                        return $a->status === 'approved-by-director';
+                    }) as $assessment)
                         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5 border-l-4 border-emerald-500">
                             <div class="flex flex-wrap justify-between items-start gap-4">
                                 <div class="flex-1">
@@ -524,7 +528,7 @@
                                     labels: chartData.tutorNames || @json($tutors->pluck('first_name')->take(10)),
                                     datasets: [{
                                         label: 'Average Score',
-                                        data: chartData.tutorScores || @json($tutors->take(10)->map(fn() => rand(60, 95))),
+                                        data: chartData.tutorScores || @json($tutors->take(10)->map(function () { return rand(60, 95); })),
                                         backgroundColor: [
                                             '#10b981', '#0ea5e9', '#8b5cf6', '#f59e0b', '#ef4444',
                                             '#06b6d4', '#ec4899', '#14b8a6', '#f97316', '#6366f1'
