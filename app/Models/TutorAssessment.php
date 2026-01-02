@@ -40,6 +40,8 @@ class TutorAssessment extends Model
         'approved_by_manager_at' => 'datetime',
         'approved_by_director_at' => 'datetime',
         'performance_score' => 'integer',
+        'criteria_assessed' => 'array',
+        'criteria_ratings' => 'array',
     ];
 
     /**
@@ -72,6 +74,112 @@ class TutorAssessment extends Model
     public function student()
     {
         return $this->belongsTo(Student::class);
+    }
+
+    /**
+     * Get the assessment ratings.
+     */
+    public function ratings()
+    {
+        return $this->hasMany(AssessmentRating::class, 'assessment_id');
+    }
+
+    /**
+     * Get the director action for this assessment.
+     */
+    public function directorAction()
+    {
+        return $this->hasOne(DirectorAction::class, 'assessment_id');
+    }
+
+    /**
+     * Calculate overall score from ratings.
+     */
+    public function calculateOverallScore(): float
+    {
+        $ratings = $this->ratings;
+        if ($ratings->isEmpty()) {
+            return 0;
+        }
+
+        $total = $ratings->sum(function ($rating) {
+            return $rating->percentage;
+        });
+
+        return round($total / $ratings->count(), 1);
+    }
+
+    /**
+     * Get criteria averages as array.
+     */
+    public function getCriteriaAveragesAttribute(): array
+    {
+        $averages = [];
+        foreach ($this->ratings as $rating) {
+            $averages[$rating->criteria->code] = $rating->percentage;
+        }
+        return $averages;
+    }
+
+    /**
+     * Get total penalties from director action.
+     */
+    public function getTotalPenaltiesAttribute(): float
+    {
+        return $this->directorAction?->penalty_amount ?? 0;
+    }
+
+    /**
+     * Get assessment period display string.
+     */
+    public function getAssessmentPeriodAttribute(): string
+    {
+        if ($this->class_date) {
+            return $this->class_date->format('F j, Y');
+        }
+        return $this->assessment_month ?? 'N/A';
+    }
+
+    /**
+     * Get strengths list (criteria >= 75%).
+     */
+    public function getStrengthsListAttribute(): array
+    {
+        $criteria = AssessmentCriteria::active()->get()->keyBy('code');
+        $strengths = [];
+
+        foreach ($this->criteria_averages as $code => $percentage) {
+            if ($percentage >= 75 && isset($criteria[$code])) {
+                $strengths[] = [
+                    'name' => $criteria[$code]->name,
+                    'percentage' => $percentage
+                ];
+            }
+        }
+
+        usort($strengths, fn($a, $b) => $b['percentage'] <=> $a['percentage']);
+        return array_slice($strengths, 0, 3);
+    }
+
+    /**
+     * Get weaknesses list (criteria < 75%).
+     */
+    public function getWeaknessesListAttribute(): array
+    {
+        $criteria = AssessmentCriteria::active()->get()->keyBy('code');
+        $weaknesses = [];
+
+        foreach ($this->criteria_averages as $code => $percentage) {
+            if ($percentage < 75 && isset($criteria[$code])) {
+                $weaknesses[] = [
+                    'name' => $criteria[$code]->name,
+                    'percentage' => $percentage
+                ];
+            }
+        }
+
+        usort($weaknesses, fn($a, $b) => $a['percentage'] <=> $b['percentage']);
+        return array_slice($weaknesses, 0, 3);
     }
 
     /**
@@ -175,7 +283,55 @@ class TutorAssessment extends Model
      */
     public function canDirectorApprove()
     {
-        // Director can approve assessments that are submitted or approved by manager
-        return in_array($this->status, ['submitted', 'approved-by-manager']);
+        // Director can approve assessments that are submitted, pending_review, or approved by manager
+        return in_array($this->status, ['submitted', 'pending_review', 'approved-by-manager']);
+    }
+
+    /**
+     * Scope to get assessments pending director review.
+     */
+    public function scopePendingReview($query)
+    {
+        return $query->where('status', 'pending_review');
+    }
+
+    /**
+     * Check if assessment is pending review.
+     */
+    public function isPendingReview()
+    {
+        return $this->status === 'pending_review';
+    }
+
+    /**
+     * Scope to get completed assessments (approved by director).
+     */
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', 'approved-by-director');
+    }
+
+    /**
+     * Scope to get assessments for a specific student.
+     */
+    public function scopeForStudent($query, $studentId)
+    {
+        return $query->where('student_id', $studentId);
+    }
+
+    /**
+     * Scope to get assessments for a specific year.
+     */
+    public function scopeForYear($query, int $year)
+    {
+        return $query->where('year', $year);
+    }
+
+    /**
+     * Scope to get assessments for a specific month.
+     */
+    public function scopeForMonth($query, int $month)
+    {
+        return $query->whereMonth('class_date', $month);
     }
 }

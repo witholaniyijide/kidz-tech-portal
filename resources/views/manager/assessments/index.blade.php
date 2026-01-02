@@ -469,17 +469,21 @@
                     recommendations: ''
                 },
 
-                // 8 Assessment Criteria with penalty info
-                criteria: [
-                    { id: 'punctuality', name: 'Punctuality', penalty: 'Penalty: 5% deduction if late 2+ times', options: ['Excellent', 'Good', 'Needs Improvement', 'Late'] },
-                    { id: 'video_on', name: 'Video-on Etiquette', penalty: 'Penalty: 5% deduction if video off without valid reason', options: ['Always On', 'Mostly On', 'Sometimes Off', 'Often Off'] },
-                    { id: 'network_quality', name: 'Network Quality', penalty: 'Penalty: 3% if network issues not addressed', options: ['Excellent', 'Good', 'Fair', 'Poor'] },
-                    { id: 'professional_conduct', name: 'Professional Conduct', penalty: 'Penalty: Up to 10% for unprofessional behavior', options: ['Exemplary', 'Professional', 'Acceptable', 'Needs Improvement'] },
-                    { id: 'curriculum_compliance', name: 'Curriculum Compliance', penalty: 'Penalty: 5% if deviates from curriculum', options: ['Fully Compliant', 'Mostly Compliant', 'Partially Compliant', 'Non-Compliant'] },
-                    { id: 'content_quality', name: 'Content Quality', penalty: 'Penalty: 5% for poor quality content', options: ['Excellent', 'Good', 'Acceptable', 'Poor'] },
-                    { id: 'full_class_time', name: 'Full Class Time Usage', penalty: 'Penalty: Pro-rated deduction for shortened classes', options: ['Full Time', 'Minor Shortfall', 'Significant Shortfall', 'Major Shortfall'] },
-                    { id: 'efficient_use', name: 'Efficient Use of Class Time', penalty: 'Penalty: 3% for wasted time', options: ['Very Efficient', 'Efficient', 'Somewhat Efficient', 'Inefficient'] }
-                ],
+                // 8 Assessment Criteria from database
+                criteria: @json($criteria->map(function($c) {
+                    $penaltyLabels = [];
+                    foreach ($c->penalty_rules ?? [] as $rating => $rule) {
+                        if (isset($rule['label'])) {
+                            $penaltyLabels[] = $rule['label'];
+                        }
+                    }
+                    return [
+                        'id' => $c->code,
+                        'name' => $c->name,
+                        'penalty' => implode(', ', $penaltyLabels) ?: 'No penalty',
+                        'options' => $c->options,
+                    ];
+                })),
 
                 checkedCriteria: {},
                 ratings: {},

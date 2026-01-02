@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             ParentPortalSeeder::class,
             StudentProgressSeeder::class,
             ParentNotificationSeeder::class,
+            AssessmentCriteriaSeeder::class,
         ]);
     }
 }

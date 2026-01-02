@@ -30,7 +30,9 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helpers/RoleTheme.php"
+            "app/Helpers/RoleTheme.php",
+            "app/Helpers/WeekHelper.php",
+            "app/Helpers/AssessmentHelper.php"
         ]
     },
     "autoload-dev": {

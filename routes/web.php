@@ -445,6 +445,8 @@ Route::prefix('manager')
             ->name('assessments.comment');
         Route::delete('/assessments/{assessment}', [App\Http\Controllers\Manager\AssessmentController::class, 'destroy'])
             ->name('assessments.destroy');
+        Route::post('/assessments/{assessment}/mark-complete', [App\Http\Controllers\Manager\AssessmentController::class, 'markComplete'])
+            ->name('assessments.mark-complete');
 
         // Settings
         Route::get('/settings', [App\Http\Controllers\Manager\ManagerSettingsController::class, 'index'])
@@ -504,6 +506,10 @@ Route::prefix('director')
             ->name('assessments.print');
         Route::post('/assessments/{assessment}/approve', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'approve'])
             ->name('assessments.approve');
+        Route::post('/assessments/{assessment}/approve-with-penalty', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'approveWithPenalty'])
+            ->name('assessments.approve-with-penalty');
+        Route::post('/assessments/{assessment}/approve-no-penalty', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'approveWithoutPenalty'])
+            ->name('assessments.approve-no-penalty');
         Route::post('/assessments/{assessment}/comment', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'comment'])
             ->name('assessments.comment');
         Route::get('/assessments-export', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'export'])
@@ -632,6 +638,8 @@ Route::prefix('tutor')
             ->name('performance.index');
         Route::get('/performance/{assessment}', [App\Http\Controllers\Tutor\PerformanceController::class, 'show'])
             ->name('performance.show');
+        Route::get('/performance/{assessment}/report-card', [App\Http\Controllers\Tutor\PerformanceController::class, 'reportCard'])
+            ->name('performance.report-card');
 
         // Notices (read-only)
         Route::get('/notices', [App\Http\Controllers\Tutor\NoticeController::class, 'index'])
