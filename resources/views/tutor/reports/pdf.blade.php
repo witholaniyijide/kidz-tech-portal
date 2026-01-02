@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Progress Report - {{ $report->student->fullName() }}</title>
-    {{-- Cache-busted: {{ now()->timestamp }} - Force Blade recompile for production --}}
+    <!-- Generated: {{ now()->format('Y-m-d H:i:s') }} -->
     <style>
         * {
             margin: 0;
@@ -373,11 +373,11 @@
         <div class="metrics">
             <div class="metric-item">
                 <div class="metric-label">Attendance Score</div>
-                <div class="metric-value">{{ $report->attendance_score ?? 'N/A' }}@if($report->attendance_score)%@endif</div>
+                <div class="metric-value">{{ $report->attendance_score ? $report->attendance_score . '%' : 'N/A' }}</div>
             </div>
             <div class="metric-item">
                 <div class="metric-label">Performance Rating</div>
-                <div class="metric-value">{{ $report->rating ?? 'N/A' }}@if($report->rating)/5@endif</div>
+                <div class="metric-value">{{ $report->rating ? $report->rating . '/5' : 'N/A' }}</div>
             </div>
         </div>
     </div>
