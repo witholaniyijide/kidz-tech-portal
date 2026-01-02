@@ -448,6 +448,23 @@
         </div>
     </div>
 
+    @php
+        // Prepare criteria data for JavaScript (moved out of @json for Blade compatibility)
+        $criteriaForJs = $criteria->map(function($c) {
+            $penaltyLabels = [];
+            foreach ($c->penalty_rules ?? [] as $rating => $rule) {
+                if (isset($rule['label'])) {
+                    $penaltyLabels[] = $rule['label'];
+                }
+            }
+            return [
+                'id' => $c->code,
+                'name' => $c->name,
+                'penalty' => implode(', ', $penaltyLabels) ?: 'No penalty',
+                'options' => $c->options,
+            ];
+        })->values()->toArray();
+    @endphp
     @push('scripts')
     <script>
         function assessmentApp() {
@@ -482,20 +499,7 @@
                 },
 
                 // 8 Assessment Criteria from database
-                criteria: @json($criteria->map(function($c) {
-                    $penaltyLabels = [];
-                    foreach ($c->penalty_rules ?? [] as $rating => $rule) {
-                        if (isset($rule['label'])) {
-                            $penaltyLabels[] = $rule['label'];
-                        }
-                    }
-                    return [
-                        'id' => $c->code,
-                        'name' => $c->name,
-                        'penalty' => implode(', ', $penaltyLabels) ?: 'No penalty',
-                        'options' => $c->options,
-                    ];
-                })),
+                criteria: @json($criteriaForJs),
 
                 checkedCriteria: {},
                 ratings: {},
