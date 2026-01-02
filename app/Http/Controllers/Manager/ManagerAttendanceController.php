@@ -77,6 +77,38 @@ class ManagerAttendanceController extends Controller
             ->orderBy('class_time', 'desc')
             ->paginate($perPage);
 
+        // Add monthly attendance counter for each record
+        foreach ($attendanceRecords as $record) {
+            if ($record->student && $record->class_date) {
+                // Count approved attendance for this student in the same month
+                $approvedCount = AttendanceRecord::where('student_id', $record->student_id)
+                    ->where('status', 'approved')
+                    ->whereYear('class_date', $record->class_date->year)
+                    ->whereMonth('class_date', $record->class_date->month)
+                    ->count();
+
+                // Calculate expected monthly classes based on student's schedule
+                $student = $record->student;
+                $expectedMonthlyClasses = 0;
+
+                if ($student->class_schedule && is_array($student->class_schedule)) {
+                    // Count classes per week from student's schedule
+                    $classesPerWeek = count($student->class_schedule);
+                    // Estimate 4 weeks per month
+                    $expectedMonthlyClasses = $classesPerWeek * 4;
+                } else {
+                    // Fallback to total attendance records for the month
+                    $expectedMonthlyClasses = AttendanceRecord::where('student_id', $record->student_id)
+                        ->whereYear('class_date', $record->class_date->year)
+                        ->whereMonth('class_date', $record->class_date->month)
+                        ->count();
+                }
+
+                $record->monthly_attended = $approvedCount;
+                $record->monthly_total = max($expectedMonthlyClasses, 1); // Ensure at least 1 to avoid division by zero
+            }
+        }
+
         // Get statistics
         $stats = [
             'total' => AttendanceRecord::count(),
