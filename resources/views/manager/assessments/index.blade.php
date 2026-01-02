@@ -1,4 +1,4 @@
-{{-- Cache-busted: Fixed potential quote escaping issues --}}
+{{-- CACHE-CLEAR-REQUIRED: {{ now()->format('Y-m-d-H-i-s') }} --}}
 <x-manager-layout title="Tutor Assessments">
     <div x-data="assessmentApp()" x-init="init()">
         {{-- Sub Navigation Tabs --}}
@@ -577,8 +577,8 @@
                         student_id: '',
                         tutor_id: '',
                         class_date: '',
-                        week: parseInt('{{ date("W") }}'),
-                        year: new Date().getFullYear(),
+                        week: {{ date('W') }},
+                        year: {{ date('Y') }},
                         performance_score: '',
                         strengths: '',
                         weaknesses: '',
