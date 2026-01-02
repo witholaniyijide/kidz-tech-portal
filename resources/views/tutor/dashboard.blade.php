@@ -343,7 +343,7 @@
                         <p class="text-slate-500 dark:text-slate-400">No notices at this time.</p>
                     </div>
                 @else
-                    <div class="space-y-3">
+                    <div class="space-y-3 max-h-64 overflow-y-auto">
                         @foreach($recentNotices as $notice)
                             <a href="{{ route('tutor.notices.show', $notice) }}" class="block p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                 <div class="flex items-start gap-3">
@@ -397,7 +397,7 @@
                         </a>
                     </div>
                 @else
-                    <div class="space-y-3">
+                    <div class="space-y-3 max-h-64 overflow-y-auto">
                         @foreach($recentReports as $report)
                             <a href="{{ route('tutor.reports.show', $report) }}" class="block p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                 <div class="flex items-start justify-between gap-4">
