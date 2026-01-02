@@ -124,19 +124,24 @@ class AssessmentController extends Controller
             DB::transaction(function () use ($validated, $criteriaRatings) {
                 $assessment = TutorAssessment::create($validated);
 
-                // Create individual rating records
+                // Create individual rating records (if new tables exist)
                 if (!empty($criteriaRatings)) {
-                    $criteriaMap = AssessmentCriteria::active()->pluck('id', 'code');
+                    try {
+                        $criteriaMap = AssessmentCriteria::active()->pluck('id', 'code');
 
-                    foreach ($criteriaRatings as $criteriaCode => $rating) {
-                        if (isset($criteriaMap[$criteriaCode]) && !empty($rating)) {
-                            AssessmentRating::create([
-                                'assessment_id' => $assessment->id,
-                                'criteria_id' => $criteriaMap[$criteriaCode],
-                                'rating' => $rating,
-                                'score' => ratingScore($rating),
-                            ]);
+                        foreach ($criteriaRatings as $criteriaCode => $rating) {
+                            if (isset($criteriaMap[$criteriaCode]) && !empty($rating)) {
+                                AssessmentRating::create([
+                                    'assessment_id' => $assessment->id,
+                                    'criteria_id' => $criteriaMap[$criteriaCode],
+                                    'rating' => $rating,
+                                    'score' => function_exists('ratingScore') ? ratingScore($rating) : 0,
+                                ]);
+                            }
                         }
+                    } catch (\Exception $e) {
+                        // If new tables don't exist, ratings are still stored in JSON fields
+                        \Log::warning('Could not create assessment ratings: ' . $e->getMessage());
                     }
                 }
             });
