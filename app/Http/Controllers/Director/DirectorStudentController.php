@@ -103,16 +103,19 @@ class DirectorStudentController extends Controller
             // Parent Information - Father
             'father_name' => 'nullable|string|max:255',
             'father_phone' => 'nullable|string|max:20',
-            'father_email' => 'nullable|email|max:255',
+            'father_email' => 'nullable|email|max:255|different:mother_email',
             'father_occupation' => 'nullable|string|max:255',
             'father_location' => 'nullable|string|max:255',
 
             // Parent Information - Mother
             'mother_name' => 'nullable|string|max:255',
             'mother_phone' => 'nullable|string|max:20',
-            'mother_email' => 'nullable|email|max:255',
+            'mother_email' => 'nullable|email|max:255|different:father_email',
             'mother_occupation' => 'nullable|string|max:255',
             'mother_location' => 'nullable|string|max:255',
+        ], [
+            'father_email.different' => 'Father and mother cannot have the same email address.',
+            'mother_email.different' => 'Mother and father cannot have the same email address.',
         ]);
 
         $student = null;
@@ -203,16 +206,19 @@ class DirectorStudentController extends Controller
             // Parent Information - Father
             'father_name' => 'nullable|string|max:255',
             'father_phone' => 'nullable|string|max:20',
-            'father_email' => 'nullable|email|max:255',
+            'father_email' => 'nullable|email|max:255|different:mother_email',
             'father_occupation' => 'nullable|string|max:255',
             'father_location' => 'nullable|string|max:255',
 
             // Parent Information - Mother
             'mother_name' => 'nullable|string|max:255',
             'mother_phone' => 'nullable|string|max:20',
-            'mother_email' => 'nullable|email|max:255',
+            'mother_email' => 'nullable|email|max:255|different:father_email',
             'mother_occupation' => 'nullable|string|max:255',
             'mother_location' => 'nullable|string|max:255',
+        ], [
+            'father_email.different' => 'Father and mother cannot have the same email address.',
+            'mother_email.different' => 'Mother and father cannot have the same email address.',
         ]);
 
         // Track if parent emails changed for creating new parent accounts

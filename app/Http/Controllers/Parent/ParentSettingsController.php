@@ -34,9 +34,52 @@ class ParentSettingsController extends Controller
             'phone_country_code' => ['nullable', 'string', 'max:10'],
         ]);
 
+        // Track if email is changing
+        $emailChanged = $user->email !== $validated['email'];
+        $oldEmail = $user->email;
+
         $user->update($validated);
 
+        // If email changed, update all linked student records to preserve parent linkage
+        if ($emailChanged) {
+            $this->updateStudentParentEmails($user, $oldEmail, $validated['email']);
+        }
+
         return redirect()->back()->with('success', 'Profile updated successfully.');
+    }
+
+    /**
+     * Update student parent email fields when a parent changes their email.
+     * This prevents creation of duplicate parent accounts and preserves message history.
+     */
+    protected function updateStudentParentEmails($user, $oldEmail, $newEmail)
+    {
+        // Get all students linked to this parent via guardian_student table
+        $students = $user->students()->get();
+
+        foreach ($students as $student) {
+            $updates = [];
+
+            // Update father_email if it matches the old email
+            if ($student->father_email === $oldEmail) {
+                $updates['father_email'] = $newEmail;
+            }
+
+            // Update mother_email if it matches the old email
+            if ($student->mother_email === $oldEmail) {
+                $updates['mother_email'] = $newEmail;
+            }
+
+            // Update legacy parent_email if it matches the old email
+            if ($student->parent_email === $oldEmail) {
+                $updates['parent_email'] = $newEmail;
+            }
+
+            // Apply updates if any
+            if (!empty($updates)) {
+                $student->update($updates);
+            }
+        }
     }
 
     /**
