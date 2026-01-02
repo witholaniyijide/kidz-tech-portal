@@ -195,7 +195,7 @@
             </div>
 
             {{-- Class Links --}}
-            @if($student->class_link || $student->google_class_link)
+            @if($student->class_link || $student->google_classroom_link)
             <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Class Links</h3>
                 <div class="space-y-3">
@@ -215,8 +215,8 @@
                         </svg>
                     </a>
                     @endif
-                    @if($student->google_class_link)
-                    <a href="{{ $student->google_class_link }}" target="_blank" class="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+                    @if($student->google_classroom_link)
+                    <a href="{{ $student->google_classroom_link }}" target="_blank" class="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
                         <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 0C5.372 0 0 5.373 0 12s5.372 12 12 12 12-5.373 12-12S18.628 0 12 0zm5.82 16.32a.75.75 0 01-1.06 0L12 11.56l-4.76 4.76a.75.75 0 01-1.06-1.06l4.76-4.76-4.76-4.76a.75.75 0 011.06-1.06L12 9.44l4.76-4.76a.75.75 0 011.06 1.06l-4.76 4.76 4.76 4.76a.75.75 0 010 1.06z"/>
@@ -224,13 +224,39 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="font-medium text-gray-900 dark:text-white">Google Classroom</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 truncate">{{ $student->google_class_link }}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 truncate">{{ $student->google_classroom_link }}</p>
                         </div>
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
                     </a>
                     @endif
+                </div>
+            </div>
+            @endif
+
+            {{-- Class Schedule --}}
+            @if($student->class_schedule && is_array($student->class_schedule) && count($student->class_schedule) > 0)
+            <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Class Schedule</h3>
+                <div class="space-y-2">
+                    @foreach($student->class_schedule as $schedule)
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                            <div class="w-8 h-8 bg-[#C15F3C]/10 dark:bg-[#C15F3C]/20 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-[#C15F3C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ is_array($schedule) ? ($schedule['day'] ?? $schedule['label'] ?? 'Class') : $schedule }}
+                                </p>
+                                @if(is_array($schedule) && isset($schedule['time']))
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $schedule['time'] }}</p>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
             @endif
