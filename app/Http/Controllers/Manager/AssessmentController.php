@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Manager;
 
 use App\Http\Controllers\Controller;
 use App\Models\TutorAssessment;
+use App\Models\AssessmentCriteria;
+use App\Models\AssessmentRating;
 use App\Models\Tutor;
 use App\Models\Student;
 use App\Models\DirectorNotification;
@@ -25,7 +27,7 @@ class AssessmentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = TutorAssessment::with(['tutor', 'manager']);
+        $query = TutorAssessment::with(['tutor', 'manager', 'student', 'ratings.criteria']);
 
         // Filter by status
         if ($request->filled('status')) {
@@ -48,7 +50,8 @@ class AssessmentController extends Controller
         $stats = [
             'total' => TutorAssessment::count(),
             'pending' => TutorAssessment::whereIn('status', ['draft', 'submitted'])->count(),
-            'awaiting_director' => TutorAssessment::where('status', 'approved-by-manager')->count(),
+            'pending_review' => TutorAssessment::where('status', 'pending_review')->count(),
+            'awaiting_director' => TutorAssessment::whereIn('status', ['pending_review', 'approved-by-manager'])->count(),
             'completed' => TutorAssessment::where('status', 'approved-by-director')->count(),
         ];
 
@@ -61,7 +64,10 @@ class AssessmentController extends Controller
             ->orderBy('first_name')
             ->get();
 
-        return view('manager.assessments.index', compact('assessments', 'stats', 'tutors', 'students'));
+        // Get assessment criteria from database
+        $criteria = AssessmentCriteria::active()->ordered()->get();
+
+        return view('manager.assessments.index', compact('assessments', 'stats', 'tutors', 'students', 'criteria'));
     }
 
     /**
@@ -103,15 +109,37 @@ class AssessmentController extends Controller
             $validated['manager_id'] = Auth::id();
             $validated['status'] = 'draft';
 
-            // Store criteria as JSON if provided
+            // Extract ratings for separate processing
+            $criteriaRatings = $validated['criteria_ratings'] ?? [];
+            $criteriaAssessed = $validated['criteria_assessed'] ?? [];
+
+            // Store criteria as JSON for legacy support
             if (isset($validated['criteria_assessed'])) {
-                $validated['criteria_assessed'] = json_encode($validated['criteria_assessed']);
+                $validated['criteria_assessed'] = $criteriaAssessed;
             }
             if (isset($validated['criteria_ratings'])) {
-                $validated['criteria_ratings'] = json_encode($validated['criteria_ratings']);
+                $validated['criteria_ratings'] = $criteriaRatings;
             }
 
-            TutorAssessment::create($validated);
+            DB::transaction(function () use ($validated, $criteriaRatings) {
+                $assessment = TutorAssessment::create($validated);
+
+                // Create individual rating records
+                if (!empty($criteriaRatings)) {
+                    $criteriaMap = AssessmentCriteria::active()->pluck('id', 'code');
+
+                    foreach ($criteriaRatings as $criteriaCode => $rating) {
+                        if (isset($criteriaMap[$criteriaCode]) && !empty($rating)) {
+                            AssessmentRating::create([
+                                'assessment_id' => $assessment->id,
+                                'criteria_id' => $criteriaMap[$criteriaCode],
+                                'rating' => $rating,
+                                'score' => ratingScore($rating),
+                            ]);
+                        }
+                    }
+                }
+            });
 
             if ($request->wantsJson()) {
                 return response()->json(['success' => true, 'message' => 'Assessment created successfully.']);
@@ -207,19 +235,29 @@ class AssessmentController extends Controller
     }
 
     /**
-     * Submit assessment for director approval.
+     * Mark assessment as complete (ready for director review).
      */
-    public function submit(TutorAssessment $assessment)
+    public function markComplete(TutorAssessment $assessment)
     {
         if ($assessment->status !== 'draft') {
             return redirect()
                 ->route('manager.assessments.index')
-                ->with('error', 'This assessment has already been submitted.');
+                ->with('error', 'Only draft assessments can be marked complete.');
+        }
+
+        // Verify all selected criteria have ratings
+        $criteriaRatings = $assessment->criteria_ratings ?? [];
+        $criteriaAssessed = $assessment->criteria_assessed ?? [];
+
+        if (empty($criteriaAssessed)) {
+            return redirect()
+                ->route('manager.assessments.index')
+                ->with('error', 'Please select and rate at least one criteria before marking complete.');
         }
 
         DB::transaction(function () use ($assessment) {
             $assessment->update([
-                'status' => 'approved-by-manager',
+                'status' => 'pending_review',
                 'approved_by_manager_at' => now(),
             ]);
 
@@ -229,12 +267,13 @@ class AssessmentController extends Controller
             })->get();
 
             $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'Unknown Tutor';
+            $studentName = $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '';
 
             foreach ($directors as $director) {
                 DirectorNotification::create([
                     'user_id' => $director->id,
-                    'title' => 'New Assessment Pending Approval',
-                    'body' => "Assessment for {$tutorName} ({$assessment->assessment_month}) is pending your approval.",
+                    'title' => 'Assessment Ready for Review',
+                    'body' => "Assessment for {$tutorName}" . ($studentName ? " (Student: {$studentName})" : "") . " - Week {$assessment->week} is pending your review.",
                     'type' => 'assessment',
                     'is_read' => false,
                     'meta' => [
@@ -247,7 +286,15 @@ class AssessmentController extends Controller
 
         return redirect()
             ->route('manager.assessments.index')
-            ->with('success', 'Assessment submitted for director approval.');
+            ->with('success', 'Assessment marked complete and sent for director review.');
+    }
+
+    /**
+     * Submit assessment for director approval (legacy method).
+     */
+    public function submit(TutorAssessment $assessment)
+    {
+        return $this->markComplete($assessment);
     }
 
     /**

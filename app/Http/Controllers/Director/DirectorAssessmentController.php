@@ -4,7 +4,12 @@ namespace App\Http\Controllers\Director;
 
 use App\Http\Controllers\Controller;
 use App\Models\TutorAssessment;
+use App\Models\AssessmentCriteria;
+use App\Models\DirectorAction;
+use App\Models\PenaltyTransaction;
 use App\Models\Tutor;
+use App\Models\TutorNotification;
+use App\Models\ManagerNotification;
 use App\Services\DirectorApprovalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,9 +43,9 @@ class DirectorAssessmentController extends Controller
         // Authorize
         $this->authorize('viewAny', TutorAssessment::class);
 
-        // Get all assessments that are relevant to director (manager-approved or director-approved)
-        $query = TutorAssessment::with(['tutor', 'manager', 'director', 'student'])
-            ->whereIn('status', ['approved-by-manager', 'approved-by-director'])
+        // Get all assessments that are relevant to director
+        $query = TutorAssessment::with(['tutor', 'manager', 'director', 'student', 'ratings.criteria', 'directorAction'])
+            ->whereIn('status', ['pending_review', 'approved-by-manager', 'approved-by-director'])
             ->orderBy('created_at', 'desc');
 
         // Filter by tutor
@@ -51,6 +56,16 @@ class DirectorAssessmentController extends Controller
         // Filter by month
         if ($request->filled('month')) {
             $query->where('assessment_month', $request->month);
+        }
+
+        // Filter by year
+        if ($request->filled('year')) {
+            $query->where('year', $request->year);
+        }
+
+        // Filter by week
+        if ($request->filled('week')) {
+            $query->where('week', $request->week);
         }
 
         // Get all assessments (not paginated for client-side filtering)
@@ -67,12 +82,22 @@ class DirectorAssessmentController extends Controller
             ->orderBy('first_name')
             ->get();
 
+        // Get years for filter
+        $years = TutorAssessment::select('year')
+            ->distinct()
+            ->whereNotNull('year')
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        // Get assessment criteria
+        $criteria = AssessmentCriteria::active()->ordered()->get();
+
         // Calculate statistics
         $stats = [
             'total' => TutorAssessment::count(),
-            'pending' => TutorAssessment::where('status', 'approved-by-manager')->count(),
+            'pending' => TutorAssessment::whereIn('status', ['pending_review', 'approved-by-manager'])->count(),
             'completed' => TutorAssessment::where('status', 'approved-by-director')->count(),
-            'awaiting_director' => TutorAssessment::where('status', 'approved-by-manager')->count(),
+            'awaiting_director' => TutorAssessment::whereIn('status', ['pending_review', 'approved-by-manager'])->count(),
             'avg_score' => TutorAssessment::where('status', 'approved-by-director')
                 ->whereNotNull('performance_score')
                 ->avg('performance_score') ?? 0,
@@ -84,7 +109,9 @@ class DirectorAssessmentController extends Controller
         return view('director.assessments.index', compact(
             'assessments',
             'months',
+            'years',
             'tutors',
+            'criteria',
             'stats',
             'chartData'
         ));
@@ -147,9 +174,9 @@ class DirectorAssessmentController extends Controller
     }
 
     /**
-     * Approve the assessment (final approval).
+     * Approve the assessment with penalty.
      */
-    public function approve(Request $request, TutorAssessment $assessment)
+    public function approveWithPenalty(Request $request, TutorAssessment $assessment)
     {
         // Authorize
         $this->authorize('approve', $assessment);
@@ -157,6 +184,8 @@ class DirectorAssessmentController extends Controller
         // Validate the request
         $validated = $request->validate([
             'director_comment' => 'nullable|string|max:2000',
+            'penalty_amount' => 'required|numeric|min:0',
+            'suggested_penalty' => 'nullable|numeric|min:0',
         ]);
 
         // Check if assessment can be approved
@@ -167,20 +196,180 @@ class DirectorAssessmentController extends Controller
         }
 
         try {
-            // Use the service to approve the assessment
-            $this->approvalService->approveTutorAssessment(
-                $assessment,
-                Auth::user(),
-                $validated['director_comment'] ?? null
-            );
+            DB::transaction(function () use ($assessment, $validated) {
+                // Update assessment status
+                $assessment->update([
+                    'status' => 'approved-by-director',
+                    'director_id' => Auth::id(),
+                    'director_comment' => $validated['director_comment'] ?? null,
+                    'approved_by_director_at' => now(),
+                ]);
+
+                // Create director action record
+                $directorAction = DirectorAction::create([
+                    'assessment_id' => $assessment->id,
+                    'director_id' => Auth::id(),
+                    'action_type' => 'approve',
+                    'penalty_amount' => $validated['penalty_amount'],
+                    'suggested_penalty' => $validated['suggested_penalty'] ?? $validated['penalty_amount'],
+                    'director_comment' => $validated['director_comment'] ?? null,
+                    'action_date' => now(),
+                ]);
+
+                // Create penalty transaction if penalty > 0
+                if ($validated['penalty_amount'] > 0) {
+                    PenaltyTransaction::create([
+                        'tutor_id' => $assessment->tutor_id,
+                        'director_action_id' => $directorAction->id,
+                        'amount' => $validated['penalty_amount'],
+                        'reason' => 'Assessment penalty for Week ' . $assessment->week,
+                        'week_number' => $assessment->week ?? 1,
+                        'year' => $assessment->year ?? date('Y'),
+                        'month' => $assessment->class_date ? $assessment->class_date->month : date('m'),
+                        'transaction_date' => now(),
+                    ]);
+                }
+
+                // Notify tutor
+                $this->notifyTutor($assessment, $validated['penalty_amount'], $validated['director_comment'] ?? null);
+
+                // Log the action
+                $this->approvalService->logDirectorAction(
+                    Auth::user(),
+                    'approved_assessment_with_penalty',
+                    TutorAssessment::class,
+                    $assessment->id
+                );
+            });
 
             return redirect()
                 ->route('director.assessments.index')
-                ->with('success', 'Assessment has been approved successfully. Notifications sent to tutor and manager.');
+                ->with('success', 'Assessment approved with penalty of ₦' . number_format($validated['penalty_amount'], 2));
         } catch (\Exception $e) {
             return redirect()
                 ->back()
                 ->with('error', 'Failed to approve assessment: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Approve the assessment without penalty.
+     */
+    public function approveWithoutPenalty(Request $request, TutorAssessment $assessment)
+    {
+        // Authorize
+        $this->authorize('approve', $assessment);
+
+        // Validate the request
+        $validated = $request->validate([
+            'director_comment' => 'nullable|string|max:2000',
+            'suggested_penalty' => 'nullable|numeric|min:0',
+        ]);
+
+        // Check if assessment can be approved
+        if (!$assessment->canDirectorApprove()) {
+            return redirect()
+                ->route('director.assessments.index')
+                ->with('error', 'This assessment cannot be approved at this time.');
+        }
+
+        try {
+            DB::transaction(function () use ($assessment, $validated) {
+                // Update assessment status
+                $assessment->update([
+                    'status' => 'approved-by-director',
+                    'director_id' => Auth::id(),
+                    'director_comment' => $validated['director_comment'] ?? null,
+                    'approved_by_director_at' => now(),
+                ]);
+
+                // Create director action record
+                DirectorAction::create([
+                    'assessment_id' => $assessment->id,
+                    'director_id' => Auth::id(),
+                    'action_type' => 'approve_no_penalty',
+                    'penalty_amount' => 0,
+                    'suggested_penalty' => $validated['suggested_penalty'] ?? 0,
+                    'director_comment' => $validated['director_comment'] ?? null,
+                    'action_date' => now(),
+                ]);
+
+                // Notify tutor
+                $this->notifyTutor($assessment, 0, $validated['director_comment'] ?? null);
+
+                // Log the action
+                $this->approvalService->logDirectorAction(
+                    Auth::user(),
+                    'approved_assessment_no_penalty',
+                    TutorAssessment::class,
+                    $assessment->id
+                );
+            });
+
+            return redirect()
+                ->route('director.assessments.index')
+                ->with('success', 'Assessment approved without penalty.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to approve assessment: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Approve the assessment (legacy method - redirects to appropriate action).
+     */
+    public function approve(Request $request, TutorAssessment $assessment)
+    {
+        // Default to approve without penalty for legacy calls
+        return $this->approveWithoutPenalty($request, $assessment);
+    }
+
+    /**
+     * Notify tutor about approved assessment.
+     */
+    protected function notifyTutor(TutorAssessment $assessment, float $penaltyAmount, ?string $comment)
+    {
+        $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'Tutor';
+        $studentName = $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '';
+
+        $title = 'Assessment Approved';
+        $body = "Your assessment for Week {$assessment->week}" . ($studentName ? " (Student: {$studentName})" : "") . " has been reviewed.";
+
+        if ($penaltyAmount > 0) {
+            $body .= " Penalty applied: ₦" . number_format($penaltyAmount, 2);
+        }
+
+        if ($comment) {
+            $body .= "\n\nDirector's comment: " . $comment;
+        }
+
+        // Create tutor notification
+        TutorNotification::create([
+            'tutor_id' => $assessment->tutor_id,
+            'title' => $title,
+            'body' => $body,
+            'type' => 'assessment',
+            'is_read' => false,
+            'meta' => [
+                'assessment_id' => $assessment->id,
+                'penalty_amount' => $penaltyAmount,
+            ],
+        ]);
+
+        // Notify manager who created the assessment
+        if ($assessment->manager_id) {
+            ManagerNotification::create([
+                'user_id' => $assessment->manager_id,
+                'title' => 'Assessment Approved by Director',
+                'body' => "Assessment for {$tutorName}" . ($studentName ? " (Student: {$studentName})" : "") . " - Week {$assessment->week} has been approved.",
+                'type' => 'assessment',
+                'is_read' => false,
+                'meta' => [
+                    'assessment_id' => $assessment->id,
+                    'link' => route('manager.assessments.show', $assessment->id),
+                ],
+            ]);
         }
     }
 
