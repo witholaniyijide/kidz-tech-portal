@@ -60,9 +60,14 @@
                                 <select x-model="formData.student_id" @change="selectStudent()" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
                                     <option value="">Select student</option>
                                     @foreach($students ?? [] as $student)
+                                        @php
+                                            $tutorName = $student->tutor
+                                                ? $student->tutor->first_name . ' ' . $student->tutor->last_name
+                                                : 'No Tutor Assigned';
+                                        @endphp
                                         <option value="{{ $student->id }}"
                                                 data-tutor-id="{{ $student->tutor_id }}"
-                                                data-tutor-name="{{ $student->tutor ? e($student->tutor->first_name . ' ' . $student->tutor->last_name) : 'No Tutor Assigned' }}">
+                                                data-tutor-name="{{ $tutorName }}">
                                             {{ $student->first_name }} {{ $student->last_name }}
                                         </option>
                                     @endforeach
