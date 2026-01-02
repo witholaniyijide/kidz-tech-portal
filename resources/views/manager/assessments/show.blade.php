@@ -97,8 +97,13 @@
                             </svg>
                             Criteria Assessed
                         </h3>
-                        <div class="prose dark:prose-invert max-w-none">
-                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $assessment->criteria_assessed }}</p>
+                        <div class="flex flex-wrap gap-2">
+                            @php
+                                $criteriaList = is_array($assessment->criteria_assessed) ? $assessment->criteria_assessed : [$assessment->criteria_assessed];
+                            @endphp
+                            @foreach($criteriaList as $criteria)
+                                <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm">{{ $criteria }}</span>
+                            @endforeach
                         </div>
                     </div>
                     @endif
@@ -112,8 +117,23 @@
                             </svg>
                             Criteria Ratings
                         </h3>
-                        <div class="prose dark:prose-invert max-w-none">
-                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $assessment->criteria_ratings }}</p>
+                        <div class="space-y-3">
+                            @php
+                                $ratings = is_array($assessment->criteria_ratings) ? $assessment->criteria_ratings : [];
+                            @endphp
+                            @foreach($ratings as $criteriaCode => $rating)
+                                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                                    <span class="font-medium text-gray-700 dark:text-gray-300 capitalize">{{ str_replace('_', ' ', $criteriaCode) }}</span>
+                                    <span class="px-3 py-1 rounded-full text-sm font-medium
+                                        @if(in_array($rating, ['Excellent', 'On Time'])) bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300
+                                        @elseif($rating === 'Good') bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300
+                                        @elseif($rating === 'Acceptable') bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300
+                                        @else bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300
+                                        @endif">
+                                        {{ $rating }}
+                                    </span>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                     @endif
