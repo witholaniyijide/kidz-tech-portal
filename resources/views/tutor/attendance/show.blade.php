@@ -48,7 +48,7 @@
                 </div>
                 <div>
                     <h3 class="font-semibold text-amber-800 dark:text-amber-300">Pending Approval</h3>
-                    <p class="text-sm text-amber-600 dark:text-amber-400">Awaiting manager review</p>
+                    <p class="text-sm text-amber-600 dark:text-amber-400">Awaiting admin review</p>
                 </div>
             @endif
         </div>

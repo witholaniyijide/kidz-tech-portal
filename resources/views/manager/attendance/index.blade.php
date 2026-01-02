@@ -181,6 +181,11 @@
                                 <div>
                                     <p class="font-semibold text-gray-900 dark:text-white">{{ $record->student->first_name ?? 'N/A' }} {{ $record->student->last_name ?? '' }}</p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">ID: {{ $record->student->student_id ?? 'N/A' }}</p>
+                                    @if(isset($record->monthly_attended) && isset($record->monthly_total))
+                                        <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+                                            {{ $record->monthly_attended }}/{{ $record->monthly_total }} this month
+                                        </p>
+                                    @endif
                                 </div>
                             </div>
                             <span class="px-2 py-1 text-xs rounded-full font-medium

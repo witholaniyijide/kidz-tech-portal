@@ -7,16 +7,6 @@
     <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            <!-- Action Button -->
-            <div class="flex justify-end mb-4">
-                <button onclick="document.getElementById('submitAttendanceModal').classList.remove('hidden')"
-                        class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] hover:from-[#3730A3] hover:to-[#4F46E5] text-white font-semibold rounded-lg transition-all shadow-lg">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                    </svg>
-                    Submit Attendance
-                </button>
-            </div>
 
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -132,8 +122,13 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    {{ $record->student->first_name ?? 'N/A' }} {{ $record->student->last_name ?? '' }}
+                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
+                                    <div>{{ $record->student->first_name ?? 'N/A' }} {{ $record->student->last_name ?? '' }}</div>
+                                    @if(isset($record->monthly_attended) && isset($record->monthly_total))
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            Attendance: {{ $record->monthly_attended }}/{{ $record->monthly_total }} this month
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     {{ $record->tutor->first_name ?? 'N/A' }} {{ $record->tutor->last_name ?? '' }}
@@ -172,107 +167,4 @@
         </div>
     </div>
 
-    <!-- Submit Attendance Modal -->
-    <div id="submitAttendanceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Submit Attendance</h3>
-                <button onclick="document.getElementById('submitAttendanceModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-            
-            <form method="POST" action="{{ route('director.attendance.store') }}">
-                @csrf
-                <div class="space-y-5">
-                    <!-- Student Selection -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student *</label>
-                        <select name="student_id" required class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                            <option value="">Select Student</option>
-                            @foreach($students as $student)
-                                <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <!-- Tutor Selection -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tutor *</label>
-                        <select name="tutor_id" required class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                            <option value="">Select Tutor</option>
-                            @foreach($tutors as $tutor)
-                                <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <!-- Class Date -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class Date *</label>
-                        <input type="date" name="class_date" value="{{ date('Y-m-d') }}" required 
-                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                    </div>
-
-                    <!-- Attendance Status -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Attendance Status *</label>
-                        <select name="attendance_status" required class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                            <option value="present">Present</option>
-                            <option value="absent">Absent</option>
-                            <option value="late">Late</option>
-                            <option value="excused">Excused</option>
-                        </select>
-                    </div>
-
-                    <!-- Class Start Time -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Time</label>
-                            <input type="time" name="class_start_time" 
-                                   class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Time</label>
-                            <input type="time" name="class_end_time" 
-                                   class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                        </div>
-                    </div>
-
-                    <!-- Topics Covered -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Topics Covered</label>
-                        <textarea name="topics_covered" rows="2" placeholder="What was covered in the class..." 
-                                  class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]"></textarea>
-                    </div>
-
-                    <!-- Notes -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
-                        <textarea name="notes" rows="2" placeholder="Additional notes..." 
-                                  class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]"></textarea>
-                    </div>
-
-                    <!-- Auto Approve -->
-                    <div class="flex items-center">
-                        <input type="checkbox" name="auto_approve" value="1" checked 
-                               class="rounded border-gray-300 text-[#4F46E5] shadow-sm focus:ring-[#4F46E5]">
-                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Auto-approve this attendance record</span>
-                    </div>
-                </div>
-
-                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <button type="button" onclick="document.getElementById('submitAttendanceModal').classList.add('hidden')" 
-                            class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-all">
-                        Cancel
-                    </button>
-                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-lg hover:from-[#3730A3] hover:to-[#4F46E5] transition-all">
-                        Submit Attendance
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 </x-app-layout>
