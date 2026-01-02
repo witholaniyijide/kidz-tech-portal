@@ -245,7 +245,9 @@
 
                 {{-- Assessment Cards --}}
                 <div class="space-y-4">
-                    @forelse($assessments->filter(fn($a) => in_array($a->status, ['draft', 'submitted', 'approved-by-manager'])) as $assessment)
+                    @forelse($assessments->filter(function ($a) {
+                        return in_array($a->status, ['draft', 'submitted', 'approved-by-manager']);
+                    }) as $assessment)
                         <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 border-l-4 {{ $assessment->status === 'draft' ? 'border-l-amber-400' : 'border-l-[#C15F3C]' }}">
                             <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
                                 <div class="flex-1">
@@ -380,7 +382,9 @@
                 </div>
 
                 <div class="space-y-4">
-                    @forelse($assessments->filter(fn($a) => $a->status === 'approved-by-director') as $assessment)
+                    @forelse($assessments->filter(function ($a) {
+                        return $a->status === 'approved-by-director';
+                    }) as $assessment)
                         <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 border-l-4 border-l-emerald-500">
                             <div class="flex flex-wrap justify-between items-start gap-4">
                                 <div class="flex-1">

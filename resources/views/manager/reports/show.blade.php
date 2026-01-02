@@ -254,7 +254,7 @@
                         <p class="text-xs text-gray-500">Skills</p>
                     </div>
                     <div class="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-                        <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ $report->projects ? count(array_filter($report->projects, fn($p) => !empty($p['title']))) : 0 }}</p>
+                        <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ $report->projects ? count(array_filter($report->projects, function ($p) { return !empty($p['title']); })) : 0 }}</p>
                         <p class="text-xs text-gray-500">Projects</p>
                     </div>
                     <div class="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
