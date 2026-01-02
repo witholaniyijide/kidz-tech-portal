@@ -26,7 +26,7 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p class="font-semibold text-gray-800 dark:text-white truncate">{{ $child->first_name }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Stage {{ $child->roadmap_stage ?? 1 }} of 12</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Stage {{ $child->current_stage ?? 1 }} of 12</p>
                                 </div>
                                 @if($selectedChild->id === $child->id)
                                     <span class="px-2 py-1 text-xs font-medium bg-sky-500 text-white rounded-full">Selected</span>

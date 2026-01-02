@@ -130,16 +130,12 @@ class DirectorApprovalService
                     }
                 }
 
-                // Send Laravel Notification to Tutor (queued)
-                $report->tutor->notify(new TutorReportApprovedNotification($report));
-
                 // Send email to tutor with PDF attachment
+                // (Tutor notification already created via TutorNotification::create above)
                 Mail::to($report->tutor->email)->send(new DirectorFinalApprovalMail($report));
 
-                // Notify and email all managers
-                foreach ($managers as $manager) {
-                    $manager->notify(new TutorReportApprovedNotification($report));
-                }
+                // Manager notifications already created via ManagerNotification::create above
+                // No need for additional Laravel notifications
 
                 // Send notification and email to parents
                 $this->notifyParentsOfApprovedReport($report);
