@@ -76,7 +76,7 @@ class AnalyticsController extends Controller
                     ->count(),
 
                 'pending_reports' => TutorReport::where('status', 'approved-by-manager')->count(),
-                'pending_assessments' => TutorAssessment::whereIn('status', ['submitted', 'approved-by-manager'])->count(),
+                'pending_assessments' => TutorAssessment::whereIn('status', ['submitted', 'pending_review', 'approved-by-manager'])->count(),
 
                 'activity_today' => DirectorActivityLog::whereDate('created_at', today())->count(),
             ];

@@ -9,11 +9,16 @@
         <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
             <div class="max-w-7xl mx-auto px-4">
                 <div class="flex gap-1 overflow-x-auto">
-                    <button @click="view = 'management'" 
+                    <button @click="view = 'management'"
                             :class="view === 'management' ? 'text-sky-600 border-b-3 border-sky-500' : 'text-gray-500 hover:text-sky-600'"
                             class="relative px-5 py-4 font-medium transition-all whitespace-nowrap">
                         Management
                         <span x-show="stats.pending > 0" class="ml-2 px-2 py-0.5 text-xs bg-amber-500 text-white rounded-full" x-text="stats.pending"></span>
+                    </button>
+                    <button @click="view = 'reports'"
+                            :class="view === 'reports' ? 'text-sky-600 border-b-3 border-sky-500' : 'text-gray-500 hover:text-sky-600'"
+                            class="relative px-5 py-4 font-medium transition-all whitespace-nowrap">
+                        Reports
                     </button>
                     <button @click="view = 'analytics'"
                             :class="view === 'analytics' ? 'text-sky-600 border-b-3 border-sky-500' : 'text-gray-500 hover:text-sky-600'"
@@ -94,9 +99,7 @@
 
                 {{-- Pending Assessments --}}
                 <div x-show="managementTab === 'pending'" class="space-y-4">
-                    @forelse($assessments->filter(function ($a) {
-                        return $a->status === 'approved-by-manager';
-                    }) as $assessment)
+                    @forelse($assessments->filter(fn($a) => in_array($a->status, ['approved-by-manager', 'pending_review'])) as $assessment)
                         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5 border-l-4 border-amber-400">
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                 {{-- Left: Assessment Info --}}
@@ -276,6 +279,168 @@
                 </div>
             </div>
 
+            {{-- Reports Tab --}}
+            <div x-show="view === 'reports'" x-transition class="w-full max-w-7xl mx-auto p-4 sm:p-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">Tutor Performance Reports</h2>
+                    <p class="text-gray-500 dark:text-gray-400 mt-1">Generate and view performance report cards for tutors</p>
+                </div>
+
+                {{-- Filters & Export --}}
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5 mb-6">
+                    <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+                        <h3 class="font-semibold text-gray-800 dark:text-white">Filters & Export</h3>
+                        <button @click="exportReportsCSV()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-all text-sm font-medium">
+                            Export to CSV
+                        </button>
+                    </div>
+
+                    {{-- Time Period Buttons --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Time Period</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button @click="reportPeriod = '7days'" :class="reportPeriod === '7days' ? 'bg-sky-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'" class="px-4 py-2 rounded-lg text-sm font-medium transition-all">Last 7 Days</button>
+                            <button @click="reportPeriod = '30days'" :class="reportPeriod === '30days' ? 'bg-sky-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'" class="px-4 py-2 rounded-lg text-sm font-medium transition-all">Last 30 Days</button>
+                            <button @click="reportPeriod = '3months'" :class="reportPeriod === '3months' ? 'bg-sky-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'" class="px-4 py-2 rounded-lg text-sm font-medium transition-all">Last 3 Months</button>
+                            <button @click="reportPeriod = 'all'" :class="reportPeriod === 'all' ? 'bg-sky-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'" class="px-4 py-2 rounded-lg text-sm font-medium transition-all">All Time</button>
+                        </div>
+                    </div>
+
+                    {{-- Filter Dropdowns --}}
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Year</label>
+                            <select x-model="reportYear" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
+                                <option value="{{ date('Y') }}">{{ date('Y') }}</option>
+                                <option value="{{ date('Y') - 1 }}">{{ date('Y') - 1 }}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Week</label>
+                            <select x-model="reportWeek" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
+                                <option value="">All Weeks</option>
+                                @for($w = 1; $w <= 52; $w++)
+                                    <option value="{{ $w }}">Week {{ $w }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Tutor</label>
+                            <select x-model="reportTutor" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
+                                <option value="">All Tutors</option>
+                                @foreach($tutors as $tutor)
+                                    <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Student</label>
+                            <select x-model="reportStudent" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
+                                <option value="">All Students</option>
+                                @foreach($students ?? [] as $student)
+                                    <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Generate Report Card --}}
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5 mb-6">
+                    <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Generate Tutor Report Card</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Select Tutor</label>
+                            <select x-model="generateTutor" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
+                                <option value="">Select Tutor</option>
+                                @foreach($tutors as $tutor)
+                                    <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Student (Optional)</label>
+                            <select x-model="generateStudent" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
+                                <option value="">All Students</option>
+                                @foreach($students ?? [] as $student)
+                                    <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">From Date</label>
+                            <input type="date" x-model="generateFromDate" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">To Date</label>
+                            <input type="date" x-model="generateToDate" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
+                        </div>
+                        <button @click="generatePDF()" class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition-all font-medium">
+                            Generate PDF
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Assessment History --}}
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5">
+                    <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Assessment History - Finalized Weekly Reports</h3>
+
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        Showing {{ $assessments->where('status', 'approved-by-director')->count() }} of {{ $stats['completed'] ?? 0 }} weekly assessments
+                    </div>
+
+                    <div class="space-y-3">
+                        @forelse($assessments->filter(fn($a) => $a->status === 'approved-by-director')->take(10) as $assessment)
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-sky-500 to-sky-600 flex items-center justify-center text-white font-bold text-lg">
+                                        {{ strtoupper(substr($assessment->tutor->first_name ?? 'U', 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-800 dark:text-white">
+                                            {{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}
+                                        </div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $assessment->assessment_month }}
+                                            @if($assessment->student)
+                                                - {{ $assessment->student->first_name }} {{ $assessment->student->last_name }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    @if($assessment->performance_score)
+                                        <div class="text-right">
+                                            <div class="text-xl font-bold {{ $assessment->performance_score >= 70 ? 'text-emerald-600' : ($assessment->performance_score >= 50 ? 'text-amber-600' : 'text-red-600') }}">
+                                                {{ $assessment->performance_score }}%
+                                            </div>
+                                            <div class="text-xs text-gray-500">Score</div>
+                                        </div>
+                                    @endif
+                                    <div class="flex gap-2">
+                                        <a href="{{ route('director.assessments.show', $assessment) }}" class="p-2 bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 rounded-lg hover:bg-sky-200 dark:hover:bg-sky-900/50 transition-all">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </a>
+                                        <button @click="generateReportCard({{ $assessment->id }})" class="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-all">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                No finalized assessments match your filters
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
             {{-- Analytics Tab --}}
             <div x-show="view === 'analytics'" x-transition class="w-full max-w-7xl mx-auto p-4 sm:p-6">
                 <h2 class="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Analytics & Insights</h2>
@@ -433,14 +598,25 @@
                 filterTutor: '',
                 filterMonth: '',
 
+                // Reports tab
+                reportPeriod: 'all',
+                reportYear: '{{ date("Y") }}',
+                reportWeek: '',
+                reportTutor: '',
+                reportStudent: '',
+                generateTutor: '',
+                generateStudent: '',
+                generateFromDate: '',
+                generateToDate: '',
+
                 toast: {
                     show: false,
                     message: '',
                     type: 'success'
                 },
-                
+
                 charts: {},
-                
+
                 init() {
                     this.$watch('view', (value) => {
                         if (value === 'analytics') {
@@ -471,6 +647,24 @@
                 
                 generateReportCard(assessmentId) {
                     window.open(`{{ url('director/assessments') }}/${assessmentId}/print`, '_blank');
+                },
+
+                exportReportsCSV() {
+                    window.location.href = '{{ route("director.assessments.export") }}';
+                    this.showToast('CSV export started');
+                },
+
+                generatePDF() {
+                    if (!this.generateTutor) {
+                        this.showToast('Please select a tutor', 'error');
+                        return;
+                    }
+                    let url = `{{ url('director/assessments') }}?tutor=${this.generateTutor}&format=pdf`;
+                    if (this.generateStudent) url += `&student=${this.generateStudent}`;
+                    if (this.generateFromDate) url += `&from=${this.generateFromDate}`;
+                    if (this.generateToDate) url += `&to=${this.generateToDate}`;
+                    window.open(url, '_blank');
+                    this.showToast('Generating PDF...');
                 },
 
                 initCharts() {
