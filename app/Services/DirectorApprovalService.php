@@ -130,9 +130,8 @@ class DirectorApprovalService
                     }
                 }
 
-                // Send email to tutor with PDF attachment
-                // (Tutor notification already created via TutorNotification::create above)
-                Mail::to($report->tutor->email)->send(new DirectorFinalApprovalMail($report));
+                // Tutor notification is handled via TutorNotification::create above (in-app only)
+                // Email notifications to tutors are disabled - using in-app notifications only
 
                 // Manager notifications already created via ManagerNotification::create above
                 // No need for additional Laravel notifications
@@ -297,14 +296,33 @@ class DirectorApprovalService
 
             // Get parent user (if exists and has email)
             if ($student->parent && $student->parent->email) {
-                $student->parent->notify(new ParentReportAvailableNotification($report));
-                Mail::to($student->parent->email)->send(new ParentReportReadyMail($report));
+                // Send in-app notification
+                try {
+                    $student->parent->notify(new ParentReportAvailableNotification($report));
+                } catch (\Exception $e) {
+                    Log::warning('Failed to send parent in-app notification', [
+                        'report_id' => $report->id,
+                        'parent_id' => $student->parent->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
 
-                Log::info('Notified parent via user account', [
-                    'report_id' => $report->id,
-                    'parent_id' => $student->parent->id,
-                    'parent_email' => $student->parent->email,
-                ]);
+                // Send email notification (graceful failure)
+                try {
+                    Mail::to($student->parent->email)->send(new ParentReportReadyMail($report));
+                    Log::info('Notified parent via email', [
+                        'report_id' => $report->id,
+                        'parent_id' => $student->parent->id,
+                        'parent_email' => $student->parent->email,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to send parent email notification - email may not exist or be invalid', [
+                        'report_id' => $report->id,
+                        'parent_email' => $student->parent->email,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Don't throw - continue with other notifications
+                }
             }
 
             // Also send to direct email addresses if available (father/mother)
@@ -324,14 +342,22 @@ class DirectorApprovalService
                 $parentEmails = array_filter($parentEmails, fn($email) => $email !== $student->parent->email);
             }
 
-            // Send to additional parent emails
+            // Send to additional parent emails (graceful failure for each)
             foreach ($parentEmails as $email) {
-                Mail::to($email)->send(new ParentReportReadyMail($report));
-
-                Log::info('Sent parent report email', [
-                    'report_id' => $report->id,
-                    'parent_email' => $email,
-                ]);
+                try {
+                    Mail::to($email)->send(new ParentReportReadyMail($report));
+                    Log::info('Sent parent report email', [
+                        'report_id' => $report->id,
+                        'parent_email' => $email,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to send parent email - email may not exist or be invalid', [
+                        'report_id' => $report->id,
+                        'parent_email' => $email,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Continue with other emails
+                }
             }
 
         } catch (\Exception $e) {

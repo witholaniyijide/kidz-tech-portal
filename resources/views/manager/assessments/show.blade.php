@@ -1,11 +1,5 @@
-<x-app-layout>
-    <x-slot name="header">
-        {{ __('Tutor Assessment Review') }}
-    </x-slot>
-
-    <x-slot name="title">Assessment Review</x-slot>
-
-    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 relative overflow-hidden">
+<x-manager-layout title="Assessment Review">
+    <div class="min-h-screen py-6 relative overflow-hidden">
         <div class="absolute top-0 left-0 w-72 h-72 bg-indigo-400 dark:bg-indigo-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
         <div class="absolute top-0 right-0 w-72 h-72 bg-purple-400 dark:bg-purple-900 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
@@ -212,43 +206,67 @@
                     @endif
                 </div>
 
-                {{-- Sidebar - Director Actions --}}
+                {{-- Sidebar - Assessment Info and Actions --}}
                 <div class="space-y-6">
-                    @if($assessment->canDirectorApprove())
-                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Director Approval</h3>
-
-                        <form action="{{ route('director.assessments.approve', $assessment) }}" method="POST" class="mb-4">
-                            @csrf
-                            <div class="mb-4">
-                                <label for="director_comment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Director Comment (Optional)
-                                </label>
-                                <textarea
-                                    id="director_comment"
-                                    name="director_comment"
-                                    rows="4"
-                                    maxlength="2000"
-                                    placeholder="Add approval notes..."
-                                    class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4F46E5] resize-none"></textarea>
-                            </div>
-                            <button
-                                type="submit"
-                                onclick="return confirm('Approve this assessment? This will notify the tutor and manager.')"
-                                class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all font-bold flex items-center justify-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Approve Assessment
-                            </button>
-                        </form>
-                    </div>
-                    @else
+                    {{-- Assessment Status --}}
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Assessment Status</h3>
-                        <p class="text-gray-700 dark:text-gray-300">
-                            This assessment has been processed. Current status: <strong>{{ ucfirst(str_replace('-', ' ', $assessment->status)) }}</strong>
-                        </p>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600 dark:text-gray-400">Status:</span>
+                                <x-ui.status-badge :status="$assessment->status" />
+                            </div>
+                            @if($assessment->approved_by_manager_at)
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-600 dark:text-gray-400">Completed by Manager:</span>
+                                <span class="text-gray-800 dark:text-white">{{ $assessment->approved_by_manager_at->format('M d, Y') }}</span>
+                            </div>
+                            @endif
+                            @if($assessment->approved_by_director_at)
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-600 dark:text-gray-400">Approved by Director:</span>
+                                <span class="text-gray-800 dark:text-white">{{ $assessment->approved_by_director_at->format('M d, Y') }}</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Director Comment (if present) --}}
+                    @if($assessment->director_comment)
+                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            Director's Comment
+                        </h3>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $assessment->director_comment }}</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Manager Actions (for draft assessments) --}}
+                    @if(in_array($assessment->status, ['draft', 'submitted']))
+                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Actions</h3>
+                        <div class="space-y-3">
+                            <a href="{{ route('manager.assessments.edit', $assessment) }}" class="w-full px-4 py-2.5 bg-gradient-to-r from-[#C15F3C] to-[#DA7756] text-white rounded-xl hover:shadow-lg transition-all font-medium flex items-center justify-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Edit Assessment
+                            </a>
+                            <form action="{{ route('manager.assessments.mark-complete', $assessment) }}" method="POST">
+                                @csrf
+                                <button type="submit" onclick="return confirm('Mark this assessment as complete? It will be sent for director review.')" class="w-full px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all font-medium flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Mark Complete
+                                </button>
+                            </form>
+                        </div>
                     </div>
                     @endif
                 </div>
@@ -256,7 +274,6 @@
         </div>
     </div>
 
-    @push('styles')
     <style>
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
@@ -264,5 +281,4 @@
         }
         .animate-float { animation: float 6s ease-in-out infinite; }
     </style>
-    @endpush
-</x-app-layout>
+</x-manager-layout>
