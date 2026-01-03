@@ -114,7 +114,7 @@
                                         </svg>
                                         @php
                                             try {
-                                                $unreadCount = Auth::user()->unreadNotifications->count();
+                                                $unreadCount = \App\Models\AdminNotification::where('user_id', auth()->id())->where('is_read', false)->count();
                                             } catch (\Exception $e) {
                                                 $unreadCount = 0;
                                             }
@@ -129,21 +129,48 @@
 
                                 <x-slot name="content">
                                     <div class="w-80 md:w-96 max-h-[70vh] md:max-h-[32rem] overflow-y-auto">
-                                        <div class="px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 sticky top-0">
-                                            Notifications
+                                        <div class="px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 sticky top-0 flex items-center justify-between">
+                                            <span>Notifications</span>
+                                            @if($unreadCount > 0)
+                                                <a href="{{ route('admin.notifications.mark-all-read') }}"
+                                                   onclick="event.preventDefault(); document.getElementById('admin-mark-all-read-form').submit();"
+                                                   class="text-xs text-purple-600 dark:text-purple-400 hover:underline">
+                                                    Mark all as read
+                                                </a>
+                                                <form id="admin-mark-all-read-form" action="{{ route('admin.notifications.mark-all-read') }}" method="POST" class="hidden">
+                                                    @csrf
+                                                </form>
+                                            @endif
                                         </div>
                                         @php
                                             try {
-                                                $notifications = Auth::user()->unreadNotifications->take(10);
+                                                $notifications = \App\Models\AdminNotification::where('user_id', auth()->id())
+                                                    ->where('is_read', false)
+                                                    ->orderBy('created_at', 'desc')
+                                                    ->take(10)
+                                                    ->get();
                                             } catch (\Exception $e) {
                                                 $notifications = collect();
                                             }
                                         @endphp
                                         @forelse($notifications as $notification)
-                                            <a href="#" class="block px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition">
-                                                <div class="font-semibold mb-1">{{ $notification->data['title'] ?? 'Notification' }}</div>
-                                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $notification->created_at->diffForHumans() }}</div>
-                                            </a>
+                                            <div class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition">
+                                                <div class="flex items-start justify-between gap-2">
+                                                    <a href="{{ $notification->meta['link'] ?? '#' }}" class="flex-1">
+                                                        <div class="font-semibold mb-1">{{ $notification->title }}</div>
+                                                        <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{{ Str::limit($notification->body, 60) }}</div>
+                                                        <div class="text-xs text-gray-500 dark:text-gray-500">{{ $notification->created_at->diffForHumans() }}</div>
+                                                    </a>
+                                                    <form action="{{ route('admin.notifications.mark-read', $notification->id) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="p-1 text-gray-400 hover:text-green-600 dark:hover:text-green-400" title="Mark as read">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
                                         @empty
                                             <div class="px-6 py-12 text-sm text-gray-500 dark:text-gray-400 text-center">
                                                 <svg class="w-16 h-16 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,6 +179,13 @@
                                                 <div class="font-medium">No new notifications</div>
                                             </div>
                                         @endforelse
+                                        @if($notifications->count() > 0)
+                                            <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-t dark:border-gray-600 text-center">
+                                                <a href="{{ route('admin.notifications.index') }}" class="text-sm text-purple-600 dark:text-purple-400 hover:underline font-medium">
+                                                    View all notifications
+                                                </a>
+                                            </div>
+                                        @endif
                                     </div>
                                 </x-slot>
                             </x-dropdown>
