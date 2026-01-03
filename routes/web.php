@@ -138,6 +138,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::put('/settings/password', [App\Http\Controllers\Admin\AdminSettingsController::class, 'updatePassword'])->name('settings.password');
     Route::put('/settings/notifications', [App\Http\Controllers\Admin\AdminSettingsController::class, 'updateNotifications'])->name('settings.notifications');
     Route::put('/settings/avatar', [App\Http\Controllers\Admin\AdminSettingsController::class, 'updateAvatar'])->name('settings.avatar');
+
+    // Admin Notifications
+    Route::get('/notifications', [App\Http\Controllers\Admin\AdminNotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/mark-read', [App\Http\Controllers\Admin\AdminNotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [App\Http\Controllers\Admin\AdminNotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{notification}', [App\Http\Controllers\Admin\AdminNotificationController::class, 'destroy'])->name('notifications.destroy');
 });
 
 // Legacy admin route redirect
@@ -457,6 +463,16 @@ Route::prefix('manager')
             ->name('settings.updatePassword');
         Route::put('/settings/notifications', [App\Http\Controllers\Manager\ManagerSettingsController::class, 'updateNotifications'])
             ->name('settings.updateNotifications');
+
+        // Manager Notifications
+        Route::get('/notifications', [App\Http\Controllers\Manager\ManagerNotificationController::class, 'index'])
+            ->name('notifications.index');
+        Route::post('/notifications/{notification}/mark-read', [App\Http\Controllers\Manager\ManagerNotificationController::class, 'markAsRead'])
+            ->name('notifications.mark-read');
+        Route::post('/notifications/mark-all-read', [App\Http\Controllers\Manager\ManagerNotificationController::class, 'markAllRead'])
+            ->name('notifications.mark-all-read');
+        Route::delete('/notifications/{notification}', [App\Http\Controllers\Manager\ManagerNotificationController::class, 'destroy'])
+            ->name('notifications.destroy');
     });
 
 // Director Portal Routes
@@ -606,6 +622,16 @@ Route::prefix('director')
             ->name('messages.destroy');
         Route::post('/messages/{message}/read', [App\Http\Controllers\Director\DirectorMessageController::class, 'markAsRead'])
             ->name('messages.read');
+
+        // Director Notifications
+        Route::get('/notifications', [App\Http\Controllers\Director\DirectorNotificationController::class, 'index'])
+            ->name('notifications.index');
+        Route::post('/notifications/{notification}/mark-read', [App\Http\Controllers\Director\DirectorNotificationController::class, 'markAsRead'])
+            ->name('notifications.mark-read');
+        Route::post('/notifications/mark-all-read', [App\Http\Controllers\Director\DirectorNotificationController::class, 'markAllRead'])
+            ->name('notifications.mark-all-read');
+        Route::delete('/notifications/{notification}', [App\Http\Controllers\Director\DirectorNotificationController::class, 'destroy'])
+            ->name('notifications.destroy');
     });
 
 // Tutor Portal Routes
