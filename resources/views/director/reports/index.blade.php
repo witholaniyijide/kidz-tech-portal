@@ -18,10 +18,10 @@
             <div class="mb-8 flex justify-between items-start flex-wrap gap-4">
                 <div>
                     <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                        Manager Approved Reports — Awaiting Director Review
+                        Reports Management
                     </h1>
                     <p class="text-gray-600 dark:text-gray-400">
-                        Final review and approval of tutor reports approved by managers
+                        Review, approve, and manage tutor reports
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
@@ -30,6 +30,42 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Activity Logs
+                    </a>
+                </div>
+            </div>
+
+            {{-- Status Tabs --}}
+            <div class="mb-6">
+                <div class="flex gap-2">
+                    <a href="{{ route('director.reports.index', array_merge(request()->except('status', 'page'), ['status' => 'pending'])) }}"
+                       class="px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2
+                           {{ $statusFilter === 'pending'
+                               ? 'bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white shadow-lg'
+                               : 'bg-white/30 dark:bg-gray-800/30 text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Pending Approval
+                        @if($pendingCount > 0)
+                            <span class="px-2 py-0.5 text-xs rounded-full {{ $statusFilter === 'pending' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' }}">
+                                {{ $pendingCount }}
+                            </span>
+                        @endif
+                    </a>
+                    <a href="{{ route('director.reports.index', array_merge(request()->except('status', 'page'), ['status' => 'approved'])) }}"
+                       class="px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2
+                           {{ $statusFilter === 'approved'
+                               ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg'
+                               : 'bg-white/30 dark:bg-gray-800/30 text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Approved Reports
+                        @if($approvedCount > 0)
+                            <span class="px-2 py-0.5 text-xs rounded-full {{ $statusFilter === 'approved' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' }}">
+                                {{ $approvedCount }}
+                            </span>
+                        @endif
                     </a>
                 </div>
             </div>
@@ -126,8 +162,13 @@
                     <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Reports Pending Director Approval</h3>
-                    <p class="text-gray-600 dark:text-gray-400">There are currently no manager-approved reports awaiting your final approval</p>
+                    @if($statusFilter === 'approved')
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Approved Reports</h3>
+                        <p class="text-gray-600 dark:text-gray-400">There are no reports that have been approved by the Director yet</p>
+                    @else
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Reports Pending Director Approval</h3>
+                        <p class="text-gray-600 dark:text-gray-400">There are currently no manager-approved reports awaiting your final approval</p>
+                    @endif
                 </div>
             @else
                 <div class="bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border border-white/10 rounded-2xl shadow-lg overflow-hidden">
@@ -138,8 +179,13 @@
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Student</th>
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Tutor</th>
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Month</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Manager Comment</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Approved by Manager</th>
+                                    @if($statusFilter === 'approved')
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Director Comment</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Approved by Director</th>
+                                    @else
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Manager Comment</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Approved by Manager</th>
+                                    @endif
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
@@ -165,26 +211,42 @@
                                         <td class="px-6 py-4">
                                             <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $report->month }}</div>
                                         </td>
+                                        @if($statusFilter === 'approved')
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                                    {{ $report->director_comment ? \Illuminate\Support\Str::limit($report->director_comment, 80) : 'No comment' }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm text-gray-900 dark:text-white">
+                                                    {{ $report->approved_by_director_at ? $report->approved_by_director_at->format('M d, Y') : 'N/A' }}
+                                                </div>
+                                                <div class="text-xs text-gray-600 dark:text-gray-400">
+                                                    {{ $report->approved_by_director_at ? $report->approved_by_director_at->format('g:i A') : '' }}
+                                                </div>
+                                            </td>
+                                        @else
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                                    {{ $report->manager_comment ? \Illuminate\Support\Str::limit($report->manager_comment, 80) : 'No comment' }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm text-gray-900 dark:text-white">
+                                                    {{ $report->approved_by_manager_at ? $report->approved_by_manager_at->format('M d, Y') : 'N/A' }}
+                                                </div>
+                                                <div class="text-xs text-gray-600 dark:text-gray-400">
+                                                    {{ $report->approved_by_manager_at ? $report->approved_by_manager_at->format('g:i A') : '' }}
+                                                </div>
+                                            </td>
+                                        @endif
                                         <td class="px-6 py-4">
-                                            <div class="text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
-                                                {{ $report->manager_comment ? \Illuminate\Support\Str::limit($report->manager_comment, 80) : 'No comment' }}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="text-sm text-gray-900 dark:text-white">
-                                                {{ $report->approved_by_manager_at ? $report->approved_by_manager_at->format('M d, Y') : 'N/A' }}
-                                            </div>
-                                            <div class="text-xs text-gray-600 dark:text-gray-400">
-                                                {{ $report->approved_by_manager_at ? $report->approved_by_manager_at->format('g:i A') : '' }}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <a href="{{ route('director.reports.show', $report) }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all font-medium text-sm">
+                                            <a href="{{ route('director.reports.show', $report) }}" class="inline-flex items-center px-4 py-2 {{ $statusFilter === 'approved' ? 'bg-gradient-to-r from-emerald-500 to-green-500' : 'bg-gradient-to-r from-[#4F46E5] to-[#818CF8]' }} text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all font-medium text-sm">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
-                                                Review & Approve
+                                                {{ $statusFilter === 'approved' ? 'View Report' : 'Review & Approve' }}
                                             </a>
                                         </td>
                                     </tr>
@@ -196,7 +258,7 @@
 
                 {{-- Pagination --}}
                 <div class="mt-6">
-                    {{ $reports->links() }}
+                    {{ $reports->appends(request()->query())->links() }}
                 </div>
             @endif
 

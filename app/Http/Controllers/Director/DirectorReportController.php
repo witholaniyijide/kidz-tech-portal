@@ -40,9 +40,20 @@ class DirectorReportController extends Controller
         // Authorize
         $this->authorize('viewAny', TutorReport::class);
 
-        $query = TutorReport::with(['student', 'tutor'])
-            ->where('status', 'approved-by-manager')
-            ->orderBy('approved_by_manager_at', 'desc');
+        // Determine which status to filter by
+        $statusFilter = $request->get('status', 'pending');
+
+        $query = TutorReport::with(['student', 'tutor']);
+
+        if ($statusFilter === 'approved') {
+            // Show approved reports
+            $query->where('status', 'approved-by-director')
+                ->orderBy('approved_by_director_at', 'desc');
+        } else {
+            // Show pending reports (default)
+            $query->where('status', 'approved-by-manager')
+                ->orderBy('approved_by_manager_at', 'desc');
+        }
 
         // Filter by tutor
         if ($request->filled('tutor_id')) {
@@ -60,6 +71,10 @@ class DirectorReportController extends Controller
         }
 
         $reports = $query->paginate(15);
+
+        // Get counts for tabs
+        $pendingCount = TutorReport::where('status', 'approved-by-manager')->count();
+        $approvedCount = TutorReport::where('status', 'approved-by-director')->count();
 
         // Get unique months from reports for filter
         $months = TutorReport::select('month')
@@ -81,7 +96,10 @@ class DirectorReportController extends Controller
             'reports',
             'months',
             'tutors',
-            'students'
+            'students',
+            'statusFilter',
+            'pendingCount',
+            'approvedCount'
         ));
     }
 
