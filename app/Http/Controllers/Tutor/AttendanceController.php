@@ -7,6 +7,9 @@ use App\Http\Requests\Tutor\StoreAttendanceRequest;
 use App\Models\AttendanceRecord;
 use App\Models\Student;
 use App\Models\Tutor;
+use App\Models\User;
+use App\Models\ManagerNotification;
+use App\Models\AdminNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -221,6 +224,49 @@ class AttendanceController extends Controller
             'reschedule_reason' => $isRescheduled ? $request->reschedule_reason : null,
             'reschedule_notes' => $isRescheduled ? $request->reschedule_notes : null,
         ]);
+
+        // Notify managers about the submitted attendance
+        $managers = User::whereHas('roles', function ($query) {
+            $query->where('name', 'manager');
+        })->get();
+
+        $notificationTitle = $isActuallyStandIn ? 'Stand-in Attendance Submitted' : 'Attendance Submitted';
+        $notificationBody = "{$tutor->first_name} {$tutor->last_name} submitted attendance for {$student->first_name} {$student->last_name} on {$classDate->format('M j, Y')}.";
+
+        foreach ($managers as $manager) {
+            ManagerNotification::create([
+                'user_id' => $manager->id,
+                'title' => $notificationTitle,
+                'body' => $notificationBody,
+                'type' => 'attendance',
+                'is_read' => false,
+                'meta' => [
+                    'attendance_id' => $attendance->id,
+                    'action' => 'submitted',
+                    'is_stand_in' => $isActuallyStandIn,
+                ],
+            ]);
+        }
+
+        // Notify admins about the submitted attendance
+        $admins = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin');
+        })->get();
+
+        foreach ($admins as $admin) {
+            AdminNotification::create([
+                'user_id' => $admin->id,
+                'title' => $notificationTitle,
+                'body' => $notificationBody,
+                'type' => 'attendance',
+                'is_read' => false,
+                'meta' => [
+                    'attendance_id' => $attendance->id,
+                    'action' => 'submitted',
+                    'is_stand_in' => $isActuallyStandIn,
+                ],
+            ]);
+        }
 
         $message = $isActuallyStandIn 
             ? 'Stand-in attendance submitted successfully! Awaiting manager approval.'
