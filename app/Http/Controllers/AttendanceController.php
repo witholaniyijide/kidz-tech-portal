@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\AttendanceRecord;
 use App\Models\Student;
+use App\Models\User;
+use App\Models\TutorNotification;
+use App\Models\AdminNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -98,6 +101,40 @@ class AttendanceController extends Controller
             $attendance->student->increment('completed_periods');
         }
 
+        // Notify the tutor that their attendance was approved
+        if ($attendance->tutor_id) {
+            TutorNotification::create([
+                'tutor_id' => $attendance->tutor_id,
+                'title' => 'Attendance Approved',
+                'body' => "Your attendance for {$attendance->student->first_name} {$attendance->student->last_name} on {$attendance->class_date->format('M j, Y')} has been approved.",
+                'type' => 'system',
+                'is_read' => false,
+                'meta' => [
+                    'attendance_id' => $attendance->id,
+                    'action' => 'approved',
+                ],
+            ]);
+        }
+
+        // Notify admins about the approved attendance
+        $admins = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin');
+        })->get();
+
+        foreach ($admins as $admin) {
+            AdminNotification::create([
+                'user_id' => $admin->id,
+                'title' => 'Attendance Approved',
+                'body' => "Attendance for {$attendance->student->first_name} {$attendance->student->last_name} on {$attendance->class_date->format('M j, Y')} has been approved.",
+                'type' => 'attendance',
+                'is_read' => false,
+                'meta' => [
+                    'attendance_id' => $attendance->id,
+                    'action' => 'approved',
+                ],
+            ]);
+        }
+
         return back()->with('success', 'Attendance approved successfully!');
     }
 
@@ -108,6 +145,21 @@ class AttendanceController extends Controller
             'approved_by' => Auth::id(),
             'approved_at' => now(),
         ]);
+
+        // Notify the tutor that their attendance was rejected
+        if ($attendance->tutor_id) {
+            TutorNotification::create([
+                'tutor_id' => $attendance->tutor_id,
+                'title' => 'Attendance Rejected',
+                'body' => "Your attendance for {$attendance->student->first_name} {$attendance->student->last_name} on {$attendance->class_date->format('M j, Y')} has been rejected. Please review and resubmit if necessary.",
+                'type' => 'alert',
+                'is_read' => false,
+                'meta' => [
+                    'attendance_id' => $attendance->id,
+                    'action' => 'rejected',
+                ],
+            ]);
+        }
 
         return back()->with('success', 'Attendance rejected!');
     }

@@ -65,6 +65,11 @@ class DirectorReportController extends Controller
             $query->where('month', $request->month);
         }
 
+        // Filter by year
+        if ($request->filled('year')) {
+            $query->where('year', $request->year);
+        }
+
         // Filter by student
         if ($request->filled('student_id')) {
             $query->where('student_id', $request->student_id);
@@ -82,6 +87,12 @@ class DirectorReportController extends Controller
             ->orderBy('month', 'desc')
             ->pluck('month');
 
+        // Get unique years from reports for filter
+        $years = TutorReport::select('year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
+
         // Get all tutors for filter
         $tutors = Tutor::where('status', 'active')
             ->orderBy('first_name')
@@ -95,6 +106,7 @@ class DirectorReportController extends Controller
         return view('director.reports.index', compact(
             'reports',
             'months',
+            'years',
             'tutors',
             'students',
             'statusFilter',
@@ -115,6 +127,68 @@ class DirectorReportController extends Controller
         $report->load(['student', 'tutor', 'comments.user', 'audits.user']);
 
         return view('director.reports.show', compact('report'));
+    }
+
+    /**
+     * Show form to edit the report before approval.
+     */
+    public function edit(TutorReport $report)
+    {
+        // Authorize
+        $this->authorize('view', $report);
+
+        // Only allow editing of reports pending director approval
+        if ($report->status !== 'approved-by-manager') {
+            return redirect()
+                ->route('director.reports.show', $report)
+                ->with('error', 'Only reports pending director approval can be edited.');
+        }
+
+        // Load relationships
+        $report->load(['student', 'tutor']);
+
+        return view('director.reports.edit', compact('report'));
+    }
+
+    /**
+     * Update the report before approval.
+     */
+    public function update(Request $request, TutorReport $report)
+    {
+        // Authorize
+        $this->authorize('view', $report);
+
+        // Only allow editing of reports pending director approval
+        if ($report->status !== 'approved-by-manager') {
+            return redirect()
+                ->route('director.reports.show', $report)
+                ->with('error', 'Only reports pending director approval can be edited.');
+        }
+
+        // Validate the request
+        $validated = $request->validate([
+            'areas_for_improvement' => 'nullable|string|max:5000',
+            'goals_next_month' => 'nullable|string|max:5000',
+            'assignments' => 'nullable|string|max:5000',
+            'comments_observation' => 'nullable|string|max:5000',
+            'attendance_score' => 'nullable|integer|min:0|max:100',
+            'performance_rating' => 'nullable|string|in:excellent,good,satisfactory,needs-improvement',
+        ]);
+
+        // Update the report
+        $report->update($validated);
+
+        // Log the action
+        $this->approvalService->logDirectorAction(
+            Auth::user(),
+            'edited_report',
+            TutorReport::class,
+            $report->id
+        );
+
+        return redirect()
+            ->route('director.reports.show', $report)
+            ->with('success', 'Report has been updated successfully. You can now approve it.');
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\DirectorActivityLog;
 use App\Models\TutorNotification;
 use App\Models\ManagerNotification;
+use App\Models\AdminNotification;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -106,28 +107,24 @@ class DirectorApprovalService
                     ]);
                 }
 
-                // Notify admins via email
+                // Notify admins via in-app notification
                 $admins = User::whereHas('roles', function ($query) {
                     $query->where('name', 'admin');
                 })->get();
 
                 foreach ($admins as $admin) {
-                    try {
-                        Mail::send('emails.notification', [
-                            'subject' => 'Report Approved by Director',
-                            'body' => "The report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been approved by the director.",
-                            'type' => 'report_approved',
-                            'meta' => ['report_id' => $report->id],
-                        ], function ($message) use ($admin) {
-                            $message->to($admin->email)
-                                ->subject('Report Approved by Director');
-                        });
-                    } catch (\Exception $e) {
-                        Log::error('Failed to send admin notification email', [
-                            'admin_id' => $admin->id,
-                            'error' => $e->getMessage(),
-                        ]);
-                    }
+                    AdminNotification::create([
+                        'user_id' => $admin->id,
+                        'title' => 'Report Approved by Director',
+                        'body' => "The report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been approved by the director.",
+                        'type' => 'report',
+                        'is_read' => false,
+                        'meta' => [
+                            'report_id' => $report->id,
+                            'action' => 'approved',
+                            'link' => route('admin.reports.show', $report->id),
+                        ],
+                    ]);
                 }
 
                 // Tutor notification is handled via TutorNotification::create above (in-app only)
@@ -239,7 +236,27 @@ class DirectorApprovalService
                     ]);
                 }
 
-                // Note: We're using custom notification models (TutorNotification, ManagerNotification)
+                // Notify admins via in-app notification
+                $admins = User::whereHas('roles', function ($query) {
+                    $query->where('name', 'admin');
+                })->get();
+
+                foreach ($admins as $admin) {
+                    AdminNotification::create([
+                        'user_id' => $admin->id,
+                        'title' => 'Assessment Approved by Director',
+                        'body' => "The assessment for tutor {$assessment->tutor->first_name} {$assessment->tutor->last_name} ({$assessment->assessment_month}) has been approved by the director.",
+                        'type' => 'assessment',
+                        'is_read' => false,
+                        'meta' => [
+                            'assessment_id' => $assessment->id,
+                            'action' => 'approved',
+                            'link' => route('admin.assessments.show', $assessment->id),
+                        ],
+                    ]);
+                }
+
+                // Note: We're using custom notification models (TutorNotification, ManagerNotification, AdminNotification)
                 // instead of Laravel's notification system since Tutor model doesn't have Notifiable trait
 
                 Log::info('Director approved tutor assessment', [

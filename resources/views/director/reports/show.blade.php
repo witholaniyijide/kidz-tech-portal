@@ -287,6 +287,24 @@
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl shadow-xl p-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Director Final Approval</h3>
 
+                        {{-- Edit Report Button --}}
+                        <a href="{{ route('director.reports.edit', $report) }}"
+                           class="w-full mb-4 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all font-bold flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Edit Report Before Approval
+                        </a>
+
+                        <div class="relative mb-4">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                            </div>
+                            <div class="relative flex justify-center text-sm">
+                                <span class="px-2 bg-white/30 dark:bg-gray-900/30 text-gray-600 dark:text-gray-400">THEN</span>
+                            </div>
+                        </div>
+
                         {{-- Approve Form --}}
                         <form action="{{ route('director.reports.approve', $report) }}" method="POST" class="mb-4" id="approveForm">
                             @csrf

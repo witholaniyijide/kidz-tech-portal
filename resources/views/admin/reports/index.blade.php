@@ -113,14 +113,14 @@
                                             {{ $report->tutor->first_name ?? 'Unknown' }} {{ $report->tutor->last_name ?? '' }}
                                         </td>
                                         <td class="px-6 py-4">
-                                            <span class="font-medium text-gray-900 dark:text-white">{{ $report->report_month }}</span>
-                                            <span class="text-gray-500 dark:text-gray-400">{{ $report->report_year }}</span>
+                                            <span class="font-medium text-gray-900 dark:text-white">{{ $report->month }}</span>
+                                            <span class="text-gray-500 dark:text-gray-400">{{ $report->year }}</span>
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                             {{ $report->director->name ?? 'Director' }}
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                            {{ $report->director_approved_at?->format('M j, Y') ?? '-' }}
+                                            {{ $report->approved_by_director_at?->format('M j, Y') ?? '-' }}
                                         </td>
                                         <td class="px-6 py-4">
                                             <div class="flex items-center justify-center gap-2">

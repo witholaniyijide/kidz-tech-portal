@@ -40,6 +40,11 @@ class AdminAssessmentController extends Controller
             $query->where('assessment_month', $request->month);
         }
 
+        // Filter by year
+        if ($request->filled('year')) {
+            $query->where('assessment_year', $request->year);
+        }
+
         $assessments = $query->orderBy('created_at', 'desc')->paginate(20);
 
         $tutors = Tutor::where('status', 'active')->orderBy('first_name')->get();
@@ -50,6 +55,12 @@ class AdminAssessmentController extends Controller
             ->orderBy('assessment_month', 'desc')
             ->pluck('assessment_month');
 
+        $years = TutorAssessment::where('status', 'approved-by-director')
+            ->select('assessment_year')
+            ->distinct()
+            ->orderBy('assessment_year', 'desc')
+            ->pluck('assessment_year');
+
         // Statistics
         $stats = [
             'total' => TutorAssessment::where('status', 'approved-by-director')->count(),
@@ -58,7 +69,7 @@ class AdminAssessmentController extends Controller
                 ->avg('performance_score') ?? 0,
         ];
 
-        return view('admin.assessments.index', compact('assessments', 'tutors', 'months', 'stats'));
+        return view('admin.assessments.index', compact('assessments', 'tutors', 'months', 'years', 'stats'));
     }
 
     /**

@@ -2,28 +2,64 @@
     <x-slot name="title">Progress Reports</x-slot>
     <x-slot name="subtitle">View director-approved monthly progress reports</x-slot>
 
-    {{-- Child Filter --}}
-    @if($children->count() > 1)
+    {{-- Filters Section --}}
     <div class="mb-6">
         <div class="glass-card rounded-xl p-4">
-            <div class="flex items-center gap-4 flex-wrap">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by child:</span>
-                <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('parent.reports.index') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ !$selectedChild ? 'bg-gradient-to-r from-sky-500 to-cyan-400 text-white shadow-lg' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
-                        All Children
-                    </a>
-                    @foreach($children as $child)
-                        <a href="{{ route('parent.reports.index', ['child' => $child->id]) }}"
-                           class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ $selectedChild && $selectedChild->id === $child->id ? 'bg-gradient-to-r from-sky-500 to-cyan-400 text-white shadow-lg' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
-                            {{ $child->first_name }}
+            <form method="GET" action="{{ route('parent.reports.index') }}" class="space-y-4">
+                {{-- Child Filter --}}
+                @if($children->count() > 1)
+                <div class="flex items-center gap-4 flex-wrap">
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by child:</span>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ route('parent.reports.index', request()->except('child', 'page')) }}"
+                           class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ !$selectedChild ? 'bg-gradient-to-r from-sky-500 to-cyan-400 text-white shadow-lg' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                            All Children
                         </a>
-                    @endforeach
+                        @foreach($children as $child)
+                            <a href="{{ route('parent.reports.index', array_merge(request()->except('child', 'page'), ['child' => $child->id])) }}"
+                               class="px-4 py-2 rounded-lg text-sm font-medium transition-all {{ $selectedChild && $selectedChild->id === $child->id ? 'bg-gradient-to-r from-sky-500 to-cyan-400 text-white shadow-lg' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                                {{ $child->first_name }}
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
+                @endif
+
+                {{-- Month and Year Filters --}}
+                <div class="flex items-end gap-4 flex-wrap {{ $children->count() > 1 ? 'pt-3 border-t border-gray-200 dark:border-gray-700' : '' }}">
+                    @if($selectedChild)
+                        <input type="hidden" name="child" value="{{ $selectedChild->id }}">
+                    @endif
+                    <div class="w-40">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Month</label>
+                        <select name="month" class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500">
+                            <option value="">All Months</option>
+                            @foreach($months ?? [] as $month)
+                                <option value="{{ $month }}" {{ request('month') === $month ? 'selected' : '' }}>{{ $month }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="w-32">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
+                        <select name="year" class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-sky-500">
+                            <option value="">All Years</option>
+                            @foreach($years ?? [] as $year)
+                                <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-lg hover:shadow-lg transition-all font-medium">
+                        Filter
+                    </button>
+                    @if(request()->hasAny(['month', 'year']))
+                        <a href="{{ route('parent.reports.index', $selectedChild ? ['child' => $selectedChild->id] : []) }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+            </form>
         </div>
     </div>
-    @endif
 
     {{-- Reports Grid --}}
     @if($reports->isEmpty())

@@ -107,11 +107,17 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/schedules/generate', [App\Http\Controllers\Admin\AdminScheduleController::class, 'generate'])->name('schedules.generate');
     Route::get('/schedules/weekly', [App\Http\Controllers\Admin\AdminScheduleController::class, 'weekly'])->name('schedules.weekly');
     
-    // Reports (Read-only)
+    // Reports (Read-only) - Uses TutorReport model
     Route::get('/reports', [App\Http\Controllers\Admin\AdminReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/{report}', [App\Http\Controllers\Admin\AdminReportController::class, 'show'])->name('reports.show');
-    Route::get('/reports/{report}/pdf', [App\Http\Controllers\Admin\AdminReportController::class, 'pdf'])->name('reports.pdf');
-    Route::get('/reports/{report}/print', [App\Http\Controllers\Admin\AdminReportController::class, 'print'])->name('reports.print');
+    Route::get('/reports/{report}', [App\Http\Controllers\Admin\AdminReportController::class, 'show'])
+        ->name('reports.show')
+        ->where('report', '[0-9]+');
+    Route::get('/reports/{report}/pdf', [App\Http\Controllers\Admin\AdminReportController::class, 'exportPdf'])
+        ->name('reports.pdf')
+        ->where('report', '[0-9]+');
+    Route::get('/reports/{report}/print', [App\Http\Controllers\Admin\AdminReportController::class, 'print'])
+        ->name('reports.print')
+        ->where('report', '[0-9]+');
     
     // Assessments (Read-only)
     Route::get('/assessments', [App\Http\Controllers\Admin\AdminAssessmentController::class, 'index'])->name('assessments.index');
@@ -502,6 +508,10 @@ Route::prefix('director')
             ->name('reports.index');
         Route::get('/reports/{report}', [App\Http\Controllers\Director\DirectorReportController::class, 'show'])
             ->name('reports.show');
+        Route::get('/reports/{report}/edit', [App\Http\Controllers\Director\DirectorReportController::class, 'edit'])
+            ->name('reports.edit');
+        Route::put('/reports/{report}', [App\Http\Controllers\Director\DirectorReportController::class, 'update'])
+            ->name('reports.update');
         Route::post('/reports/{report}/approve', [App\Http\Controllers\Director\DirectorReportController::class, 'approve'])
             ->name('reports.approve');
         Route::post('/reports/{report}/reject', [App\Http\Controllers\Director\DirectorReportController::class, 'reject'])
