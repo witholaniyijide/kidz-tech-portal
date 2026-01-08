@@ -49,7 +49,7 @@ class ParentMessageController extends Controller
     /**
      * Show form to compose a new message.
      */
-    public function create()
+    public function create(Request $request)
     {
         // Parents can only message the Director - get the first director
         $director = User::whereHas('roles', function ($query) {
@@ -61,7 +61,10 @@ class ParentMessageController extends Controller
                 ->with('error', 'No director available to receive messages.');
         }
 
-        return view('parent.messages.create', compact('director'));
+        // Get prefilled subject if provided (e.g., from report page)
+        $prefilledSubject = $request->query('subject');
+
+        return view('parent.messages.create', compact('director', 'prefilledSubject'));
     }
 
     /**

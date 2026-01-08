@@ -675,6 +675,16 @@ Route::prefix('tutor')
         Route::post('/notices/{notice}/read', [App\Http\Controllers\Tutor\NoticeController::class, 'markAsRead'])
             ->name('notices.read');
 
+        // Notifications
+        Route::get('/notifications', [App\Http\Controllers\Tutor\TutorNotificationController::class, 'index'])
+            ->name('notifications.index');
+        Route::post('/notifications/{notification}/mark-read', [App\Http\Controllers\Tutor\TutorNotificationController::class, 'markAsRead'])
+            ->name('notifications.mark-read');
+        Route::post('/notifications/mark-all-read', [App\Http\Controllers\Tutor\TutorNotificationController::class, 'markAllRead'])
+            ->name('notifications.mark-all-read');
+        Route::delete('/notifications/{notification}', [App\Http\Controllers\Tutor\TutorNotificationController::class, 'destroy'])
+            ->name('notifications.destroy');
+
         // Reports
         Route::resource('reports', App\Http\Controllers\Tutor\ReportController::class);
         Route::post('reports/{report}/submit', [App\Http\Controllers\Tutor\ReportController::class, 'submit'])
