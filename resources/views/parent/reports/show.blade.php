@@ -308,7 +308,7 @@
                 <h3 class="text-lg font-heading font-semibold text-gray-900 dark:text-white mb-4">Actions</h3>
 
                 {{-- Message Director Button --}}
-                <a href="mailto:director@kidztech.edu?subject=Question about {{ $student->fullName() }}'s Report - {{ $report->month }}&body=Dear Director,%0D%0A%0D%0AI have a question about my child's progress report for {{ $report->month }}.%0D%0A%0D%0AStudent: {{ $student->fullName() }}%0D%0ATutor: {{ $report->tutor->fullName() }}%0D%0A%0D%0A"
+                <a href="{{ route('parent.messages.create', ['subject' => $student->first_name . ' Report for ' . $report->month]) }}"
                    class="w-full mb-3 px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all font-medium flex items-center justify-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />

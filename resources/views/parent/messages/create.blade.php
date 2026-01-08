@@ -44,7 +44,7 @@
                     <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Subject <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" id="subject" name="subject" value="{{ old('subject') }}" required
+                    <input type="text" id="subject" name="subject" value="{{ old('subject', $prefilledSubject ?? '') }}" required
                            class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-[#F5A623] focus:border-[#F5A623]"
                            placeholder="Enter subject">
                     @error('subject')
