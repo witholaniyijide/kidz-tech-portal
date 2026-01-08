@@ -83,19 +83,65 @@
                             </svg>
                         </div>
 
-                        <a href="{{ route('tutor.notices.index') }}" class="relative p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                            </svg>
-                            @php
-                                $tutorUnreadCount = \App\Models\TutorNotification::where('tutor_id', Auth::user()->tutor?->id)->where('is_read', false)->count();
-                            @endphp
-                            @if($tutorUnreadCount > 0)
-                                <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
-                                    {{ $tutorUnreadCount > 9 ? '9+' : $tutorUnreadCount }}
-                                </span>
-                            @endif
-                        </a>
+                        <div x-data="{ notifOpen: false }" class="relative">
+                            <button @click="notifOpen = !notifOpen" class="relative p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                </svg>
+                                @php
+                                    $tutorUnreadCount = \App\Models\TutorNotification::where('tutor_id', Auth::user()->tutor?->id)->where('is_read', false)->count();
+                                @endphp
+                                @if($tutorUnreadCount > 0)
+                                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                                        {{ $tutorUnreadCount > 9 ? '9+' : $tutorUnreadCount }}
+                                    </span>
+                                @endif
+                            </button>
+
+                            {{-- Notifications Dropdown --}}
+                            <div x-show="notifOpen" x-cloak @click.away="notifOpen = false" x-transition
+                                 class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+                                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 flex justify-between items-center">
+                                    <span class="font-semibold text-gray-900 dark:text-white">Notifications</span>
+                                    @if($tutorUnreadCount > 0)
+                                        <span class="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">{{ $tutorUnreadCount }} new</span>
+                                    @endif
+                                </div>
+                                <div class="max-h-80 overflow-y-auto">
+                                    @php
+                                        $recentNotifications = \App\Models\TutorNotification::where('tutor_id', Auth::user()->tutor?->id)
+                                            ->orderBy('created_at', 'desc')
+                                            ->take(5)
+                                            ->get();
+                                    @endphp
+                                    @forelse($recentNotifications as $notification)
+                                        <a href="{{ $notification->meta['link'] ?? route('tutor.notifications.index') }}"
+                                           class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b dark:border-gray-600 {{ !$notification->is_read ? 'bg-indigo-50 dark:bg-indigo-900/20' : '' }}">
+                                            <div class="flex items-start gap-2">
+                                                @if(!$notification->is_read)
+                                                    <span class="w-2 h-2 mt-1.5 bg-[#4B49AC] rounded-full flex-shrink-0"></span>
+                                                @endif
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $notification->title }}</p>
+                                                    <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ Str::limit($notification->body, 60) }}</p>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">{{ $notification->created_at->diffForHumans() }}</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @empty
+                                        <div class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                                            <svg class="w-10 h-10 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                            </svg>
+                                            <p class="text-sm">No notifications</p>
+                                        </div>
+                                    @endforelse
+                                </div>
+                                <a href="{{ route('tutor.notifications.index') }}" class="block px-4 py-3 text-center text-sm text-[#4B49AC] hover:bg-gray-50 dark:hover:bg-gray-700 font-medium border-t dark:border-gray-600">
+                                    View All Notifications
+                                </a>
+                            </div>
+                        </div>
 
                         <div x-data="{ open: false }" class="relative">
                             <button @click="open = !open" class="flex items-center gap-3 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
