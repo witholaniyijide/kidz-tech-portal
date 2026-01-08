@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Report;
+use App\Models\TutorReport;
 use App\Models\Student;
 use App\Models\Tutor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminReportController extends Controller
 {
@@ -24,22 +25,22 @@ class AdminReportController extends Controller
 
     /**
      * Display a listing of approved reports.
-     * Admin sees ONLY reports that have been approved (by director/manager).
+     * Admin sees ONLY reports that have been approved by director.
      */
     public function index(Request $request)
     {
-        // Admin sees ONLY approved reports
-        $query = Report::with(['student', 'instructor'])
-            ->where('status', 'approved');
+        // Admin sees ONLY director-approved reports
+        $query = TutorReport::with(['student', 'tutor', 'director'])
+            ->where('status', 'approved-by-director');
 
         // Filter by student
         if ($request->filled('student_id')) {
             $query->where('student_id', $request->student_id);
         }
 
-        // Filter by instructor (tutor)
-        if ($request->filled('instructor_id')) {
-            $query->where('instructor_id', $request->instructor_id);
+        // Filter by tutor
+        if ($request->filled('tutor_id')) {
+            $query->where('tutor_id', $request->tutor_id);
         }
 
         // Filter by month
@@ -52,17 +53,18 @@ class AdminReportController extends Controller
             $query->where('year', $request->year);
         }
 
-        $reports = $query->orderBy('created_at', 'desc')->paginate(20);
+        $reports = $query->orderBy('approved_by_director_at', 'desc')->paginate(20);
 
         $students = Student::where('status', 'active')->orderBy('first_name')->get();
         $tutors = Tutor::where('status', 'active')->orderBy('first_name')->get();
 
-        $months = Report::where('status', 'approved')
+        $months = TutorReport::where('status', 'approved-by-director')
             ->select('month')
             ->distinct()
+            ->orderBy('month', 'desc')
             ->pluck('month');
 
-        $years = Report::where('status', 'approved')
+        $years = TutorReport::where('status', 'approved-by-director')
             ->select('year')
             ->distinct()
             ->orderBy('year', 'desc')
@@ -74,43 +76,45 @@ class AdminReportController extends Controller
     /**
      * Display the specified report.
      */
-    public function show(Report $report)
+    public function show(TutorReport $report)
     {
-        // Admin can only view approved reports
-        if ($report->status !== 'approved') {
+        // Admin can only view director-approved reports
+        if ($report->status !== 'approved-by-director') {
             abort(403, 'This report is not available for viewing.');
         }
 
-        $report->load(['student', 'instructor', 'approvedBy']);
+        $report->load(['student', 'tutor', 'director']);
         return view('admin.reports.show', compact('report'));
     }
 
     /**
      * Generate PDF of the report.
      */
-    public function pdf(Report $report)
+    public function exportPdf(TutorReport $report)
     {
-        if ($report->status !== 'approved') {
+        if ($report->status !== 'approved-by-director') {
             abort(403, 'This report is not available for download.');
         }
 
-        $report->load(['student', 'instructor', 'approvedBy']);
+        $report->load(['student', 'tutor', 'director']);
 
-        // For now, return a print view. DomPDF can be integrated later.
-        return view('admin.reports.pdf', compact('report'));
+        $pdf = Pdf::loadView('tutor.reports.pdf', compact('report'));
+        $filename = 'report_' . $report->student->first_name . '_' . $report->student->last_name . '_' . $report->month . '.pdf';
+
+        return $pdf->download($filename);
     }
 
     /**
      * Print view of the report.
      */
-    public function print(Report $report)
+    public function print(TutorReport $report)
     {
-        if ($report->status !== 'approved') {
+        if ($report->status !== 'approved-by-director') {
             abort(403, 'This report is not available for printing.');
         }
 
-        $report->load(['student', 'instructor', 'approvedBy']);
-        return view('admin.reports.print', compact('report'));
+        $report->load(['student', 'tutor', 'director']);
+        return view('tutor.reports.print', compact('report'));
     }
 
     // Note: Admin CANNOT approve, reject, or comment on reports per specification
