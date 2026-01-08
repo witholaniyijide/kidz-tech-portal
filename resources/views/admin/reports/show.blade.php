@@ -11,9 +11,15 @@
             <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Monthly Report</h1>
-                    <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $report->report_month }} {{ $report->report_year }}</p>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $report->month }} {{ $report->year }}</p>
                 </div>
                 <div class="flex gap-2">
+                    <a href="{{ route('admin.reports.pdf', $report) }}" class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        PDF
+                    </a>
                     <a href="{{ route('admin.reports.print', $report) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
@@ -36,7 +42,7 @@
                     <div>
                         <p class="font-semibold text-emerald-800 dark:text-emerald-400">Director Approved</p>
                         <p class="text-sm text-emerald-700 dark:text-emerald-500">
-                            Approved by {{ $report->director->name ?? 'Director' }} on {{ $report->director_approved_at?->format('M j, Y \a\t g:i A') }}
+                            Approved by {{ $report->director->name ?? 'Director' }} on {{ $report->approved_by_director_at?->format('M j, Y \a\t g:i A') }}
                         </p>
                     </div>
                 </div>
@@ -77,32 +83,30 @@
                 </div>
             </div>
 
-            {{-- Report Period & Stats --}}
+            {{-- Performance Indicators --}}
+            @if($report->attendance_score || $report->performance_rating)
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
                 <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
-                    <h3 class="text-lg font-semibold">Report Summary</h3>
+                    <h3 class="text-lg font-semibold">Performance Overview</h3>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        @if($report->attendance_score)
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ $report->classes_held ?? 0 }}</div>
-                            <div class="text-sm text-gray-500">Classes Held</div>
+                            <div class="text-3xl font-bold text-emerald-600">{{ $report->attendance_score }}%</div>
+                            <div class="text-sm text-gray-500">Attendance</div>
                         </div>
+                        @endif
+                        @if($report->performance_rating)
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-emerald-600">{{ $report->classes_attended ?? 0 }}</div>
-                            <div class="text-sm text-gray-500">Attended</div>
+                            <div class="text-3xl font-bold text-blue-600 capitalize">{{ $report->performance_rating }}</div>
+                            <div class="text-sm text-gray-500">Performance Rating</div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-blue-600">Level {{ $report->course_level ?? '-' }}</div>
-                            <div class="text-sm text-gray-500">Course Level</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-purple-600">{{ $report->total_periods ?? 0 }}</div>
-                            <div class="text-sm text-gray-500">Total Periods</div>
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
+            @endif
 
             {{-- Report Content --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
@@ -110,16 +114,6 @@
                     <h3 class="text-lg font-semibold">Report Details</h3>
                 </div>
                 <div class="p-6 space-y-6">
-                    {{-- Topics Covered --}}
-                    @if($report->topics_covered)
-                        <div>
-                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase mb-2">Topics Covered</h4>
-                            <div class="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-400">
-                                {!! nl2br(e($report->topics_covered)) !!}
-                            </div>
-                        </div>
-                    @endif
-
                     {{-- Progress Summary --}}
                     @if($report->progress_summary)
                         <div>
@@ -130,32 +124,42 @@
                         </div>
                     @endif
 
-                    {{-- Challenges --}}
-                    @if($report->challenges)
+                    {{-- Areas for Improvement --}}
+                    @if($report->areas_for_improvement)
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase mb-2">Challenges</h4>
+                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase mb-2">Areas for Improvement</h4>
                             <div class="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-400">
-                                {!! nl2br(e($report->challenges)) !!}
+                                {!! nl2br(e($report->areas_for_improvement)) !!}
                             </div>
                         </div>
                     @endif
 
-                    {{-- Recommendations --}}
-                    @if($report->recommendations)
+                    {{-- Goals for Next Month --}}
+                    @if($report->goals_next_month)
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase mb-2">Recommendations</h4>
+                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase mb-2">Goals for Next Month</h4>
                             <div class="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-400">
-                                {!! nl2br(e($report->recommendations)) !!}
+                                {!! nl2br(e($report->goals_next_month)) !!}
                             </div>
                         </div>
                     @endif
 
-                    {{-- Next Month Goals --}}
-                    @if($report->next_month_goals)
+                    {{-- Assignments --}}
+                    @if($report->assignments)
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase mb-2">Next Month Goals</h4>
+                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase mb-2">Assignments</h4>
                             <div class="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-400">
-                                {!! nl2br(e($report->next_month_goals)) !!}
+                                {!! nl2br(e($report->assignments)) !!}
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Comments & Observations --}}
+                    @if($report->comments_observation)
+                        <div>
+                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase mb-2">Comments & Observations</h4>
+                            <div class="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-400">
+                                {!! nl2br(e($report->comments_observation)) !!}
                             </div>
                         </div>
                     @endif
