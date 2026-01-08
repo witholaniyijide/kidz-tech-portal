@@ -502,6 +502,10 @@ Route::prefix('director')
             ->name('reports.index');
         Route::get('/reports/{report}', [App\Http\Controllers\Director\DirectorReportController::class, 'show'])
             ->name('reports.show');
+        Route::get('/reports/{report}/edit', [App\Http\Controllers\Director\DirectorReportController::class, 'edit'])
+            ->name('reports.edit');
+        Route::put('/reports/{report}', [App\Http\Controllers\Director\DirectorReportController::class, 'update'])
+            ->name('reports.update');
         Route::post('/reports/{report}/approve', [App\Http\Controllers\Director\DirectorReportController::class, 'approve'])
             ->name('reports.approve');
         Route::post('/reports/{report}/reject', [App\Http\Controllers\Director\DirectorReportController::class, 'reject'])

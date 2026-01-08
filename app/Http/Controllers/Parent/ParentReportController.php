@@ -37,6 +37,8 @@ class ParentReportController extends Controller
                 'children' => $children,
                 'reports' => collect(),
                 'selectedChild' => null,
+                'months' => collect(),
+                'years' => collect(),
             ]);
         }
 
@@ -55,11 +57,37 @@ class ParentReportController extends Controller
             $selectedChild = null;
         }
 
+        // Filter by month
+        if ($request->filled('month')) {
+            $query->where('month', $request->month);
+        }
+
+        // Filter by year
+        if ($request->filled('year')) {
+            $query->where('year', $request->year);
+        }
+
         $reports = $query->orderBy('approved_by_director_at', 'desc')
             ->paginate(15)
             ->withQueryString();
 
-        return view('parent.reports.index', compact('children', 'reports', 'selectedChild'));
+        // Get unique months for filter
+        $months = TutorReport::where('status', 'approved-by-director')
+            ->whereIn('student_id', $studentIds)
+            ->select('month')
+            ->distinct()
+            ->orderBy('month', 'desc')
+            ->pluck('month');
+
+        // Get unique years for filter
+        $years = TutorReport::where('status', 'approved-by-director')
+            ->whereIn('student_id', $studentIds)
+            ->select('year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
+
+        return view('parent.reports.index', compact('children', 'reports', 'selectedChild', 'months', 'years'));
     }
 
     /**

@@ -65,6 +65,10 @@ class ReportController extends Controller
             $query->where('month', $request->month);
         }
 
+        if ($request->filled('year')) {
+            $query->where('year', $request->year);
+        }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -84,6 +88,13 @@ class ReportController extends Controller
             ->orderBy('month', 'desc')
             ->pluck('month');
 
+        // Get unique years for filter dropdown
+        $years = TutorReport::where('tutor_id', $tutor->id)
+            ->select('year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
+
         // Get students for filter
         $students = $tutor->students()->active()->get();
 
@@ -96,7 +107,7 @@ class ReportController extends Controller
             'returned' => TutorReport::where('tutor_id', $tutor->id)->where('status', 'returned')->count(),
         ];
 
-        return view('tutor.reports.index', compact('reports', 'months', 'students', 'stats'));
+        return view('tutor.reports.index', compact('reports', 'months', 'years', 'students', 'stats'));
     }
 
     /**
