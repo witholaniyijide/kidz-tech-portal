@@ -92,13 +92,35 @@ class ParentPerformanceController extends Controller
             ->where('status', 'approved-by-director')
             ->get();
 
-        // Calculate average performance rating
-        $avgRating = $approvedReports->avg('rating') ?? 0;
+        // Calculate average performance rating from reports that have ratings
+        $reportsWithRatings = $approvedReports->filter(fn($r) => $r->rating && $r->rating > 0);
+        $avgRating = $reportsWithRatings->count() > 0 ? $reportsWithRatings->avg('rating') : 0;
 
-        // Calculate total XP points from progress
+        // If no explicit ratings, calculate based on attendance scores
+        if ($avgRating == 0 && $approvedReports->count() > 0) {
+            $avgAttendance = $approvedReports->filter(fn($r) => $r->attendance_score)->avg('attendance_score');
+            if ($avgAttendance) {
+                // Convert attendance percentage to 5-point scale
+                $avgRating = round(($avgAttendance / 100) * 5, 1);
+            }
+        }
+
+        // Calculate total XP points from StudentProgress
         $totalPoints = StudentProgress::where('student_id', $student->id)
             ->where('completed', true)
             ->sum('points');
+
+        // If no StudentProgress records, calculate XP based on curriculum progress
+        if ($totalPoints == 0) {
+            // Get current level and calculate accumulated XP
+            $currentLevel = $student->current_level ?? $student->roadmap_stage ?? $student->starting_course_level ?? 1;
+            $completedLevels = max(0, $currentLevel - 1);
+            // Each completed level gives 100 XP
+            $totalPoints = $completedLevels * 100;
+
+            // Add XP for each approved report (50 XP per report)
+            $totalPoints += $approvedReports->count() * 50;
+        }
 
         // Calculate progress percentage
         $progressPercentage = $student->progressPercentage();
