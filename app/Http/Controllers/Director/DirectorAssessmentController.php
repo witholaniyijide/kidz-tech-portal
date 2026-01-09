@@ -128,40 +128,96 @@ class DirectorAssessmentController extends Controller
      */
     protected function prepareChartData($assessments, $tutors)
     {
-        // Performance trend by month
+        // Performance trend by month - use class_date for proper date ordering
         $completedAssessments = $assessments->where('status', 'approved-by-director');
-        
-        $monthlyData = $completedAssessments
-            ->groupBy('assessment_month')
-            ->map(function ($group) {
-                return round($group->avg('performance_score') ?? 0, 1);
-            });
 
-        // Tutor comparison
+        // Group by year-month from class_date, or fall back to year-week
+        $monthlyData = collect();
+        if ($completedAssessments->whereNotNull('class_date')->count() > 0) {
+            $monthlyData = $completedAssessments
+                ->whereNotNull('class_date')
+                ->groupBy(function($item) {
+                    return $item->class_date->format('Y-m');
+                })
+                ->map(function ($group) {
+                    return round($group->avg('performance_score') ?? 0, 1);
+                })
+                ->sortKeys();
+        } else {
+            // Fallback to year-week grouping
+            $monthlyData = $completedAssessments
+                ->whereNotNull('year')
+                ->groupBy(function($item) {
+                    return $item->year . '-W' . str_pad($item->week ?? 1, 2, '0', STR_PAD_LEFT);
+                })
+                ->map(function ($group) {
+                    return round($group->avg('performance_score') ?? 0, 1);
+                })
+                ->sortKeys();
+        }
+
+        // Tutor comparison - get average score per tutor
         $tutorScores = [];
         $tutorNames = [];
         foreach ($tutors->take(10) as $tutor) {
-            $tutorNames[] = $tutor->first_name;
-            $avgScore = $completedAssessments
-                ->where('tutor_id', $tutor->id)
-                ->avg('performance_score') ?? 0;
-            $tutorScores[] = round($avgScore, 1);
+            $tutorAssessments = $completedAssessments->where('tutor_id', $tutor->id);
+            if ($tutorAssessments->count() > 0) {
+                $tutorNames[] = $tutor->first_name . ' ' . substr($tutor->last_name ?? '', 0, 1) . '.';
+                $avgScore = $tutorAssessments->avg('performance_score') ?? 0;
+                $tutorScores[] = round($avgScore, 1);
+            }
         }
 
-        // Criteria breakdown
-        $criteriaScores = [
-            round($completedAssessments->avg('professionalism_rating') ?? 0, 2),
-            round($completedAssessments->avg('communication_rating') ?? 0, 2),
-            round($completedAssessments->avg('punctuality_rating') ?? 0, 2),
-            round(($completedAssessments->avg('performance_score') ?? 0) / 25, 2), // Convert to 1-5 scale
-        ];
+        // Criteria breakdown - use the actual ratings relationship
+        $criteriaData = [];
+        $criteriaNames = [];
+
+        // Get all ratings from completed assessments
+        $allRatings = $completedAssessments->flatMap(function($assessment) {
+            return $assessment->ratings ?? collect();
+        });
+
+        // Group by criteria and calculate average
+        $criteriaGroups = $allRatings->groupBy(function($rating) {
+            return $rating->criteria->name ?? 'Unknown';
+        });
+
+        foreach ($criteriaGroups as $name => $ratings) {
+            if ($name !== 'Unknown') {
+                $criteriaNames[] = $name;
+                // Convert rating text to numeric value
+                $numericRatings = $ratings->map(function($r) {
+                    return match(strtolower($r->rating ?? '')) {
+                        'excellent', 'on time' => 5,
+                        'good' => 4,
+                        'acceptable' => 3,
+                        'needs improvement', 'late' => 2,
+                        'unacceptable' => 1,
+                        default => 3
+                    };
+                });
+                $criteriaData[] = round($numericRatings->avg(), 2);
+            }
+        }
+
+        // If no criteria data from ratings, use fallback fields
+        if (empty($criteriaData)) {
+            $criteriaNames = ['Professionalism', 'Communication', 'Punctuality', 'Performance'];
+            $criteriaData = [
+                round($completedAssessments->avg('professionalism_rating') ?? 0, 2),
+                round($completedAssessments->avg('communication_rating') ?? 0, 2),
+                round($completedAssessments->avg('punctuality_rating') ?? 0, 2),
+                round(($completedAssessments->avg('performance_score') ?? 0) / 20, 2), // Convert to 1-5 scale
+            ];
+        }
 
         return [
             'months' => $monthlyData->keys()->toArray(),
             'scores' => $monthlyData->values()->toArray(),
             'tutorNames' => $tutorNames,
             'tutorScores' => $tutorScores,
-            'criteriaScores' => $criteriaScores,
+            'criteriaNames' => $criteriaNames,
+            'criteriaScores' => $criteriaData,
         ];
     }
 
