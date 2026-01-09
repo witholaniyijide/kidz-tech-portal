@@ -754,20 +754,24 @@
                     if (this.selectedChart === 'criteria') {
                         const ctx = document.getElementById('criteriaChart');
                         if (ctx) {
+                            const criteriaLabels = chartData.criteriaNames || ['Professionalism', 'Communication', 'Punctuality', 'Performance'];
+                            const criteriaColors = ['#10b981', '#0ea5e9', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#14b8a6'];
                             this.charts.criteria = new Chart(ctx, {
-                                type: 'doughnut',
+                                type: 'bar',
                                 data: {
-                                    labels: ['Professionalism', 'Communication', 'Punctuality', 'Preparation'],
+                                    labels: criteriaLabels,
                                     datasets: [{
+                                        label: 'Average Rating (out of 5)',
                                         data: chartData.criteriaScores || [4.2, 3.8, 4.5, 3.9],
-                                        backgroundColor: ['#10b981', '#0ea5e9', '#8b5cf6', '#f59e0b'],
-                                        borderWidth: 2,
-                                        borderColor: '#fff'
+                                        backgroundColor: criteriaColors.slice(0, criteriaLabels.length),
+                                        borderWidth: 1,
+                                        borderRadius: 4
                                     }]
                                 },
                                 options: {
                                     responsive: true,
                                     maintainAspectRatio: false,
+                                    indexAxis: 'y',
                                     plugins: {
                                         title: {
                                             display: true,
@@ -775,8 +779,16 @@
                                             font: { size: 16, weight: 'bold' }
                                         },
                                         legend: {
-                                            display: true,
-                                            position: 'right'
+                                            display: false
+                                        }
+                                    },
+                                    scales: {
+                                        x: {
+                                            beginAtZero: true,
+                                            max: 5,
+                                            ticks: {
+                                                stepSize: 1
+                                            }
                                         }
                                     }
                                 }
