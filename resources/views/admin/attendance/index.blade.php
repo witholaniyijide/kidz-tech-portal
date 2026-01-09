@@ -201,6 +201,11 @@
                                                     @if($attendance->is_stand_in)
                                                         <span class="ml-1 text-xs text-blue-600 dark:text-blue-400">(Stand-in)</span>
                                                     @endif
+                                                    @if(isset($attendance->monthly_attended) && isset($attendance->monthly_total))
+                                                        <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                                            {{ $attendance->monthly_attended }}/{{ $attendance->monthly_total }} classes this month
+                                                        </p>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </td>

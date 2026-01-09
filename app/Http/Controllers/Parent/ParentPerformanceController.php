@@ -298,15 +298,11 @@ class ParentPerformanceController extends Controller
             ->where('status', 'approved-by-director')
             ->get();
 
-        // Progress: Based on roadmap_progress
-        $progress = $student->roadmap_progress ?? $student->progressPercentage();
+        // Progress: Based on overall progress percentage (same as displayed in performance data)
+        $overallProgress = $student->progressPercentage();
 
-        // Engagement: Based on average performance rating from reports
-        $engagement = 0;
-        if ($approvedReports->count() > 0) {
-            $avgRating = $approvedReports->avg('rating') ?? 0;
-            $engagement = min(100, $avgRating * 20); // Convert 1-5 scale to 0-100
-        }
+        // Engagement: Set to match overall progress as per requirement
+        $engagement = $overallProgress;
 
         // Technical Skills: Based on skills_mastered count
         $technicalSkills = 0;
@@ -331,7 +327,7 @@ class ParentPerformanceController extends Controller
         return [
             'labels' => ['Progress', 'Engagement', 'Technical Skills', 'Project Completion'],
             'data' => [
-                round($progress),
+                round($overallProgress),
                 round($engagement),
                 round($technicalSkills),
                 round($projectCompletion),
