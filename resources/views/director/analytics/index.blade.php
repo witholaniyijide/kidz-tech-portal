@@ -18,7 +18,13 @@
                     <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">Analytics Dashboard</h1>
                     <p class="text-gray-600 dark:text-gray-400">Executive insights and performance metrics</p>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 flex-wrap">
+                    {{-- Year Filter --}}
+                    <select id="yearFilter" class="px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5]">
+                        @for($y = now()->year; $y >= now()->year - 3; $y--)
+                            <option value="{{ $y }}" {{ $y == now()->year ? 'selected' : '' }}>{{ $y }}</option>
+                        @endfor
+                    </select>
                     <a href="{{ route('director.analytics.reports.export', ['month' => now()->format('Y-m')]) }}" class="px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -210,7 +216,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl">
                         <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Average Performance Score Trend</h2>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Performance Score Trend</h2>
                         </div>
                         <div class="h-64">
                             <canvas id="performanceChart"></canvas>
@@ -219,11 +225,22 @@
 
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl">
                         <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Professionalism Rating Distribution</h2>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Performance Score Distribution</h2>
                         </div>
                         <div class="h-64">
                             <canvas id="ratingDistributionChart"></canvas>
                         </div>
+                    </div>
+                </div>
+
+                {{-- Criteria Breakdown --}}
+                <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Criteria Breakdown</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Average scores by assessment criteria</p>
+                    </div>
+                    <div class="h-80">
+                        <canvas id="criteriaBreakdownChart"></canvas>
                     </div>
                 </div>
 
@@ -347,7 +364,7 @@
                 });
 
                 new Chart(document.getElementById('ratingDistributionChart'), {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: data.rating_distribution,
                     options: {
                         responsive: true,
@@ -355,6 +372,42 @@
                         plugins: { legend: { position: 'right' } }
                     }
                 });
+
+                // Criteria Breakdown Chart
+                if (data.criteria_breakdown && data.criteria_breakdown.labels.length > 0) {
+                    new Chart(document.getElementById('criteriaBreakdownChart'), {
+                        type: 'bar',
+                        data: data.criteria_breakdown,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.raw + '%';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value + '%';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    document.getElementById('criteriaBreakdownChart').parentElement.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 py-8">No criteria data available yet.</p>';
+                }
             });
     </script>
     @endpush
