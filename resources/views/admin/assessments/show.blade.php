@@ -6,12 +6,12 @@
         <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
         <div class="absolute top-0 right-0 w-72 h-72 bg-[#00CCCD]/30 dark:bg-[#00CCCD]/40 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             {{-- Header --}}
             <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Performance Assessment</h1>
-                    <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $assessment->assessment_month }}</p>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Tutor Assessment — {{ $assessment->assessment_month }}</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $assessment->tutor->fullName() ?? $assessment->tutor->first_name . ' ' . $assessment->tutor->last_name }}</p>
                 </div>
                 <div class="flex gap-2">
                     <a href="{{ route('admin.assessments.print', $assessment) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
@@ -42,118 +42,307 @@
                 </div>
             </div>
 
-            {{-- Tutor Info & Score --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="md:col-span-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
-                    <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-4">Tutor</h4>
-                    <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                            {{ strtoupper(substr($assessment->tutor->first_name ?? 'U', 0, 1)) }}{{ strtoupper(substr($assessment->tutor->last_name ?? '', 0, 1)) }}
-                        </div>
-                        <div>
-                            <p class="font-semibold text-gray-900 dark:text-white text-xl">
-                                {{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}
-                            </p>
-                            <p class="text-sm text-gray-500">{{ $assessment->tutor->email ?? '-' }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6 text-center">
-                    <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">Overall Score</h4>
-                    @php
-                        $score = $assessment->performance_score ?? 0;
-                        $colorClass = $score >= 80 ? 'text-emerald-600' : ($score >= 60 ? 'text-amber-600' : 'text-red-600');
-                    @endphp
-                    <div class="text-5xl font-bold {{ $colorClass }}">{{ number_format($score, 0) }}%</div>
-                    <div class="text-sm text-gray-500 mt-1">
-                        @if($score >= 80) Excellent
-                        @elseif($score >= 60) Good
-                        @else Needs Improvement
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            {{-- Assessment Criteria --}}
-            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
-                <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
-                    <h3 class="text-lg font-semibold">Assessment Criteria</h3>
-                </div>
-                <div class="p-6">
-                    @php
-                        $criteria = [
-                            'punctuality' => 'Punctuality',
-                            'class_preparation' => 'Class Preparation',
-                            'teaching_quality' => 'Teaching Quality',
-                            'communication' => 'Communication',
-                            'student_engagement' => 'Student Engagement',
-                            'report_submission' => 'Report Submission',
-                            'professionalism' => 'Professionalism',
-                            'adaptability' => 'Adaptability',
-                        ];
-                    @endphp
-                    <div class="space-y-4">
-                        @foreach($criteria as $key => $label)
-                            @php
-                                $rating = $assessment->{$key} ?? 0;
-                                $barColor = $rating >= 4 ? 'bg-emerald-500' : ($rating >= 3 ? 'bg-amber-500' : 'bg-red-500');
-                            @endphp
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {{-- Main Content --}}
+                <div class="lg:col-span-2 space-y-6">
+                    {{-- Assessment Details --}}
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Assessment Details</h3>
+                        <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
-                                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $rating }}/5</span>
-                                </div>
-                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                    <div class="{{ $barColor }} h-2 rounded-full transition-all" style="width: {{ ($rating / 5) * 100 }}%"></div>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Tutor</label>
+                                <p class="text-gray-900 dark:text-white font-medium">{{ $assessment->tutor->fullName() ?? $assessment->tutor->first_name . ' ' . $assessment->tutor->last_name }}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ $assessment->tutor->email ?? '-' }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Student Assessed</label>
+                                <p class="text-gray-900 dark:text-white font-medium">{{ $assessment->student ? $assessment->student->first_name . ' ' . $assessment->student->last_name : 'N/A' }}</p>
+                                @if($assessment->student && $assessment->student->email)
+                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ $assessment->student->email }}</p>
+                                @endif
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Assessment Month</label>
+                                <p class="text-gray-900 dark:text-white">{{ $assessment->assessment_month }}</p>
+                            </div>
+                            @if($assessment->class_date)
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Class Date</label>
+                                <p class="text-gray-900 dark:text-white">{{ $assessment->class_date->format('M d, Y') }}</p>
+                            </div>
+                            @endif
+                            @if($assessment->week)
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Week</label>
+                                <p class="text-gray-900 dark:text-white">Week {{ $assessment->week }}</p>
+                            </div>
+                            @endif
+                            @if($assessment->session)
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Session</label>
+                                <p class="text-gray-900 dark:text-white">{{ $assessment->session }}</p>
+                            </div>
+                            @endif
+                            @if($assessment->performance_score)
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Performance Score</label>
+                                <div class="flex items-center gap-2">
+                                    @php
+                                        $score = $assessment->performance_score ?? 0;
+                                        $colorClass = $score >= 80 ? 'text-emerald-600' : ($score >= 60 ? 'text-amber-600' : 'text-red-600');
+                                    @endphp
+                                    <div class="text-3xl font-bold {{ $colorClass }}">{{ $score }}</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">/100</div>
                                 </div>
                             </div>
-                        @endforeach
+                            @endif
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            {{-- Comments --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                @if($assessment->manager_comment)
+                    {{-- Criteria Assessed --}}
+                    @if($assessment->criteria_assessed)
                     <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
-                        <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Manager's Comment</h4>
-                        <p class="text-gray-700 dark:text-gray-300">{{ $assessment->manager_comment }}</p>
-                        <p class="text-xs text-gray-500 mt-3">— {{ $assessment->manager->name ?? 'Manager' }}</p>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            </svg>
+                            Criteria Assessed
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            @php
+                                $criteriaList = is_array($assessment->criteria_assessed) ? $assessment->criteria_assessed : [$assessment->criteria_assessed];
+                            @endphp
+                            @foreach($criteriaList as $criteria)
+                                <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm">{{ $criteria }}</span>
+                            @endforeach
+                        </div>
                     </div>
-                @endif
+                    @endif
 
-                @if($assessment->director_comment)
+                    {{-- Criteria Ratings --}}
+                    @if($assessment->criteria_ratings)
                     <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
-                        <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Director's Comment</h4>
-                        <p class="text-gray-700 dark:text-gray-300">{{ $assessment->director_comment }}</p>
-                        <p class="text-xs text-gray-500 mt-3">— {{ $assessment->director->name ?? 'Director' }}</p>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            </svg>
+                            Criteria Ratings
+                        </h3>
+                        <div class="space-y-3">
+                            @php
+                                $ratings = is_array($assessment->criteria_ratings) ? $assessment->criteria_ratings : [];
+                            @endphp
+                            @foreach($ratings as $criteriaCode => $rating)
+                                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                                    <span class="font-medium text-gray-700 dark:text-gray-300 capitalize">{{ str_replace('_', ' ', $criteriaCode) }}</span>
+                                    <span class="px-3 py-1 rounded-full text-sm font-medium
+                                        @if(in_array($rating, ['Excellent', 'On Time'])) bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300
+                                        @elseif($rating === 'Good') bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300
+                                        @elseif($rating === 'Acceptable') bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300
+                                        @else bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300
+                                        @endif">
+                                        {{ $rating }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                @endif
-            </div>
+                    @endif
 
-            {{-- Strengths & Improvements --}}
-            @if($assessment->strengths || $assessment->areas_for_improvement)
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    {{-- Performance Ratings (Progress Bars) --}}
+                    @if($assessment->professionalism_rating || $assessment->communication_rating || $assessment->punctuality_rating)
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Performance Ratings</h3>
+                        <div class="space-y-4">
+                            @if($assessment->professionalism_rating)
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Professionalism</span>
+                                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $assessment->professionalism_rating }}/5</span>
+                                </div>
+                                @php $profColor = $assessment->professionalism_rating >= 4 ? 'bg-emerald-500' : ($assessment->professionalism_rating >= 3 ? 'bg-amber-500' : 'bg-red-500'); @endphp
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="{{ $profColor }} h-2 rounded-full transition-all" style="width: {{ ($assessment->professionalism_rating / 5) * 100 }}%"></div>
+                                </div>
+                            </div>
+                            @endif
+                            @if($assessment->communication_rating)
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Communication</span>
+                                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $assessment->communication_rating }}/5</span>
+                                </div>
+                                @php $commColor = $assessment->communication_rating >= 4 ? 'bg-emerald-500' : ($assessment->communication_rating >= 3 ? 'bg-amber-500' : 'bg-red-500'); @endphp
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="{{ $commColor }} h-2 rounded-full transition-all" style="width: {{ ($assessment->communication_rating / 5) * 100 }}%"></div>
+                                </div>
+                            </div>
+                            @endif
+                            @if($assessment->punctuality_rating)
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Punctuality</span>
+                                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $assessment->punctuality_rating }}/5</span>
+                                </div>
+                                @php $punctColor = $assessment->punctuality_rating >= 4 ? 'bg-emerald-500' : ($assessment->punctuality_rating >= 3 ? 'bg-amber-500' : 'bg-red-500'); @endphp
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="{{ $punctColor }} h-2 rounded-full transition-all" style="width: {{ ($assessment->punctuality_rating / 5) * 100 }}%"></div>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Assessment Criteria --}}
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden">
+                        <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
+                            <h3 class="text-lg font-semibold">Assessment Criteria</h3>
+                        </div>
+                        <div class="p-6">
+                            @php
+                                $criteria = [
+                                    'punctuality' => 'Punctuality',
+                                    'class_preparation' => 'Class Preparation',
+                                    'teaching_quality' => 'Teaching Quality',
+                                    'communication' => 'Communication',
+                                    'student_engagement' => 'Student Engagement',
+                                    'report_submission' => 'Report Submission',
+                                    'professionalism' => 'Professionalism',
+                                    'adaptability' => 'Adaptability',
+                                ];
+                            @endphp
+                            <div class="space-y-4">
+                                @foreach($criteria as $key => $label)
+                                    @php
+                                        $rating = $assessment->{$key} ?? 0;
+                                        $barColor = $rating >= 4 ? 'bg-emerald-500' : ($rating >= 3 ? 'bg-amber-500' : 'bg-red-500');
+                                    @endphp
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $rating }}/5</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                            <div class="{{ $barColor }} h-2 rounded-full transition-all" style="width: {{ ($rating / 5) * 100 }}%"></div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Strengths --}}
                     @if($assessment->strengths)
-                        <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/30 rounded-2xl p-6">
-                            <h4 class="text-sm font-semibold text-emerald-700 dark:text-emerald-400 uppercase mb-3 flex items-center">
-                                <span class="mr-2">💪</span> Strengths
-                            </h4>
-                            <p class="text-gray-700 dark:text-gray-300">{{ $assessment->strengths }}</p>
-                        </div>
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                            </svg>
+                            Strengths
+                        </h3>
+                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $assessment->strengths }}</p>
+                    </div>
                     @endif
 
-                    @if($assessment->areas_for_improvement)
-                        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 rounded-2xl p-6">
-                            <h4 class="text-sm font-semibold text-amber-700 dark:text-amber-400 uppercase mb-3 flex items-center">
-                                <span class="mr-2">📈</span> Areas for Improvement
-                            </h4>
-                            <p class="text-gray-700 dark:text-gray-300">{{ $assessment->areas_for_improvement }}</p>
+                    {{-- Weaknesses --}}
+                    @if($assessment->weaknesses)
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            Areas for Improvement
+                        </h3>
+                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $assessment->weaknesses }}</p>
+                    </div>
+                    @endif
+
+                    {{-- Recommendations --}}
+                    @if($assessment->recommendations)
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            Recommendations
+                        </h3>
+                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $assessment->recommendations }}</p>
+                    </div>
+                    @endif
+
+                    {{-- Manager Comment --}}
+                    @if($assessment->manager_comment)
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Manager Comment</h3>
+                        <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4">
+                            <p class="text-gray-700 dark:text-gray-300">{{ $assessment->manager_comment }}</p>
+                            <p class="text-xs text-gray-500 mt-3">— {{ $assessment->manager->name ?? 'Manager' }}</p>
                         </div>
+                    </div>
                     @endif
                 </div>
-            @endif
+
+                {{-- Sidebar --}}
+                <div class="space-y-6">
+                    {{-- Overall Score Card --}}
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6 text-center">
+                        <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">Overall Score</h4>
+                        @php
+                            $score = $assessment->performance_score ?? 0;
+                            $colorClass = $score >= 80 ? 'text-emerald-600' : ($score >= 60 ? 'text-amber-600' : 'text-red-600');
+                        @endphp
+                        <div class="text-5xl font-bold {{ $colorClass }}">{{ number_format($score, 0) }}%</div>
+                        <div class="text-sm text-gray-500 mt-1">
+                            @if($score >= 80) Excellent
+                            @elseif($score >= 60) Good
+                            @else Needs Improvement
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Assessment Status --}}
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Assessment Status</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600 dark:text-gray-400">Status:</span>
+                                <span class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                                    {{ ucfirst(str_replace('-', ' ', $assessment->status)) }}
+                                </span>
+                            </div>
+                            @if($assessment->approved_by_manager_at)
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-600 dark:text-gray-400">Completed by Manager:</span>
+                                <span class="text-gray-800 dark:text-white">{{ $assessment->approved_by_manager_at->format('M d, Y') }}</span>
+                            </div>
+                            @endif
+                            @if($assessment->approved_by_director_at)
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-600 dark:text-gray-400">Approved by Director:</span>
+                                <span class="text-gray-800 dark:text-white">{{ $assessment->approved_by_director_at->format('M d, Y') }}</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Director Comment (if present) --}}
+                    @if($assessment->director_comment)
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            Director's Comment
+                        </h3>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                            <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $assessment->director_comment }}</p>
+                            <p class="text-xs text-gray-500 mt-3">— {{ $assessment->director->name ?? 'Director' }}</p>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 

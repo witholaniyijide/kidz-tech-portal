@@ -42,13 +42,13 @@ class AdminAssessmentController extends Controller
 
         // Filter by year
         if ($request->filled('year')) {
-            $query->where('assessment_year', $request->year);
+            $query->where('year', $request->year);
         }
 
         $assessments = $query->orderBy('created_at', 'desc')->paginate(20);
 
         $tutors = Tutor::where('status', 'active')->orderBy('first_name')->get();
-        
+
         $months = TutorAssessment::where('status', 'approved-by-director')
             ->select('assessment_month')
             ->distinct()
@@ -56,10 +56,10 @@ class AdminAssessmentController extends Controller
             ->pluck('assessment_month');
 
         $years = TutorAssessment::where('status', 'approved-by-director')
-            ->select('assessment_year')
+            ->select('year')
             ->distinct()
-            ->orderBy('assessment_year', 'desc')
-            ->pluck('assessment_year');
+            ->orderBy('year', 'desc')
+            ->pluck('year');
 
         // Statistics
         $stats = [

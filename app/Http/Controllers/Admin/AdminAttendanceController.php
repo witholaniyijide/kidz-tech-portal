@@ -62,6 +62,38 @@ class AdminAttendanceController extends Controller
         $perPage = $request->get('per_page', 20);
         $attendances = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
+        // Add monthly attendance counter for each record
+        foreach ($attendances as $attendance) {
+            if ($attendance->student && $attendance->class_date) {
+                // Count approved attendance for this student in the same month
+                $approvedCount = AttendanceRecord::where('student_id', $attendance->student_id)
+                    ->where('status', 'approved')
+                    ->whereYear('class_date', $attendance->class_date->year)
+                    ->whereMonth('class_date', $attendance->class_date->month)
+                    ->count();
+
+                // Calculate expected monthly classes based on student's schedule
+                $student = $attendance->student;
+                $expectedMonthlyClasses = 0;
+
+                if ($student->class_schedule && is_array($student->class_schedule)) {
+                    // Count classes per week from student's schedule
+                    $classesPerWeek = count($student->class_schedule);
+                    // Estimate 4 weeks per month
+                    $expectedMonthlyClasses = $classesPerWeek * 4;
+                } else {
+                    // Fallback to total attendance records for the month
+                    $expectedMonthlyClasses = AttendanceRecord::where('student_id', $attendance->student_id)
+                        ->whereYear('class_date', $attendance->class_date->year)
+                        ->whereMonth('class_date', $attendance->class_date->month)
+                        ->count();
+                }
+
+                $attendance->monthly_attended = $approvedCount;
+                $attendance->monthly_total = max($expectedMonthlyClasses, 1); // Ensure at least 1 to avoid division by zero
+            }
+        }
+
         // Statistics
         $stats = [
             'total' => AttendanceRecord::count(),
