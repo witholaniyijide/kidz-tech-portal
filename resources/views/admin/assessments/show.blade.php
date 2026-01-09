@@ -194,44 +194,6 @@
                     </div>
                     @endif
 
-                    {{-- Assessment Criteria --}}
-                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden">
-                        <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white">
-                            <h3 class="text-lg font-semibold">Assessment Criteria</h3>
-                        </div>
-                        <div class="p-6">
-                            @php
-                                $criteria = [
-                                    'punctuality' => 'Punctuality',
-                                    'class_preparation' => 'Class Preparation',
-                                    'teaching_quality' => 'Teaching Quality',
-                                    'communication' => 'Communication',
-                                    'student_engagement' => 'Student Engagement',
-                                    'report_submission' => 'Report Submission',
-                                    'professionalism' => 'Professionalism',
-                                    'adaptability' => 'Adaptability',
-                                ];
-                            @endphp
-                            <div class="space-y-4">
-                                @foreach($criteria as $key => $label)
-                                    @php
-                                        $rating = $assessment->{$key} ?? 0;
-                                        $barColor = $rating >= 4 ? 'bg-emerald-500' : ($rating >= 3 ? 'bg-amber-500' : 'bg-red-500');
-                                    @endphp
-                                    <div>
-                                        <div class="flex justify-between mb-1">
-                                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $label }}</span>
-                                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $rating }}/5</span>
-                                        </div>
-                                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                            <div class="{{ $barColor }} h-2 rounded-full transition-all" style="width: {{ ($rating / 5) * 100 }}%"></div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-
                     {{-- Strengths --}}
                     @if($assessment->strengths)
                     <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">

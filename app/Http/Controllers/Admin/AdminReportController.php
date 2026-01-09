@@ -114,7 +114,7 @@ class AdminReportController extends Controller
         }
 
         $report->load(['student', 'tutor', 'director']);
-        return view('tutor.reports.print', compact('report'));
+        return view('admin.reports.print', compact('report'));
     }
 
     // Note: Admin CANNOT approve, reject, or comment on reports per specification

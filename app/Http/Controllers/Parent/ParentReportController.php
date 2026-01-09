@@ -194,9 +194,9 @@ class ParentReportController extends Controller
         );
 
         // Load relationships
-        $report->load(['tutor', 'student']);
+        $report->load(['tutor', 'student', 'director']);
 
-        // Use the tutor print view which has all the report content
-        return view('tutor.reports.print', compact('report'));
+        // Use the admin print view which has all the report content for TutorReport model
+        return view('admin.reports.print', compact('report'));
     }
 }
