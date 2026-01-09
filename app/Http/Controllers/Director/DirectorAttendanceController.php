@@ -100,8 +100,14 @@ class DirectorAttendanceController extends Controller
                 if ($student->class_schedule && is_array($student->class_schedule)) {
                     // Count classes per week from student's schedule
                     $classesPerWeek = count($student->class_schedule);
-                    // Estimate 4 weeks per month
-                    $expectedMonthlyClasses = $classesPerWeek * 4;
+
+                    // Calculate number of weeks in the month (same logic as tutor portal)
+                    $monthStart = \Carbon\Carbon::create($record->class_date->year, $record->class_date->month, 1);
+                    $monthEnd = $monthStart->copy()->endOfMonth();
+                    $weeksInMonth = ceil($monthEnd->diffInDays($monthStart) / 7);
+
+                    // Expected classes = classes per week * weeks in month
+                    $expectedMonthlyClasses = $classesPerWeek * $weeksInMonth;
                 } else {
                     // Fallback to total attendance records for the month
                     $expectedMonthlyClasses = AttendanceRecord::where('student_id', $record->student_id)
