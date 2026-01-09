@@ -120,6 +120,9 @@ class ParentPerformanceController extends Controller
         $months = [];
         $currentDate = Carbon::now();
 
+        // Get overall progress as baseline
+        $overallProgress = $student->progressPercentage();
+
         // Get last 6 months
         for ($i = 5; $i >= 0; $i--) {
             $date = $currentDate->copy()->subMonths($i);
@@ -133,10 +136,23 @@ class ParentPerformanceController extends Controller
                 ->where('year', $year)
                 ->first();
 
+            // Calculate progress for this month
+            $progress = 0;
+            if ($report) {
+                // If report has a rating, use it (convert 1-5 to percentage)
+                if ($report->rating && $report->rating > 0) {
+                    $progress = $report->rating * 20;
+                } else {
+                    // If report exists but no rating, use the overall progress
+                    // This ensures the chart shows activity when reports exist
+                    $progress = $overallProgress;
+                }
+            }
+
             $months[] = [
                 'month' => $monthName,
                 'year' => $year,
-                'progress' => $report ? ($report->rating ?? 0) * 20 : 0, // Convert 1-5 to percentage
+                'progress' => round($progress),
                 'has_report' => $report !== null,
             ];
         }
