@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progress Report - {{ $report->student->fullName() }}</title>
-    <!-- Generated: {{ now()->format('Y-m-d H:i:s') }} -->
+    <title>Progress Report - {{ $report->student->first_name ?? 'Student' }} {{ $report->student->last_name ?? '' }}</title>
     <style>
         * {
             margin: 0;
@@ -22,7 +21,7 @@
         .header {
             padding: 20px 0;
             margin-bottom: 20px;
-            border-bottom: 3px solid #9333ea;
+            border-bottom: 3px solid #423A8E;
         }
 
         .header-content {
@@ -50,7 +49,7 @@
 
         .header h1 {
             font-size: 20pt;
-            color: #9333ea;
+            color: #423A8E;
             margin-bottom: 5px;
             font-weight: bold;
         }
@@ -64,7 +63,7 @@
             background-color: #f9fafb;
             padding: 15px;
             margin-bottom: 20px;
-            border-left: 4px solid #9333ea;
+            border-left: 4px solid #423A8E;
         }
 
         .report-info table {
@@ -90,7 +89,7 @@
         .section-title {
             font-size: 12pt;
             font-weight: bold;
-            color: #9333ea;
+            color: #423A8E;
             margin-bottom: 8px;
             padding-bottom: 4px;
             border-bottom: 2px solid #e5e7eb;
@@ -109,8 +108,8 @@
 
         .badge {
             display: inline-block;
-            background-color: #f3e8ff;
-            color: #7c3aed;
+            background-color: #e8e6f5;
+            color: #423A8E;
             padding: 4px 10px;
             border-radius: 12px;
             font-size: 9pt;
@@ -123,8 +122,8 @@
         }
 
         .skill-badge.new {
-            background-color: #d1fae5;
-            color: #065f46;
+            background-color: #e0f7fa;
+            color: #00838f;
         }
 
         .skills-section {
@@ -143,7 +142,7 @@
             background-color: #f9fafb;
             padding: 8px 10px;
             margin-bottom: 6px;
-            border-left: 3px solid #6366f1;
+            border-left: 3px solid #423A8E;
         }
 
         .project-name {
@@ -154,22 +153,16 @@
 
         .project-link {
             font-size: 8pt;
-            color: #6366f1;
+            color: #423A8E;
             word-break: break-all;
         }
 
-        .metrics {
-            display: table;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .metric-item {
-            display: table-cell;
-            width: 50%;
-            padding: 12px;
+        .metric-box {
             background-color: #f9fafb;
+            padding: 15px;
             text-align: center;
+            border-radius: 8px;
+            margin-top: 10px;
         }
 
         .metric-label {
@@ -179,32 +172,32 @@
         }
 
         .metric-value {
-            font-size: 16pt;
+            font-size: 20pt;
             font-weight: bold;
-            color: #9333ea;
+            color: #423A8E;
         }
 
         .comment-box {
-            background-color: #f0fdf4;
-            border-left: 4px solid #10b981;
+            background-color: #f0f0ff;
+            border-left: 4px solid #423A8E;
             padding: 12px;
             margin-top: 8px;
         }
 
         .comment-box.director {
-            background-color: #ede9fe;
-            border-left-color: #8b5cf6;
+            background-color: #e0f7fa;
+            border-left-color: #00CCCD;
         }
 
         .comment-title {
             font-weight: bold;
-            color: #065f46;
+            color: #423A8E;
             margin-bottom: 6px;
             font-size: 10pt;
         }
 
         .comment-box.director .comment-title {
-            color: #5b21b6;
+            color: #00838f;
         }
 
         .footer {
@@ -213,7 +206,7 @@
             left: 0;
             right: 0;
             padding: 12px;
-            border-top: 1px solid #e5e7eb;
+            border-top: 2px solid #423A8E;
             font-size: 8pt;
             color: #6b7280;
             text-align: center;
@@ -245,11 +238,11 @@
         <table>
             <tr>
                 <td>Student Name:</td>
-                <td><strong>{{ $report->student->fullName() }}</strong></td>
+                <td><strong>{{ $report->student->first_name ?? '' }} {{ $report->student->last_name ?? '' }}</strong></td>
             </tr>
             <tr>
                 <td>Tutor:</td>
-                <td><strong>{{ $report->tutor->first_name }} {{ $report->tutor->last_name }}</strong></td>
+                <td><strong>{{ $report->tutor->first_name ?? '' }} {{ $report->tutor->last_name ?? '' }}</strong></td>
             </tr>
             <tr>
                 <td>Report Period:</td>
@@ -272,10 +265,17 @@
         </table>
     </div>
 
-    <!-- Courses Covered -->
     @php
         $courses = is_array($report->courses) ? $report->courses : [];
+        $skillsMastered = is_array($report->skills_mastered) ? $report->skills_mastered : [];
+        $newSkills = is_array($report->new_skills) ? $report->new_skills : [];
+        $projects = is_array($report->projects) ? $report->projects : [];
+
+        // Calculate overall progress for this student
+        $overallProgress = $report->student ? $report->student->progressPercentage() : 0;
     @endphp
+
+    <!-- Courses Covered -->
     @if(count($courses) > 0)
     <div class="section">
         <div class="section-title">Courses Covered</div>
@@ -288,10 +288,6 @@
     @endif
 
     <!-- Skills Section -->
-    @php
-        $skillsMastered = is_array($report->skills_mastered) ? $report->skills_mastered : [];
-        $newSkills = is_array($report->new_skills) ? $report->new_skills : [];
-    @endphp
     @if(count($skillsMastered) > 0 || count($newSkills) > 0)
     <div class="section">
         <div class="section-title">Skills Development</div>
@@ -318,9 +314,6 @@
     @endif
 
     <!-- Projects Completed -->
-    @php
-        $projects = is_array($report->projects) ? $report->projects : [];
-    @endphp
     @if(count($projects) > 0)
     <div class="section">
         <div class="section-title">Projects Completed</div>
@@ -367,44 +360,38 @@
     </div>
     @endif
 
-    <!-- Performance Metrics -->
+    <!-- Overall Progress -->
     <div class="section">
-        <div class="section-title">Performance Metrics</div>
-        <div class="metrics">
-            <div class="metric-item">
-                <div class="metric-label">Attendance Score</div>
-                <div class="metric-value">{{ $report->attendance_score ? $report->attendance_score . '%' : 'N/A' }}</div>
-            </div>
-            <div class="metric-item">
-                <div class="metric-label">Performance Rating</div>
-                <div class="metric-value">{{ $report->rating ? $report->rating . '/5' : 'N/A' }}</div>
-            </div>
+        <div class="section-title">Overall Progress</div>
+        <div class="metric-box">
+            <div class="metric-label">Student Progress</div>
+            <div class="metric-value">{{ $overallProgress }}%</div>
         </div>
     </div>
 
-    <!-- Legacy Fields (if present and MVP fields are empty) -->
-    @if($report->progress_summary && empty($courses) && empty($skillsMastered))
+    <!-- Legacy Fields (if present) -->
+    @if($report->progress_summary)
     <div class="section">
         <div class="section-title">Progress Summary</div>
         <div class="section-content">{{ $report->progress_summary }}</div>
     </div>
     @endif
 
-    @if($report->strengths && empty($skillsMastered))
+    @if($report->strengths)
     <div class="section">
         <div class="section-title">Strengths & Achievements</div>
         <div class="section-content">{{ $report->strengths }}</div>
     </div>
     @endif
 
-    @if($report->weaknesses && empty($report->areas_for_improvement))
+    @if($report->weaknesses)
     <div class="section">
-        <div class="section-title">Areas for Improvement</div>
+        <div class="section-title">Areas Needing Attention</div>
         <div class="section-content">{{ $report->weaknesses }}</div>
     </div>
     @endif
 
-    @if($report->next_steps && empty($report->goals_next_month))
+    @if($report->next_steps)
     <div class="section">
         <div class="section-title">Next Steps & Recommendations</div>
         <div class="section-content">{{ $report->next_steps }}</div>
@@ -465,7 +452,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        <div>&copy; {{ date('Y') }} KidzTech - Empowering Young Minds Through Technology</div>
+        <div>&copy; {{ date('Y') }} KidzTech Coding Club - Empowering Young Minds Through Technology</div>
         <div>This report is confidential and intended for the student and their parents/guardians only.</div>
     </div>
 </body>

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Print - Progress Report - {{ $report->student->first_name ?? 'Student' }} {{ $report->student->last_name ?? '' }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -22,17 +24,17 @@
             justify-content: space-between;
             margin-bottom: 25px;
             padding-bottom: 15px;
-            border-bottom: 3px solid #14B8A6;
+            border-bottom: 3px solid #423A8E;
         }
         .logo { width: 120px; height: auto; }
         .header-text { text-align: right; }
-        .header h1 { font-size: 22pt; color: #14B8A6; margin-bottom: 5px; }
+        .header h1 { font-size: 22pt; color: #423A8E; margin-bottom: 5px; }
         .header .subtitle { font-size: 12pt; color: #666; }
         .report-info {
             background-color: #f5f5f5;
             padding: 15px;
             margin-bottom: 20px;
-            border-left: 4px solid #14B8A6;
+            border-left: 4px solid #423A8E;
         }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .info-item { margin-bottom: 5px; }
@@ -42,7 +44,7 @@
         .section-title {
             font-size: 14pt;
             font-weight: bold;
-            color: #14B8A6;
+            color: #423A8E;
             margin-bottom: 10px;
             padding-bottom: 5px;
             border-bottom: 2px solid #e5e5e5;
@@ -50,32 +52,32 @@
         .section-content { padding: 8px 0; text-align: justify; line-height: 1.7; color: #222; white-space: pre-wrap; }
         .badge-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
         .badge {
-            background-color: #e0f2f1;
-            color: #00796b;
+            background-color: #e8e6f5;
+            color: #423A8E;
             padding: 6px 12px;
             border-radius: 15px;
             font-size: 10pt;
             font-weight: 500;
         }
         .badge-blue { background-color: #dbeafe; color: #1e40af; }
-        .badge-green { background-color: #d1fae5; color: #065f46; }
+        .badge-cyan { background-color: #e0f7fa; color: #00838f; }
         .project-item {
             background-color: #f9fafb;
             padding: 10px 12px;
             margin-bottom: 8px;
-            border-left: 3px solid #14B8A6;
+            border-left: 3px solid #423A8E;
         }
         .project-name { font-weight: bold; color: #333; font-size: 11pt; }
-        .project-link { font-size: 9pt; color: #14B8A6; word-break: break-all; }
-        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+        .project-link { font-size: 9pt; color: #423A8E; word-break: break-all; }
         .metric-box {
             background-color: #f9f9f9;
-            padding: 12px;
+            padding: 15px;
             border: 1px solid #ddd;
             text-align: center;
+            border-radius: 8px;
         }
         .metric-label { font-size: 10pt; color: #666; margin-bottom: 5px; }
-        .metric-value { font-size: 18pt; font-weight: bold; color: #14B8A6; }
+        .metric-value { font-size: 24pt; font-weight: bold; color: #423A8E; }
         .comment-box {
             background-color: #fafafa;
             border: 1px solid #ccc;
@@ -93,7 +95,7 @@
         .footer {
             margin-top: 30px;
             padding-top: 15px;
-            border-top: 2px solid #14B8A6;
+            border-top: 2px solid #423A8E;
             text-align: center;
             font-size: 9pt;
             color: #666;
@@ -102,7 +104,7 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background: linear-gradient(135deg, #14B8A6, #06B6D4);
+            background: linear-gradient(135deg, #423A8E, #00CCCD);
             color: white;
             padding: 12px 24px;
             border: none;
@@ -110,12 +112,15 @@
             font-size: 12pt;
             cursor: pointer;
         }
-        .manager-comment { border-left-color: #10b981; background-color: #f0fdf4; }
-        .director-comment { border-left-color: #8b5cf6; background-color: #ede9fe; }
+        .manager-comment { border-left-color: #423A8E; background-color: #f0f0ff; }
+        .director-comment { border-left-color: #00CCCD; background-color: #e0f7fa; }
+        @media print {
+            .print-btn { display: none !important; }
+        }
     </style>
 </head>
 <body>
-    <button onclick="window.print()" class="print-btn" style="display: block;">Print Report</button>
+    <button onclick="window.print()" class="print-btn">Print Report</button>
 
     <div class="header">
         <img src="{{ asset('images/logo_light.png') }}" alt="KidzTech Logo" class="logo">
@@ -155,6 +160,9 @@
         $skillsMastered = is_array($report->skills_mastered) ? $report->skills_mastered : [];
         $newSkills = is_array($report->new_skills) ? $report->new_skills : [];
         $projects = is_array($report->projects) ? $report->projects : [];
+
+        // Calculate overall progress for this student
+        $overallProgress = $report->student ? $report->student->progressPercentage() : 0;
     @endphp
 
     @if(count($courses) > 0)
@@ -184,7 +192,7 @@
             <div class="section-title">New Skills Being Learned</div>
             <div class="badge-list">
                 @foreach($newSkills as $skill)
-                    <span class="badge badge-green">{{ $skill }}</span>
+                    <span class="badge badge-cyan">{{ $skill }}</span>
                 @endforeach
             </div>
         </div>
@@ -233,16 +241,10 @@
     @endif
 
     <div class="section">
-        <div class="section-title">Performance Metrics</div>
-        <div class="metrics-grid">
-            <div class="metric-box">
-                <div class="metric-label">Attendance Score</div>
-                <div class="metric-value">{{ $report->attendance_score ? $report->attendance_score . '%' : 'N/A' }}</div>
-            </div>
-            <div class="metric-box">
-                <div class="metric-label">Performance Rating</div>
-                <div class="metric-value">{{ $report->rating ? $report->rating . '/5' : 'N/A' }}</div>
-            </div>
+        <div class="section-title">Overall Progress</div>
+        <div class="metric-box">
+            <div class="metric-label">Student Progress</div>
+            <div class="metric-value">{{ $overallProgress }}%</div>
         </div>
     </div>
 
@@ -278,7 +280,7 @@
         <div class="section">
             <div class="section-title">Manager Feedback</div>
             <div class="comment-box manager-comment">
-                <div class="comment-title" style="color: #065f46;">Manager's Comment</div>
+                <div class="comment-title" style="color: #423A8E;">Manager's Comment</div>
                 <div class="section-content">{{ $report->manager_comment }}</div>
             </div>
         </div>
@@ -288,7 +290,7 @@
         <div class="section">
             <div class="section-title">Director's Review</div>
             <div class="comment-box director-comment">
-                <div class="comment-title" style="color: #5b21b6;">Director's Comment</div>
+                <div class="comment-title" style="color: #00838f;">Director's Comment</div>
                 <div class="section-content">{{ $report->director_comment }}</div>
             </div>
         </div>
@@ -321,7 +323,7 @@
     @endif
 
     <div class="footer">
-        <div>KidzTech - Empowering Young Minds Through Technology</div>
+        <div>KidzTech Coding Club - Empowering Young Minds Through Technology</div>
         <div>This report is confidential and intended for the student and their parents/guardians only.</div>
     </div>
 </body>

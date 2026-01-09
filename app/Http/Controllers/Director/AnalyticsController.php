@@ -285,28 +285,86 @@ class AnalyticsController extends Controller
     public function getAssessmentData()
     {
         $data = Cache::remember('director.analytics.assessments', 1800, function () {
-            // Average performance score by month (last 12 months)
+            // Average performance score by month (last 12 months) - using class_date for proper date ordering
             $monthlyPerformance = DB::table('tutor_assessments')
                 ->select(
-                    DB::raw("DATE_FORMAT(assessment_month, '%Y-%m') as month"),
+                    DB::raw("DATE_FORMAT(class_date, '%Y-%m') as month"),
                     DB::raw('AVG(performance_score) as avg_score'),
                     DB::raw('COUNT(*) as count')
                 )
-                ->where('assessment_month', '>=', now()->subMonths(12)->format('Y-m'))
+                ->where('class_date', '>=', now()->subMonths(12))
+                ->where('status', 'approved-by-director')
                 ->whereNotNull('performance_score')
+                ->where('performance_score', '>', 0)
                 ->groupBy('month')
                 ->orderBy('month', 'asc')
                 ->get();
 
-            // Distribution of professionalism ratings
+            // If no data from class_date, try using year field
+            if ($monthlyPerformance->isEmpty()) {
+                $monthlyPerformance = DB::table('tutor_assessments')
+                    ->select(
+                        DB::raw("CONCAT(year, '-', LPAD(week, 2, '0')) as month"),
+                        DB::raw('AVG(performance_score) as avg_score'),
+                        DB::raw('COUNT(*) as count')
+                    )
+                    ->whereNotNull('year')
+                    ->where('status', 'approved-by-director')
+                    ->whereNotNull('performance_score')
+                    ->where('performance_score', '>', 0)
+                    ->groupBy('year', 'week')
+                    ->orderBy('year', 'asc')
+                    ->orderBy('week', 'asc')
+                    ->limit(12)
+                    ->get();
+            }
+
+            // Distribution of performance scores (grouped by ranges)
             $ratingDistribution = TutorAssessment::select(
-                    DB::raw('ROUND(professionalism_rating / 10) * 10 as rating_range'),
+                    DB::raw('CASE
+                        WHEN performance_score >= 90 THEN "90-100 (Excellent)"
+                        WHEN performance_score >= 70 THEN "70-89 (Good)"
+                        WHEN performance_score >= 50 THEN "50-69 (Fair)"
+                        ELSE "0-49 (Needs Improvement)"
+                    END as rating_range'),
                     DB::raw('COUNT(*) as count')
                 )
-                ->whereNotNull('professionalism_rating')
+                ->where('status', 'approved-by-director')
+                ->whereNotNull('performance_score')
+                ->where('performance_score', '>', 0)
                 ->groupBy('rating_range')
-                ->orderBy('rating_range', 'desc')
+                ->orderByRaw('MIN(performance_score) DESC')
                 ->get();
+
+            // Criteria breakdown - average scores by criteria
+            $criteriaBreakdown = TutorAssessment::with('ratings.criteria')
+                ->where('status', 'approved-by-director')
+                ->get()
+                ->flatMap(function($assessment) {
+                    return $assessment->ratings ?? collect();
+                })
+                ->groupBy(function($rating) {
+                    return $rating->criteria->name ?? 'Unknown';
+                })
+                ->map(function($ratings, $name) {
+                    $ratingValues = $ratings->map(function($r) {
+                        // Convert rating text to numeric value
+                        return match(strtolower($r->rating ?? '')) {
+                            'excellent', 'on time' => 5,
+                            'good' => 4,
+                            'acceptable' => 3,
+                            'needs improvement', 'late' => 2,
+                            'unacceptable' => 1,
+                            default => 3
+                        };
+                    });
+                    return [
+                        'name' => $name,
+                        'average' => round($ratingValues->avg() * 20, 1), // Convert to percentage
+                        'count' => $ratings->count()
+                    ];
+                })
+                ->values();
 
             return [
                 'monthly_performance' => [
@@ -314,25 +372,36 @@ class AnalyticsController extends Controller
                     'datasets' => [
                         [
                             'label' => 'Average Performance Score',
-                            'data' => $monthlyPerformance->pluck('avg_score')->toArray(),
+                            'data' => $monthlyPerformance->pluck('avg_score')->map(fn($v) => round($v, 1))->toArray(),
                             'borderColor' => 'rgb(124, 58, 237)',
                             'backgroundColor' => 'rgba(124, 58, 237, 0.1)',
                             'tension' => 0.4,
+                            'fill' => true,
                         ]
                     ]
                 ],
                 'rating_distribution' => [
-                    'labels' => $ratingDistribution->pluck('rating_range')->map(fn($r) => $r . '-' . ($r + 10))->toArray(),
+                    'labels' => $ratingDistribution->pluck('rating_range')->toArray(),
                     'datasets' => [
                         [
-                            'label' => 'Professionalism Rating Distribution',
+                            'label' => 'Performance Score Distribution',
                             'data' => $ratingDistribution->pluck('count')->toArray(),
                             'backgroundColor' => [
-                                'rgba(239, 68, 68, 0.7)',
-                                'rgba(251, 191, 36, 0.7)',
-                                'rgba(59, 130, 246, 0.7)',
-                                'rgba(34, 197, 94, 0.7)',
+                                'rgba(34, 197, 94, 0.7)',   // Excellent - green
+                                'rgba(59, 130, 246, 0.7)', // Good - blue
+                                'rgba(251, 191, 36, 0.7)', // Fair - yellow
+                                'rgba(239, 68, 68, 0.7)',  // Needs Improvement - red
                             ]
+                        ]
+                    ]
+                ],
+                'criteria_breakdown' => [
+                    'labels' => $criteriaBreakdown->pluck('name')->toArray(),
+                    'datasets' => [
+                        [
+                            'label' => 'Average Score by Criteria',
+                            'data' => $criteriaBreakdown->pluck('average')->toArray(),
+                            'backgroundColor' => 'rgba(79, 70, 229, 0.7)',
                         ]
                     ]
                 ]
