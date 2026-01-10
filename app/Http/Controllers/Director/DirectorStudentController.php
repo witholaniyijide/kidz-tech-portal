@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Director;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
 use App\Models\Student;
+use App\Models\StudentCourseProgress;
 use App\Models\Tutor;
 use App\Models\User;
+use App\Services\CourseCompletionNotificationService;
 use App\Services\ParentAccountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -69,8 +72,9 @@ class DirectorStudentController extends Controller
         $parents = User::whereHas('roles', function ($q) {
             $q->where('name', 'parent');
         })->get();
+        $courses = Course::where('is_active', true)->orderBy('sort_order')->get();
 
-        return view('director.students.create', compact('tutors', 'parents'));
+        return view('director.students.create', compact('tutors', 'parents', 'courses'));
     }
 
     /**
@@ -99,6 +103,12 @@ class DirectorStudentController extends Controller
             'google_classroom_link' => 'nullable|url|max:500',
             'live_classroom_link' => 'nullable|url|max:500',
             'notes' => 'nullable|string|max:1000',
+
+            // Course Progression
+            'starting_course_id' => 'nullable|exists:courses,id',
+            'current_course_id' => 'nullable|exists:courses,id',
+            'completed_course_ids' => 'nullable|array',
+            'completed_course_ids.*' => 'exists:courses,id',
 
             // Parent Information - Father
             'father_name' => 'nullable|string|max:255',
@@ -131,11 +141,26 @@ class DirectorStudentController extends Controller
                 unset($validated['class_schedules']);
             }
 
+            // Remove course progression arrays from validated data (handled separately)
+            $completedCourseIds = $validated['completed_course_ids'] ?? [];
+            unset($validated['completed_course_ids']);
+
             $student = Student::create($validated);
 
             // Link to parent if provided (existing parent)
             if ($request->filled('parent_id')) {
                 $student->guardians()->attach($request->parent_id);
+            }
+
+            // Handle completed courses
+            if (!empty($completedCourseIds)) {
+                $student->syncCompletedCourses($completedCourseIds, 'manual');
+
+                // Send notifications for newly completed courses
+                $notificationService = app(CourseCompletionNotificationService::class);
+                foreach ($completedCourseIds as $courseId) {
+                    $notificationService->notify($student, $courseId);
+                }
             }
 
             DB::commit();
@@ -172,8 +197,10 @@ class DirectorStudentController extends Controller
         $parents = User::whereHas('roles', function ($q) {
             $q->where('name', 'parent');
         })->get();
+        $courses = Course::where('is_active', true)->orderBy('sort_order')->get();
+        $student->load('completedCourses');
 
-        return view('director.students.edit', compact('student', 'tutors', 'parents'));
+        return view('director.students.edit', compact('student', 'tutors', 'parents', 'courses'));
     }
 
     /**
@@ -203,6 +230,12 @@ class DirectorStudentController extends Controller
             'live_classroom_link' => 'nullable|url|max:500',
             'notes' => 'nullable|string|max:1000',
 
+            // Course Progression
+            'starting_course_id' => 'nullable|exists:courses,id',
+            'current_course_id' => 'nullable|exists:courses,id',
+            'completed_course_ids' => 'nullable|array',
+            'completed_course_ids.*' => 'exists:courses,id',
+
             // Parent Information - Father
             'father_name' => 'nullable|string|max:255',
             'father_phone' => 'nullable|string|max:20',
@@ -227,6 +260,9 @@ class DirectorStudentController extends Controller
         $motherEmailChanged = !empty($validated['mother_email']) &&
             $validated['mother_email'] !== $student->mother_email;
 
+        // Get existing completed course IDs for comparison
+        $existingCompletedCourseIds = $student->completedCourses()->pluck('courses.id')->toArray();
+
         DB::beginTransaction();
         try {
             // Handle class schedule JSON
@@ -234,6 +270,10 @@ class DirectorStudentController extends Controller
                 $validated['class_schedule'] = json_encode($validated['class_schedules']);
                 unset($validated['class_schedules']);
             }
+
+            // Remove course progression arrays from validated data (handled separately)
+            $completedCourseIds = $validated['completed_course_ids'] ?? [];
+            unset($validated['completed_course_ids']);
 
             $student->update($validated);
 
@@ -244,7 +284,21 @@ class DirectorStudentController extends Controller
                 $student->guardians()->detach();
             }
 
+            // Handle completed courses
+            $student->syncCompletedCourses($completedCourseIds, 'manual');
+
+            // Find newly completed courses
+            $newlyCompletedCourseIds = array_diff($completedCourseIds, $existingCompletedCourseIds);
+
             DB::commit();
+
+            // Send notifications for newly completed courses (after commit)
+            if (!empty($newlyCompletedCourseIds)) {
+                $notificationService = app(CourseCompletionNotificationService::class);
+                foreach ($newlyCompletedCourseIds as $courseId) {
+                    $notificationService->notify($student, (int)$courseId);
+                }
+            }
 
             // Create parent accounts if new parent emails were added
             if ($fatherEmailChanged || $motherEmailChanged) {

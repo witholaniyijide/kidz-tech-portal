@@ -152,22 +152,33 @@
                                     @endfor
                                 </select>
                             </div>
-                            {{-- Starting Course Level --}}
+                            {{-- Starting Course --}}
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Starting Course Level</label>
-                                <select name="starting_course_level" class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
-                                    <option value="">Select Level</option>
-                                    @for($i = 1; $i <= 12; $i++)
-                                        <option value="{{ $i }}" {{ old('starting_course_level') == $i ? 'selected' : '' }}>Level {{ $i }}</option>
-                                    @endfor
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Starting Course</label>
+                                <select name="starting_course_id" class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                                    <option value="">Select Starting Course</option>
+                                    @if(isset($courses))
+                                        @foreach($courses as $course)
+                                            <option value="{{ $course->id }}" {{ old('starting_course_id') == $course->id ? 'selected' : '' }}>
+                                                Level {{ $course->level }} - {{ $course->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
                                 </select>
                             </div>
-                            {{-- Current Level --}}
+                            {{-- Current Course --}}
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Level</label>
-                                <input type="text" name="current_level" value="{{ old('current_level') }}" placeholder="e.g., Scratch Level 3, Python Basics"
-                                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Student's current progress level or course name</p>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Course</label>
+                                <select name="current_course_id" class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                                    <option value="">Select Current Course</option>
+                                    @if(isset($courses))
+                                        @foreach($courses as $course)
+                                            <option value="{{ $course->id }}" {{ old('current_course_id') == $course->id ? 'selected' : '' }}>
+                                                Level {{ $course->level }} - {{ $course->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
                             </div>
                             {{-- Enrollment Date --}}
                             <div>
@@ -209,6 +220,32 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Course Progression Section --}}
+                @if(isset($courses) && $courses->count() > 0)
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                    <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-green-500 to-teal-600 text-white">
+                        <h3 class="text-base sm:text-lg font-semibold">Course Progression</h3>
+                    </div>
+                    <div class="p-4 sm:p-6">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Select courses the student has already completed.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            @foreach($courses as $course)
+                                <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                                    <input type="checkbox"
+                                           name="completed_course_ids[]"
+                                           value="{{ $course->id }}"
+                                           {{ in_array($course->id, old('completed_course_ids', [])) ? 'checked' : '' }}
+                                           class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 dark:border-gray-600 rounded">
+                                    <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">
+                                        Level {{ $course->level }} - {{ $course->name }}
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 {{-- SECTION 3: Parent Information --}}
                 <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
