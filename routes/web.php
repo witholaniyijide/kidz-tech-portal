@@ -672,6 +672,8 @@ Route::prefix('tutor')
         // Performance (Assessments - view only, Director-approved)
         Route::get('/performance', [App\Http\Controllers\Tutor\PerformanceController::class, 'index'])
             ->name('performance.index');
+        Route::get('/performance/student-summary', [App\Http\Controllers\Tutor\PerformanceController::class, 'studentSummary'])
+            ->name('performance.student-summary');
         Route::get('/performance/{assessment}', [App\Http\Controllers\Tutor\PerformanceController::class, 'show'])
             ->name('performance.show');
         Route::get('/performance/{assessment}/report-card', [App\Http\Controllers\Tutor\PerformanceController::class, 'reportCard'])
