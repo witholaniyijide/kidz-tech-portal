@@ -139,7 +139,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Starting Course Level</label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Starting Course Level (Legacy)</label>
                                 <select name="starting_course_level" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500">
                                     <option value="">Select Level</option>
                                     @for($i = 1; $i <= 12; $i++)
@@ -153,6 +153,101 @@
                                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
+
+                        {{-- Course Progression Section --}}
+                        @if(isset($courses) && $courses->count() > 0)
+                        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
+                            <h4 class="text-md font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                </svg>
+                                Course Progression (Explicit System)
+                            </h4>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                {{-- Starting Course (Immutable after set) --}}
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Starting Course
+                                        @if($student->starting_course_id)
+                                            <span class="text-xs text-amber-600 dark:text-amber-400 ml-2">(Locked)</span>
+                                        @endif
+                                    </label>
+                                    <select name="starting_course_id"
+                                            {{ $student->starting_course_id ? 'disabled' : '' }}
+                                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 {{ $student->starting_course_id ? 'bg-gray-100 dark:bg-gray-600 cursor-not-allowed' : '' }}">
+                                        <option value="">Select Starting Course</option>
+                                        @foreach($courses as $course)
+                                            <option value="{{ $course->id }}" {{ old('starting_course_id', $student->starting_course_id) == $course->id ? 'selected' : '' }}>
+                                                {{ $course->full_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @if($student->starting_course_id)
+                                        <input type="hidden" name="starting_course_id" value="{{ $student->starting_course_id }}">
+                                    @endif
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Once set, cannot be changed</p>
+                                </div>
+
+                                {{-- Current Course --}}
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Course</label>
+                                    <select name="current_course_id" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        <option value="">No Active Course</option>
+                                        @foreach($courses as $course)
+                                            <option value="{{ $course->id }}" {{ old('current_course_id', $student->current_course_id) == $course->id ? 'selected' : '' }}>
+                                                {{ $course->full_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Course student is currently working on</p>
+                                </div>
+                            </div>
+
+                            {{-- Completed Courses (Multi-select) --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Completed Courses</label>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Select all courses the student has completed. Non-sequential completion is allowed.</p>
+
+                                @php
+                                    $completedIds = old('completed_course_ids', $student->completedCourses->pluck('id')->toArray());
+                                @endphp
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    @foreach($courses as $course)
+                                        <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                            <input type="checkbox"
+                                                   name="completed_course_ids[]"
+                                                   value="{{ $course->id }}"
+                                                   {{ in_array($course->id, $completedIds) ? 'checked' : '' }}
+                                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">
+                                                <span class="font-medium">Level {{ $course->level }}</span>
+                                                <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $course->name }}</span>
+                                            </span>
+                                            @if($course->certificate_eligible)
+                                                <span class="ml-auto text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded">Certificate</span>
+                                            @endif
+                                        </label>
+                                    @endforeach
+                                </div>
+
+                                {{-- Warning for inconsistencies --}}
+                                <div x-data="{ showWarning: false }" x-init="
+                                    $watch('showWarning', value => {});
+                                    const checkConsistency = () => {
+                                        const completed = document.querySelectorAll('input[name=\'completed_course_ids[]\']:checked');
+                                        const current = document.querySelector('select[name=current_course_id]').value;
+                                        // Show warning logic could be added here
+                                    };
+                                ">
+                                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-2" x-show="showWarning">
+                                        Warning: Some completed courses have higher levels than the current course.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
 
                         {{-- Dynamic Class Schedule --}}
                         <div class="mt-6">

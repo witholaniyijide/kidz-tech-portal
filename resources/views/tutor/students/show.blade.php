@@ -130,6 +130,60 @@
                 </div>
             </div>
 
+            <!-- Course Progression (Read-Only) -->
+            <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Course Progression</h2>
+
+                <div class="space-y-4">
+                    {{-- Current Course --}}
+                    <div>
+                        <span class="text-gray-600 dark:text-gray-400 block mb-2">Current Course:</span>
+                        @if($student->currentCourse)
+                            <div class="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                <span class="text-xl">▶️</span>
+                                <span class="font-medium text-blue-800 dark:text-blue-200">{{ $student->currentCourse->full_name }}</span>
+                            </div>
+                        @else
+                            <p class="text-gray-500 dark:text-gray-400 italic">No current course set</p>
+                        @endif
+                    </div>
+
+                    {{-- Completed Courses --}}
+                    <div>
+                        <span class="text-gray-600 dark:text-gray-400 block mb-2">Completed Courses:</span>
+                        @php
+                            $completedCourses = $student->completedCourses ?? collect();
+                        @endphp
+                        @if($completedCourses->count() > 0)
+                            <div class="space-y-2">
+                                @foreach($completedCourses as $course)
+                                    <div class="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
+                                        <span class="text-lg">✅</span>
+                                        <span class="text-green-800 dark:text-green-200">{{ $course->full_name }}</span>
+                                        @if($course->certificate_eligible)
+                                            <span class="ml-auto text-xs bg-green-200 dark:bg-green-800 text-green-700 dark:text-green-300 px-2 py-0.5 rounded">Certificate</span>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-gray-500 dark:text-gray-400 italic">No completed courses yet</p>
+                        @endif
+                    </div>
+
+                    {{-- Progress Summary --}}
+                    <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-600 dark:text-gray-400">Overall Progress:</span>
+                            <span class="font-bold text-gray-900 dark:text-white">{{ $student->getExplicitProgressPercentage() }}%</span>
+                        </div>
+                        <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                            <div class="bg-gradient-to-r from-[#4B49AC] to-[#7978E9] h-2.5 rounded-full" style="width: {{ $student->getExplicitProgressPercentage() }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Recent Reports -->
             <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-lg">
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Recent Reports</h2>

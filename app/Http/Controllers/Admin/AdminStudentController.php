@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\Tutor;
+use App\Models\Course;
 use App\Models\ActivityLog;
 use App\Services\ParentAccountService;
+use App\Services\CourseCompletionNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -70,7 +72,8 @@ class AdminStudentController extends Controller
     public function create()
     {
         $tutors = Tutor::where('status', 'active')->orderBy('first_name')->get();
-        return view('admin.students.create', compact('tutors'));
+        $courses = Course::active()->ordered()->get();
+        return view('admin.students.create', compact('tutors', 'courses'));
     }
 
     /**
@@ -96,6 +99,10 @@ class AdminStudentController extends Controller
             'tutor_id' => 'nullable|exists:tutors,id',
             'classes_per_week' => 'nullable|integer|min:1|max:7',
             'starting_course_level' => 'nullable|integer|min:1|max:12',
+            'starting_course_id' => 'nullable|exists:courses,id',
+            'current_course_id' => 'nullable|exists:courses,id',
+            'completed_course_ids' => 'nullable|array',
+            'completed_course_ids.*' => 'exists:courses,id',
             'enrollment_date' => 'nullable|date',
             'class_schedule' => 'nullable|array',
 
@@ -119,11 +126,20 @@ class AdminStudentController extends Controller
 
         $student = null;
 
+        // Extract completed course IDs before creating student
+        $completedCourseIds = $validated['completed_course_ids'] ?? [];
+        unset($validated['completed_course_ids']);
+
         // Generate student ID
         $validated['student_id'] = 'STU-' . strtoupper(uniqid());
 
-        DB::transaction(function() use ($validated, &$student) {
+        DB::transaction(function() use ($validated, $completedCourseIds, &$student) {
             $student = Student::create($validated);
+
+            // Sync completed courses if provided
+            if (!empty($completedCourseIds)) {
+                $student->syncCompletedCourses($completedCourseIds, 'manual');
+            }
 
             // Log the action
             ActivityLog::create([
@@ -160,7 +176,9 @@ class AdminStudentController extends Controller
     public function edit(Student $student)
     {
         $tutors = Tutor::where('status', 'active')->orderBy('first_name')->get();
-        return view('admin.students.edit', compact('student', 'tutors'));
+        $courses = Course::active()->ordered()->get();
+        $student->load(['startingCourse', 'currentCourse', 'completedCourses']);
+        return view('admin.students.edit', compact('student', 'tutors', 'courses'));
     }
 
     /**
@@ -179,13 +197,17 @@ class AdminStudentController extends Controller
             'coding_experience' => 'nullable|string|max:500',
             'career_interest' => 'nullable|string|max:500',
             'status' => 'required|in:active,inactive,graduated,withdrawn',
-            
+
             // Class Information
             'class_link' => 'nullable|url|max:500',
             'google_classroom_link' => 'nullable|url|max:500',
             'tutor_id' => 'nullable|exists:tutors,id',
             'classes_per_week' => 'nullable|integer|min:1|max:7',
             'starting_course_level' => 'nullable|integer|min:1|max:12',
+            'starting_course_id' => 'nullable|exists:courses,id',
+            'current_course_id' => 'nullable|exists:courses,id',
+            'completed_course_ids' => 'nullable|array',
+            'completed_course_ids.*' => 'exists:courses,id',
             'enrollment_date' => 'nullable|date',
             'class_schedule' => 'nullable|array',
 
@@ -207,14 +229,30 @@ class AdminStudentController extends Controller
             'mother_email.different' => 'Mother and father cannot have the same email address.',
         ]);
 
+        // Extract completed course IDs before updating student
+        $completedCourseIds = $validated['completed_course_ids'] ?? [];
+        unset($validated['completed_course_ids']);
+
+        // Prevent changing starting_course_id if already set
+        if ($student->starting_course_id !== null && isset($validated['starting_course_id'])) {
+            unset($validated['starting_course_id']);
+        }
+
         // Track if parent emails changed for creating new parent accounts
         $fatherEmailChanged = !empty($validated['father_email']) &&
             $validated['father_email'] !== $student->father_email;
         $motherEmailChanged = !empty($validated['mother_email']) &&
             $validated['mother_email'] !== $student->mother_email;
 
-        DB::transaction(function() use ($student, $validated) {
+        // Track newly completed courses for notification
+        $existingCompletedIds = $student->completedCourses()->pluck('courses.id')->toArray();
+        $newlyCompletedIds = array_diff($completedCourseIds, $existingCompletedIds);
+
+        DB::transaction(function() use ($student, $validated, $completedCourseIds) {
             $student->update($validated);
+
+            // Sync completed courses
+            $student->syncCompletedCourses($completedCourseIds, 'manual');
 
             // Log the action
             ActivityLog::create([
@@ -225,6 +263,14 @@ class AdminStudentController extends Controller
                 'model_id' => $student->id,
             ]);
         });
+
+        // Send notifications for newly completed courses
+        if (!empty($newlyCompletedIds)) {
+            $notificationService = app(CourseCompletionNotificationService::class);
+            foreach ($newlyCompletedIds as $courseId) {
+                $notificationService->notify($student, $courseId);
+            }
+        }
 
         // Create parent accounts if new parent emails were added
         if ($fatherEmailChanged || $motherEmailChanged) {

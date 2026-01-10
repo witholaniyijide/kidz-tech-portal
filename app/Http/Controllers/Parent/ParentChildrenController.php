@@ -138,6 +138,7 @@ class ParentChildrenController extends Controller
 
     /**
      * Get the curriculum roadmap with progress for a student.
+     * Uses explicit progression system if student has starting_course_id set.
      */
     private function getCurriculumRoadmap(Student $student): array
     {
@@ -156,8 +157,12 @@ class ParentChildrenController extends Controller
             12 => 'robot',
         ];
 
-        // Get course statuses from student model (uses starting_course_level and reports)
-        $curriculumWithStatuses = $student->getCurriculumWithStatuses();
+        // Use explicit progression if student has it, otherwise fall back to legacy
+        if ($student->usesExplicitProgression()) {
+            $curriculumWithStatuses = $student->getExplicitCurriculumWithStatuses();
+        } else {
+            $curriculumWithStatuses = $student->getCurriculumWithStatuses();
+        }
 
         $courses = [];
         foreach ($curriculumWithStatuses as $course) {
@@ -169,10 +174,13 @@ class ParentChildrenController extends Controller
                 default => 'upcoming',
             };
 
+            // Use 'level' for explicit system, 'id' for legacy
+            $courseId = $course['level'] ?? $course['id'];
+
             $courses[] = [
-                'id' => $course['id'],
-                'title' => $course['title'],
-                'icon' => $icons[$course['id']] ?? 'book',
+                'id' => $courseId,
+                'title' => $course['title'] ?? $course['full_name'] ?? "Level {$courseId}",
+                'icon' => $icons[$courseId] ?? 'book',
                 'status' => $displayStatus,
                 'progress' => $displayStatus === 'completed' ? 100 : ($displayStatus === 'current' ? ($student->roadmap_progress ?? 0) : 0),
             ];

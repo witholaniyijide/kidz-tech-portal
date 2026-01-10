@@ -326,6 +326,48 @@
                                     Optional comments for final approval
                                 </p>
                             </div>
+
+                            {{-- Course Completion Suggestion --}}
+                            @if(isset($courses) && $courses->count() > 0)
+                            <div class="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl" x-data="{ markComplete: false }">
+                                <label class="flex items-center cursor-pointer mb-3">
+                                    <input type="checkbox"
+                                           name="mark_course_completed"
+                                           value="1"
+                                           x-model="markComplete"
+                                           class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                    <span class="ml-2 text-sm font-medium text-blue-800 dark:text-blue-300">
+                                        Mark a course as completed
+                                    </span>
+                                </label>
+
+                                <div x-show="markComplete" x-cloak class="mt-2">
+                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                        Select Course to Complete
+                                    </label>
+                                    <select name="completed_course_id"
+                                            class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        <option value="">-- Select Course --</option>
+                                        @foreach($courses as $course)
+                                            @php
+                                                $isCompleted = $report->student->completedCourses->contains('id', $course->id);
+                                            @endphp
+                                            <option value="{{ $course->id }}"
+                                                    {{ $isCompleted ? 'disabled' : '' }}
+                                                    {{ $suggestedCourseId == $course->id && !$isCompleted ? 'selected' : '' }}>
+                                                {{ $course->full_name }}
+                                                @if($isCompleted) (Already Completed) @endif
+                                                @if($suggestedCourseId == $course->id && !$isCompleted) (Current) @endif
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                        This will notify the parent of the completion
+                                    </p>
+                                </div>
+                            </div>
+                            @endif
+
                             <button
                                 type="submit"
                                 onclick="return confirm('Are you sure you want to give FINAL APPROVAL to this report? This will notify the tutor and manager.')"
