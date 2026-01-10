@@ -164,8 +164,8 @@ class ParentReportController extends Controller
         // Load relationships
         $report->load(['student', 'tutor', 'director']);
 
-        // Generate PDF using DomPDF
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('tutor.reports.pdf', compact('report'));
+        // Generate PDF using DomPDF with parent-specific view
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('parent.reports.pdf', compact('report'));
 
         // Generate filename
         $filename = 'report_' . $student->first_name . '_' . $student->last_name . '_' . $report->month . '.pdf';
@@ -196,7 +196,7 @@ class ParentReportController extends Controller
         // Load relationships
         $report->load(['tutor', 'student', 'director']);
 
-        // Use the admin print view which has all the report content for TutorReport model
-        return view('admin.reports.print', compact('report'));
+        // Use parent-specific print view (without approval timeline and progress section)
+        return view('parent.reports.print', compact('report'));
     }
 }

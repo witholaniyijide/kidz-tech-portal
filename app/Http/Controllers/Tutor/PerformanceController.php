@@ -188,6 +188,71 @@ class PerformanceController extends Controller
     }
 
     /**
+     * Display student performance summary view.
+     */
+    public function studentSummary()
+    {
+        $tutor = Auth::user()->tutor;
+
+        if (!$tutor) {
+            abort(403, 'You do not have a tutor profile.');
+        }
+
+        // Get all students assigned to this tutor
+        $students = Student::where('tutor_id', $tutor->id)
+            ->where('status', 'active')
+            ->orderBy('first_name')
+            ->get();
+
+        // Build performance data for each student
+        $studentPerformance = [];
+        foreach ($students as $student) {
+            $assessments = TutorAssessment::where('tutor_id', $tutor->id)
+                ->where('student_id', $student->id)
+                ->where('status', 'approved-by-director')
+                ->with(['ratings'])
+                ->orderBy('class_date', 'asc')
+                ->get();
+
+            if ($assessments->isEmpty()) {
+                continue;
+            }
+
+            // Calculate scores for each assessment
+            $scores = $assessments->map(function ($assessment) {
+                return [
+                    'date' => $assessment->class_date ? $assessment->class_date->format('M d') : 'Week ' . $assessment->week,
+                    'score' => $assessment->calculateOverallScore(),
+                    'id' => $assessment->id,
+                ];
+            });
+
+            $avgScore = $scores->avg('score');
+            $latestScore = $scores->last()['score'] ?? 0;
+            $firstScore = $scores->first()['score'] ?? 0;
+            $trend = $latestScore - $firstScore;
+
+            $studentPerformance[] = [
+                'student' => $student,
+                'total_assessments' => $assessments->count(),
+                'average_score' => round($avgScore, 1),
+                'latest_score' => round($latestScore, 1),
+                'trend' => $trend,
+                'scores' => $scores,
+                'chart_labels' => $scores->pluck('date')->toArray(),
+                'chart_data' => $scores->pluck('score')->toArray(),
+            ];
+        }
+
+        // Sort by average score descending
+        usort($studentPerformance, function ($a, $b) {
+            return $b['average_score'] <=> $a['average_score'];
+        });
+
+        return view('tutor.performance.student-summary', compact('studentPerformance'));
+    }
+
+    /**
      * Calculate performance statistics for the tutor.
      */
     private function calculateStats($tutorId)
