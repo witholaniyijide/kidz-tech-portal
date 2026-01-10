@@ -267,14 +267,33 @@
                 <tr>
                     <th>Criteria</th>
                     <th>Rating</th>
+                    <th>Score</th>
                     <th>Visual</th>
                 </tr>
             </thead>
             <tbody>
+                @forelse($assessment->ratings as $rating)
+                <tr>
+                    <td><strong>{{ $rating->criteria->name ?? 'Unknown Criteria' }}</strong></td>
+                    <td>
+                        <span class="score-box {{ $rating->percentage >= 85 ? 'score-excellent' : ($rating->percentage >= 65 ? 'score-good' : ($rating->percentage >= 40 ? 'score-acceptable' : 'score-needs')) }}">
+                            {{ $rating->rating }}
+                        </span>
+                    </td>
+                    <td>{{ round($rating->percentage) }}%</td>
+                    <td>
+                        <div class="rating-bar">
+                            <div class="rating-bar-fill" style="width: {{ $rating->percentage }}%"></div>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                {{-- Fallback to old column-based ratings if no relationship data --}}
                 @if($assessment->professionalism_rating)
                 <tr>
                     <td><strong>Professionalism</strong></td>
                     <td>{{ $assessment->professionalism_rating }}/5</td>
+                    <td>{{ ($assessment->professionalism_rating / 5) * 100 }}%</td>
                     <td>
                         <div class="rating-bar">
                             <div class="rating-bar-fill" style="width: {{ ($assessment->professionalism_rating / 5) * 100 }}%"></div>
@@ -286,6 +305,7 @@
                 <tr>
                     <td><strong>Communication</strong></td>
                     <td>{{ $assessment->communication_rating }}/5</td>
+                    <td>{{ ($assessment->communication_rating / 5) * 100 }}%</td>
                     <td>
                         <div class="rating-bar">
                             <div class="rating-bar-fill" style="width: {{ ($assessment->communication_rating / 5) * 100 }}%"></div>
@@ -297,6 +317,7 @@
                 <tr>
                     <td><strong>Punctuality</strong></td>
                     <td>{{ $assessment->punctuality_rating }}/5</td>
+                    <td>{{ ($assessment->punctuality_rating / 5) * 100 }}%</td>
                     <td>
                         <div class="rating-bar">
                             <div class="rating-bar-fill" style="width: {{ ($assessment->punctuality_rating / 5) * 100 }}%"></div>
@@ -304,6 +325,12 @@
                     </td>
                 </tr>
                 @endif
+                @if(!$assessment->professionalism_rating && !$assessment->communication_rating && !$assessment->punctuality_rating)
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #6b7280; padding: 20px;">No ratings recorded for this assessment</td>
+                </tr>
+                @endif
+                @endforelse
             </tbody>
         </table>
 

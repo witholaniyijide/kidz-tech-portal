@@ -443,8 +443,8 @@ class DirectorAssessmentController extends Controller
         // Authorize
         $this->authorize('view', $assessment);
 
-        // Load relationships
-        $assessment->load(['tutor', 'manager', 'director']);
+        // Load relationships including ratings with criteria
+        $assessment->load(['tutor', 'manager', 'director', 'ratings.criteria']);
 
         return view('director.assessments.print', compact('assessment'));
     }
