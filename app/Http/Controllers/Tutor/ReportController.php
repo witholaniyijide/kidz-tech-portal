@@ -9,6 +9,7 @@ use App\Models\CustomSkill;
 use App\Models\Student;
 use App\Models\TutorNotification;
 use App\Models\TutorReport;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -219,6 +220,9 @@ class ReportController extends Controller
                 'is_read' => false,
                 'meta' => ['report_id' => $report->id],
             ]);
+
+            // Notify managers about the new submission
+            app(NotificationService::class)->notifyReportSubmitted($report);
         }
 
         $message = $report->status === 'draft'
@@ -416,6 +420,9 @@ class ReportController extends Controller
             'is_read' => false,
             'meta' => ['report_id' => $report->id],
         ]);
+
+        // Notify managers about the submission
+        app(NotificationService::class)->notifyReportSubmitted($report);
 
         return redirect()
             ->route('tutor.reports.show', $report)

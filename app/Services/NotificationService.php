@@ -17,6 +17,48 @@ use Illuminate\Support\Facades\Log;
 class NotificationService
 {
     /**
+     * Send notification when Tutor submits a report for review
+     * Recipients: Manager
+     */
+    public function notifyReportSubmitted(TutorReport $report): void
+    {
+        $report->load(['tutor', 'student']);
+
+        $managers = User::role('manager')->get();
+        foreach ($managers as $manager) {
+            $this->notifyManager(
+                $manager,
+                'New Report Submitted',
+                "Tutor {$report->tutor->first_name} {$report->tutor->last_name} has submitted a report for {$report->student->first_name} {$report->student->last_name} ({$report->month} {$report->year}). Please review.",
+                'report_submitted',
+                ['report_id' => $report->id, 'tutor_id' => $report->tutor_id, 'student_id' => $report->student_id]
+            );
+        }
+    }
+
+    /**
+     * Send notification when Manager sends back a report for modification
+     * Recipients: Tutor
+     */
+    public function notifyReportReturned(TutorReport $report, string $managerComment = ''): void
+    {
+        $report->load(['tutor', 'student']);
+
+        $message = "Your report for {$report->student->first_name} {$report->student->last_name} ({$report->month} {$report->year}) has been sent back for modification.";
+        if ($managerComment) {
+            $message .= " Manager's comment: {$managerComment}";
+        }
+
+        $this->notifyTutor(
+            $report->tutor,
+            'Report Returned for Modification',
+            $message,
+            'report_returned',
+            ['report_id' => $report->id, 'student_id' => $report->student_id, 'manager_comment' => $managerComment]
+        );
+    }
+
+    /**
      * Send notification when Director approves a report
      * Recipients: Tutor, Manager, Admin, Parent
      */
