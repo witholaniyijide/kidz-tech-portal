@@ -139,15 +139,6 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Starting Course Level (Legacy)</label>
-                                <select name="starting_course_level" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500">
-                                    <option value="">Select Level</option>
-                                    @for($i = 1; $i <= 12; $i++)
-                                        <option value="{{ $i }}" {{ old('starting_course_level', $student->starting_course_level) == $i ? 'selected' : '' }}>Level {{ $i }}</option>
-                                    @endfor
-                                </select>
-                            </div>
-                            <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Enrollment Date</label>
                                 <input type="date" name="enrollment_date" value="{{ old('enrollment_date', $student->enrollment_date?->format('Y-m-d')) }}"
                                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -161,7 +152,7 @@
                                 <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                                 </svg>
-                                Course Progression (Explicit System)
+                                Course Progression
                             </h4>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -179,7 +170,7 @@
                                         <option value="">Select Starting Course</option>
                                         @foreach($courses as $course)
                                             <option value="{{ $course->id }}" {{ old('starting_course_id', $student->starting_course_id) == $course->id ? 'selected' : '' }}>
-                                                {{ $course->full_name }}
+                                                Level {{ $course->level }} - {{ $course->name }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -196,7 +187,7 @@
                                         <option value="">No Active Course</option>
                                         @foreach($courses as $course)
                                             <option value="{{ $course->id }}" {{ old('current_course_id', $student->current_course_id) == $course->id ? 'selected' : '' }}>
-                                                {{ $course->full_name }}
+                                                Level {{ $course->level }} - {{ $course->name }}
                                             </option>
                                         @endforeach
                                     </select>
