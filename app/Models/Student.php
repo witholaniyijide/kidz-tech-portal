@@ -65,6 +65,8 @@ class Student extends Model
         'course_statuses',
         'class_reminder_enabled',
         'class_reminder_minutes',
+        'starting_course_id',
+        'current_course_id',
     ];
 
     protected $casts = [
@@ -159,6 +161,41 @@ class Student extends Model
     public function tutor()
     {
         return $this->belongsTo(Tutor::class);
+    }
+
+    /**
+     * Get the starting course for this student.
+     */
+    public function startingCourse()
+    {
+        return $this->belongsTo(Course::class, 'starting_course_id');
+    }
+
+    /**
+     * Get the current course for this student.
+     */
+    public function currentCourse()
+    {
+        return $this->belongsTo(Course::class, 'current_course_id');
+    }
+
+    /**
+     * Get explicitly completed courses for this student.
+     */
+    public function completedCourses()
+    {
+        return $this->belongsToMany(Course::class, 'student_course_progress')
+            ->withPivot(['status', 'source', 'completed_at'])
+            ->withTimestamps()
+            ->orderBy('level', 'asc');
+    }
+
+    /**
+     * Get the course progress records for this student.
+     */
+    public function courseProgress()
+    {
+        return $this->hasMany(StudentCourseProgress::class);
     }
 
     public function attendanceRecords()
@@ -512,5 +549,157 @@ class Student extends Model
             'completed_count' => $progress['completed_count'],
             'in_progress_course' => $progress['in_progress_course'],
         ];
+    }
+
+    // =====================================================
+    // EXPLICIT COURSE PROGRESSION SYSTEM (New Implementation)
+    // =====================================================
+
+    /**
+     * Mark a course as completed for this student (explicit).
+     *
+     * @param int $courseId
+     * @param string $source 'manual' or 'report'
+     * @return StudentCourseProgress
+     */
+    public function markCourseCompleted(int $courseId, string $source = 'manual'): StudentCourseProgress
+    {
+        return StudentCourseProgress::markCompleted($this->id, $courseId, $source);
+    }
+
+    /**
+     * Remove a completed course for this student.
+     *
+     * @param int $courseId
+     * @return bool
+     */
+    public function removeCourseCompletion(int $courseId): bool
+    {
+        return StudentCourseProgress::removeCompletion($this->id, $courseId);
+    }
+
+    /**
+     * Check if this student has explicitly completed a course.
+     *
+     * @param int $courseId
+     * @return bool
+     */
+    public function hasCourseCompleted(int $courseId): bool
+    {
+        return StudentCourseProgress::hasCompleted($this->id, $courseId);
+    }
+
+    /**
+     * Set the starting course (immutable after first set).
+     *
+     * @param int $courseId
+     * @return bool
+     */
+    public function setStartingCourse(int $courseId): bool
+    {
+        // Only allow setting once
+        if ($this->starting_course_id !== null) {
+            return false;
+        }
+
+        $this->starting_course_id = $courseId;
+        return $this->save();
+    }
+
+    /**
+     * Set the current course.
+     *
+     * @param int|null $courseId
+     * @return bool
+     */
+    public function setCurrentCourse(?int $courseId): bool
+    {
+        $this->current_course_id = $courseId;
+        return $this->save();
+    }
+
+    /**
+     * Sync completed courses (replace all with given IDs).
+     *
+     * @param array $courseIds
+     * @param string $source
+     * @return void
+     */
+    public function syncCompletedCourses(array $courseIds, string $source = 'manual'): void
+    {
+        // Get current completed course IDs
+        $currentIds = $this->completedCourses()->pluck('courses.id')->toArray();
+
+        // Courses to remove
+        $toRemove = array_diff($currentIds, $courseIds);
+        foreach ($toRemove as $courseId) {
+            $this->removeCourseCompletion($courseId);
+        }
+
+        // Courses to add
+        $toAdd = array_diff($courseIds, $currentIds);
+        foreach ($toAdd as $courseId) {
+            $this->markCourseCompleted($courseId, $source);
+        }
+    }
+
+    /**
+     * Get explicit curriculum with statuses using the new system.
+     * This replaces the old calculateCourseStatuses() for parent portal.
+     *
+     * @return array
+     */
+    public function getExplicitCurriculumWithStatuses(): array
+    {
+        $courses = Course::active()->ordered()->get();
+        $completedIds = $this->completedCourses()->pluck('courses.id')->toArray();
+        $currentId = $this->current_course_id;
+
+        $result = [];
+        foreach ($courses as $course) {
+            $status = 'not_started';
+
+            if (in_array($course->id, $completedIds)) {
+                $status = 'completed';
+            } elseif ($course->id === $currentId) {
+                $status = 'ongoing';
+            }
+
+            $result[] = [
+                'id' => $course->id,
+                'level' => $course->level,
+                'title' => $course->name,
+                'full_name' => $course->full_name,
+                'status' => $status,
+                'certificate_eligible' => $course->certificate_eligible,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Calculate explicit progress percentage.
+     * Only counts explicitly completed courses, not skipped ones.
+     *
+     * @return int
+     */
+    public function getExplicitProgressPercentage(): int
+    {
+        $completedCount = $this->completedCourses()->count();
+        $totalCourses = 12;
+
+        return $totalCourses > 0 ? (int) (($completedCount / $totalCourses) * 100) : 0;
+    }
+
+    /**
+     * Check if using the new explicit progression system.
+     * Returns true if starting_course_id is set.
+     *
+     * @return bool
+     */
+    public function usesExplicitProgression(): bool
+    {
+        return $this->starting_course_id !== null;
     }
 }
