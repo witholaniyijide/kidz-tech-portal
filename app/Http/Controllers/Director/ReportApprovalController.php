@@ -88,10 +88,16 @@ class ReportApprovalController extends Controller
         // Check authorization
         $this->authorize('view', $report);
 
-        // Load relationships
-        $report->load(['student', 'tutor', 'comments.user', 'audits.user']);
+        // Load relationships including student's course progression
+        $report->load(['student.currentCourse', 'student.completedCourses', 'tutor', 'comments.user', 'audits.user']);
 
-        return view('director.reports.show', compact('report'));
+        // Get all available courses for course completion suggestion
+        $courses = \App\Models\Course::active()->ordered()->get();
+
+        // Determine suggested course (current course if set)
+        $suggestedCourseId = $report->student->current_course_id;
+
+        return view('director.reports.show', compact('report', 'courses', 'suggestedCourseId'));
     }
 
     /**
@@ -105,6 +111,8 @@ class ReportApprovalController extends Controller
         // Validate the request
         $validated = $request->validate([
             'director_comment' => 'nullable|string|max:2000',
+            'mark_course_completed' => 'nullable|boolean',
+            'completed_course_id' => 'nullable|exists:courses,id',
         ]);
 
         // Check for idempotency - don't approve already approved reports
@@ -181,11 +189,29 @@ class ReportApprovalController extends Controller
 
             // Optional: Dispatch email notifications here
             // Mail::to($report->tutor->email)->send(new ReportApprovedByDirector($report));
+
+            // Mark course as completed if requested
+            if ($request->has('mark_course_completed') && $request->input('completed_course_id')) {
+                $courseId = $request->input('completed_course_id');
+                $student = $report->student;
+
+                // Mark the course as completed with source = 'report'
+                $student->markCourseCompleted($courseId, 'report');
+
+                // Send notification to parent(s)
+                $notificationService = app(\App\Services\CourseCompletionNotificationService::class);
+                $notificationService->notify($student, $courseId);
+            }
         });
+
+        $message = 'Report has been approved successfully. Notifications sent to tutor and manager.';
+        if ($request->has('mark_course_completed') && $request->input('completed_course_id')) {
+            $message .= ' Course completion has been recorded.';
+        }
 
         return redirect()
             ->route('director.reports.index')
-            ->with('success', 'Report has been approved successfully. Notifications sent to tutor and manager.');
+            ->with('success', $message);
     }
 
     /**
