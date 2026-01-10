@@ -45,6 +45,9 @@ class AnalyticsController extends Controller
      */
     protected function getDashboardStats()
     {
+        // Clear cache for fresh data
+        Cache::forget('director.analytics.dashboard.stats');
+
         return Cache::remember('director.analytics.dashboard.stats', 300, function () {
             return [
                 'total_students' => Student::count(),
@@ -88,7 +91,10 @@ class AnalyticsController extends Controller
      */
     public function getEnrollmentsData()
     {
-        $data = Cache::remember('director.analytics.enrollments', 3600, function () {
+        // Clear cache for fresh data
+        Cache::forget('director.analytics.enrollments');
+
+        $data = Cache::remember('director.analytics.enrollments', 300, function () {
             // Last 12 months enrollment data
             $enrollments = DB::table('students')
                 ->select(
@@ -134,7 +140,10 @@ class AnalyticsController extends Controller
      */
     public function getReportsData()
     {
-        $data = Cache::remember('director.analytics.reports', 600, function () {
+        // Clear cache for fresh data
+        Cache::forget('director.analytics.reports');
+
+        $data = Cache::remember('director.analytics.reports', 300, function () {
             // Monthly report submissions (last 12 months)
             $monthlyReports = DB::table('tutor_reports')
                 ->select(
@@ -146,16 +155,50 @@ class AnalyticsController extends Controller
                 ->orderBy('month', 'asc')
                 ->get();
 
-            // Current month status breakdown
+            // If no monthly data, fill with zeros for last 6 months
+            if ($monthlyReports->isEmpty()) {
+                $monthlyReports = collect();
+                for ($i = 5; $i >= 0; $i--) {
+                    $month = now()->subMonths($i)->format('Y-m');
+                    $monthlyReports->push((object)['month' => $month, 'total' => 0]);
+                }
+            }
+
+            // Status breakdown - get all reports, not just current month
             $statusBreakdown = TutorReport::select('status', DB::raw('COUNT(*) as count'))
-                ->whereYear('created_at', now()->year)
-                ->whereMonth('created_at', now()->month)
                 ->groupBy('status')
                 ->get()
                 ->pluck('count', 'status')
                 ->toArray();
 
-            // Top 10 tutors by reports this month
+            // If no reports, use placeholder
+            if (empty($statusBreakdown)) {
+                $statusBreakdown = [
+                    'draft' => 0,
+                    'submitted' => 0,
+                    'approved-by-manager' => 0,
+                    'approved-by-director' => 0
+                ];
+            }
+
+            // Map status names to readable labels and colors
+            $statusLabels = [];
+            $statusData = [];
+            $statusColors = [
+                'draft' => 'rgba(156, 163, 175, 0.8)',
+                'submitted' => 'rgba(99, 102, 241, 0.8)',
+                'approved-by-manager' => 'rgba(251, 191, 36, 0.8)',
+                'approved-by-director' => 'rgba(34, 197, 94, 0.8)',
+            ];
+            $colorValues = [];
+
+            foreach ($statusBreakdown as $status => $count) {
+                $statusLabels[] = ucwords(str_replace('-', ' ', $status));
+                $statusData[] = $count;
+                $colorValues[] = $statusColors[$status] ?? 'rgba(107, 114, 128, 0.8)';
+            }
+
+            // Top tutors by reports - all time if current month is empty
             $topTutors = DB::table('tutor_reports')
                 ->join('tutors', 'tutor_reports.tutor_id', '=', 'tutors.id')
                 ->select(
@@ -164,8 +207,6 @@ class AnalyticsController extends Controller
                     DB::raw('COUNT(*) as report_count'),
                     DB::raw('AVG(tutor_reports.attendance_score) as avg_attendance')
                 )
-                ->whereYear('tutor_reports.created_at', now()->year)
-                ->whereMonth('tutor_reports.created_at', now()->month)
                 ->groupBy('tutors.id', 'tutors.first_name', 'tutors.last_name')
                 ->orderBy('report_count', 'desc')
                 ->limit(10)
@@ -180,21 +221,18 @@ class AnalyticsController extends Controller
                             'data' => $monthlyReports->pluck('total')->toArray(),
                             'borderColor' => 'rgb(30, 64, 175)',
                             'backgroundColor' => 'rgba(30, 64, 175, 0.5)',
+                            'fill' => true,
+                            'tension' => 0.4,
                         ]
                     ]
                 ],
                 'status' => [
-                    'labels' => array_keys($statusBreakdown),
+                    'labels' => $statusLabels,
                     'datasets' => [
                         [
                             'label' => 'Reports by Status',
-                            'data' => array_values($statusBreakdown),
-                            'backgroundColor' => [
-                                'rgba(156, 163, 175, 0.8)', // draft - gray
-                                'rgba(99, 102, 241, 0.8)',  // submitted - indigo
-                                'rgba(251, 191, 36, 0.8)',  // approved-by-manager - yellow
-                                'rgba(34, 197, 94, 0.8)',   // approved-by-director - green
-                            ]
+                            'data' => $statusData,
+                            'backgroundColor' => $colorValues,
                         ]
                     ]
                 ],
@@ -210,7 +248,10 @@ class AnalyticsController extends Controller
      */
     public function getTutorPerformanceData()
     {
-        $data = Cache::remember('director.analytics.tutor_performance', 600, function () {
+        // Clear cache for fresh data
+        Cache::forget('director.analytics.tutor_performance');
+
+        $data = Cache::remember('director.analytics.tutor_performance', 300, function () {
             // Students per tutor (top 20)
             $studentsPerTutor = DB::table('tutors')
                 ->leftJoin('tutor_reports', 'tutors.id', '=', 'tutor_reports.tutor_id')
@@ -284,7 +325,10 @@ class AnalyticsController extends Controller
      */
     public function getAssessmentData()
     {
-        $data = Cache::remember('director.analytics.assessments', 1800, function () {
+        // Clear cache for fresh data
+        Cache::forget('director.analytics.assessments');
+
+        $data = Cache::remember('director.analytics.assessments', 300, function () {
             // Average performance score by month (last 12 months) - using class_date for proper date ordering
             $monthlyPerformance = DB::table('tutor_assessments')
                 ->select(
