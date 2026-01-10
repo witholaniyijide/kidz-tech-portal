@@ -48,14 +48,16 @@ class StudentController extends Controller
             abort(403, 'Unauthorized access to this student.');
         }
 
-        // Load student relationships
+        // Load student relationships including course progression
         $student->load([
             'tutorReports' => function ($query) {
                 $query->orderBy('created_at', 'desc');
             },
             'attendanceRecords' => function ($query) {
                 $query->orderBy('class_date', 'desc')->take(10);
-            }
+            },
+            'currentCourse',
+            'completedCourses',
         ]);
 
         // Calculate attendance stats

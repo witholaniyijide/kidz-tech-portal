@@ -137,18 +137,21 @@
 
         {{-- Sidebar --}}
         <div class="space-y-6">
-            {{-- Classes Overview --}}
+            {{-- Course Progression --}}
             <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Course Progress</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Course Progression</h3>
+
+                {{-- Progress Circle --}}
                 @php
-                    $classesPerMonth = ($student->classes_per_week ?? 1) * 4;
-                    $courseProgress = $student->progressPercentage();
+                    $courseProgress = $student->usesExplicitProgression()
+                        ? $student->getExplicitProgressPercentage()
+                        : $student->progressPercentage();
                 @endphp
                 <div class="text-center mb-4">
-                    <div class="relative w-32 h-32 mx-auto">
-                        <svg class="w-32 h-32 transform -rotate-90">
-                            <circle cx="64" cy="64" r="56" stroke="currentColor" stroke-width="12" fill="none" class="text-gray-200 dark:text-gray-700"></circle>
-                            <circle cx="64" cy="64" r="56" stroke="url(#progressGradient)" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="{{ 351.86 }}" stroke-dashoffset="{{ 351.86 - (351.86 * $courseProgress / 100) }}"></circle>
+                    <div class="relative w-28 h-28 mx-auto">
+                        <svg class="w-28 h-28 transform -rotate-90">
+                            <circle cx="56" cy="56" r="48" stroke="currentColor" stroke-width="10" fill="none" class="text-gray-200 dark:text-gray-700"></circle>
+                            <circle cx="56" cy="56" r="48" stroke="url(#progressGradient)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="{{ 301.59 }}" stroke-dashoffset="{{ 301.59 - (301.59 * $courseProgress / 100) }}"></circle>
                             <defs>
                                 <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                                     <stop offset="0%" stop-color="#C15F3C" />
@@ -157,19 +160,39 @@
                             </defs>
                         </svg>
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ $courseProgress }}%</span>
+                            <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ $courseProgress }}%</span>
                         </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4 text-center">
-                    <div>
-                        <p class="text-2xl font-bold text-[#C15F3C]">{{ $student->classes_per_week ?? 1 }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Classes/Week</p>
-                    </div>
-                    <div>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $classesPerMonth }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Est. Classes/Month</p>
-                    </div>
+
+                {{-- Current Course --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Current Course</label>
+                    @if($student->currentCourse)
+                        <div class="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg text-sm">
+                            <span>▶️</span>
+                            <span class="font-medium text-blue-800 dark:text-blue-200">{{ $student->currentCourse->full_name }}</span>
+                        </div>
+                    @else
+                        <p class="text-gray-500 dark:text-gray-400 text-sm italic">Not set</p>
+                    @endif
+                </div>
+
+                {{-- Completed Courses --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Completed ({{ $student->completedCourses->count() }}/12)</label>
+                    @if($student->completedCourses->count() > 0)
+                        <div class="space-y-1 max-h-40 overflow-y-auto">
+                            @foreach($student->completedCourses as $course)
+                                <div class="flex items-center gap-2 p-1.5 bg-green-50 dark:bg-green-900/30 rounded text-xs">
+                                    <span>✅</span>
+                                    <span class="text-green-800 dark:text-green-200">Level {{ $course->level }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-gray-500 dark:text-gray-400 text-sm italic">None yet</p>
+                    @endif
                 </div>
             </div>
 
