@@ -279,6 +279,8 @@ Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('
         ->name('settings.update-password');
     Route::put('/settings/notifications', [App\Http\Controllers\Parent\ParentSettingsController::class, 'updateNotifications'])
         ->name('settings.update-notifications');
+    Route::put('/settings/avatar', [App\Http\Controllers\Parent\ParentSettingsController::class, 'updateAvatar'])
+        ->name('settings.update-avatar');
 
     // Legacy routes (for backward compatibility)
     Route::get('/students', [App\Http\Controllers\Parent\ParentChildrenController::class, 'index'])
@@ -469,6 +471,8 @@ Route::prefix('manager')
             ->name('settings.updatePassword');
         Route::put('/settings/notifications', [App\Http\Controllers\Manager\ManagerSettingsController::class, 'updateNotifications'])
             ->name('settings.updateNotifications');
+        Route::put('/settings/avatar', [App\Http\Controllers\Manager\ManagerSettingsController::class, 'updateAvatar'])
+            ->name('settings.updateAvatar');
 
         // Manager Notifications
         Route::get('/notifications', [App\Http\Controllers\Manager\ManagerNotificationController::class, 'index'])

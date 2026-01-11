@@ -126,8 +126,8 @@
                         <div class="flex items-center gap-6">
                             {{-- Current Avatar Preview --}}
                             <div class="flex-shrink-0">
-                                @if($user->avatar)
-                                    <img src="{{ Storage::url($user->avatar) }}" alt="Profile Picture" class="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-lg">
+                                @if($user->profile_photo)
+                                    <img src="{{ Storage::url($user->profile_photo) }}" alt="Profile Picture" class="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-lg">
                                 @else
                                     <div class="w-24 h-24 rounded-full bg-gradient-to-r from-[#4F46E5] to-[#818CF8] flex items-center justify-center text-white text-3xl font-bold border-4 border-white dark:border-gray-700 shadow-lg">
                                         {{ strtoupper(substr($user->name, 0, 1)) }}

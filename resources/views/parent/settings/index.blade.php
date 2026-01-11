@@ -34,6 +34,69 @@
             </div>
         @endif
 
+        {{-- Profile Photo Section --}}
+        <div class="glass-card rounded-2xl overflow-hidden">
+            <div class="p-6 bg-gradient-to-r from-pink-500 to-rose-500">
+                <h3 class="text-xl font-heading font-bold text-white flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Profile Photo
+                </h3>
+                <p class="text-pink-100 text-sm mt-1">Upload your profile picture</p>
+            </div>
+
+            <div class="p-6">
+                <form method="POST" action="{{ route('parent.settings.update-avatar') }}" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="flex items-center gap-6">
+                        {{-- Current Photo Preview --}}
+                        <div class="flex-shrink-0">
+                            @if($user->profile_photo)
+                                <img src="{{ Storage::url($user->profile_photo) }}" alt="Profile Photo"
+                                     class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg">
+                            @else
+                                <div class="w-24 h-24 bg-gradient-to-br from-sky-500 to-cyan-400 rounded-full flex items-center justify-center text-white font-bold text-3xl border-4 border-white shadow-lg">
+                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Upload Section --}}
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Upload New Photo
+                            </label>
+                            <input type="file" name="avatar" accept="image/jpeg,image/png,image/jpg,image/gif"
+                                   class="block w-full text-sm text-gray-500 dark:text-gray-400
+                                          file:mr-4 file:py-2 file:px-4
+                                          file:rounded-lg file:border-0
+                                          file:text-sm file:font-medium
+                                          file:bg-pink-100 file:text-pink-600
+                                          hover:file:bg-pink-200
+                                          dark:file:bg-pink-900/30 dark:file:text-pink-400
+                                          cursor-pointer">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                JPG, PNG or GIF. Max size 2MB.
+                            </p>
+                            @error('avatar')
+                                <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit"
+                                class="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+                            Update Photo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         {{-- Profile Information Section --}}
         <div class="glass-card rounded-2xl overflow-hidden">
             <div class="p-6 bg-gradient-to-r from-sky-500 to-cyan-400">

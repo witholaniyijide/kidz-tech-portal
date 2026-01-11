@@ -101,15 +101,15 @@ class DirectorSettingsController extends Controller
         $user = Auth::user();
 
         // Delete old avatar if exists
-        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-            Storage::disk('public')->delete($user->avatar);
+        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+            Storage::disk('public')->delete($user->profile_photo);
         }
 
         // Store new avatar
         $path = $request->file('avatar')->store('avatars', 'public');
 
         $user->update([
-            'avatar' => $path,
+            'profile_photo' => $path,
         ]);
 
         return back()->with('success', 'Profile picture updated successfully.');

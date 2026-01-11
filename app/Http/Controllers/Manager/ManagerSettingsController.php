@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class ManagerSettingsController extends Controller
@@ -111,5 +112,39 @@ class ManagerSettingsController extends Controller
         return redirect()
             ->route('manager.settings.index')
             ->with('success', 'Notification preferences updated.');
+    }
+
+    /**
+     * Update profile photo/avatar.
+     */
+    public function updateAvatar(Request $request)
+    {
+        $validated = $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $user = Auth::user();
+
+        // Delete old avatar if exists
+        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+            Storage::disk('public')->delete($user->profile_photo);
+        }
+
+        // Store new avatar
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $user->profile_photo = $path;
+        $user->save();
+
+        ActivityLog::create([
+            'user_id' => $user->id,
+            'action' => 'updated_avatar',
+            'description' => 'Manager updated profile photo',
+            'model_type' => get_class($user),
+            'model_id' => $user->id,
+        ]);
+
+        return redirect()
+            ->route('manager.settings.index')
+            ->with('success', 'Profile photo updated successfully.');
     }
 }

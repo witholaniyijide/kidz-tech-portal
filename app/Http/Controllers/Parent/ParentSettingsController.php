@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class ParentSettingsController extends Controller
@@ -121,5 +122,29 @@ class ParentSettingsController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Notification preferences updated successfully.');
+    }
+
+    /**
+     * Update profile photo/avatar.
+     */
+    public function updateAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $user = Auth::user();
+
+        // Delete old avatar if exists
+        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+            Storage::disk('public')->delete($user->profile_photo);
+        }
+
+        // Store new avatar
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $user->profile_photo = $path;
+        $user->save();
+
+        return redirect()->back()->with('success', 'Profile photo updated successfully.');
     }
 }

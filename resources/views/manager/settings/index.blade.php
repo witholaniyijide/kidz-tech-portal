@@ -25,6 +25,59 @@
                 <p class="text-gray-600 dark:text-gray-400 mt-1">Manage your profile and preferences</p>
             </div>
 
+            {{-- Profile Photo --}}
+            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-6">
+                <div class="px-6 py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white">
+                    <h3 class="text-lg font-semibold">Profile Photo</h3>
+                </div>
+                <form action="{{ route('manager.settings.updateAvatar') }}" method="POST" enctype="multipart/form-data" class="p-6">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="flex items-center gap-6">
+                        {{-- Current Photo Preview --}}
+                        <div class="flex-shrink-0">
+                            @if($user->profile_photo)
+                                <img src="{{ Storage::url($user->profile_photo) }}" alt="Profile Photo"
+                                     class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg">
+                            @else
+                                <div class="w-24 h-24 bg-gradient-to-br from-[#C15F3C] to-[#DA7756] rounded-full flex items-center justify-center text-white font-bold text-3xl border-4 border-white shadow-lg">
+                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Upload Section --}}
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Upload New Photo
+                            </label>
+                            <input type="file" name="avatar" accept="image/jpeg,image/png,image/jpg,image/gif"
+                                   class="block w-full text-sm text-gray-500 dark:text-gray-400
+                                          file:mr-4 file:py-2 file:px-4
+                                          file:rounded-lg file:border-0
+                                          file:text-sm file:font-medium
+                                          file:bg-[#C15F3C]/10 file:text-[#C15F3C]
+                                          hover:file:bg-[#C15F3C]/20
+                                          dark:file:bg-[#C15F3C]/30 dark:file:text-[#DA7756]
+                                          cursor-pointer">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                JPG, PNG or GIF. Max size 2MB.
+                            </p>
+                            @error('avatar')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit" class="px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg hover:shadow-lg transition-all font-medium">
+                            Update Photo
+                        </button>
+                    </div>
+                </form>
+            </div>
+
             {{-- Profile Information --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-6">
                 <div class="px-6 py-4 bg-gradient-to-r from-[#C15F3C] to-[#DA7756] text-white">
@@ -37,9 +90,14 @@
                     <div class="flex items-center gap-6 mb-6">
                         {{-- Profile Avatar --}}
                         <div class="flex-shrink-0">
-                            <div class="w-24 h-24 bg-gradient-to-br from-[#C15F3C] to-[#DA7756] rounded-full flex items-center justify-center text-white font-bold text-3xl border-4 border-white shadow-lg">
-                                {{ strtoupper(substr($user->name, 0, 1)) }}
-                            </div>
+                            @if($user->profile_photo)
+                                <img src="{{ Storage::url($user->profile_photo) }}" alt="Profile Photo"
+                                     class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg">
+                            @else
+                                <div class="w-24 h-24 bg-gradient-to-br from-[#C15F3C] to-[#DA7756] rounded-full flex items-center justify-center text-white font-bold text-3xl border-4 border-white shadow-lg">
+                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                </div>
+                            @endif
                         </div>
 
                         <div class="flex-1">
