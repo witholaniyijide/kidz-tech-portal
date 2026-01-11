@@ -266,149 +266,264 @@
         Chart.defaults.font.family = 'Inter, Plus Jakarta Sans, sans-serif';
         Chart.defaults.color = '#6B7280';
 
+        // Store chart instances for updating
+        let charts = {};
+        let selectedYear = new Date().getFullYear();
+
         // Toggle table visibility
         function toggleTable(id) {
             const table = document.getElementById(id + '-table');
             table.classList.toggle('hidden');
         }
 
+        // Show loading state
+        function showLoading(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const parent = canvas.parentElement;
+            parent.innerHTML = '<div class="flex items-center justify-center h-full"><p class="text-gray-500">Loading data...</p></div><canvas id="' + canvasId + '"></canvas>';
+        }
+
+        // Show no data message
+        function showNoData(canvasId, message = 'No data available') {
+            const canvas = document.getElementById(canvasId);
+            if (canvas) {
+                canvas.parentElement.innerHTML = '<div class="flex items-center justify-center h-full"><p class="text-gray-500 dark:text-gray-400 py-8">' + message + '</p></div>';
+            }
+        }
+
+        // Year filter change handler
+        document.getElementById('yearFilter').addEventListener('change', function() {
+            selectedYear = this.value;
+            loadAllCharts();
+        });
+
+        // Load all charts
+        function loadAllCharts() {
+            loadEnrollmentsChart();
+            loadReportsCharts();
+            loadTutorPerformanceCharts();
+            loadAssessmentCharts();
+        }
+
         // Fetch and render enrollments chart
-        fetch('{{ route('director.analytics.enrollments') }}')
-            .then(res => res.json())
-            .then(data => {
-                new Chart(document.getElementById('enrollmentsChart'), {
-                    type: 'line',
-                    data: data,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'top' },
-                            title: { display: false }
-                        },
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
-                    }
-                });
-            });
+        function loadEnrollmentsChart() {
+            fetch('{{ route('director.analytics.enrollments') }}?year=' + selectedYear)
+                .then(res => res.json())
+                .then(data => {
+                    if (charts.enrollments) charts.enrollments.destroy();
 
-        // Fetch and render reports charts
-        fetch('{{ route('director.analytics.reports') }}')
-            .then(res => res.json())
-            .then(data => {
-                new Chart(document.getElementById('reportsMonthlyChart'), {
-                    type: 'line',
-                    data: data.monthly,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'top' } },
-                        scales: { y: { beginAtZero: true } }
+                    if (!data.labels || data.labels.length === 0) {
+                        showNoData('enrollmentsChart', 'No enrollment data available for ' + selectedYear);
+                        return;
                     }
-                });
 
-                new Chart(document.getElementById('reportsStatusChart'), {
-                    type: 'doughnut',
-                    data: data.status,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'right' } }
-                    }
-                });
-            });
-
-        // Fetch and render tutor performance charts
-        fetch('{{ route('director.analytics.tutors') }}')
-            .then(res => res.json())
-            .then(data => {
-                new Chart(document.getElementById('studentsPerTutorChart'), {
-                    type: 'bar',
-                    data: data.students_per_tutor,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y',
-                        plugins: { legend: { display: false } },
-                        scales: { x: { beginAtZero: true } }
-                    }
-                });
-
-                new Chart(document.getElementById('attendanceChart'), {
-                    type: 'bar',
-                    data: data.attendance,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y',
-                        plugins: { legend: { display: false } },
-                        scales: { x: { beginAtZero: true, max: 100 } }
-                    }
-                });
-            });
-
-        // Fetch and render assessment charts
-        fetch('{{ route('director.analytics.assessments') }}')
-            .then(res => res.json())
-            .then(data => {
-                new Chart(document.getElementById('performanceChart'), {
-                    type: 'line',
-                    data: data.monthly_performance,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'top' } },
-                        scales: { y: { beginAtZero: true, max: 100 } }
-                    }
-                });
-
-                new Chart(document.getElementById('ratingDistributionChart'), {
-                    type: 'doughnut',
-                    data: data.rating_distribution,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'right' } }
-                    }
-                });
-
-                // Criteria Breakdown Chart
-                if (data.criteria_breakdown && data.criteria_breakdown.labels.length > 0) {
-                    new Chart(document.getElementById('criteriaBreakdownChart'), {
-                        type: 'bar',
-                        data: data.criteria_breakdown,
+                    charts.enrollments = new Chart(document.getElementById('enrollmentsChart'), {
+                        type: 'line',
+                        data: data,
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            indexAxis: 'y',
                             plugins: {
-                                legend: { display: false },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return context.raw + '%';
-                                        }
-                                    }
-                                }
+                                legend: { position: 'top' },
+                                title: { display: false }
                             },
                             scales: {
-                                x: {
-                                    beginAtZero: true,
-                                    max: 100,
-                                    ticks: {
-                                        callback: function(value) {
-                                            return value + '%';
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading enrollments:', err);
+                    showNoData('enrollmentsChart', 'Error loading enrollment data');
+                });
+        }
+
+        // Fetch and render reports charts
+        function loadReportsCharts() {
+            fetch('{{ route('director.analytics.reports') }}?year=' + selectedYear)
+                .then(res => res.json())
+                .then(data => {
+                    // Monthly Reports Chart
+                    if (charts.reportsMonthly) charts.reportsMonthly.destroy();
+
+                    if (data.monthly && data.monthly.labels && data.monthly.labels.length > 0) {
+                        charts.reportsMonthly = new Chart(document.getElementById('reportsMonthlyChart'), {
+                            type: 'line',
+                            data: data.monthly,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { position: 'top' } },
+                                scales: { y: { beginAtZero: true } }
+                            }
+                        });
+                    } else {
+                        showNoData('reportsMonthlyChart', 'No report data available for ' + selectedYear);
+                    }
+
+                    // Reports Status Chart
+                    if (charts.reportsStatus) charts.reportsStatus.destroy();
+
+                    if (data.status && data.status.datasets && data.status.datasets[0].data.some(v => v > 0)) {
+                        charts.reportsStatus = new Chart(document.getElementById('reportsStatusChart'), {
+                            type: 'doughnut',
+                            data: data.status,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { position: 'right' } }
+                            }
+                        });
+                    } else {
+                        showNoData('reportsStatusChart', 'No report status data available');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading reports:', err);
+                    showNoData('reportsMonthlyChart', 'Error loading report data');
+                    showNoData('reportsStatusChart', 'Error loading report data');
+                });
+        }
+
+        // Fetch and render tutor performance charts
+        function loadTutorPerformanceCharts() {
+            fetch('{{ route('director.analytics.tutors') }}?year=' + selectedYear)
+                .then(res => res.json())
+                .then(data => {
+                    // Students per Tutor Chart
+                    if (charts.studentsPerTutor) charts.studentsPerTutor.destroy();
+
+                    if (data.students_per_tutor && data.students_per_tutor.labels && data.students_per_tutor.labels.length > 0) {
+                        charts.studentsPerTutor = new Chart(document.getElementById('studentsPerTutorChart'), {
+                            type: 'bar',
+                            data: data.students_per_tutor,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                indexAxis: 'y',
+                                plugins: { legend: { display: false } },
+                                scales: { x: { beginAtZero: true } }
+                            }
+                        });
+                    } else {
+                        showNoData('studentsPerTutorChart', 'No tutor student data available');
+                    }
+
+                    // Attendance Chart
+                    if (charts.attendance) charts.attendance.destroy();
+
+                    if (data.attendance && data.attendance.labels && data.attendance.labels.length > 0) {
+                        charts.attendance = new Chart(document.getElementById('attendanceChart'), {
+                            type: 'bar',
+                            data: data.attendance,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                indexAxis: 'y',
+                                plugins: { legend: { display: false } },
+                                scales: { x: { beginAtZero: true, max: 100 } }
+                            }
+                        });
+                    } else {
+                        showNoData('attendanceChart', 'No attendance data available');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading tutor performance:', err);
+                    showNoData('studentsPerTutorChart', 'Error loading tutor data');
+                    showNoData('attendanceChart', 'Error loading attendance data');
+                });
+        }
+
+        // Fetch and render assessment charts
+        function loadAssessmentCharts() {
+            fetch('{{ route('director.analytics.assessments') }}?year=' + selectedYear)
+                .then(res => res.json())
+                .then(data => {
+                    // Performance Trend Chart
+                    if (charts.performance) charts.performance.destroy();
+
+                    if (data.monthly_performance && data.monthly_performance.labels && data.monthly_performance.labels.length > 0) {
+                        charts.performance = new Chart(document.getElementById('performanceChart'), {
+                            type: 'line',
+                            data: data.monthly_performance,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { position: 'top' } },
+                                scales: { y: { beginAtZero: true, max: 100 } }
+                            }
+                        });
+                    } else {
+                        showNoData('performanceChart', 'No performance trend data available for ' + selectedYear);
+                    }
+
+                    // Rating Distribution Chart
+                    if (charts.ratingDistribution) charts.ratingDistribution.destroy();
+
+                    if (data.rating_distribution && data.rating_distribution.datasets && data.rating_distribution.datasets[0].data.some(v => v > 0)) {
+                        charts.ratingDistribution = new Chart(document.getElementById('ratingDistributionChart'), {
+                            type: 'doughnut',
+                            data: data.rating_distribution,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { position: 'right' } }
+                            }
+                        });
+                    } else {
+                        showNoData('ratingDistributionChart', 'No rating distribution data available');
+                    }
+
+                    // Criteria Breakdown Chart
+                    if (charts.criteriaBreakdown) charts.criteriaBreakdown.destroy();
+
+                    if (data.criteria_breakdown && data.criteria_breakdown.labels && data.criteria_breakdown.labels.length > 0) {
+                        charts.criteriaBreakdown = new Chart(document.getElementById('criteriaBreakdownChart'), {
+                            type: 'bar',
+                            data: data.criteria_breakdown,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                indexAxis: 'y',
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return context.raw + '%';
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        beginAtZero: true,
+                                        max: 100,
+                                        ticks: {
+                                            callback: function(value) {
+                                                return value + '%';
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                    });
-                } else {
-                    document.getElementById('criteriaBreakdownChart').parentElement.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 py-8">No criteria data available yet.</p>';
-                }
-            });
+                        });
+                    } else {
+                        showNoData('criteriaBreakdownChart', 'No criteria data available. Assessments need to be approved by director to show here.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading assessments:', err);
+                    showNoData('performanceChart', 'Error loading performance data');
+                    showNoData('ratingDistributionChart', 'Error loading rating data');
+                    showNoData('criteriaBreakdownChart', 'Error loading criteria data');
+                });
+        }
+
+        // Initial load
+        loadAllCharts();
     </script>
     @endpush
 </x-app-layout>

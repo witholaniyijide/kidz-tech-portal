@@ -124,6 +124,18 @@
                         </select>
                     </div>
                     <div class="w-40">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Month</label>
+                        <select name="month" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                            <option value="">All Months</option>
+                            @for($m = 1; $m <= 12; $m++)
+                                @php $monthValue = now()->year . '-' . str_pad($m, 2, '0', STR_PAD_LEFT); @endphp
+                                <option value="{{ $monthValue }}" {{ request('month') === $monthValue ? 'selected' : '' }}>
+                                    {{ date('F Y', strtotime($monthValue . '-01')) }}
+                                </option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="w-40">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class Date</label>
                         <input type="date" name="date" value="{{ request('date') }}"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
@@ -158,7 +170,7 @@
                     <button type="submit" class="px-4 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E] transition-colors">
                         Filter
                     </button>
-                    @if(request()->hasAny(['status', 'date', 'tutor_id', 'student_id', 'late_only']))
+                    @if(request()->hasAny(['status', 'month', 'date', 'tutor_id', 'student_id', 'late_only']))
                         <a href="{{ route('admin.attendance.index') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
                             Clear
                         </a>

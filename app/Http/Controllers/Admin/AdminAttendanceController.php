@@ -39,6 +39,13 @@ class AdminAttendanceController extends Controller
             $query->where('status', $request->status);
         }
 
+        // Filter by month
+        if ($request->filled('month')) {
+            $monthDate = Carbon::parse($request->month . '-01');
+            $query->whereYear('class_date', $monthDate->year)
+                  ->whereMonth('class_date', $monthDate->month);
+        }
+
         // Filter by date
         if ($request->filled('date')) {
             $query->whereDate('class_date', $request->date);

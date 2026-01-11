@@ -44,12 +44,28 @@
                         <p class="font-medium text-gray-900 dark:text-white">{{ $attendanceRate }}%</p>
                     </div>
                     <div>
-                        <span class="text-gray-600 dark:text-gray-400">Starting Level:</span>
-                        <p class="font-medium text-gray-900 dark:text-white">Level {{ $student->starting_course_level ?? 'N/A' }}</p>
+                        <span class="text-gray-600 dark:text-gray-400">Starting Course:</span>
+                        <p class="font-medium text-gray-900 dark:text-white">
+                            @if($student->startingCourse)
+                                Level {{ $student->startingCourse->level }} - {{ $student->startingCourse->name }}
+                            @elseif($student->starting_course_level)
+                                Level {{ $student->starting_course_level }}
+                            @else
+                                N/A
+                            @endif
+                        </p>
                     </div>
                     <div>
-                        <span class="text-gray-600 dark:text-gray-400">Current Level:</span>
-                        <p class="font-medium text-gray-900 dark:text-white">Level {{ $student->current_level ?? $student->starting_course_level ?? 'N/A' }}</p>
+                        <span class="text-gray-600 dark:text-gray-400">Current Course:</span>
+                        <p class="font-medium text-gray-900 dark:text-white">
+                            @if($student->currentCourse)
+                                Level {{ $student->currentCourse->level }} - {{ $student->currentCourse->name }}
+                            @elseif($student->startingCourse)
+                                Level {{ $student->startingCourse->level }} - {{ $student->startingCourse->name }}
+                            @else
+                                N/A
+                            @endif
+                        </p>
                     </div>
                     <div>
                         <span class="text-gray-600 dark:text-gray-400">Career Interest:</span>
@@ -66,16 +82,35 @@
             <div class="bg-white/20 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-lg">
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Class Schedule & Links</h2>
 
-                @if($student->class_schedule && is_array($student->class_schedule) && count($student->class_schedule) > 0)
+                @php
+                    $classSchedule = $student->class_schedule;
+                    if (is_string($classSchedule)) {
+                        $classSchedule = json_decode($classSchedule, true) ?? [];
+                    }
+                @endphp
+                @if($classSchedule && is_array($classSchedule) && count($classSchedule) > 0)
                     <div class="mb-4">
-                        <span class="text-gray-600 dark:text-gray-400 block mb-2">Class Days & Times:</span>
+                        <span class="text-gray-600 dark:text-gray-400 block mb-2">Class Days & Times <span class="text-xs text-amber-600 dark:text-amber-400">(NG Time)</span>:</span>
                         <div class="space-y-2">
-                            @foreach($student->class_schedule as $schedule)
+                            @foreach($classSchedule as $schedule)
+                                @php
+                                    // Convert 24-hour to 12-hour format
+                                    $time = $schedule['time'] ?? '';
+                                    $displayTime = $time;
+                                    if ($time && strpos($time, ':') !== false) {
+                                        $parts = explode(':', $time);
+                                        $h = (int)$parts[0];
+                                        $m = $parts[1] ?? '00';
+                                        $period = $h >= 12 ? 'PM' : 'AM';
+                                        $h12 = $h % 12 ?: 12;
+                                        $displayTime = $h12 . ':' . $m . ' ' . $period;
+                                    }
+                                @endphp
                                 <div class="flex items-center gap-2 p-2 bg-white/30 dark:bg-gray-800/30 rounded-lg">
                                     <svg class="w-4 h-4 text-[#4B49AC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                     </svg>
-                                    <span class="font-medium text-gray-900 dark:text-white">{{ $schedule['day'] ?? 'N/A' }} at {{ $schedule['time'] ?? 'N/A' }}</span>
+                                    <span class="font-medium text-gray-900 dark:text-white capitalize">{{ $schedule['day'] ?? 'N/A' }} at {{ $displayTime }}</span>
                                 </div>
                             @endforeach
                         </div>
@@ -111,20 +146,7 @@
                         </div>
                     @endif
 
-                    @if($student->class_link)
-                        <div>
-                            <span class="text-gray-600 dark:text-gray-400 block mb-1">Class Link:</span>
-                            <a href="{{ $student->class_link }}" target="_blank"
-                                class="inline-flex items-center gap-2 px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-                                </svg>
-                                Open Class
-                            </a>
-                        </div>
-                    @endif
-
-                    @if(!$student->live_classroom_link && !$student->google_classroom_link && !$student->class_link)
+                    @if(!$student->live_classroom_link && !$student->google_classroom_link)
                         <p class="text-gray-600 dark:text-gray-400">No class links available</p>
                     @endif
                 </div>

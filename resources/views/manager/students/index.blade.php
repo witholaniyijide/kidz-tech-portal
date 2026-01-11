@@ -168,9 +168,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
-                                    $progress = $student->total_periods > 0
-                                        ? round(($student->completed_periods / $student->total_periods) * 100)
-                                        : 0;
+                                    $progress = $student->getExplicitProgressPercentage();
                                 @endphp
                                 <div class="flex items-center">
                                     <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">

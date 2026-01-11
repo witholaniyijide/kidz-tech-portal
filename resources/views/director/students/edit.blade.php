@@ -180,32 +180,57 @@
                         </div>
                     </div>
 
-                    <!-- Course Progression -->
-                    @if(isset($courses) && $courses->count() > 0)
-                    <div class="mb-8">
+                    <!-- Class Schedule - Moved before Course Progression and Parent Info -->
+                    <div class="mb-8" x-show="classesPerWeek > 0">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            Course Progression
+                            Class Schedule <span class="text-sm font-normal text-amber-600 dark:text-amber-400">(NG Time)</span>
                         </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Select courses the student has completed.</p>
-                        @php
-                            $completedCourseIds = old('completed_course_ids', $student->completedCourses->pluck('id')->toArray());
-                        @endphp
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            @foreach($courses as $course)
-                                <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
-                                    <input type="checkbox"
-                                           name="completed_course_ids[]"
-                                           value="{{ $course->id }}"
-                                           {{ in_array($course->id, $completedCourseIds) ? 'checked' : '' }}
-                                           class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 dark:border-gray-600 rounded">
-                                    <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">
-                                        Level {{ $course->level }} - {{ $course->name }}
-                                    </span>
-                                </label>
-                            @endforeach
+                        <div class="space-y-4">
+                            <template x-for="(slot, index) in scheduleSlots" :key="index">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            Day <span x-text="index + 1"></span>
+                                        </label>
+                                        <select :name="'class_schedules[' + index + '][day]'" x-model="slot.day"
+                                                class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                            <option value="">Select Day</option>
+                                            <option value="Monday">Monday</option>
+                                            <option value="Tuesday">Tuesday</option>
+                                            <option value="Wednesday">Wednesday</option>
+                                            <option value="Thursday">Thursday</option>
+                                            <option value="Friday">Friday</option>
+                                            <option value="Saturday">Saturday</option>
+                                            <option value="Sunday">Sunday</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time</label>
+                                        <div class="flex items-center gap-1">
+                                            <input type="hidden" :name="'class_schedules[' + index + '][time]'" :value="slot.time">
+                                            <select x-model="slot.hour" @change="updateSlotTime(index)" class="w-16 px-2 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm">
+                                                <option value="">Hr</option>
+                                                <template x-for="h in 12" :key="h">
+                                                    <option :value="h" x-text="h"></option>
+                                                </template>
+                                            </select>
+                                            <span class="text-gray-500 dark:text-gray-400 font-bold">:</span>
+                                            <select x-model="slot.minute" @change="updateSlotTime(index)" class="w-16 px-2 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm">
+                                                <option value="">Min</option>
+                                                @for($i = 0; $i < 60; $i += 5)
+                                                    <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                                @endfor
+                                            </select>
+                                            <select x-model="slot.period" @change="updateSlotTime(index)" class="w-16 px-2 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm">
+                                                <option value="AM">AM</option>
+                                                <option value="PM">PM</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
-                    @endif
 
                     <!-- Parent Information -->
                     <div class="mb-8">
@@ -288,57 +313,32 @@
                         </div>
                     </div>
 
-                    <!-- Class Schedule -->
-                    <div class="mb-8" x-show="classesPerWeek > 0">
+                    <!-- Course Progression - Moved after Parent Info -->
+                    @if(isset($courses) && $courses->count() > 0)
+                    <div class="mb-8">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            Class Schedule
+                            Course Progression
                         </h3>
-                        <div class="space-y-4">
-                            <template x-for="(slot, index) in scheduleSlots" :key="index">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                            Day <span x-text="index + 1"></span>
-                                        </label>
-                                        <select :name="'class_schedules[' + index + '][day]'" x-model="slot.day"
-                                                class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                            <option value="">Select Day</option>
-                                            <option value="Monday">Monday</option>
-                                            <option value="Tuesday">Tuesday</option>
-                                            <option value="Wednesday">Wednesday</option>
-                                            <option value="Thursday">Thursday</option>
-                                            <option value="Friday">Friday</option>
-                                            <option value="Saturday">Saturday</option>
-                                            <option value="Sunday">Sunday</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time</label>
-                                        <div class="flex items-center gap-1">
-                                            <input type="hidden" :name="'class_schedules[' + index + '][time]'" :value="slot.time">
-                                            <select x-model="slot.hour" @change="updateSlotTime(index)" class="w-16 px-2 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm">
-                                                <option value="">Hr</option>
-                                                <template x-for="h in 12" :key="h">
-                                                    <option :value="h" x-text="h"></option>
-                                                </template>
-                                            </select>
-                                            <span class="text-gray-500 dark:text-gray-400 font-bold">:</span>
-                                            <select x-model="slot.minute" @change="updateSlotTime(index)" class="w-16 px-2 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm">
-                                                <option value="">Min</option>
-                                                @for($i = 0; $i < 60; $i += 5)
-                                                    <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
-                                                @endfor
-                                            </select>
-                                            <select x-model="slot.period" @change="updateSlotTime(index)" class="w-16 px-2 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm">
-                                                <option value="AM">AM</option>
-                                                <option value="PM">PM</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Select courses the student has completed.</p>
+                        @php
+                            $completedCourseIds = old('completed_course_ids', $student->completedCourses->pluck('id')->toArray());
+                        @endphp
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            @foreach($courses as $course)
+                                <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
+                                    <input type="checkbox"
+                                           name="completed_course_ids[]"
+                                           value="{{ $course->id }}"
+                                           {{ in_array($course->id, $completedCourseIds) ? 'checked' : '' }}
+                                           class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 dark:border-gray-600 rounded">
+                                    <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">
+                                        Level {{ $course->level }} - {{ $course->name }}
+                                    </span>
+                                </label>
+                            @endforeach
                         </div>
                     </div>
+                    @endif
 
                     <!-- Notes -->
                     <div class="mb-8">
@@ -370,7 +370,7 @@
         function studentForm() {
             return {
                 classesPerWeek: {{ old('classes_per_week', $student->classes_per_week ?? 0) }},
-                scheduleSlots: @json($existingSchedules),
+                scheduleSlots: [],
 
                 parseTimeTo12Hour(time24) {
                     if (!time24) return { hour: '', minute: '', period: 'AM' };
@@ -420,8 +420,16 @@
                 },
 
                 init() {
+                    // Load existing schedules, filtering out empty entries
+                    let rawSchedules = @json($existingSchedules);
+
+                    // Filter to only include schedules that have a day set
+                    let validSchedules = Array.isArray(rawSchedules)
+                        ? rawSchedules.filter(s => s && s.day && s.day.trim() !== '')
+                        : [];
+
                     // Parse existing times to 12-hour format
-                    this.scheduleSlots = this.scheduleSlots.map(slot => {
+                    this.scheduleSlots = validSchedules.map(slot => {
                         const parsed = this.parseTimeTo12Hour(slot.time);
                         return {
                             ...slot,
@@ -431,6 +439,7 @@
                         };
                     });
 
+                    // If no valid schedules but classes per week is set, create empty slots
                     if (this.scheduleSlots.length === 0 && this.classesPerWeek > 0) {
                         this.updateScheduleSlots();
                     }

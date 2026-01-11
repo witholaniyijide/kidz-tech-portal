@@ -148,6 +148,16 @@ class DirectorDashboardController extends Controller
         $pendingAttendance = AttendanceRecord::where('status', 'pending')->count();
         $pendingAssessments = TutorAssessment::whereIn('status', ['pending_review', 'approved-by-manager'])->count();
 
+        // System tasks
+        $studentsWithoutTutor = Student::where('status', 'active')->whereNull('tutor_id')->count();
+        $inactiveTutors = Tutor::where('status', 'inactive')->count();
+        $studentsWithoutSchedule = Student::where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('class_schedule')
+                  ->orWhere('class_schedule', '[]')
+                  ->orWhere('class_schedule', '');
+            })->count();
+
         $todos = [
             [
                 'text' => "Review {$pendingApprovals} pending report(s)",
@@ -166,6 +176,18 @@ class DirectorDashboardController extends Controller
                 'completed' => $pendingAssessments == 0,
                 'link' => route('director.assessments.index'),
                 'count' => $pendingAssessments,
+            ],
+            [
+                'text' => "Assign tutors to {$studentsWithoutTutor} student(s)",
+                'completed' => $studentsWithoutTutor == 0,
+                'link' => route('director.students.index'),
+                'count' => $studentsWithoutTutor,
+            ],
+            [
+                'text' => "Set schedule for {$studentsWithoutSchedule} student(s)",
+                'completed' => $studentsWithoutSchedule == 0,
+                'link' => route('director.students.index'),
+                'count' => $studentsWithoutSchedule,
             ],
             [
                 'text' => 'Check analytics dashboard',
