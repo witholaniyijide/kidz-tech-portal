@@ -287,7 +287,7 @@
                                     </svg>
                                     @php
                                         try {
-                                            $unreadCount = Auth::user()->unreadNotifications->count();
+                                            $unreadCount = Auth::user()->unreadManagerNotifications()->count();
                                         } catch (\Exception $e) {
                                             $unreadCount = 0;
                                         }
@@ -307,15 +307,16 @@
                                     </div>
                                     @php
                                         try {
-                                            $notifications = Auth::user()->unreadNotifications->take(10);
+                                            $notifications = Auth::user()->unreadManagerNotifications()->latest()->take(10)->get();
                                         } catch (\Exception $e) {
                                             $notifications = collect();
                                         }
                                     @endphp
                                     @forelse($notifications as $notification)
-                                        <a href="#" class="block px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition">
-                                            <div class="font-semibold mb-1">{{ $notification->data['title'] ?? 'Notification' }}</div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ $notification->created_at->diffForHumans() }}</div>
+                                        <a href="{{ $notification->meta['link'] ?? '#' }}" class="block px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition">
+                                            <div class="font-semibold mb-1">{{ $notification->title ?? 'Notification' }}</div>
+                                            <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{{ \Illuminate\Support\Str::limit($notification->body, 80) }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-500">{{ $notification->created_at->diffForHumans() }}</div>
                                         </a>
                                     @empty
                                         <div class="px-6 py-12 text-sm text-gray-500 dark:text-gray-400 text-center">

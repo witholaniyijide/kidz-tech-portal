@@ -99,6 +99,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Scope to filter users by role name
+     */
+    public function scopeRole($query, $role)
+    {
+        return $query->whereHas('roles', function ($q) use ($role) {
+            $q->where('name', $role);
+        });
+    }
+
+    /**
      * Get the tutor profile associated with this user
      */
     public function tutor()
@@ -146,5 +156,21 @@ class User extends Authenticatable
     public function students()
     {
         return $this->guardiansOf();
+    }
+
+    /**
+     * Get manager notifications for this user
+     */
+    public function managerNotifications()
+    {
+        return $this->hasMany(ManagerNotification::class);
+    }
+
+    /**
+     * Get unread manager notifications for this user
+     */
+    public function unreadManagerNotifications()
+    {
+        return $this->hasMany(ManagerNotification::class)->where('is_read', false);
     }
 }

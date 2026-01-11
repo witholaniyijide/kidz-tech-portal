@@ -66,22 +66,6 @@
                                                     {{ date('F Y', strtotime($report->month . '-01')) }}
                                                 </td>
                                             </tr>
-                                            <tr>
-                                                <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">
-                                                    <strong>Performance Rating:</strong>
-                                                </td>
-                                                <td style="padding: 8px 0; font-size: 14px; color: #1f2937; font-weight: bold;">
-                                                    {{ ucfirst($report->performance_rating ?? 'N/A') }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">
-                                                    <strong>Attendance Score:</strong>
-                                                </td>
-                                                <td style="padding: 8px 0; font-size: 14px; color: #1f2937; font-weight: bold;">
-                                                    {{ $report->attendance_score ?? 'N/A' }}@if($report->attendance_score)%@endif
-                                                </td>
-                                            </tr>
                                         </table>
                                     </td>
                                 </tr>

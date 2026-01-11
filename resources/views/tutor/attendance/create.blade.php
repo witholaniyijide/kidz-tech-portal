@@ -160,15 +160,42 @@
                         @enderror
                     </div>
 
-                    <!-- Class Time -->
-                    <div>
-                        <label for="class_time" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <!-- Class Time (12-hour format) -->
+                    <div x-data="{
+                        hour: '{{ old('class_time') ? (int)substr(old('class_time'), 0, 2) % 12 ?: 12 : '' }}',
+                        minute: '{{ old('class_time') ? substr(old('class_time'), 3, 2) : '' }}',
+                        period: '{{ old('class_time') && (int)substr(old('class_time'), 0, 2) >= 12 ? 'PM' : 'AM' }}',
+                        get time24() {
+                            if (!this.hour || !this.minute) return '';
+                            let h = parseInt(this.hour);
+                            if (this.period === 'PM' && h !== 12) h += 12;
+                            if (this.period === 'AM' && h === 12) h = 0;
+                            return String(h).padStart(2, '0') + ':' + this.minute;
+                        }
+                    }">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                             Actual Class Time <span class="text-red-500">*</span>
                         </label>
-                        <input type="time" id="class_time" name="class_time"
-                               value="{{ old('class_time') }}"
-                               required
-                               class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                        <input type="hidden" name="class_time" :value="time24" required>
+                        <div class="flex items-center gap-2">
+                            <select x-model="hour" required class="w-20 px-3 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                                <option value="">Hr</option>
+                                @for($i = 1; $i <= 12; $i++)
+                                    <option value="{{ $i }}">{{ $i }}</option>
+                                @endfor
+                            </select>
+                            <span class="text-slate-500 dark:text-slate-400 font-bold text-lg">:</span>
+                            <select x-model="minute" required class="w-20 px-3 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                                <option value="">Min</option>
+                                @for($i = 0; $i < 60; $i += 5)
+                                    <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                @endfor
+                            </select>
+                            <select x-model="period" class="w-20 px-3 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
                         @error('class_time')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
@@ -205,15 +232,42 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Original Scheduled Time -->
-                            <div>
-                                <label for="original_scheduled_time" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            <!-- Original Scheduled Time (12-hour format) -->
+                            <div x-data="{
+                                origHour: '{{ old('original_scheduled_time') ? (int)substr(old('original_scheduled_time'), 0, 2) % 12 ?: 12 : '' }}',
+                                origMinute: '{{ old('original_scheduled_time') ? substr(old('original_scheduled_time'), 3, 2) : '' }}',
+                                origPeriod: '{{ old('original_scheduled_time') && (int)substr(old('original_scheduled_time'), 0, 2) >= 12 ? 'PM' : 'AM' }}',
+                                get origTime24() {
+                                    if (!this.origHour || !this.origMinute) return '';
+                                    let h = parseInt(this.origHour);
+                                    if (this.origPeriod === 'PM' && h !== 12) h += 12;
+                                    if (this.origPeriod === 'AM' && h === 12) h = 0;
+                                    return String(h).padStart(2, '0') + ':' + this.origMinute;
+                                }
+                            }">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                     Original Scheduled Time <span class="text-red-500">*</span>
                                 </label>
-                                <input type="time" id="original_scheduled_time" name="original_scheduled_time"
-                                       value="{{ old('original_scheduled_time') }}"
-                                       :required="isRescheduled"
-                                       class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                                <input type="hidden" name="original_scheduled_time" :value="origTime24">
+                                <div class="flex items-center gap-2">
+                                    <select x-model="origHour" :required="isRescheduled" class="w-16 px-2 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] text-sm">
+                                        <option value="">Hr</option>
+                                        @for($i = 1; $i <= 12; $i++)
+                                            <option value="{{ $i }}">{{ $i }}</option>
+                                        @endfor
+                                    </select>
+                                    <span class="text-slate-500 dark:text-slate-400 font-bold">:</span>
+                                    <select x-model="origMinute" :required="isRescheduled" class="w-16 px-2 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] text-sm">
+                                        <option value="">Min</option>
+                                        @for($i = 0; $i < 60; $i += 5)
+                                            <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                        @endfor
+                                    </select>
+                                    <select x-model="origPeriod" class="w-16 px-2 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] text-sm">
+                                        <option value="AM">AM</option>
+                                        <option value="PM">PM</option>
+                                    </select>
+                                </div>
                                 @error('original_scheduled_time')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror

@@ -58,11 +58,13 @@ class StudentController extends Controller
             },
             'currentCourse',
             'completedCourses',
+            'startingCourse',
         ]);
 
-        // Calculate attendance stats
-        $totalClasses = $student->attendanceRecords->count();
-        $presentCount = $student->attendanceRecords->where('status', 'present')->count();
+        // Calculate attendance stats from ALL attendance records (not just the loaded 10)
+        $allAttendanceRecords = $student->attendanceRecords()->get();
+        $totalClasses = $allAttendanceRecords->count();
+        $presentCount = $allAttendanceRecords->where('status', 'present')->count();
         $attendanceRate = $totalClasses > 0 ? round(($presentCount / $totalClasses) * 100, 1) : 0;
 
         return view('tutor.students.show', compact('student', 'attendanceRate'));

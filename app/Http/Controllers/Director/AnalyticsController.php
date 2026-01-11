@@ -89,13 +89,15 @@ class AnalyticsController extends Controller
     /**
      * Get enrollments data for chart (JSON).
      */
-    public function getEnrollmentsData()
+    public function getEnrollmentsData(Request $request)
     {
-        // Clear cache for fresh data
-        Cache::forget('director.analytics.enrollments');
+        $year = $request->input('year', now()->year);
 
-        $data = Cache::remember('director.analytics.enrollments', 300, function () {
-            // Last 12 months enrollment data
+        // Clear cache for fresh data
+        Cache::forget("director.analytics.enrollments.{$year}");
+
+        $data = Cache::remember("director.analytics.enrollments.{$year}", 300, function () use ($year) {
+            // Get enrollment data for the selected year
             $enrollments = DB::table('students')
                 ->select(
                     DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
@@ -103,7 +105,7 @@ class AnalyticsController extends Controller
                     DB::raw("SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active"),
                     DB::raw("SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive")
                 )
-                ->where('created_at', '>=', now()->subMonths(12))
+                ->whereYear('created_at', $year)
                 ->groupBy('month')
                 ->orderBy('month', 'asc')
                 ->get();
@@ -138,34 +140,37 @@ class AnalyticsController extends Controller
     /**
      * Get reports analytics data (JSON).
      */
-    public function getReportsData()
+    public function getReportsData(Request $request)
     {
-        // Clear cache for fresh data
-        Cache::forget('director.analytics.reports');
+        $year = $request->input('year', now()->year);
 
-        $data = Cache::remember('director.analytics.reports', 300, function () {
-            // Monthly report submissions (last 12 months)
+        // Clear cache for fresh data
+        Cache::forget("director.analytics.reports.{$year}");
+
+        $data = Cache::remember("director.analytics.reports.{$year}", 300, function () use ($year) {
+            // Monthly report submissions for selected year
             $monthlyReports = DB::table('tutor_reports')
                 ->select(
                     DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
                     DB::raw('COUNT(*) as total')
                 )
-                ->where('created_at', '>=', now()->subMonths(12))
+                ->whereYear('created_at', $year)
                 ->groupBy('month')
                 ->orderBy('month', 'asc')
                 ->get();
 
-            // If no monthly data, fill with zeros for last 6 months
+            // If no monthly data, fill with zeros for all months of the year
             if ($monthlyReports->isEmpty()) {
                 $monthlyReports = collect();
-                for ($i = 5; $i >= 0; $i--) {
-                    $month = now()->subMonths($i)->format('Y-m');
+                for ($i = 1; $i <= 12; $i++) {
+                    $month = $year . '-' . str_pad($i, 2, '0', STR_PAD_LEFT);
                     $monthlyReports->push((object)['month' => $month, 'total' => 0]);
                 }
             }
 
-            // Status breakdown - get all reports, not just current month
+            // Status breakdown for the selected year
             $statusBreakdown = TutorReport::select('status', DB::raw('COUNT(*) as count'))
+                ->whereYear('created_at', $year)
                 ->groupBy('status')
                 ->get()
                 ->pluck('count', 'status')
@@ -246,15 +251,20 @@ class AnalyticsController extends Controller
     /**
      * Get tutor performance data (JSON).
      */
-    public function getTutorPerformanceData()
+    public function getTutorPerformanceData(Request $request)
     {
-        // Clear cache for fresh data
-        Cache::forget('director.analytics.tutor_performance');
+        $year = $request->input('year', now()->year);
 
-        $data = Cache::remember('director.analytics.tutor_performance', 300, function () {
-            // Students per tutor (top 20)
+        // Clear cache for fresh data
+        Cache::forget("director.analytics.tutor_performance.{$year}");
+
+        $data = Cache::remember("director.analytics.tutor_performance.{$year}", 300, function () use ($year) {
+            // Students per tutor for selected year (top 20)
             $studentsPerTutor = DB::table('tutors')
-                ->leftJoin('tutor_reports', 'tutors.id', '=', 'tutor_reports.tutor_id')
+                ->leftJoin('tutor_reports', function($join) use ($year) {
+                    $join->on('tutors.id', '=', 'tutor_reports.tutor_id')
+                         ->whereYear('tutor_reports.created_at', $year);
+                })
                 ->select(
                     'tutors.first_name',
                     'tutors.last_name',
@@ -266,9 +276,12 @@ class AnalyticsController extends Controller
                 ->limit(20)
                 ->get();
 
-            // Average attendance by tutor
+            // Average attendance by tutor for selected year
             $attendanceByTutor = DB::table('tutors')
-                ->leftJoin('tutor_reports', 'tutors.id', '=', 'tutor_reports.tutor_id')
+                ->leftJoin('tutor_reports', function($join) use ($year) {
+                    $join->on('tutors.id', '=', 'tutor_reports.tutor_id')
+                         ->whereYear('tutor_reports.created_at', $year);
+                })
                 ->select(
                     'tutors.first_name',
                     'tutors.last_name',
@@ -323,20 +336,22 @@ class AnalyticsController extends Controller
     /**
      * Get assessment metrics data (JSON).
      */
-    public function getAssessmentData()
+    public function getAssessmentData(Request $request)
     {
-        // Clear cache for fresh data
-        Cache::forget('director.analytics.assessments');
+        $year = $request->input('year', now()->year);
 
-        $data = Cache::remember('director.analytics.assessments', 300, function () {
-            // Average performance score by month (last 12 months) - using class_date for proper date ordering
+        // Clear cache for fresh data
+        Cache::forget("director.analytics.assessments.{$year}");
+
+        $data = Cache::remember("director.analytics.assessments.{$year}", 300, function () use ($year) {
+            // Average performance score by month for selected year - using class_date for proper date ordering
             $monthlyPerformance = DB::table('tutor_assessments')
                 ->select(
                     DB::raw("DATE_FORMAT(class_date, '%Y-%m') as month"),
                     DB::raw('AVG(performance_score) as avg_score'),
                     DB::raw('COUNT(*) as count')
                 )
-                ->where('class_date', '>=', now()->subMonths(12))
+                ->whereYear('class_date', $year)
                 ->where('status', 'approved-by-director')
                 ->whereNotNull('performance_score')
                 ->where('performance_score', '>', 0)
@@ -352,7 +367,7 @@ class AnalyticsController extends Controller
                         DB::raw('AVG(performance_score) as avg_score'),
                         DB::raw('COUNT(*) as count')
                     )
-                    ->whereNotNull('year')
+                    ->where('year', $year)
                     ->where('status', 'approved-by-director')
                     ->whereNotNull('performance_score')
                     ->where('performance_score', '>', 0)
@@ -363,7 +378,7 @@ class AnalyticsController extends Controller
                     ->get();
             }
 
-            // Distribution of performance scores (grouped by ranges)
+            // Distribution of performance scores for selected year (grouped by ranges)
             $ratingDistribution = TutorAssessment::select(
                     DB::raw('CASE
                         WHEN performance_score >= 90 THEN "90-100 (Excellent)"
@@ -373,6 +388,7 @@ class AnalyticsController extends Controller
                     END as rating_range'),
                     DB::raw('COUNT(*) as count')
                 )
+                ->whereYear('created_at', $year)
                 ->where('status', 'approved-by-director')
                 ->whereNotNull('performance_score')
                 ->where('performance_score', '>', 0)

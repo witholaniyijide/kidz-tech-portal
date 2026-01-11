@@ -145,6 +145,59 @@
                             </div>
                         </div>
 
+                        {{-- Dynamic Class Schedule --}}
+                        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                Class Schedule
+                                <span class="text-xs text-amber-600 dark:text-amber-400 ml-2">(NG Time)</span>
+                            </label>
+                            <div class="space-y-3">
+                                <template x-for="(schedule, index) in schedules" :key="index">
+                                    <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                        <select x-model="schedule.day" :name="'class_schedule['+index+'][day]'" class="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg">
+                                            <option value="">Day</option>
+                                            <option value="monday">Monday</option>
+                                            <option value="tuesday">Tuesday</option>
+                                            <option value="wednesday">Wednesday</option>
+                                            <option value="thursday">Thursday</option>
+                                            <option value="friday">Friday</option>
+                                            <option value="saturday">Saturday</option>
+                                            <option value="sunday">Sunday</option>
+                                        </select>
+                                        {{-- 12-Hour Time Picker --}}
+                                        <div class="flex items-center gap-1">
+                                            <input type="hidden" :name="'class_schedule['+index+'][time]'" :value="schedule.time">
+                                            <select x-model="schedule.hour" @change="updateScheduleTime(index)" class="w-16 px-2 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                                                <option value="">Hr</option>
+                                                <template x-for="h in 12" :key="h">
+                                                    <option :value="h" x-text="h"></option>
+                                                </template>
+                                            </select>
+                                            <span class="text-gray-500 dark:text-gray-400 font-bold">:</span>
+                                            <select x-model="schedule.minute" @change="updateScheduleTime(index)" class="w-16 px-2 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                                                <option value="">Min</option>
+                                                @for($i = 0; $i < 60; $i += 5)
+                                                    <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                                @endfor
+                                            </select>
+                                            <select x-model="schedule.period" @change="updateScheduleTime(index)" class="w-16 px-2 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                                                <option value="AM">AM</option>
+                                                <option value="PM">PM</option>
+                                            </select>
+                                        </div>
+                                        <button type="button" @click="removeSchedule(index)" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                            <button type="button" @click="addSchedule()" class="mt-3 text-sm text-[#423A8E] dark:text-[#00CCCD] hover:underline">
+                                + Add Schedule Slot
+                            </button>
+                        </div>
+
                         {{-- Course Progression Section --}}
                         @if(isset($courses) && $courses->count() > 0)
                         <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
@@ -239,56 +292,6 @@
                             </div>
                         </div>
                         @endif
-
-                        {{-- Dynamic Class Schedule --}}
-                        <div class="mt-6">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Class Schedule</label>
-                            <div class="space-y-3">
-                                <template x-for="(schedule, index) in schedules" :key="index">
-                                    <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                        <select x-model="schedule.day" :name="'class_schedule['+index+'][day]'" class="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg">
-                                            <option value="">Day</option>
-                                            <option value="monday">Monday</option>
-                                            <option value="tuesday">Tuesday</option>
-                                            <option value="wednesday">Wednesday</option>
-                                            <option value="thursday">Thursday</option>
-                                            <option value="friday">Friday</option>
-                                            <option value="saturday">Saturday</option>
-                                            <option value="sunday">Sunday</option>
-                                        </select>
-                                        {{-- 12-Hour Time Picker --}}
-                                        <div class="flex items-center gap-1">
-                                            <input type="hidden" :name="'class_schedule['+index+'][time]'" :value="schedule.time">
-                                            <select x-model="schedule.hour" @change="updateScheduleTime(index)" class="w-16 px-2 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
-                                                <option value="">Hr</option>
-                                                <template x-for="h in 12" :key="h">
-                                                    <option :value="h" x-text="h"></option>
-                                                </template>
-                                            </select>
-                                            <span class="text-gray-500 dark:text-gray-400 font-bold">:</span>
-                                            <select x-model="schedule.minute" @change="updateScheduleTime(index)" class="w-16 px-2 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
-                                                <option value="">Min</option>
-                                                @for($i = 0; $i < 60; $i += 5)
-                                                    <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
-                                                @endfor
-                                            </select>
-                                            <select x-model="schedule.period" @change="updateScheduleTime(index)" class="w-16 px-2 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
-                                                <option value="AM">AM</option>
-                                                <option value="PM">PM</option>
-                                            </select>
-                                        </div>
-                                        <button type="button" @click="removeSchedule(index)" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </template>
-                            </div>
-                            <button type="button" @click="addSchedule()" class="mt-3 text-sm text-[#423A8E] dark:text-[#00CCCD] hover:underline">
-                                + Add Schedule Slot
-                            </button>
-                        </div>
                     </div>
                 </div>
 
@@ -360,7 +363,7 @@
             return {
                 dob: '{{ old('date_of_birth', $student->date_of_birth?->format('Y-m-d')) }}',
                 age: '',
-                schedules: @json($student->class_schedule ?? [['day' => '', 'time' => '']]),
+                schedules: [],
 
                 parseTimeTo12Hour(time24) {
                     if (!time24) return { hour: '', minute: '', period: 'AM' };
@@ -404,12 +407,25 @@
                 removeSchedule(index) { if (this.schedules.length > 1) this.schedules.splice(index, 1); },
                 init() {
                     this.calculateAge();
-                    if (!this.schedules.length) this.schedules = [{ day: '', time: '', hour: '', minute: '', period: 'AM' }];
-                    // Parse existing times to 12-hour format
-                    this.schedules = this.schedules.map(schedule => {
-                        const parsed = this.parseTimeTo12Hour(schedule.time);
-                        return { ...schedule, hour: parsed.hour, minute: parsed.minute, period: parsed.period };
-                    });
+
+                    // Load existing schedules from server, filtering out empty entries
+                    let rawSchedules = @json($student->class_schedule ?? []);
+
+                    // Filter to only include schedules that have a day set
+                    let validSchedules = Array.isArray(rawSchedules)
+                        ? rawSchedules.filter(s => s && s.day && s.day.trim() !== '')
+                        : [];
+
+                    // If no valid schedules, start with one empty slot
+                    if (!validSchedules.length) {
+                        this.schedules = [{ day: '', time: '', hour: '', minute: '', period: 'AM' }];
+                    } else {
+                        // Parse existing times to 12-hour format
+                        this.schedules = validSchedules.map(schedule => {
+                            const parsed = this.parseTimeTo12Hour(schedule.time);
+                            return { ...schedule, hour: parsed.hour, minute: parsed.minute, period: parsed.period };
+                        });
+                    }
                 }
             };
         }
