@@ -29,8 +29,7 @@ class AdminSettingsController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $preferences = $user->preferences['notifications'] ?? [];
-        return view('admin.settings.index', compact('user', 'preferences'));
+        return view('admin.settings.index', compact('user'));
     }
 
     /**
@@ -94,21 +93,19 @@ class AdminSettingsController extends Controller
      */
     public function updateNotifications(Request $request)
     {
-        $validated = $request->validate([
-            'email_notifications' => 'boolean',
-            'sms_notifications' => 'boolean',
-            'attendance_alerts' => 'boolean',
-            'report_alerts' => 'boolean',
-            'schedule_alerts' => 'boolean',
+        $request->validate([
+            'notify_email' => 'boolean',
+            'notify_in_app' => 'boolean',
+            'notify_daily_summary' => 'boolean',
         ]);
 
         $user = Auth::user();
-        
-        // Store in user preferences (JSON column or separate table)
-        $preferences = $user->preferences ?? [];
-        $preferences['notifications'] = $validated;
-        $user->preferences = $preferences;
-        $user->save();
+
+        $user->update([
+            'notify_email' => $request->boolean('notify_email'),
+            'notify_in_app' => $request->boolean('notify_in_app'),
+            'notify_daily_summary' => $request->boolean('notify_daily_summary'),
+        ]);
 
         return redirect()
             ->route('admin.settings.index')

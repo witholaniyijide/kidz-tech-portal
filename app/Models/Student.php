@@ -115,6 +115,16 @@ class Student extends Model
                 $student->enrollment_date = now();
             }
         });
+
+        // Auto-calculate classes_per_week from class_schedule
+        static::saving(function ($student) {
+            if (is_array($student->class_schedule)) {
+                $validSchedules = array_filter($student->class_schedule, function ($schedule) {
+                    return !empty($schedule['day']) && trim($schedule['day']) !== '';
+                });
+                $student->classes_per_week = count($validSchedules);
+            }
+        });
     }
 
     /**

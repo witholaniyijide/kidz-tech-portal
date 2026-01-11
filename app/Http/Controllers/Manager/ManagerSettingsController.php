@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class ManagerSettingsController extends Controller
@@ -28,8 +29,7 @@ class ManagerSettingsController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $preferences = $user->preferences['notifications'] ?? [];
-        return view('manager.settings.index', compact('user', 'preferences'));
+        return view('manager.settings.index', compact('user'));
     }
 
     /**
@@ -93,23 +93,56 @@ class ManagerSettingsController extends Controller
      */
     public function updateNotifications(Request $request)
     {
-        $validated = $request->validate([
-            'email_notifications' => 'boolean',
-            'attendance_alerts' => 'boolean',
-            'report_alerts' => 'boolean',
-            'assessment_alerts' => 'boolean',
+        $request->validate([
+            'notify_email' => 'boolean',
+            'notify_in_app' => 'boolean',
+            'notify_daily_summary' => 'boolean',
         ]);
 
         $user = Auth::user();
 
-        // Store in user preferences (JSON column)
-        $preferences = $user->preferences ?? [];
-        $preferences['notifications'] = $validated;
-        $user->preferences = $preferences;
-        $user->save();
+        $user->update([
+            'notify_email' => $request->boolean('notify_email'),
+            'notify_in_app' => $request->boolean('notify_in_app'),
+            'notify_daily_summary' => $request->boolean('notify_daily_summary'),
+        ]);
 
         return redirect()
             ->route('manager.settings.index')
             ->with('success', 'Notification preferences updated.');
+    }
+
+    /**
+     * Update profile photo/avatar.
+     */
+    public function updateAvatar(Request $request)
+    {
+        $validated = $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $user = Auth::user();
+
+        // Delete old avatar if exists
+        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+            Storage::disk('public')->delete($user->profile_photo);
+        }
+
+        // Store new avatar
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $user->profile_photo = $path;
+        $user->save();
+
+        ActivityLog::create([
+            'user_id' => $user->id,
+            'action' => 'updated_avatar',
+            'description' => 'Manager updated profile photo',
+            'model_type' => get_class($user),
+            'model_id' => $user->id,
+        ]);
+
+        return redirect()
+            ->route('manager.settings.index')
+            ->with('success', 'Profile photo updated successfully.');
     }
 }
