@@ -112,8 +112,26 @@
                             <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $student->classes_per_week ?? '-' }}</p>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Starting Course Level</label>
-                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $student->starting_course_level ? 'Level ' . $student->starting_course_level : '-' }}</p>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Starting Course</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">
+                                @if($student->startingCourse)
+                                    Level {{ $student->startingCourse->level }} - {{ $student->startingCourse->name }}
+                                @elseif($student->starting_course_level)
+                                    Level {{ $student->starting_course_level }}
+                                @else
+                                    -
+                                @endif
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Current Course</label>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">
+                                @if($student->currentCourse)
+                                    Level {{ $student->currentCourse->level }} - {{ $student->currentCourse->name }}
+                                @else
+                                    -
+                                @endif
+                            </p>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Enrollment Date</label>
@@ -140,6 +158,21 @@
                             @endif
                         </div>
                     </div>
+
+                    {{-- Completed Courses --}}
+                    @if($student->completedCourses && $student->completedCourses->count() > 0)
+                        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Completed Courses</label>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($student->completedCourses as $course)
+                                    <span class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg text-xs sm:text-sm">
+                                        <svg class="w-3 sm:w-4 h-3 sm:h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                        Level {{ $course->level }} - {{ $course->name }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
 
                     {{-- Class Schedule --}}
                     @php

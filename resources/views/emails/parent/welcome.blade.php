@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to KidzTech Parent Portal</title>
+    <title>Welcome to Kidz Tech Coding Club Parent Portal</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f3f4f6;">
     <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f3f4f6;">
@@ -15,7 +15,7 @@
                     <tr>
                         <td style="background: linear-gradient(135deg, #423A8E 0%, #00CCCD 100%); padding: 40px 30px; text-align: center;">
                             <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">
-                                Welcome to KidzTech!
+                                Welcome to Kidz Tech Coding Club!
                             </h1>
                             <p style="margin: 10px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 16px;">
                                 Your Parent Portal Account Has Been Created
@@ -109,7 +109,7 @@
 
                             <p style="margin: 20px 0 0 0; font-size: 14px; color: #6b7280; line-height: 1.6;">
                                 Best regards,<br>
-                                <strong style="color: #1f2937;">The KidzTech Team</strong>
+                                <strong style="color: #1f2937;">The Kidz Tech Coding Club Team</strong>
                             </p>
                         </td>
                     </tr>
@@ -118,7 +118,7 @@
                     <tr>
                         <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #6b7280;">
-                                &copy; {{ date('Y') }} KidzTech - Empowering Young Minds Through Technology
+                                &copy; {{ date('Y') }} Kidz Tech Coding Club - Empowering Young Minds Through Technology
                             </p>
                             <p style="margin: 0; font-size: 12px; color: #9ca3af;">
                                 This is an automated message. Please do not reply directly to this email.

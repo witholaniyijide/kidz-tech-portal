@@ -198,8 +198,20 @@
                                 @if($report->imported_from_artifact)
                                     <span class="inline-flex items-center px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs rounded-full">Imported</span>
                                 @endif
+                                @if($report->status === 'returned')
+                                    <span class="inline-flex items-center px-2.5 py-1 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 text-xs rounded-full">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                        Sent back for correction
+                                    </span>
+                                @endif
                             </div>
-                            <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                            @if($report->status === 'returned' && $report->manager_comment)
+                                <div class="mt-2 p-3 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-lg">
+                                    <p class="text-sm font-medium text-rose-700 dark:text-rose-400 mb-1">Manager's Feedback:</p>
+                                    <p class="text-sm text-rose-600 dark:text-rose-300">{{ $report->manager_comment }}</p>
+                                </div>
+                            @endif
+                            <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400 mt-2">
                                 @if($report->courses && count($report->courses) > 0)
                                     <span class="flex items-center gap-1">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>

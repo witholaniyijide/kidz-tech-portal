@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\TutorReport;
 use App\Models\Tutor;
 use App\Models\Student;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -171,10 +172,14 @@ class ReportReviewController extends Controller
         // Update the report
         DB::transaction(function () use ($report, $validated) {
             $report->update([
-                'status' => 'draft',
+                'status' => 'returned',
                 'manager_comment' => $validated['manager_comment'],
+                'returned_at' => now(),
             ]);
         });
+
+        // Notify tutor about the returned report
+        app(NotificationService::class)->notifyReportReturned($report, $validated['manager_comment']);
 
         return redirect()
             ->route('manager.reports.index')

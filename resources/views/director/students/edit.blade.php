@@ -314,8 +314,26 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time</label>
-                                        <input type="time" :name="'class_schedules[' + index + '][time]'" x-model="slot.time"
-                                               class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                        <div class="flex items-center gap-1">
+                                            <input type="hidden" :name="'class_schedules[' + index + '][time]'" :value="slot.time">
+                                            <select x-model="slot.hour" @change="updateSlotTime(index)" class="w-16 px-2 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm">
+                                                <option value="">Hr</option>
+                                                <template x-for="h in 12" :key="h">
+                                                    <option :value="h" x-text="h"></option>
+                                                </template>
+                                            </select>
+                                            <span class="text-gray-500 dark:text-gray-400 font-bold">:</span>
+                                            <select x-model="slot.minute" @change="updateSlotTime(index)" class="w-16 px-2 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm">
+                                                <option value="">Min</option>
+                                                @for($i = 0; $i < 60; $i += 5)
+                                                    <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                                @endfor
+                                            </select>
+                                            <select x-model="slot.period" @change="updateSlotTime(index)" class="w-16 px-2 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm">
+                                                <option value="AM">AM</option>
+                                                <option value="PM">PM</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </template>
@@ -353,19 +371,66 @@
             return {
                 classesPerWeek: {{ old('classes_per_week', $student->classes_per_week ?? 0) }},
                 scheduleSlots: @json($existingSchedules),
+
+                parseTimeTo12Hour(time24) {
+                    if (!time24) return { hour: '', minute: '', period: 'AM' };
+                    const parts = time24.split(':');
+                    if (parts.length < 2) return { hour: '', minute: '', period: 'AM' };
+
+                    let h = parseInt(parts[0]);
+                    const m = parts[1];
+                    let period = 'AM';
+
+                    if (h === 0) {
+                        h = 12;
+                        period = 'AM';
+                    } else if (h === 12) {
+                        period = 'PM';
+                    } else if (h > 12) {
+                        h = h - 12;
+                        period = 'PM';
+                    }
+
+                    return { hour: String(h), minute: m, period: period };
+                },
+
+                updateSlotTime(index) {
+                    const slot = this.scheduleSlots[index];
+                    if (slot.hour && slot.minute) {
+                        let h = parseInt(slot.hour);
+                        if (slot.period === 'PM' && h !== 12) h += 12;
+                        if (slot.period === 'AM' && h === 12) h = 0;
+                        slot.time = String(h).padStart(2, '0') + ':' + slot.minute;
+                    } else {
+                        slot.time = '';
+                    }
+                },
+
                 updateScheduleSlots() {
                     const count = parseInt(this.classesPerWeek) || 0;
                     const currentLength = this.scheduleSlots.length;
-                    
+
                     if (count > currentLength) {
                         for (let i = currentLength; i < count; i++) {
-                            this.scheduleSlots.push({ day: '', time: '' });
+                            this.scheduleSlots.push({ day: '', time: '', hour: '', minute: '', period: 'AM' });
                         }
                     } else if (count < currentLength) {
                         this.scheduleSlots = this.scheduleSlots.slice(0, count);
                     }
                 },
+
                 init() {
+                    // Parse existing times to 12-hour format
+                    this.scheduleSlots = this.scheduleSlots.map(slot => {
+                        const parsed = this.parseTimeTo12Hour(slot.time);
+                        return {
+                            ...slot,
+                            hour: parsed.hour,
+                            minute: parsed.minute,
+                            period: parsed.period
+                        };
+                    });
+
                     if (this.scheduleSlots.length === 0 && this.classesPerWeek > 0) {
                         this.updateScheduleSlots();
                     }

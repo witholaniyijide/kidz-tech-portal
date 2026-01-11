@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Student;
 use App\Models\Course;
-use App\Models\Notification;
+use App\Models\ParentNotification;
 use App\Models\User;
 
 class CourseCompletionNotificationService
@@ -61,20 +61,20 @@ class CourseCompletionNotificationService
      */
     protected function createNotification(User $user, Student $student, Course $course, string $message): void
     {
-        Notification::create([
-            'user_id' => $user->id,
+        ParentNotification::create([
+            'parent_id' => $user->id,
+            'student_id' => $student->id,
             'type' => 'course_completion',
             'title' => "Course Completed: {$course->name}",
             'message' => $message,
+            'link' => route('parent.children.show', $student->id),
             'data' => [
-                'student_id' => $student->id,
                 'student_name' => $student->fullName(),
                 'course_id' => $course->id,
                 'course_name' => $course->name,
                 'course_level' => $course->level,
                 'certificate_eligible' => $course->certificate_eligible,
             ],
-            'read_at' => null,
         ]);
     }
 }

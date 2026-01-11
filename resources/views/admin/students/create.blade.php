@@ -204,8 +204,27 @@
                                             <option value="saturday">Saturday</option>
                                             <option value="sunday">Sunday</option>
                                         </select>
-                                        <input type="time" x-model="schedule.time" :name="'class_schedule['+index+'][time]'" 
-                                               class="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg">
+                                        {{-- 12-Hour Time Picker --}}
+                                        <div class="flex items-center gap-1">
+                                            <input type="hidden" :name="'class_schedule['+index+'][time]'" :value="schedule.time">
+                                            <select x-model="schedule.hour" @change="updateScheduleTime(index)" class="w-16 px-2 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                                                <option value="">Hr</option>
+                                                <template x-for="h in 12" :key="h">
+                                                    <option :value="h" x-text="h"></option>
+                                                </template>
+                                            </select>
+                                            <span class="text-gray-500 dark:text-gray-400 font-bold">:</span>
+                                            <select x-model="schedule.minute" @change="updateScheduleTime(index)" class="w-16 px-2 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                                                <option value="">Min</option>
+                                                @for($i = 0; $i < 60; $i += 5)
+                                                    <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                                @endfor
+                                            </select>
+                                            <select x-model="schedule.period" @change="updateScheduleTime(index)" class="w-16 px-2 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                                                <option value="AM">AM</option>
+                                                <option value="PM">PM</option>
+                                            </select>
+                                        </div>
                                         <button type="button" @click="removeSchedule(index)" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -352,8 +371,8 @@
             return {
                 dob: '{{ old('date_of_birth') }}',
                 age: '',
-                schedules: [{ day: '', time: '' }],
-                
+                schedules: [{ day: '', time: '', hour: '', minute: '', period: 'AM' }],
+
                 calculateAge() {
                     if (!this.dob) {
                         this.age = '';
@@ -368,17 +387,29 @@
                     }
                     this.age = age + ' years';
                 },
-                
-                addSchedule() {
-                    this.schedules.push({ day: '', time: '' });
+
+                updateScheduleTime(index) {
+                    const schedule = this.schedules[index];
+                    if (schedule.hour && schedule.minute) {
+                        let h = parseInt(schedule.hour);
+                        if (schedule.period === 'PM' && h !== 12) h += 12;
+                        if (schedule.period === 'AM' && h === 12) h = 0;
+                        schedule.time = String(h).padStart(2, '0') + ':' + schedule.minute;
+                    } else {
+                        schedule.time = '';
+                    }
                 },
-                
+
+                addSchedule() {
+                    this.schedules.push({ day: '', time: '', hour: '', minute: '', period: 'AM' });
+                },
+
                 removeSchedule(index) {
                     if (this.schedules.length > 1) {
                         this.schedules.splice(index, 1);
                     }
                 },
-                
+
                 init() {
                     this.calculateAge();
                 }

@@ -18,7 +18,7 @@
                                 {{ $title }}
                             </h1>
                             <p style="margin: 10px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 16px;">
-                                KidzTech System Notification
+                                Kidz Tech Coding Club System Notification
                             </p>
                         </td>
                     </tr>
@@ -74,7 +74,7 @@
 
                             <p style="margin: 20px 0 0 0; font-size: 14px; color: #6b7280; line-height: 1.6;">
                                 Best regards,<br>
-                                <strong style="color: #1f2937;">The KidzTech Team</strong>
+                                <strong style="color: #1f2937;">The Kidz Tech Coding Club Team</strong>
                             </p>
                         </td>
                     </tr>
@@ -83,7 +83,7 @@
                     <tr>
                         <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #6b7280;">
-                                &copy; {{ date('Y') }} KidzTech - Empowering Young Minds Through Technology
+                                &copy; {{ date('Y') }} Kidz Tech Coding Club - Empowering Young Minds Through Technology
                             </p>
                             <p style="margin: 0; font-size: 12px; color: #9ca3af;">
                                 This is an automated system notification. Please do not reply to this email.

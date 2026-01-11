@@ -105,7 +105,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">KidzTech</div>
+            <div class="logo">Kidz Tech Coding Club</div>
             <div class="subtitle">Empowering Young Minds Through Technology</div>
         </div>
         
@@ -156,12 +156,12 @@
         </div>
         
         <div class="footer">
-            <p>This is an automated notification from KidzTech Portal.</p>
+            <p>This is an automated notification from Kidz Tech Coding Club.</p>
             <p>
                 <a href="{{ config('app.url') }}">Visit Portal</a> |
                 <a href="{{ config('app.url') }}/settings">Notification Settings</a>
             </p>
-            <p style="margin-top: 15px;">&copy; {{ date('Y') }} KidzTech. All rights reserved.</p>
+            <p style="margin-top: 15px;">&copy; {{ date('Y') }} Kidz Tech Coding Club. All rights reserved.</p>
         </div>
     </div>
 </body>

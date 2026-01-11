@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\AttendanceRecord;
-use App\Models\Report;
+use App\Models\TutorReport;
 use App\Models\DailyClassSchedule;
 use App\Models\Payment;
 use App\Models\TutorAssessment;
@@ -28,17 +28,18 @@ class DirectorDashboardController extends Controller
         $currentMonth = Carbon::now()->format('F');
         $currentYear = Carbon::now()->format('Y');
 
-        // Reports stats
-        $monthlyReports = Report::where('month', $currentMonth)
+        // Reports stats - using TutorReport model
+        $monthlyReports = TutorReport::where('month', $currentMonth)
                                 ->where('year', $currentYear)
                                 ->count();
 
-        $approvedReports = Report::where('status', 'approved')
+        $approvedReports = TutorReport::where('status', 'approved-by-director')
                                  ->where('month', $currentMonth)
                                  ->where('year', $currentYear)
                                  ->count();
 
-        $pendingApprovals = Report::where('status', 'submitted')->count();
+        // Pending approvals - reports waiting for manager review + reports waiting for director review
+        $pendingApprovals = TutorReport::whereIn('status', ['submitted', 'approved-by-manager'])->count();
 
         // Attendance stats - Calculate from approved records this month
         $currentMonthApproved = AttendanceRecord::where('status', 'approved')
