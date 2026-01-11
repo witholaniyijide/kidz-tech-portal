@@ -206,38 +206,28 @@
                                 <p class="font-medium text-gray-900 dark:text-white">Email Notifications</p>
                                 <p class="text-sm text-gray-500">Receive email alerts for important updates</p>
                             </div>
-                            <input type="checkbox" name="email_notifications" value="1"
-                                   {{ ($preferences['email_notifications'] ?? true) ? 'checked' : '' }}
+                            <input type="checkbox" name="notify_email" value="1"
+                                   {{ $user->notify_email ? 'checked' : '' }}
                                    class="w-5 h-5 text-[#C15F3C] border-gray-300 rounded focus:ring-[#C15F3C]">
                         </label>
 
                         <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-orange-50 dark:hover:bg-[#C15F3C]/10 transition-colors">
                             <div>
-                                <p class="font-medium text-gray-900 dark:text-white">Attendance Alerts</p>
-                                <p class="text-sm text-gray-500">Get notified when new attendance is submitted</p>
+                                <p class="font-medium text-gray-900 dark:text-white">In-App Notifications</p>
+                                <p class="text-sm text-gray-500">Show notifications when using the portal</p>
                             </div>
-                            <input type="checkbox" name="attendance_alerts" value="1"
-                                   {{ ($preferences['attendance_alerts'] ?? true) ? 'checked' : '' }}
+                            <input type="checkbox" name="notify_in_app" value="1"
+                                   {{ $user->notify_in_app ? 'checked' : '' }}
                                    class="w-5 h-5 text-[#C15F3C] border-gray-300 rounded focus:ring-[#C15F3C]">
                         </label>
 
                         <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-orange-50 dark:hover:bg-[#C15F3C]/10 transition-colors">
                             <div>
-                                <p class="font-medium text-gray-900 dark:text-white">Report Submission Alerts</p>
-                                <p class="text-sm text-gray-500">Get notified when tutors submit reports for review</p>
+                                <p class="font-medium text-gray-900 dark:text-white">Daily Summary</p>
+                                <p class="text-sm text-gray-500">Receive daily summary of activities</p>
                             </div>
-                            <input type="checkbox" name="report_alerts" value="1"
-                                   {{ ($preferences['report_alerts'] ?? true) ? 'checked' : '' }}
-                                   class="w-5 h-5 text-[#C15F3C] border-gray-300 rounded focus:ring-[#C15F3C]">
-                        </label>
-
-                        <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-orange-50 dark:hover:bg-[#C15F3C]/10 transition-colors">
-                            <div>
-                                <p class="font-medium text-gray-900 dark:text-white">Assessment Alerts</p>
-                                <p class="text-sm text-gray-500">Get notified about assessment deadlines and reviews</p>
-                            </div>
-                            <input type="checkbox" name="assessment_alerts" value="1"
-                                   {{ ($preferences['assessment_alerts'] ?? true) ? 'checked' : '' }}
+                            <input type="checkbox" name="notify_daily_summary" value="1"
+                                   {{ $user->notify_daily_summary ? 'checked' : '' }}
                                    class="w-5 h-5 text-[#C15F3C] border-gray-300 rounded focus:ring-[#C15F3C]">
                         </label>
                     </div>
