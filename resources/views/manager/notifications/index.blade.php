@@ -1,16 +1,12 @@
-@extends('layouts.manager')
-
-@section('title', 'Notifications')
-
-@section('content')
-<div class="p-6">
-    <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Notifications</h1>
-                <p class="text-gray-500 dark:text-gray-400 mt-1">Stay updated on assessments and reports</p>
-            </div>
+<x-manager-layout title="Notifications">
+    <div class="p-6">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Notifications</h1>
+                    <p class="text-gray-500 dark:text-gray-400 mt-1">Stay updated on assessments and reports</p>
+                </div>
             <div class="flex items-center space-x-4">
                 <span class="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full text-sm font-medium">
                     {{ $unreadCount }} Unread
@@ -122,6 +118,6 @@
                 </p>
             </div>
         @endif
+        </div>
     </div>
-</div>
-@endsection
+</x-manager-layout>
