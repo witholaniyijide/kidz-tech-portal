@@ -302,8 +302,16 @@
 
                             <x-slot name="content">
                                 <div class="w-80 md:w-96 max-h-[70vh] md:max-h-[32rem] overflow-y-auto">
-                                    <div class="px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 sticky top-0">
-                                        Notifications
+                                    <div class="px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 sticky top-0 flex items-center justify-between">
+                                        <span>Notifications</span>
+                                        @if($unreadCount > 0)
+                                            <form action="{{ route('manager.notifications.mark-all-read') }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" class="text-xs text-[#F5A623] hover:text-[#E09000] font-medium">
+                                                    Mark all read
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                     @php
                                         try {
@@ -313,11 +321,21 @@
                                         }
                                     @endphp
                                     @forelse($notifications as $notification)
-                                        <a href="{{ $notification->meta['link'] ?? '#' }}" class="block px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition">
-                                            <div class="font-semibold mb-1">{{ $notification->title ?? 'Notification' }}</div>
-                                            <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{{ \Illuminate\Support\Str::limit($notification->body, 80) }}</div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-500">{{ $notification->created_at->diffForHumans() }}</div>
-                                        </a>
+                                        <div class="flex items-start gap-2 px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition">
+                                            <a href="{{ $notification->meta['link'] ?? route('manager.notifications.index') }}" class="flex-1 min-w-0">
+                                                <div class="font-semibold mb-1">{{ $notification->title ?? 'Notification' }}</div>
+                                                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{{ \Illuminate\Support\Str::limit($notification->body, 80) }}</div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-500">{{ $notification->created_at->diffForHumans() }}</div>
+                                            </a>
+                                            <form action="{{ route('manager.notifications.mark-read', $notification) }}" method="POST" class="flex-shrink-0">
+                                                @csrf
+                                                <button type="submit" class="p-1.5 text-gray-400 hover:text-[#F5A623] hover:bg-[#F5A623]/10 rounded-lg transition" title="Mark as read">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </div>
                                     @empty
                                         <div class="px-6 py-12 text-sm text-gray-500 dark:text-gray-400 text-center">
                                             <svg class="w-16 h-16 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,6 +344,11 @@
                                             <div class="font-medium">No new notifications</div>
                                         </div>
                                     @endforelse
+                                    @if($notifications->count() > 0)
+                                        <a href="{{ route('manager.notifications.index') }}" class="block px-4 py-3 text-center text-sm font-medium text-[#F5A623] hover:bg-gray-50 dark:hover:bg-gray-700 border-t dark:border-gray-600 transition">
+                                            View all notifications
+                                        </a>
+                                    @endif
                                 </div>
                             </x-slot>
                         </x-dropdown>
