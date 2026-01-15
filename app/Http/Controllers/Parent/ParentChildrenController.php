@@ -25,7 +25,12 @@ class ParentChildrenController extends Controller
             ->with(['tutor'])
             ->get()
             ->map(function ($child) {
-                $child->progress_percentage = $child->progressPercentage();
+                // Use appropriate progression system
+                if ($child->usesExplicitProgression()) {
+                    $child->progress_percentage = $child->getExplicitProgressPercentage();
+                } else {
+                    $child->progress_percentage = $child->progressPercentage();
+                }
                 // Calculate current stage based on course statuses
                 $child->current_stage = $this->calculateCurrentStage($child);
                 return $child;
@@ -39,12 +44,17 @@ class ParentChildrenController extends Controller
      */
     private function calculateCurrentStage(Student $student): int
     {
-        $courseStatuses = $student->getCurriculumWithStatuses();
+        // Use appropriate progression system
+        if ($student->usesExplicitProgression()) {
+            $courseStatuses = $student->getExplicitCurriculumWithStatuses();
+        } else {
+            $courseStatuses = $student->getCurriculumWithStatuses();
+        }
 
         // Find the current (ongoing) course
         foreach ($courseStatuses as $course) {
             if ($course['status'] === 'ongoing') {
-                return $course['id'];
+                return $course['level'] ?? $course['id'];
             }
         }
 
@@ -52,7 +62,8 @@ class ParentChildrenController extends Controller
         $lastCompleted = 0;
         foreach ($courseStatuses as $course) {
             if ($course['status'] === 'completed') {
-                $lastCompleted = max($lastCompleted, $course['id']);
+                $courseLevel = $course['level'] ?? $course['id'];
+                $lastCompleted = max($lastCompleted, $courseLevel);
             }
         }
 
@@ -76,8 +87,12 @@ class ParentChildrenController extends Controller
         // Load relationships
         $student->load(['tutor']);
 
-        // Get progress percentage
-        $progressPercentage = $student->progressPercentage();
+        // Get progress percentage using appropriate progression system
+        if ($student->usesExplicitProgression()) {
+            $progressPercentage = $student->getExplicitProgressPercentage();
+        } else {
+            $progressPercentage = $student->progressPercentage();
+        }
 
         // Calculate current stage dynamically
         $currentStage = $this->calculateCurrentStage($student);

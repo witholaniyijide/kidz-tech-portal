@@ -56,17 +56,23 @@ class ParentDashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Calculate overall progress percentage
+        // Calculate overall progress percentage using appropriate progression system
         $totalProgress = 0;
         foreach ($children as $child) {
-            $totalProgress += $child->progressPercentage();
+            if ($child->usesExplicitProgression()) {
+                $totalProgress += $child->getExplicitProgressPercentage();
+            } else {
+                $totalProgress += $child->progressPercentage();
+            }
         }
         $overallProgress = $children->count() > 0 ? round($totalProgress / $children->count()) : 0;
 
-        // Get milestones completed based on current curriculum level
-        // Use starting_course_level if numeric, otherwise calculate from approved reports
+        // Get milestones completed based on progression system
         $milestonesCompleted = 0;
-        if (is_numeric($selectedChild->starting_course_level)) {
+        if ($selectedChild->usesExplicitProgression()) {
+            // Use explicit progression: count completed courses
+            $milestonesCompleted = $selectedChild->completedCourses()->count();
+        } elseif (is_numeric($selectedChild->starting_course_level)) {
             $milestonesCompleted = max(0, (int)$selectedChild->starting_course_level - 1);
         } else {
             // Count approved reports as proxy for milestones completed
@@ -126,8 +132,12 @@ class ParentDashboardController extends Controller
             12 => 'Robotics',
         ];
 
-        // Get actual course statuses based on starting_course_level and approved reports
-        $curriculumWithStatuses = $student->getCurriculumWithStatuses();
+        // Get actual course statuses using appropriate progression system
+        if ($student->usesExplicitProgression()) {
+            $curriculumWithStatuses = $student->getExplicitCurriculumWithStatuses();
+        } else {
+            $curriculumWithStatuses = $student->getCurriculumWithStatuses();
+        }
 
         // Find the first course that is not completed (either ongoing or upcoming)
         $nextCourse = null;
@@ -265,12 +275,17 @@ class ParentDashboardController extends Controller
      */
     private function calculateCurrentStage(Student $student): int
     {
-        $courseStatuses = $student->getCurriculumWithStatuses();
+        // Use appropriate progression system
+        if ($student->usesExplicitProgression()) {
+            $courseStatuses = $student->getExplicitCurriculumWithStatuses();
+        } else {
+            $courseStatuses = $student->getCurriculumWithStatuses();
+        }
 
         // Find the current (ongoing) course
         foreach ($courseStatuses as $course) {
             if ($course['status'] === 'ongoing') {
-                return $course['id'];
+                return $course['level'] ?? $course['id'];
             }
         }
 
@@ -278,7 +293,8 @@ class ParentDashboardController extends Controller
         $lastCompleted = 0;
         foreach ($courseStatuses as $course) {
             if ($course['status'] === 'completed') {
-                $lastCompleted = max($lastCompleted, $course['id']);
+                $courseLevel = $course['level'] ?? $course['id'];
+                $lastCompleted = max($lastCompleted, $courseLevel);
             }
         }
 
