@@ -88,181 +88,179 @@ class CleanSlateCommand extends Command
         DB::beginTransaction();
 
         try {
-            // Get IDs of users to delete (parents, students, tutors)
+            // Get IDs of users to delete (parents, tutors)
             $parentUserIds = User::whereHas('roles', function ($query) {
                 $query->where('name', 'parent');
-            })->pluck('id')->toArray();
-
-            $studentUserIds = User::whereHas('roles', function ($query) {
-                $query->where('name', 'student');
             })->pluck('id')->toArray();
 
             $tutorUserIds = User::whereHas('roles', function ($query) {
                 $query->where('name', 'tutor');
             })->pluck('id')->toArray();
 
-            $userIdsToDelete = array_merge($parentUserIds, $studentUserIds, $tutorUserIds);
+            $userIdsToDelete = array_merge($parentUserIds, $tutorUserIds);
+
+            // Count students from students table (they don't have user accounts)
+            $studentCount = Student::withTrashed()->count();
+            $tutorCount = Tutor::withTrashed()->count();
 
             $this->info('Found:');
             $this->line('  - ' . count($parentUserIds) . ' parent users');
-            $this->line('  - ' . count($studentUserIds) . ' student users');
-            $this->line('  - ' . count($tutorUserIds) . ' tutor users');
+            $this->line('  - ' . $studentCount . ' students (in students table)');
+            $this->line('  - ' . $tutorCount . ' tutors (' . count($tutorUserIds) . ' with user accounts)');
             $this->newLine();
 
             // Step 1: Delete Messages
-            $this->task('Deleting Messages', function () use ($userIdsToDelete) {
-                return Message::where(function ($query) use ($userIdsToDelete) {
-                    $query->whereIn('sender_id', $userIdsToDelete)
-                          ->orWhereIn('recipient_id', $userIdsToDelete)
-                          ->orWhereNotNull('student_id');
-                })->delete();
-            });
+            $this->info('Deleting Messages...');
+            $count = Message::where(function ($query) use ($userIdsToDelete) {
+                $query->whereIn('sender_id', $userIdsToDelete)
+                      ->orWhereIn('recipient_id', $userIdsToDelete)
+                      ->orWhereNotNull('student_id');
+            })->delete();
+            $this->line('  ✓ Deleted ' . $count . ' messages');
 
             // Step 2: Delete TutorReportComments
-            $this->task('Deleting Tutor Report Comments', function () {
-                return TutorReportComment::whereHas('report')->delete();
-            });
+            $this->info('Deleting Tutor Report Comments...');
+            $count = TutorReportComment::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' comments');
 
             // Step 3: Delete AssessmentRatings
-            $this->task('Deleting Assessment Ratings', function () {
-                return AssessmentRating::whereHas('assessment')->delete();
-            });
+            $this->info('Deleting Assessment Ratings...');
+            $count = AssessmentRating::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' ratings');
 
             // Step 4: Delete PenaltyTransactions
-            $this->task('Deleting Penalty Transactions', function () {
-                return PenaltyTransaction::query()->delete();
-            });
+            $this->info('Deleting Penalty Transactions...');
+            $count = PenaltyTransaction::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' transactions');
 
             // Step 5: Delete DirectorActions
-            $this->task('Deleting Director Actions', function () {
-                return DirectorAction::query()->delete();
-            });
+            $this->info('Deleting Director Actions...');
+            $count = DirectorAction::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' actions');
 
             // Step 6: Delete TutorAssessments
-            $this->task('Deleting Tutor Assessments', function () {
-                return TutorAssessment::query()->delete();
-            });
+            $this->info('Deleting Tutor Assessments...');
+            $count = TutorAssessment::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' assessments');
 
             // Step 7: Delete TutorReports
-            $this->task('Deleting Tutor Reports', function () {
-                return TutorReport::query()->delete();
-            });
+            $this->info('Deleting Tutor Reports...');
+            $count = TutorReport::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' reports');
 
             // Step 8: Delete Reports
-            $this->task('Deleting Reports', function () {
-                return Report::query()->delete();
-            });
+            $this->info('Deleting Reports...');
+            $count = Report::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' reports');
 
             // Step 9: Delete AttendanceRecords
-            $this->task('Deleting Attendance Records', function () {
-                return AttendanceRecord::query()->delete();
-            });
+            $this->info('Deleting Attendance Records...');
+            $count = AttendanceRecord::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' records');
 
             // Step 10: Delete Payments
-            $this->task('Deleting Payments', function () {
-                return Payment::query()->delete();
-            });
+            $this->info('Deleting Payments...');
+            $count = Payment::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' payments');
 
             // Step 11: Delete StudentCourseProgress
-            $this->task('Deleting Student Course Progress', function () {
-                return StudentCourseProgress::query()->delete();
-            });
+            $this->info('Deleting Student Course Progress...');
+            $count = StudentCourseProgress::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' progress records');
 
             // Step 12: Delete StudentProgress
-            $this->task('Deleting Student Progress', function () {
-                return StudentProgress::query()->delete();
-            });
+            $this->info('Deleting Student Progress...');
+            $count = StudentProgress::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' progress records');
 
             // Step 13: Delete StudentPortalSettings
-            $this->task('Deleting Student Portal Settings', function () {
-                return DB::table('student_portal_settings')->delete();
-            });
+            $this->info('Deleting Student Portal Settings...');
+            $count = DB::table('student_portal_settings')->delete();
+            $this->line('  ✓ Deleted ' . $count . ' settings');
 
             // Step 14: Delete MonthlyClassSchedules
-            $this->task('Deleting Monthly Class Schedules', function () {
-                return MonthlyClassSchedule::query()->delete();
-            });
+            $this->info('Deleting Monthly Class Schedules...');
+            $count = MonthlyClassSchedule::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' schedules');
 
             // Step 15: Delete TutorAvailabilities
-            $this->task('Deleting Tutor Availabilities', function () {
-                return TutorAvailability::query()->delete();
-            });
+            $this->info('Deleting Tutor Availabilities...');
+            $count = TutorAvailability::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' availabilities');
 
             // Step 16: Delete TutorTodos
-            $this->task('Deleting Tutor Todos', function () {
-                return TutorTodo::query()->delete();
-            });
+            $this->info('Deleting Tutor Todos...');
+            $count = TutorTodo::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' todos');
 
             // Step 17: Delete guardian_student pivot records
-            $this->task('Deleting Guardian-Student Relationships', function () {
-                return DB::table('guardian_student')->delete();
-            });
+            $this->info('Deleting Guardian-Student Relationships...');
+            $count = DB::table('guardian_student')->delete();
+            $this->line('  ✓ Deleted ' . $count . ' relationships');
 
             // Step 18: Delete Students (force delete to remove soft deleted as well)
-            $this->task('Deleting Students', function () {
-                Student::withTrashed()->forceDelete();
-                return true;
-            });
+            $this->info('Deleting Students...');
+            Student::withTrashed()->forceDelete();
+            $this->line('  ✓ Deleted ' . $studentCount . ' students');
 
             // Step 19: Delete Tutors (force delete to remove soft deleted as well)
-            $this->task('Deleting Tutors', function () {
-                Tutor::withTrashed()->forceDelete();
-                return true;
-            });
+            $this->info('Deleting Tutors...');
+            Tutor::withTrashed()->forceDelete();
+            $this->line('  ✓ Deleted ' . $tutorCount . ' tutors');
 
             // Step 20: Delete Notices
-            $this->task('Deleting Notices', function () {
-                return Notice::query()->delete();
-            });
+            $this->info('Deleting Notices...');
+            $count = Notice::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' notices');
 
             // Step 21: Delete All Notifications
-            $this->task('Deleting Parent Notifications', function () {
-                return ParentNotification::query()->delete();
-            });
+            $this->info('Deleting Parent Notifications...');
+            $count = ParentNotification::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' notifications');
 
-            $this->task('Deleting Tutor Notifications', function () {
-                return TutorNotification::query()->delete();
-            });
+            $this->info('Deleting Tutor Notifications...');
+            $count = TutorNotification::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' notifications');
 
-            $this->task('Deleting Admin Notifications', function () {
-                return AdminNotification::query()->delete();
-            });
+            $this->info('Deleting Admin Notifications...');
+            $count = AdminNotification::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' notifications');
 
-            $this->task('Deleting Director Notifications', function () {
-                return DirectorNotification::query()->delete();
-            });
+            $this->info('Deleting Director Notifications...');
+            $count = DirectorNotification::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' notifications');
 
-            $this->task('Deleting Manager Notifications', function () {
-                return ManagerNotification::query()->delete();
-            });
+            $this->info('Deleting Manager Notifications...');
+            $count = ManagerNotification::query()->delete();
+            $this->line('  ✓ Deleted ' . $count . ' notifications');
 
             // Step 22: Delete Activity Logs related to deleted users
-            $this->task('Cleaning Activity Logs', function () use ($userIdsToDelete) {
-                return ActivityLog::whereIn('user_id', $userIdsToDelete)->delete();
-            });
+            $this->info('Cleaning Activity Logs...');
+            $count = ActivityLog::whereIn('user_id', $userIdsToDelete)->delete();
+            $this->line('  ✓ Deleted ' . $count . ' logs');
 
             // Step 23: Delete Audit Logs for deleted models
-            $this->task('Cleaning Audit Logs', function () {
-                return DB::table('audit_logs')
-                    ->whereIn('auditable_type', [
-                        'App\\Models\\Student',
-                        'App\\Models\\Tutor',
-                        'App\\Models\\TutorReport',
-                        'App\\Models\\TutorAssessment',
-                        'App\\Models\\AttendanceRecord',
-                    ])
-                    ->delete();
-            });
+            $this->info('Cleaning Audit Logs...');
+            $count = DB::table('audit_logs')
+                ->whereIn('auditable_type', [
+                    'App\\Models\\Student',
+                    'App\\Models\\Tutor',
+                    'App\\Models\\TutorReport',
+                    'App\\Models\\TutorAssessment',
+                    'App\\Models\\AttendanceRecord',
+                ])
+                ->delete();
+            $this->line('  ✓ Deleted ' . $count . ' logs');
 
             // Step 24: Delete role_user pivot for deleted users
-            $this->task('Cleaning User Role Assignments', function () use ($userIdsToDelete) {
-                return DB::table('role_user')->whereIn('user_id', $userIdsToDelete)->delete();
-            });
+            $this->info('Cleaning User Role Assignments...');
+            $count = DB::table('role_user')->whereIn('user_id', $userIdsToDelete)->delete();
+            $this->line('  ✓ Deleted ' . $count . ' role assignments');
 
-            // Step 25: Delete User accounts (parent, student, tutor roles)
-            $this->task('Deleting Parent/Student/Tutor User Accounts', function () use ($userIdsToDelete) {
-                return User::whereIn('id', $userIdsToDelete)->delete();
-            });
+            // Step 25: Delete User accounts (parent, tutor roles)
+            $this->info('Deleting Parent/Tutor User Accounts...');
+            $count = User::whereIn('id', $userIdsToDelete)->delete();
+            $this->line('  ✓ Deleted ' . $count . ' user accounts');
 
             DB::commit();
 
