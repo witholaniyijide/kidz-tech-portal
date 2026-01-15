@@ -179,7 +179,7 @@
                                                 <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{{ \Illuminate\Support\Str::limit($notification->body ?? '', 80) }}</div>
                                                 <div class="text-xs text-gray-500 dark:text-gray-400">{{ $notification->created_at->diffForHumans() }}</div>
                                             </a>
-                                            <form action="{{ route('parent.notifications.read', $notification) }}" method="POST" class="flex-shrink-0">
+                                            <form action="{{ route('parent.notifications.mark-read', $notification) }}" method="POST" class="flex-shrink-0">
                                                 @csrf
                                                 <button type="submit" class="p-1.5 text-gray-400 hover:text-sky-500 hover:bg-sky-500/10 rounded-lg transition" title="Mark as read">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

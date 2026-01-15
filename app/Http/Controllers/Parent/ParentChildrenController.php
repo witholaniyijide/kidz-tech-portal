@@ -20,8 +20,8 @@ class ParentChildrenController extends Controller
     {
         $user = Auth::user();
 
-        // Get all children with their tutors and progress
-        $children = $user->guardiansOf()
+        // Get all visible children with their tutors and progress
+        $children = $user->visibleChildren()
             ->with(['tutor'])
             ->get()
             ->map(function ($child) {

@@ -16,7 +16,7 @@ class ParentAttendanceController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $children = $user->guardiansOf()->get();
+        $children = $user->visibleChildren()->get();
 
         if ($children->isEmpty()) {
             return view('parent.no-children');
