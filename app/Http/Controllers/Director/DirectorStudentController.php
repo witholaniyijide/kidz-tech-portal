@@ -28,7 +28,7 @@ class DirectorStudentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Student::with(['tutor', 'parent', 'guardians']);
+        $query = Student::with(['tutor', 'parent', 'guardians', 'currentCourse']);
 
         // Filter by search (name, email, student_id)
         if ($request->filled('search')) {

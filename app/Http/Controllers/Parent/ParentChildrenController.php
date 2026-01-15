@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Parent;
 
 use App\Http\Controllers\Controller;
+use App\Models\DirectorNotification;
 use App\Models\Message;
 use App\Models\Student;
 use App\Models\StudentProgress;
@@ -245,6 +246,22 @@ class ParentChildrenController extends Controller
             'student_id' => $student->id,
             'subject' => 'New Course Request: ' . $request->course_name . ' for ' . $student->first_name,
             'body' => $body,
+        ]);
+
+        // Create notification for director
+        DirectorNotification::create([
+            'user_id' => $director->id,
+            'title' => 'New Course Request from Parent',
+            'body' => $user->name . ' has requested "' . $request->course_name . '" for ' . $student->first_name . ' ' . $student->last_name,
+            'type' => 'course_request',
+            'is_read' => false,
+            'meta' => [
+                'student_id' => $student->id,
+                'student_name' => $student->first_name . ' ' . $student->last_name,
+                'parent_name' => $user->name,
+                'course_name' => $request->course_name,
+                'link' => route('director.messages.index'),
+            ],
         ]);
 
         return response()->json([

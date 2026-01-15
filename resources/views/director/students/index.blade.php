@@ -115,7 +115,13 @@
                                         {{ $student->tutor ? $student->tutor->first_name . ' ' . $student->tutor->last_name : 'Unassigned' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        {{ $student->current_level ?? 'N/A' }}
+                                        @if($student->currentCourse)
+                                            Level {{ $student->currentCourse->level }}
+                                        @elseif($student->current_level)
+                                            Level {{ $student->current_level }}
+                                        @else
+                                            N/A
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <x-ui.status-badge :status="$student->status" />
