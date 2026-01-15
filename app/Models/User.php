@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password_change_required',
         'phone',
         'phone_country_code',
+        'timezone',
         'status',
         'last_login',
         'profile_photo',

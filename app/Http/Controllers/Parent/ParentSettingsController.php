@@ -33,6 +33,7 @@ class ParentSettingsController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'phone' => ['nullable', 'string', 'max:20'],
             'phone_country_code' => ['nullable', 'string', 'max:10'],
+            'timezone' => ['nullable', 'string', 'timezone'],
         ]);
 
         // Track if email is changing

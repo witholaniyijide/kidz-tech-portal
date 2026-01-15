@@ -186,6 +186,47 @@
                                 <p class="mt-1 text-sm text-rose-600 dark:text-rose-400" role="alert">{{ $message }}</p>
                             @enderror
                         </div>
+
+                        {{-- Timezone --}}
+                        <div>
+                            <label for="timezone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Your Timezone
+                            </label>
+                            <select name="timezone"
+                                    id="timezone"
+                                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-colors">
+                                @php
+                                    $timezones = [
+                                        'Africa/Lagos' => '🇳🇬 Nigeria (WAT, UTC+1)',
+                                        'Europe/London' => '🇬🇧 United Kingdom (GMT/BST)',
+                                        'America/New_York' => '🇺🇸 US Eastern (EST/EDT)',
+                                        'America/Chicago' => '🇺🇸 US Central (CST/CDT)',
+                                        'America/Denver' => '🇺🇸 US Mountain (MST/MDT)',
+                                        'America/Los_Angeles' => '🇺🇸 US Pacific (PST/PDT)',
+                                        'Europe/Paris' => '🇫🇷 France/Germany (CET/CEST)',
+                                        'Europe/Berlin' => '🇩🇪 Germany (CET/CEST)',
+                                        'Asia/Dubai' => '🇦🇪 UAE (GST, UTC+4)',
+                                        'Asia/Kolkata' => '🇮🇳 India (IST, UTC+5:30)',
+                                        'Africa/Johannesburg' => '🇿🇦 South Africa (SAST, UTC+2)',
+                                        'Africa/Nairobi' => '🇰🇪 Kenya/East Africa (EAT, UTC+3)',
+                                        'Africa/Accra' => '🇬🇭 Ghana (GMT)',
+                                        'Australia/Sydney' => '🇦🇺 Australia Eastern (AEST/AEDT)',
+                                        'Asia/Singapore' => '🇸🇬 Singapore (SGT, UTC+8)',
+                                        'Asia/Hong_Kong' => '🇭🇰 Hong Kong (HKT, UTC+8)',
+                                    ];
+                                    $currentTimezone = old('timezone', $user->timezone ?? 'Africa/Lagos');
+                                @endphp
+                                @foreach($timezones as $tz => $label)
+                                    <option value="{{ $tz }}" {{ $currentTimezone === $tz ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                Class schedules will be displayed in your local time. All classes are taught in Nigeria time (WAT).
+                            </p>
+                            @error('timezone')
+                                <p class="mt-1 text-sm text-rose-600 dark:text-rose-400" role="alert">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     <div class="mt-6 flex justify-end">

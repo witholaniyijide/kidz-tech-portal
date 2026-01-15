@@ -5,6 +5,14 @@
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Class Schedule</h1>
                 <p class="text-gray-600 dark:text-gray-400">View your children's weekly class schedules</p>
+                @if(!$isNigeriaTimezone)
+                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                        <svg class="w-3.5 h-3.5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Times shown in your timezone ({{ $timezoneIndicator }}). Nigeria time shown in parentheses.
+                    </p>
+                @endif
             </div>
 
             <!-- Child Filter -->
@@ -48,6 +56,9 @@
                                 </div>
                                 <div class="text-right">
                                     <span class="text-sm font-medium text-amber-600 dark:text-amber-400">{{ $class['time'] }}</span>
+                                    @if(!$isNigeriaTimezone && isset($class['time_ng']) && $class['time_ng'] !== 'TBD')
+                                        <p class="text-xs text-gray-400">({{ $class['time_ng'] }} NG)</p>
+                                    @endif
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ $class['duration'] ?? '1 hour' }}</p>
                                 </div>
                             </div>
@@ -108,6 +119,9 @@
                                             </div>
                                             <div class="text-right">
                                                 <span class="text-sm font-semibold text-[#F5A623]">{{ $class['time'] }}</span>
+                                                @if(!$isNigeriaTimezone && isset($class['time_ng']) && $class['time_ng'] !== 'TBD')
+                                                    <p class="text-xs text-gray-400">({{ $class['time_ng'] }} NG)</p>
+                                                @endif
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ $class['duration'] ?? '1 hour' }}</p>
                                             </div>
                                         </div>

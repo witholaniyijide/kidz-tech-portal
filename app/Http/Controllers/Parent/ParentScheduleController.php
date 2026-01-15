@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Parent;
 
 use App\Http\Controllers\Controller;
 use App\Models\DailyClassSchedule;
+use App\Models\DirectorNotification;
 use App\Models\Message;
 use App\Models\Student;
 use App\Models\User;
@@ -14,11 +15,62 @@ use Illuminate\Support\Facades\Auth;
 class ParentScheduleController extends Controller
 {
     /**
+     * Nigeria timezone (server time).
+     */
+    private const NIGERIA_TIMEZONE = 'Africa/Lagos';
+
+    /**
+     * Convert time from Nigeria timezone to user's timezone.
+     */
+    private function convertToUserTimezone(string $time, string $userTimezone): string
+    {
+        try {
+            // Parse the time in Nigeria timezone
+            $nigeriaTime = Carbon::parse($time, self::NIGERIA_TIMEZONE);
+            // Convert to user's timezone
+            return $nigeriaTime->setTimezone($userTimezone)->format('g:i A');
+        } catch (\Exception $e) {
+            return $time; // Return original if conversion fails
+        }
+    }
+
+    /**
+     * Get timezone indicator text for the user.
+     */
+    private function getTimezoneIndicator(string $userTimezone): string
+    {
+        if ($userTimezone === self::NIGERIA_TIMEZONE) {
+            return '';
+        }
+
+        $offset = Carbon::now($userTimezone)->format('P');
+        $abbreviations = [
+            'America/New_York' => 'EST',
+            'America/Chicago' => 'CST',
+            'America/Denver' => 'MST',
+            'America/Los_Angeles' => 'PST',
+            'Europe/London' => 'GMT',
+            'Europe/Paris' => 'CET',
+            'Europe/Berlin' => 'CET',
+            'Asia/Dubai' => 'GST',
+            'Asia/Kolkata' => 'IST',
+            'Africa/Johannesburg' => 'SAST',
+            'Africa/Nairobi' => 'EAT',
+            'Australia/Sydney' => 'AEST',
+            'Asia/Singapore' => 'SGT',
+            'Asia/Hong_Kong' => 'HKT',
+        ];
+
+        return $abbreviations[$userTimezone] ?? 'UTC' . $offset;
+    }
+
+    /**
      * Display class schedules for all children.
      */
     public function index(Request $request)
     {
         $user = Auth::user();
+        $userTimezone = $user->timezone ?? self::NIGERIA_TIMEZONE;
         $children = $user->guardiansOf()->with(['tutor'])->get();
 
         if ($children->isEmpty()) {
@@ -49,10 +101,16 @@ class ParentScheduleController extends Controller
                     if (is_array($schedule) && isset($schedule['day'])) {
                         $day = $schedule['day'];
                         if (isset($weeklySchedule[$day])) {
+                            $originalTime = $schedule['time'] ?? 'TBD';
+                            $convertedTime = $originalTime !== 'TBD'
+                                ? $this->convertToUserTimezone($originalTime, $userTimezone)
+                                : 'TBD';
+
                             $weeklySchedule[$day][] = [
                                 'student' => $child,
                                 'tutor' => $child->tutor,
-                                'time' => $schedule['time'] ?? 'TBD',
+                                'time' => $convertedTime,
+                                'time_ng' => $originalTime,
                                 'duration' => $schedule['duration'] ?? '1 hour',
                                 'course' => $schedule['course'] ?? $child->current_course ?? 'Coding Class',
                                 'class_link' => $child->class_link,
@@ -85,10 +143,16 @@ class ParentScheduleController extends Controller
             foreach ($postedClasses as $class) {
                 $child = $children->firstWhere('id', $class['student_id']);
                 if ($child) {
+                    $originalTime = isset($class['time']) ? Carbon::parse($class['time'])->format('g:i A') : 'TBD';
+                    $convertedTime = $originalTime !== 'TBD'
+                        ? $this->convertToUserTimezone($class['time'], $userTimezone)
+                        : 'TBD';
+
                     $todayClasses[] = [
                         'student' => $child,
                         'tutor' => $child->tutor,
-                        'time' => isset($class['time']) ? Carbon::parse($class['time'])->format('g:i A') : 'TBD',
+                        'time' => $convertedTime,
+                        'time_ng' => $originalTime,
                         'duration' => $class['duration'] ?? '1 hour',
                         'course' => $class['course'] ?? $child->current_course ?? 'Coding Class',
                         'class_link' => $class['class_link'] ?? $child->class_link,
@@ -124,10 +188,16 @@ class ParentScheduleController extends Controller
                     foreach ($postedClasses as $class) {
                         $child = $children->firstWhere('id', $class['student_id']);
                         if ($child) {
+                            $originalTime = isset($class['time']) ? Carbon::parse($class['time'])->format('g:i A') : 'TBD';
+                            $convertedTime = $originalTime !== 'TBD'
+                                ? $this->convertToUserTimezone($class['time'], $userTimezone)
+                                : 'TBD';
+
                             $weeklySchedule[$dayName][] = [
                                 'student' => $child,
                                 'tutor' => $child->tutor,
-                                'time' => isset($class['time']) ? Carbon::parse($class['time'])->format('g:i A') : 'TBD',
+                                'time' => $convertedTime,
+                                'time_ng' => $originalTime,
                                 'duration' => $class['duration'] ?? '1 hour',
                                 'course' => $class['course'] ?? $child->current_course ?? 'Coding Class',
                                 'class_link' => $class['class_link'] ?? $child->class_link,
@@ -141,13 +211,20 @@ class ParentScheduleController extends Controller
             }
         }
 
+        // Get timezone info for display
+        $timezoneIndicator = $this->getTimezoneIndicator($userTimezone);
+        $isNigeriaTimezone = ($userTimezone === self::NIGERIA_TIMEZONE);
+
         return view('parent.schedule.index', compact(
             'children',
             'weeklySchedule',
             'todayClasses',
             'selectedChildId',
             'today',
-            'schedulePosted'
+            'schedulePosted',
+            'userTimezone',
+            'timezoneIndicator',
+            'isNigeriaTimezone'
         ));
     }
 
