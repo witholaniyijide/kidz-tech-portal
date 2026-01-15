@@ -122,8 +122,12 @@ class ParentPerformanceController extends Controller
             $totalPoints += $approvedReports->count() * 50;
         }
 
-        // Calculate progress percentage
-        $progressPercentage = $student->progressPercentage();
+        // Calculate progress percentage using appropriate progression system
+        if ($student->usesExplicitProgression()) {
+            $progressPercentage = $student->getExplicitProgressPercentage();
+        } else {
+            $progressPercentage = $student->progressPercentage();
+        }
 
         return [
             'overall_progress' => $progressPercentage,
@@ -142,8 +146,12 @@ class ParentPerformanceController extends Controller
         $months = [];
         $currentDate = Carbon::now();
 
-        // Get overall progress as baseline
-        $overallProgress = $student->progressPercentage();
+        // Get overall progress as baseline using appropriate progression system
+        if ($student->usesExplicitProgression()) {
+            $overallProgress = $student->getExplicitProgressPercentage();
+        } else {
+            $overallProgress = $student->progressPercentage();
+        }
 
         // Get last 6 months
         for ($i = 5; $i >= 0; $i--) {
@@ -205,25 +213,39 @@ class ParentPerformanceController extends Controller
 
         $milestones = [];
 
-        // Get current level (use current_level, then roadmap_stage, then starting_course_level as fallback)
-        $currentLevel = $student->current_level
-            ?? $student->roadmap_stage
-            ?? $student->starting_course_level
-            ?? 1;
-
-        // All stages before the current level are considered completed
-        // If current_level is 5, they've completed 1-4, currently on 5
-        $completedLevels = max(0, $currentLevel - 1);
-
-        for ($i = 1; $i <= $completedLevels; $i++) {
-            if (isset($curriculumStages[$i])) {
+        // Use explicit progression if available
+        if ($student->usesExplicitProgression()) {
+            // Get completed courses from explicit system
+            $completedCourses = $student->completedCourses()->orderBy('level')->get();
+            foreach ($completedCourses as $course) {
                 $milestones[] = [
-                    'id' => $i,
-                    'title' => $curriculumStages[$i],
-                    'description' => 'Stage ' . $i . ' of 12 completed',
-                    'points' => $i * 100, // 100 points per stage
-                    'completed_at' => null, // We don't have exact dates for curriculum stages
+                    'id' => $course->level,
+                    'title' => $course->name,
+                    'description' => 'Stage ' . $course->level . ' of 12 completed',
+                    'points' => $course->level * 100,
+                    'completed_at' => null,
                 ];
+            }
+        } else {
+            // Get current level (use current_level, then roadmap_stage, then starting_course_level as fallback)
+            $currentLevel = $student->current_level
+                ?? $student->roadmap_stage
+                ?? $student->starting_course_level
+                ?? 1;
+
+            // All stages before the current level are considered completed
+            $completedLevels = max(0, $currentLevel - 1);
+
+            for ($i = 1; $i <= $completedLevels; $i++) {
+                if (isset($curriculumStages[$i])) {
+                    $milestones[] = [
+                        'id' => $i,
+                        'title' => $curriculumStages[$i],
+                        'description' => 'Stage ' . $i . ' of 12 completed',
+                        'points' => $i * 100,
+                        'completed_at' => null,
+                    ];
+                }
             }
         }
 
@@ -268,7 +290,49 @@ class ParentPerformanceController extends Controller
             12 => 'Robotics',
         ];
 
-        // Get current level (use current_level, then roadmap_stage, then starting_course_level as fallback)
+        // Use explicit progression if available
+        if ($student->usesExplicitProgression()) {
+            $curriculum = $student->getExplicitCurriculumWithStatuses();
+
+            // Find current or next course
+            $currentCourse = null;
+            foreach ($curriculum as $course) {
+                if ($course['status'] === 'ongoing') {
+                    $currentCourse = $course;
+                    break;
+                }
+                if ($course['status'] === 'not_started' && !$currentCourse) {
+                    $currentCourse = $course;
+                    break;
+                }
+            }
+
+            if (!$currentCourse) {
+                return [
+                    'title' => 'Curriculum Completed!',
+                    'description' => 'All 12 stages completed - Advanced learning continues',
+                    'stage' => 12,
+                    'progress' => 100,
+                ];
+            }
+
+            $currentLevel = $currentCourse['level'];
+            $title = $currentCourse['title'] ?? $currentCourse['full_name'] ?? $curriculumStages[$currentLevel] ?? "Level {$currentLevel}";
+            $description = 'Stage ' . $currentLevel . ' of 12';
+
+            if ($student->roadmap_next_milestone) {
+                $description = $student->roadmap_next_milestone;
+            }
+
+            return [
+                'title' => $title,
+                'description' => $description,
+                'stage' => $currentLevel,
+                'progress' => $student->getExplicitProgressPercentage(),
+            ];
+        }
+
+        // Legacy system
         $currentLevel = $student->current_level
             ?? $student->roadmap_stage
             ?? $student->starting_course_level
@@ -337,7 +401,11 @@ class ParentPerformanceController extends Controller
             ->get();
 
         // Progress: Based on overall progress percentage (same as displayed in performance data)
-        $overallProgress = $student->progressPercentage();
+        if ($student->usesExplicitProgression()) {
+            $overallProgress = $student->getExplicitProgressPercentage();
+        } else {
+            $overallProgress = $student->progressPercentage();
+        }
 
         // Engagement: Set to match overall progress as per requirement
         $engagement = $overallProgress;
