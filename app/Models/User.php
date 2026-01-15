@@ -159,6 +159,20 @@ class User extends Authenticatable
     }
 
     /**
+     * Get only visible children for parent portal.
+     * Filters out withdrawn students and those with visible_to_parent = false.
+     */
+    public function visibleChildren()
+    {
+        return $this->guardiansOf()
+            ->where(function ($query) {
+                $query->where('visible_to_parent', true)
+                      ->orWhereNull('visible_to_parent'); // Default to visible if not set
+            })
+            ->whereNotIn('status', ['withdrawn']); // Hide withdrawn students
+    }
+
+    /**
      * Get manager notifications for this user
      */
     public function managerNotifications()

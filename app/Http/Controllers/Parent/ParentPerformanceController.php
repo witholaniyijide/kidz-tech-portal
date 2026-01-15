@@ -19,8 +19,8 @@ class ParentPerformanceController extends Controller
     {
         $user = Auth::user();
 
-        // Get all children
-        $children = $user->guardiansOf()->with(['tutor'])->get();
+        // Get all visible children
+        $children = $user->visibleChildren()->with(['tutor'])->get();
 
         if ($children->isEmpty()) {
             return view('parent.no-children');

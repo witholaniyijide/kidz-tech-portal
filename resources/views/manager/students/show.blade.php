@@ -198,14 +198,23 @@
 
             {{-- Attendance Stats --}}
             <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Attendance Rate</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Classes Attended</h3>
                 @php
-                    $attendanceRate = $student->attendanceRecords()->count() > 0
-                        ? round(($student->attendanceRecords()->where('status', 'present')->count() / $student->attendanceRecords()->count()) * 100)
-                        : 0;
+                    // Count approved attendance records (classes confirmed attended)
+                    $approvedClasses = $student->attendanceRecords()->where('status', 'approved')->count();
+                    $pendingClasses = $student->attendanceRecords()->where('status', 'pending')->count();
+                    $totalRecords = $student->attendanceRecords()->count();
+
+                    // Calculate expected classes based on enrollment
+                    $classesPerWeek = $student->classes_per_week ?? 2;
+                    $enrollmentDate = $student->enrollment_date ?? $student->created_at;
+                    $weeksEnrolled = $enrollmentDate ? max(1, ceil($enrollmentDate->diffInWeeks(now()))) : 1;
+                    $expectedClasses = min($classesPerWeek * $weeksEnrolled, 100); // Cap at 100 for display
+
+                    $attendanceRate = $expectedClasses > 0 ? min(100, round(($approvedClasses / $expectedClasses) * 100)) : 0;
                 @endphp
                 <div class="flex items-center gap-4">
-                    <div class="text-4xl font-bold text-[#C15F3C]">{{ $attendanceRate }}%</div>
+                    <div class="text-4xl font-bold text-[#C15F3C]">{{ $approvedClasses }}</div>
                     <div class="flex-1">
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                             <div class="bg-gradient-to-r from-[#C15F3C] to-[#DA7756] h-3 rounded-full" style="width: {{ $attendanceRate }}%"></div>
@@ -213,7 +222,7 @@
                     </div>
                 </div>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                    {{ $student->attendanceRecords()->where('status', 'present')->count() }} of {{ $student->attendanceRecords()->count() }} classes attended
+                    {{ $approvedClasses }} approved classes{{ $pendingClasses > 0 ? ", {$pendingClasses} pending" : '' }}
                 </p>
             </div>
 

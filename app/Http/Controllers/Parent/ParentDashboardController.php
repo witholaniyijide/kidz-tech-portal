@@ -19,8 +19,8 @@ class ParentDashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Get all children of this parent using guardian_student relationship
-        $children = $user->guardiansOf()->with(['tutor'])->get()
+        // Get all visible children of this parent using guardian_student relationship
+        $children = $user->visibleChildren()->with(['tutor'])->get()
             ->map(function ($child) {
                 // Calculate current stage based on curriculum progress
                 $child->current_stage = $this->calculateCurrentStage($child);

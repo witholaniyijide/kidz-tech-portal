@@ -36,7 +36,7 @@
                     <div>
                         <p class="font-semibold text-emerald-800 dark:text-emerald-400">Director Approved</p>
                         <p class="text-sm text-emerald-700 dark:text-emerald-500">
-                            Approved by {{ $assessment->director->name ?? 'Director' }} on {{ $assessment->director_approved_at?->format('M j, Y \a\t g:i A') }}
+                            Approved by {{ $assessment->director->name ?? 'Director' }} on {{ $assessment->approved_by_director_at?->format('M j, Y \a\t g:i A') }}
                         </p>
                     </div>
                 </div>
