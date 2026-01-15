@@ -87,7 +87,7 @@
 
                 <!-- Class Schedule -->
                 <div class="bg-sky-50 dark:bg-sky-900/30 rounded-xl p-4">
-                    <h4 class="text-sm font-semibold text-sky-700 dark:text-sky-400 mb-2">Weekly Schedule</h4>
+                    <h4 class="text-sm font-semibold text-sky-700 dark:text-sky-400 mb-2">Weekly Schedule <span class="text-xs font-normal">(NG Time)</span></h4>
                     @if($selectedChild->class_schedule && is_array($selectedChild->class_schedule) && count($selectedChild->class_schedule) > 0)
                         <div class="space-y-1">
                             @foreach($selectedChild->class_schedule as $schedule)

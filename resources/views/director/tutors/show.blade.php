@@ -246,7 +246,7 @@
                                             @endphp
                                             @if($studentSchedule && is_array($studentSchedule) && count($studentSchedule) > 0)
                                                 <div class="mb-2 sm:mb-3">
-                                                    <div class="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Schedule</div>
+                                                    <div class="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Schedule <span class="font-normal">(NG Time)</span></div>
                                                     <div class="flex flex-wrap gap-1">
                                                         @foreach($studentSchedule as $schedule)
                                                             @if(isset($schedule['day']) && isset($schedule['time']))

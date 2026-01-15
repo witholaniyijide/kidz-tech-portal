@@ -111,7 +111,7 @@
 
             <!-- Class Schedule -->
             <div class="glass-card rounded-2xl p-5">
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4">Class Schedule</h3>
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4">Class Schedule <span class="text-xs font-normal">(NG Time)</span></h3>
                 @if($classSchedule && count($classSchedule) > 0)
                     <div class="space-y-2">
                         @foreach($classSchedule as $schedule)

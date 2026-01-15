@@ -183,7 +183,7 @@
                     @endphp
                     @if($classSchedule && is_array($classSchedule) && count($classSchedule) > 0)
                         <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Class Schedule</label>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Class Schedule <span class="text-xs font-normal text-gray-400">(NG Time)</span></label>
                             <div class="flex flex-wrap gap-2">
                                 @foreach($classSchedule as $schedule)
                                     @if(isset($schedule['day']) && isset($schedule['time']))

@@ -105,7 +105,7 @@
                 @if($student->class_schedule && is_array($student->class_schedule))
                 <div class="flex items-start py-3 border-b border-gray-200 dark:border-gray-700">
                     <div class="w-1/3">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Class Schedule</p>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Class Schedule <span class="font-normal">(NG Time)</span></p>
                     </div>
                     <div class="w-2/3">
                         <div class="space-y-1">

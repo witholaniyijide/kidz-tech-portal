@@ -261,7 +261,7 @@
             {{-- Class Schedule --}}
             @if($student->class_schedule && is_array($student->class_schedule) && count($student->class_schedule) > 0)
             <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Class Schedule</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Class Schedule <span class="text-sm font-normal text-gray-500">(NG Time)</span></h3>
                 <div class="space-y-2">
                     @foreach($student->class_schedule as $schedule)
                         <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
