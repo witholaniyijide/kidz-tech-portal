@@ -45,10 +45,6 @@
                     <div class="text-3xl font-bold text-amber-600">{{ $stats['on_leave'] ?? 0 }}</div>
                     <div class="text-sm text-amber-700 dark:text-amber-400">On Leave</div>
                 </div>
-                <div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800/30 rounded-2xl p-5 shadow">
-                    <div class="text-3xl font-bold text-red-600">{{ $stats['resigned'] ?? 0 }}</div>
-                    <div class="text-sm text-red-700 dark:text-red-400">Resigned</div>
-                </div>
             </div>
 
             {{-- Filters --}}
@@ -66,7 +62,6 @@
                             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
                             <option value="on_leave" {{ request('status') === 'on_leave' ? 'selected' : '' }}>On Leave</option>
-                            <option value="resigned" {{ request('status') === 'resigned' ? 'selected' : '' }}>Resigned</option>
                         </select>
                     </div>
                     <button type="submit" class="px-5 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E] transition-colors">

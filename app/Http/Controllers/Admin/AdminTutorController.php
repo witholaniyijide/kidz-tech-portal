@@ -59,7 +59,6 @@ class AdminTutorController extends Controller
             'active' => Tutor::where('status', 'active')->count(),
             'inactive' => Tutor::where('status', 'inactive')->count(),
             'on_leave' => Tutor::where('status', 'on_leave')->count(),
-            'resigned' => Tutor::where('status', 'resigned')->count(),
         ];
 
         return view('admin.tutors.index', compact('tutors', 'stats'));

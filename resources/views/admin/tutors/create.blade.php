@@ -106,7 +106,6 @@
                                     <option value="active" {{ old('status', 'active') === 'active' ? 'selected' : '' }}>Active</option>
                                     <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
                                     <option value="on_leave" {{ old('status') === 'on_leave' ? 'selected' : '' }}>On Leave</option>
-                                    <option value="resigned" {{ old('status') === 'resigned' ? 'selected' : '' }}>Resigned</option>
                                 </select>
                             </div>
                             {{-- Bio --}}
