@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Rules\NigerianPhone;
 
 class DirectorTutorController extends Controller
 {
@@ -85,7 +86,7 @@ class DirectorTutorController extends Controller
             // Emergency Contact
             'contact_person_name' => 'nullable|string|max:255',
             'contact_person_relationship' => 'nullable|string|max:100',
-            'contact_person_phone' => 'nullable|string|regex:/^(070|080|081|090|091)\d{8}$/',
+            'contact_person_phone' => ['nullable', 'string', new NigerianPhone()],
         ]);
 
         DB::beginTransaction();
@@ -171,7 +172,7 @@ class DirectorTutorController extends Controller
             // Emergency Contact
             'contact_person_name' => 'nullable|string|max:255',
             'contact_person_relationship' => 'nullable|string|max:100',
-            'contact_person_phone' => 'nullable|string|regex:/^(070|080|081|090|091)\d{8}$/',
+            'contact_person_phone' => ['nullable', 'string', new NigerianPhone()],
         ]);
 
         DB::beginTransaction();

@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\QueryException;
+use App\Rules\NigerianPhone;
 
 class AdminTutorController extends Controller
 {
@@ -96,7 +97,7 @@ class AdminTutorController extends Controller
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
                 'email' => 'required|email|unique:tutors,email',
-                'phone' => 'required|string|regex:/^(070|080|081|090|091)\d{8}$/',
+                'phone' => ['required', 'string', new NigerianPhone()],
                 'gender' => 'required|in:male,female',
                 'date_of_birth' => 'required|date|before:today',
                 'hire_date' => 'required|date',
@@ -108,7 +109,7 @@ class AdminTutorController extends Controller
                 // Emergency Contact
                 'contact_person_name' => 'nullable|string|max:255',
                 'contact_person_relationship' => 'nullable|string|max:100',
-                'contact_person_phone' => 'nullable|string|regex:/^(070|080|081|090|091)\d{8}$/',
+                'contact_person_phone' => ['nullable', 'string', new NigerianPhone()],
 
                 // Payment Details
                 'bank_name' => 'nullable|string|max:255',
@@ -273,7 +274,7 @@ class AdminTutorController extends Controller
             // Emergency Contact
             'contact_person_name' => 'nullable|string|max:255',
             'contact_person_relationship' => 'nullable|string|max:100',
-            'contact_person_phone' => 'nullable|string|regex:/^(070|080|081|090|091)\d{8}$/',
+            'contact_person_phone' => ['nullable', 'string', new NigerianPhone()],
             
             // Payment Details
             'bank_name' => 'nullable|string|max:255',
