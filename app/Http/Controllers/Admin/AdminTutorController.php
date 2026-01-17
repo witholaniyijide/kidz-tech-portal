@@ -163,33 +163,6 @@ class AdminTutorController extends Controller
                 ]);
             });
 
-            // Create associated user account with default password
-            $user = User::create([
-                'name' => $validated['first_name'] . ' ' . $validated['last_name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($defaultPassword),
-                'password_change_required' => true,
-                'phone' => $validated['phone'] ?? null,
-            ]);
-
-            // Assign tutor role via role_user pivot table
-            $tutorRole = Role::where('name', 'tutor')->first();
-            if ($tutorRole) {
-                $user->roles()->attach($tutorRole->id);
-            }
-
-            $tutor->update(['user_id' => $user->id]);
-
-            // Log the action
-            ActivityLog::create([
-                'user_id' => Auth::id(),
-                'action' => 'created',
-                'description' => "Created tutor: {$tutor->first_name} {$tutor->last_name}",
-                'model_type' => Tutor::class,
-                'model_id' => $tutor->id,
-            ]);
-        });
-
         // Send welcome email to tutor
         if ($user && $tutor && !empty($user->email)) {
             try {
@@ -216,9 +189,9 @@ class AdminTutorController extends Controller
             }
         }
 
-            return redirect()
-                ->route('admin.tutors.index')
-                ->with('success', 'Tutor created successfully. A welcome email with login credentials has been sent to ' . $validated['email']);
+        return redirect()
+            ->route('admin.tutors.index')
+            ->with('success', 'Tutor created successfully. A welcome email with login credentials has been sent to ' . $validated['email']);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Re-throw validation exceptions so they display properly
