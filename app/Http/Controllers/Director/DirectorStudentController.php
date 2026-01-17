@@ -319,9 +319,11 @@ class DirectorStudentController extends Controller
     public function destroy(Student $student)
     {
         try {
-            $student->delete();
+            // Force delete student (permanently remove from database so email can be reused)
+            $student->forceDelete();
+
             return redirect()->route('director.students.index')
-                ->with('success', 'Student deleted successfully.');
+                ->with('success', 'Student deleted successfully. Email can now be reused.');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to delete student: ' . $e->getMessage());
         }
