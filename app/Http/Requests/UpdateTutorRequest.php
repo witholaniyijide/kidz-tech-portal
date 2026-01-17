@@ -27,7 +27,7 @@ class UpdateTutorRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('tutors', 'email')->ignore($tutorId)],
-            'phone' => ['required', 'string', 'regex:/^(070|080|081|090|091)\d{8}$/'],
+            'phone' => ['required','string',Rule::regex('/^(070|080|081|090|091)\d{8}$/'),],
             'date_of_birth' => ['nullable', 'date', 'before:today'],
             'gender' => ['nullable', 'in:male,female,other'],
             'location' => ['nullable', 'string', 'max:255'],
@@ -39,7 +39,7 @@ class UpdateTutorRequest extends FormRequest
             // Emergency Contact
             'contact_person_name' => ['nullable', 'string', 'max:255'],
             'contact_person_relationship' => ['nullable', 'string', 'max:255'],
-            'contact_person_phone' => ['nullable', 'string', 'regex:/^(070|080|081|090|091)\d{8}$/'],
+            'contact_person_phone' => ['nullable','string',Rule::regex('/^(070|080|081|090|091)\d{8}$/'),],
 
             // Payment Information
             'bank_name' => ['nullable', 'string', 'max:255'],
