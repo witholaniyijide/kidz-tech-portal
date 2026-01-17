@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\QueryException;
 
 class AdminTutorController extends Controller
 {
@@ -123,7 +124,7 @@ class AdminTutorController extends Controller
 
             $tutor = null;
             $user = null;
-            $defaultPassword = 'password';
+            $defaultPassword = 'password123';
 
             DB::transaction(function() use ($validated, $request, $defaultPassword, &$tutor, &$user) {
                 // Handle profile photo upload
@@ -196,7 +197,33 @@ class AdminTutorController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Re-throw validation exceptions so they display properly
             throw $e;
+        } catch (QueryException $e) {
+            // Handle database-specific errors
+            if ($e->getCode() === '23000' || str_contains($e->getMessage(), 'Duplicate entry')) {
+                Log::warning("Duplicate tutor email attempted", [
+                    'email' => $request->email,
+                    'error' => $e->getMessage()
+                ]);
+
+                return back()
+                    ->withInput()
+                    ->with('error', 'This email address is already in use. Please use a different email.');
+            }
+
+            // Log other database errors with full details
+            Log::error("Database error creating tutor in Admin portal", [
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Show actual error to user for debugging
+            return back()
+                ->withInput()
+                ->with('error', 'Database error: ' . $e->getMessage());
+
         } catch (\Exception $e) {
+            // Keep existing generic handler for non-database errors
             Log::error("Failed to create tutor in Admin portal", [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -204,7 +231,7 @@ class AdminTutorController extends Controller
 
             return back()
                 ->withInput()
-                ->with('error', 'Failed to create tutor. Please check all required fields and try again.');
+                ->with('error', 'Error: ' . $e->getMessage());
         }
     }
 
@@ -244,9 +271,9 @@ class AdminTutorController extends Controller
             'profile_photo' => 'nullable|image|max:2048',
             
             // Emergency Contact
-            'emergency_contact_name' => 'nullable|string|max:255',
-            'emergency_contact_relationship' => 'nullable|string|max:100',
-            'emergency_contact_phone' => 'nullable|string|max:20',
+            'contact_person_name' => 'nullable|string|max:255',
+            'contact_person_relationship' => 'nullable|string|max:100',
+            'contact_person_phone' => 'nullable|string|regex:/^(070|080|081|090|091)\d{8}$/',
             
             // Payment Details
             'bank_name' => 'nullable|string|max:255',

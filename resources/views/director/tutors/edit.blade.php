@@ -61,6 +61,25 @@
                         </div>
                     </div>
 
+                    {{-- Emergency Contact Section --}}
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Emergency Contact</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contact Person Name</label>
+                                <input type="text" name="contact_person_name" value="{{ old('contact_person_name', $tutor->contact_person_name) }}" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Relationship</label>
+                                <input type="text" name="contact_person_relationship" value="{{ old('contact_person_relationship', $tutor->contact_person_relationship) }}" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                                <input type="tel" name="contact_person_phone" value="{{ old('contact_person_phone', $tutor->contact_person_phone) }}" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-8">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Professional Information</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
