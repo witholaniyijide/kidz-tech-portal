@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,12 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tutors', function (Blueprint $table) {
-            // Make fields nullable that should be optional
-            $table->date('date_of_birth')->nullable()->change();
-            $table->date('hire_date')->nullable()->change();
-            $table->enum('gender', ['male', 'female'])->nullable()->change();
-        });
+        // Use raw SQL for ENUM column to avoid Doctrine issues
+        DB::statement("ALTER TABLE tutors MODIFY COLUMN date_of_birth DATE NULL");
+        DB::statement("ALTER TABLE tutors MODIFY COLUMN hire_date DATE NULL");
+        DB::statement("ALTER TABLE tutors MODIFY COLUMN gender ENUM('male', 'female') NULL");
     }
 
     /**
@@ -24,10 +23,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tutors', function (Blueprint $table) {
-            $table->date('date_of_birth')->nullable(false)->change();
-            $table->date('hire_date')->nullable(false)->change();
-            $table->enum('gender', ['male', 'female'])->nullable(false)->change();
-        });
+        // Use raw SQL for ENUM column to avoid Doctrine issues
+        DB::statement("ALTER TABLE tutors MODIFY COLUMN date_of_birth DATE NOT NULL");
+        DB::statement("ALTER TABLE tutors MODIFY COLUMN hire_date DATE NOT NULL");
+        DB::statement("ALTER TABLE tutors MODIFY COLUMN gender ENUM('male', 'female') NOT NULL");
     }
 };
