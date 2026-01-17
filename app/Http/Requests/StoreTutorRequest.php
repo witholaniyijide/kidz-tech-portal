@@ -32,7 +32,7 @@ class StoreTutorRequest extends FormRequest
             'occupation' => ['nullable', 'string', 'max:255'],
             'bio' => ['nullable', 'string', 'max:2000'],
             'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'status' => ['nullable', 'in:active,inactive,on_leave'],
+            'status' => ['nullable', 'in:active,inactive,on_leave,resigned'],
 
             // Emergency Contact
             'contact_person_name' => ['nullable', 'string', 'max:255'],

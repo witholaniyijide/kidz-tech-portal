@@ -104,7 +104,7 @@ class AdminTutorController extends Controller
                 'account_name' => 'nullable|string|max:255',
 
                 // Status
-                'status' => 'nullable|in:active,inactive,on_leave',
+                'status' => 'nullable|in:active,inactive,on_leave,resigned',
             ]);
 
             // Set default status if not provided
