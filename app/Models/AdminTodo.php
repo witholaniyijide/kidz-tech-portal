@@ -17,6 +17,7 @@ class AdminTodo extends Model
         'completed',
         'completed_at',
         'due_date',
+        'due_time',
     ];
 
     protected $casts = [
