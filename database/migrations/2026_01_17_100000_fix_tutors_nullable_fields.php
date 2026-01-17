@@ -15,7 +15,6 @@ return new class extends Migration
             // Make fields nullable that should be optional
             $table->date('date_of_birth')->nullable()->change();
             $table->date('hire_date')->nullable()->change();
-            $table->json('specializations')->nullable()->change();
             $table->enum('gender', ['male', 'female'])->nullable()->change();
         });
     }
@@ -28,7 +27,6 @@ return new class extends Migration
         Schema::table('tutors', function (Blueprint $table) {
             $table->date('date_of_birth')->nullable(false)->change();
             $table->date('hire_date')->nullable(false)->change();
-            $table->json('specializations')->nullable(false)->change();
             $table->enum('gender', ['male', 'female'])->nullable(false)->change();
         });
     }
