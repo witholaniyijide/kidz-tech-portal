@@ -232,7 +232,10 @@
                                     <option value="medium" selected>Medium Priority</option>
                                     <option value="high">High Priority</option>
                                 </select>
-                                <input type="date" name="due_date" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#423A8E]">
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="date" name="due_date" placeholder="Due date" class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#423A8E]">
+                                <input type="time" name="due_time" placeholder="Time" class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#423A8E]">
                             </div>
                             <div class="flex gap-2">
                                 <button type="submit" class="flex-1 px-4 py-2 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white text-sm font-medium rounded-lg hover:shadow-lg">Add To-Do</button>
@@ -349,6 +352,9 @@
                                                 @if($todo->due_date)
                                                     <span class="text-xs text-gray-500 dark:text-gray-400">
                                                         Due: {{ $todo->due_date->format('M j') }}
+                                                        @if($todo->due_time)
+                                                            at {{ date('g:i A', strtotime($todo->due_time)) }}
+                                                        @endif
                                                     </span>
                                                 @endif
                                             </div>
@@ -381,7 +387,10 @@
                                                     <option value="medium" {{ $todo->priority === 'medium' ? 'selected' : '' }}>Medium</option>
                                                     <option value="high" {{ $todo->priority === 'high' ? 'selected' : '' }}>High</option>
                                                 </select>
-                                                <input type="date" name="due_date" value="{{ $todo->due_date?->format('Y-m-d') }}" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <input type="date" name="due_date" value="{{ $todo->due_date?->format('Y-m-d') }}" class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                                                <input type="time" name="due_time" value="{{ $todo->due_time }}" class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                                             </div>
                                             <div class="flex gap-2">
                                                 <button type="submit" class="flex-1 px-3 py-1.5 bg-[#423A8E] text-white text-sm rounded-lg hover:bg-[#352f73]">Save</button>
