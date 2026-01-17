@@ -83,26 +83,27 @@ class AdminTutorController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:tutors,email',
-            'phone' => 'nullable|string|max:20',
-            'gender' => 'nullable|in:male,female,other',
-            'date_of_birth' => 'nullable|date',
+            'phone' => 'required|string|regex:/^(070|080|081|090|091)\d{8}$/',
+            'gender' => 'required|in:male,female',
+            'date_of_birth' => 'required|date|before:today',
+            'hire_date' => 'required|date',
             'location' => 'nullable|string|max:255',
             'occupation' => 'nullable|string|max:255',
             'bio' => 'nullable|string|max:2000',
             'profile_photo' => 'nullable|image|max:2048',
-            
+
             // Emergency Contact
-            'emergency_contact_name' => 'nullable|string|max:255',
-            'emergency_contact_relationship' => 'nullable|string|max:100',
-            'emergency_contact_phone' => 'nullable|string|max:20',
-            
+            'contact_person_name' => 'nullable|string|max:255',
+            'contact_person_relationship' => 'nullable|string|max:100',
+            'contact_person_phone' => 'nullable|string|regex:/^(070|080|081|090|091)\d{8}$/',
+
             // Payment Details
             'bank_name' => 'nullable|string|max:255',
             'account_number' => 'nullable|string|max:50',
             'account_name' => 'nullable|string|max:255',
-            
+
             // Status
-            'status' => 'required|in:active,inactive,on_leave,resigned',
+            'status' => 'nullable|in:active,inactive,on_leave',
         ]);
 
         $tutor = null;
@@ -114,6 +115,9 @@ class AdminTutorController extends Controller
             if ($request->hasFile('profile_photo')) {
                 $validated['profile_photo'] = $request->file('profile_photo')->store('tutors/photos', 'public');
             }
+
+            // Generate unique tutor ID
+            $validated['tutor_id'] = 'TUT-' . strtoupper(uniqid());
 
             $tutor = Tutor::create($validated);
 

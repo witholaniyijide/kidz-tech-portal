@@ -197,10 +197,19 @@ class DirectorTutorController extends Controller
                 return back()->with('error', 'Cannot delete tutor with active students. Please reassign students first.');
             }
 
-            $tutor->delete();
-            
+            // Store user reference before deleting tutor
+            $user = $tutor->user;
+
+            // Force delete tutor (permanently remove from database so email can be reused)
+            $tutor->forceDelete();
+
+            // Also delete associated user account if it exists
+            if ($user) {
+                $user->delete();
+            }
+
             return redirect()->route('director.tutors.index')
-                ->with('success', 'Tutor deleted successfully.');
+                ->with('success', 'Tutor deleted successfully. Email can now be reused.');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to delete tutor: ' . $e->getMessage());
         }
