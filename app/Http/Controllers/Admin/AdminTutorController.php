@@ -54,13 +54,24 @@ class AdminTutorController extends Controller
         $tutors = $query->orderBy('created_at', 'desc')->paginate(20);
 
         // Statistics
-        $stats = [
-            'total' => Tutor::count(),
-            'active' => Tutor::where('status', 'active')->count(),
-            'inactive' => Tutor::where('status', 'inactive')->count(),
-            'on_leave' => Tutor::where('status', 'on_leave')->count(),
-            'resigned' => Tutor::where('status', 'resigned')->count(),
-        ];
+        try {
+            $stats = [
+                'total' => Tutor::count(),
+                'active' => Tutor::where('status', 'active')->count(),
+                'inactive' => Tutor::where('status', 'inactive')->count(),
+                'on_leave' => Tutor::where('status', 'on_leave')->count(),
+                'resigned' => Tutor::where('status', 'resigned')->count(),
+            ];
+        } catch (\Exception $e) {
+            // Fallback if 'resigned' status doesn't exist yet (migration not run)
+            $stats = [
+                'total' => Tutor::count(),
+                'active' => Tutor::where('status', 'active')->count(),
+                'inactive' => Tutor::where('status', 'inactive')->count(),
+                'on_leave' => Tutor::where('status', 'on_leave')->count(),
+                'resigned' => 0,
+            ];
+        }
 
         return view('admin.tutors.index', compact('tutors', 'stats'));
     }
