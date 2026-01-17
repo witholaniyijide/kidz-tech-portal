@@ -78,48 +78,79 @@ class AdminTutorController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            // Personal Info
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:tutors,email',
-            'phone' => 'required|string|regex:/^(070|080|081|090|091)\d{8}$/',
-            'gender' => 'required|in:male,female',
-            'date_of_birth' => 'required|date|before:today',
-            'hire_date' => 'required|date',
-            'location' => 'nullable|string|max:255',
-            'occupation' => 'nullable|string|max:255',
-            'bio' => 'nullable|string|max:2000',
-            'profile_photo' => 'nullable|image|max:2048',
+        try {
+            $validated = $request->validate([
+                // Personal Info
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'email' => 'required|email|unique:tutors,email',
+                'phone' => 'required|string|regex:/^(070|080|081|090|091)\d{8}$/',
+                'gender' => 'required|in:male,female',
+                'date_of_birth' => 'required|date|before:today',
+                'hire_date' => 'required|date',
+                'location' => 'nullable|string|max:255',
+                'occupation' => 'nullable|string|max:255',
+                'bio' => 'nullable|string|max:2000',
+                'profile_photo' => 'nullable|image|max:2048',
 
-            // Emergency Contact
-            'contact_person_name' => 'nullable|string|max:255',
-            'contact_person_relationship' => 'nullable|string|max:100',
-            'contact_person_phone' => 'nullable|string|regex:/^(070|080|081|090|091)\d{8}$/',
+                // Emergency Contact
+                'contact_person_name' => 'nullable|string|max:255',
+                'contact_person_relationship' => 'nullable|string|max:100',
+                'contact_person_phone' => 'nullable|string|regex:/^(070|080|081|090|091)\d{8}$/',
 
-            // Payment Details
-            'bank_name' => 'nullable|string|max:255',
-            'account_number' => 'nullable|string|max:50',
-            'account_name' => 'nullable|string|max:255',
+                // Payment Details
+                'bank_name' => 'nullable|string|max:255',
+                'account_number' => 'nullable|string|max:50',
+                'account_name' => 'nullable|string|max:255',
 
-            // Status
-            'status' => 'nullable|in:active,inactive,on_leave',
-        ]);
+                // Status
+                'status' => 'nullable|in:active,inactive,on_leave',
+            ]);
 
-        $tutor = null;
-        $user = null;
-        $defaultPassword = 'password';
+            // Set default status if not provided
+            $validated['status'] = $validated['status'] ?? 'active';
 
-        DB::transaction(function() use ($validated, $request, $defaultPassword, &$tutor, &$user) {
-            // Handle profile photo upload
-            if ($request->hasFile('profile_photo')) {
-                $validated['profile_photo'] = $request->file('profile_photo')->store('tutors/photos', 'public');
-            }
+            $tutor = null;
+            $user = null;
+            $defaultPassword = 'password';
 
-            // Generate unique tutor ID
-            $validated['tutor_id'] = 'TUT-' . strtoupper(uniqid());
+            DB::transaction(function() use ($validated, $request, $defaultPassword, &$tutor, &$user) {
+                // Handle profile photo upload
+                if ($request->hasFile('profile_photo')) {
+                    $validated['profile_photo'] = $request->file('profile_photo')->store('tutors/photos', 'public');
+                }
 
-            $tutor = Tutor::create($validated);
+                // Generate unique tutor ID
+                $validated['tutor_id'] = 'TUT-' . strtoupper(uniqid());
+
+                $tutor = Tutor::create($validated);
+
+                // Create associated user account with default password
+                $user = User::create([
+                    'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+                    'email' => $validated['email'],
+                    'password' => Hash::make($defaultPassword),
+                    'password_change_required' => true,
+                    'phone' => $validated['phone'] ?? null,
+                ]);
+
+                // Assign tutor role via role_user pivot table
+                $tutorRole = Role::where('name', 'tutor')->first();
+                if ($tutorRole) {
+                    $user->roles()->attach($tutorRole->id);
+                }
+
+                $tutor->update(['user_id' => $user->id]);
+
+                // Log the action
+                ActivityLog::create([
+                    'user_id' => Auth::id(),
+                    'action' => 'created',
+                    'description' => "Created tutor: {$tutor->first_name} {$tutor->last_name}",
+                    'model_type' => Tutor::class,
+                    'model_id' => $tutor->id,
+                ]);
+            });
 
             // Create associated user account with default password
             $user = User::create([
@@ -174,9 +205,23 @@ class AdminTutorController extends Controller
             }
         }
 
-        return redirect()
-            ->route('admin.tutors.index')
-            ->with('success', 'Tutor created successfully. A welcome email with login credentials has been sent to ' . $validated['email']);
+            return redirect()
+                ->route('admin.tutors.index')
+                ->with('success', 'Tutor created successfully. A welcome email with login credentials has been sent to ' . $validated['email']);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Re-throw validation exceptions so they display properly
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error("Failed to create tutor in Admin portal", [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to create tutor. Please check all required fields and try again.');
+        }
     }
 
     /**
