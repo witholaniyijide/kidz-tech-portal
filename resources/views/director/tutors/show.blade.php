@@ -125,15 +125,15 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Contact Person</label>
-                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->emergency_contact_name ?? '-' }}</p>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->contact_person_name ?? '-' }}</p>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Relationship</label>
-                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->emergency_contact_relationship ?? '-' }}</p>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->contact_person_relationship ?? '-' }}</p>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Phone</label>
-                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->emergency_contact_phone ?? '-' }}</p>
+                            <p class="text-gray-900 dark:text-white text-sm sm:text-base">{{ $tutor->contact_person_phone ?? '-' }}</p>
                         </div>
                     </div>
                 </div>

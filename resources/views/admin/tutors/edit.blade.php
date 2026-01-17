@@ -125,17 +125,17 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contact Person Name</label>
-                                <input type="text" name="emergency_contact_name" value="{{ old('emergency_contact_name', $tutor->emergency_contact_name) }}"
+                                <input type="text" name="contact_person_name" value="{{ old('contact_person_name', $tutor->contact_person_name) }}"
                                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Relationship</label>
-                                <input type="text" name="emergency_contact_relationship" value="{{ old('emergency_contact_relationship', $tutor->emergency_contact_relationship) }}"
+                                <input type="text" name="contact_person_relationship" value="{{ old('contact_person_relationship', $tutor->contact_person_relationship) }}"
                                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
-                                <input type="tel" name="emergency_contact_phone" value="{{ old('emergency_contact_phone', $tutor->emergency_contact_phone) }}"
+                                <input type="tel" name="contact_person_phone" value="{{ old('contact_person_phone', $tutor->contact_person_phone) }}"
                                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500">
                             </div>
                         </div>

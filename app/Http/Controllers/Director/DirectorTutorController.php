@@ -81,6 +81,11 @@ class DirectorTutorController extends Controller
             'hourly_rate' => 'nullable|numeric|min:0',
             'create_user_account' => 'nullable|boolean',
             'password' => 'required_if:create_user_account,1|nullable|min:8',
+
+            // Emergency Contact
+            'contact_person_name' => 'nullable|string|max:255',
+            'contact_person_relationship' => 'nullable|string|max:100',
+            'contact_person_phone' => 'nullable|string|regex:/^(070|080|081|090|091)\d{8}$/',
         ]);
 
         DB::beginTransaction();
@@ -162,6 +167,11 @@ class DirectorTutorController extends Controller
             'specialization' => 'nullable|string|max:255',
             'bio' => 'nullable|string|max:1000',
             'hourly_rate' => 'nullable|numeric|min:0',
+
+            // Emergency Contact
+            'contact_person_name' => 'nullable|string|max:255',
+            'contact_person_relationship' => 'nullable|string|max:100',
+            'contact_person_phone' => 'nullable|string|regex:/^(070|080|081|090|091)\d{8}$/',
         ]);
 
         DB::beginTransaction();
