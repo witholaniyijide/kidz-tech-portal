@@ -59,6 +59,7 @@ class AdminTutorController extends Controller
             'active' => Tutor::where('status', 'active')->count(),
             'inactive' => Tutor::where('status', 'inactive')->count(),
             'on_leave' => Tutor::where('status', 'on_leave')->count(),
+            'resigned' => Tutor::where('status', 'resigned')->count(),
         ];
 
         return view('admin.tutors.index', compact('tutors', 'stats'));
@@ -103,7 +104,7 @@ class AdminTutorController extends Controller
                 'account_name' => 'nullable|string|max:255',
 
                 // Status
-                'status' => 'nullable|in:active,inactive,on_leave',
+                'status' => 'nullable|in:active,inactive,on_leave,resigned',
             ]);
 
             // Set default status if not provided

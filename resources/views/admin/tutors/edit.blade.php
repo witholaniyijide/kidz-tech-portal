@@ -99,6 +99,7 @@
                                     <option value="active" {{ old('status', $tutor->status) === 'active' ? 'selected' : '' }}>Active</option>
                                     <option value="inactive" {{ old('status', $tutor->status) === 'inactive' ? 'selected' : '' }}>Inactive</option>
                                     <option value="on_leave" {{ old('status', $tutor->status) === 'on_leave' ? 'selected' : '' }}>On Leave</option>
+                                    <option value="resigned" {{ old('status', $tutor->status) === 'resigned' ? 'selected' : '' }}>Resigned</option>
                                 </select>
                             </div>
                             <div class="md:col-span-2 lg:col-span-3">
