@@ -61,24 +61,30 @@
                             </div>
                             {{-- Phone --}}
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
-                                <input type="tel" name="phone" value="{{ old('phone') }}"
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone <span class="text-red-500">*</span></label>
+                                <input type="tel" name="phone" value="{{ old('phone') }}" required
+                                       placeholder="e.g., 08012345678"
                                        class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
                             </div>
                             {{-- Gender --}}
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender</label>
-                                <select name="gender" class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender <span class="text-red-500">*</span></label>
+                                <select name="gender" required class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
                                     <option value="">Select Gender</option>
                                     <option value="male" {{ old('gender') === 'male' ? 'selected' : '' }}>Male</option>
                                     <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Female</option>
-                                    <option value="other" {{ old('gender') === 'other' ? 'selected' : '' }}>Other</option>
                                 </select>
                             </div>
                             {{-- Date of Birth --}}
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Birth</label>
-                                <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}"
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Birth <span class="text-red-500">*</span></label>
+                                <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}" required
+                                       class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
+                            </div>
+                            {{-- Hire Date / Join Date --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Join Date <span class="text-red-500">*</span></label>
+                                <input type="date" name="hire_date" value="{{ old('hire_date', now()->toDateString()) }}" required
                                        class="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E] text-sm sm:text-base">
                             </div>
                             {{-- Location --}}
