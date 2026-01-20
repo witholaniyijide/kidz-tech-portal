@@ -101,6 +101,9 @@ class DirectorTutorController extends Controller
                     'name' => $validated['first_name'] . ' ' . $validated['last_name'],
                     'email' => $validated['email'],
                     'password' => Hash::make($request->password),
+                    'email_verified_at' => now(), // Auto-verify since director is creating the account
+                    'status' => 'active',
+                    'phone' => $validated['phone'] ?? null,
                 ]);
 
                 // Assign tutor role
