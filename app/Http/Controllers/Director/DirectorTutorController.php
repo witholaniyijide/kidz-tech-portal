@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Director;
 
 use App\Http\Controllers\Controller;
+use App\Mail\TutorAccountWelcomeMail;
 use App\Models\Tutor;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use App\Rules\NigerianPhone;
 
@@ -80,8 +83,6 @@ class DirectorTutorController extends Controller
             'specialization' => 'nullable|string|max:255',
             'bio' => 'nullable|string|max:1000',
             'hourly_rate' => 'nullable|numeric|min:0',
-            'create_user_account' => 'nullable|boolean',
-            'password' => 'required_if:create_user_account,1|nullable|min:8',
 
             // Emergency Contact
             'contact_person_name' => 'nullable|string|max:255',
@@ -89,43 +90,90 @@ class DirectorTutorController extends Controller
             'contact_person_phone' => ['nullable', 'string', new NigerianPhone()],
         ]);
 
+        $defaultPassword = 'password123';
+        $tutor = null;
+        $user = null;
+
         DB::beginTransaction();
         try {
             // Generate tutor ID
             $validated['tutor_id'] = 'TUT-' . strtoupper(uniqid());
 
-            // Create user account if requested
-            $userId = null;
-            if ($request->boolean('create_user_account')) {
-                $user = User::create([
-                    'name' => $validated['first_name'] . ' ' . $validated['last_name'],
-                    'email' => $validated['email'],
-                    'password' => Hash::make($request->password),
-                    'email_verified_at' => now(), // Auto-verify since director is creating the account
-                    'status' => 'active',
-                    'phone' => $validated['phone'] ?? null,
-                ]);
+            // Create tutor record first
+            $tutor = Tutor::create($validated);
 
-                // Assign tutor role
-                $tutorRole = Role::where('name', 'tutor')->first();
-                if ($tutorRole) {
-                    $user->roles()->attach($tutorRole->id);
-                }
+            // Always create user account with default password
+            $user = User::create([
+                'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($defaultPassword),
+                'email_verified_at' => now(), // Auto-verify since director is creating the account
+                'status' => 'active',
+                'password_change_required' => true,
+                'phone' => $validated['phone'] ?? null,
+            ]);
 
-                $userId = $user->id;
+            // Assign tutor role
+            $tutorRole = Role::where('name', 'tutor')->first();
+            if ($tutorRole) {
+                $user->roles()->attach($tutorRole->id);
             }
 
-            $validated['user_id'] = $userId;
-            unset($validated['create_user_account'], $validated['password']);
-
-            $tutor = Tutor::create($validated);
+            // Link user to tutor
+            $tutor->update(['user_id' => $user->id]);
 
             DB::commit();
 
+            // Send welcome email to tutor
+            $emailSent = false;
+            if ($user && $tutor && !empty($user->email)) {
+                try {
+                    $loginUrl = config('app.url') . '/login';
+                    Mail::to($user->email)->send(new TutorAccountWelcomeMail(
+                        user: $user,
+                        tutor: $tutor,
+                        password: $defaultPassword,
+                        loginUrl: $loginUrl
+                    ));
+
+                    $emailSent = true;
+                    Log::info("Successfully sent tutor welcome email from Director portal", [
+                        'user_id' => $user->id,
+                        'email' => $user->email,
+                        'tutor_id' => $tutor->id,
+                        'tutor_name' => $tutor->first_name . ' ' . $tutor->last_name
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error("FAILED to send tutor welcome email from Director portal", [
+                        'user_id' => $user->id,
+                        'email' => $user->email,
+                        'tutor_id' => $tutor->id,
+                        'error' => $e->getMessage(),
+                        'error_code' => $e->getCode(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    // Don't throw - email failure shouldn't break account creation
+                }
+            }
+
+            $successMessage = 'Tutor created successfully. ';
+            if ($emailSent) {
+                $successMessage .= 'A welcome email with login credentials has been sent to ' . $validated['email'] . '. Default password: password123';
+            } else {
+                $successMessage .= 'Please note: Welcome email could not be sent. Default password is: password123. Please share this with the tutor.';
+            }
+
             return redirect()->route('director.tutors.index')
-                ->with('success', 'Tutor created successfully.');
+                ->with('success', $successMessage);
+
         } catch (\Exception $e) {
             DB::rollBack();
+
+            Log::error("Failed to create tutor in Director portal", [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return back()->withInput()->with('error', 'Failed to create tutor: ' . $e->getMessage());
         }
     }
