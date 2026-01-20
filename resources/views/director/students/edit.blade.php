@@ -192,7 +192,7 @@
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                             Day <span x-text="index + 1"></span>
                                         </label>
-                                        <select :name="'class_schedules[' + index + '][day]'" x-model="slot.day"
+                                        <select :name="'class_schedule[' + index + '][day]'" x-model="slot.day"
                                                 class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                                             <option value="">Select Day</option>
                                             <option value="Monday">Monday</option>
@@ -207,7 +207,7 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time</label>
                                         <div class="flex items-center gap-1">
-                                            <input type="hidden" :name="'class_schedules[' + index + '][time]'" :value="slot.time">
+                                            <input type="hidden" :name="'class_schedule[' + index + '][time]'" :value="slot.time">
                                             <select x-model="slot.hour" @change="updateSlotTime(index)" class="w-16 px-2 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm">
                                                 <option value="">Hr</option>
                                                 <template x-for="h in 12" :key="h">
