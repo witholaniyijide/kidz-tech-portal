@@ -229,6 +229,7 @@ class DashboardController extends Controller
             'description' => 'nullable|string|max:1000',
             'priority' => 'in:low,medium,high',
             'due_date' => 'nullable|date',
+            'due_time' => 'nullable|date_format:H:i',
         ]);
 
         TutorTodo::create([
@@ -237,6 +238,7 @@ class DashboardController extends Controller
             'description' => $validated['description'] ?? null,
             'priority' => $validated['priority'] ?? 'medium',
             'due_date' => $validated['due_date'] ?? null,
+            'due_time' => $validated['due_time'] ?? null,
         ]);
 
         return back()->with('success', 'Todo added successfully.');
@@ -258,6 +260,7 @@ class DashboardController extends Controller
             'description' => 'nullable|string|max:1000',
             'priority' => 'in:low,medium,high',
             'due_date' => 'nullable|date',
+            'due_time' => 'nullable|date_format:H:i',
         ]);
 
         $todo->update($validated);

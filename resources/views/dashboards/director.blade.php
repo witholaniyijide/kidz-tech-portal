@@ -261,6 +261,8 @@
                     x-data="{
                         todos: [],
                         newTodo: '',
+                        newDate: '',
+                        newTime: '',
                         init() {
                             const stored = localStorage.getItem('director_todos');
                             if (stored) {
@@ -291,9 +293,13 @@
                             if (this.newTodo.trim()) {
                                 this.todos.push({
                                     text: this.newTodo.trim(),
+                                    date: this.newDate || null,
+                                    time: this.newTime || null,
                                     completed: false
                                 });
                                 this.newTodo = '';
+                                this.newDate = '';
+                                this.newTime = '';
                                 this.saveTodos();
                             }
                         },
@@ -309,6 +315,12 @@
                                 event.preventDefault();
                                 this.toggleTodo(index);
                             }
+                        },
+                        formatDateTime(date, time) {
+                            if (!date) return '';
+                            const d = new Date(date);
+                            const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            return time ? `${dateStr} at ${time}` : dateStr;
                         }
                     }"
                 >
@@ -336,10 +348,11 @@
                                 >
                                 <label
                                     :for="'todo-' + index"
-                                    class="flex-1 ml-3 text-gray-800 dark:text-gray-200 group-hover:text-[#4F46E5] dark:group-hover:text-[#818CF8] transition-colors cursor-pointer text-sm"
-                                    :class="{ 'line-through opacity-50': todo.completed }"
-                                    x-text="todo.text"
-                                ></label>
+                                    class="flex-1 ml-3 cursor-pointer"
+                                >
+                                    <div class="text-gray-800 dark:text-gray-200 group-hover:text-[#4F46E5] dark:group-hover:text-[#818CF8] transition-colors text-sm" :class="{ 'line-through opacity-50': todo.completed }" x-text="todo.text"></div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5" x-show="todo.date" x-text="formatDateTime(todo.date, todo.time)"></div>
+                                </label>
                                 <button
                                     type="button"
                                     @click="removeTodo(index)"
@@ -364,23 +377,37 @@
                     </div>
 
                     {{-- Add New Todo --}}
-                    <form @submit.prevent="addTodo" class="flex gap-2 mb-4">
+                    <form @submit.prevent="addTodo" class="space-y-3 mb-4">
                         <input
                             type="text"
                             x-model="newTodo"
                             placeholder="Add a new task..."
-                            class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
+                            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
                             aria-label="New task input"
                         >
-                        <button
-                            type="submit"
-                            class="px-5 py-2.5 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5] focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
-                            aria-label="Add task"
-                        >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                        </button>
+                        <div class="flex gap-2">
+                            <input
+                                type="date"
+                                x-model="newDate"
+                                class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
+                                aria-label="Task date"
+                            >
+                            <input
+                                type="time"
+                                x-model="newTime"
+                                class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
+                                aria-label="Task time"
+                            >
+                            <button
+                                type="submit"
+                                class="px-5 py-2.5 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5] focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
+                                aria-label="Add task"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        </div>
                     </form>
 
                     <div class="p-3 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 border border-indigo-200 dark:border-indigo-700">

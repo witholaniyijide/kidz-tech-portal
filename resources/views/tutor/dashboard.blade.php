@@ -184,6 +184,7 @@
                             <option value="high">High Priority</option>
                         </select>
                         <input type="date" name="due_date" class="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-lg focus:ring-2 focus:ring-[#7978E9]">
+                        <input type="time" name="due_time" class="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-lg focus:ring-2 focus:ring-[#7978E9]">
                         <button type="submit" class="px-4 py-2 bg-[#7978E9] text-white text-sm font-medium rounded-lg hover:bg-[#6968d8] transition-colors">
                             Add
                         </button>
@@ -293,7 +294,9 @@
                                 <div class="flex-1 min-w-0">
                                     <div class="font-medium text-slate-800 dark:text-slate-200 text-sm truncate">{{ $todo->title }}</div>
                                     @if($todo->due_date)
-                                        <div class="text-xs text-slate-500 dark:text-slate-400">Due: {{ $todo->due_date->format('M j, Y') }}</div>
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">
+                                            Due: {{ $todo->due_date->format('M j, Y') }}@if($todo->due_time) at {{ $todo->due_time }}@endif
+                                        </div>
                                     @endif
                                 </div>
                                 <form action="{{ route('tutor.todos.destroy', $todo) }}" method="POST" class="opacity-0 group-hover:opacity-100 transition-opacity">
