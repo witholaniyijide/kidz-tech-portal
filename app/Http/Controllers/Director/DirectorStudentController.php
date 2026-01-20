@@ -97,11 +97,14 @@ class DirectorStudentController extends Controller
             'current_level' => 'nullable|string|max:100',
             'starting_course_level' => 'nullable|integer|min:1|max:12',
             'classes_per_week' => 'nullable|integer|min:1|max:7',
-            'class_schedules' => 'nullable|array',
-            'class_schedules.*.day' => 'required_with:class_schedules|string',
-            'class_schedules.*.time' => 'required_with:class_schedules|string',
+            'class_schedule' => 'nullable|array',
+            'class_schedule.*.day' => 'required_with:class_schedule|string',
+            'class_schedule.*.time' => 'required_with:class_schedule|string',
+            'class_link' => 'nullable|url|max:500',
             'google_classroom_link' => 'nullable|url|max:500',
             'live_classroom_link' => 'nullable|url|max:500',
+            'coding_experience' => 'nullable|string|max:1000',
+            'career_interest' => 'nullable|string|max:1000',
             'notes' => 'nullable|string|max:1000',
 
             // Course Progression
@@ -135,11 +138,7 @@ class DirectorStudentController extends Controller
             // Generate student ID
             $validated['student_id'] = 'STU-' . strtoupper(uniqid());
 
-            // Handle class schedule JSON
-            if (isset($validated['class_schedules'])) {
-                $validated['class_schedule'] = json_encode($validated['class_schedules']);
-                unset($validated['class_schedules']);
-            }
+            // class_schedule is automatically cast to JSON by the model
 
             // Remove course progression arrays from validated data (handled separately)
             $completedCourseIds = $validated['completed_course_ids'] ?? [];
@@ -223,11 +222,14 @@ class DirectorStudentController extends Controller
             'current_level' => 'nullable|string|max:100',
             'starting_course_level' => 'nullable|integer|min:1|max:12',
             'classes_per_week' => 'nullable|integer|min:1|max:7',
-            'class_schedules' => 'nullable|array',
-            'class_schedules.*.day' => 'required_with:class_schedules|string',
-            'class_schedules.*.time' => 'required_with:class_schedules|string',
+            'class_schedule' => 'nullable|array',
+            'class_schedule.*.day' => 'required_with:class_schedule|string',
+            'class_schedule.*.time' => 'required_with:class_schedule|string',
+            'class_link' => 'nullable|url|max:500',
             'google_classroom_link' => 'nullable|url|max:500',
             'live_classroom_link' => 'nullable|url|max:500',
+            'coding_experience' => 'nullable|string|max:1000',
+            'career_interest' => 'nullable|string|max:1000',
             'notes' => 'nullable|string|max:1000',
 
             // Course Progression
@@ -265,11 +267,7 @@ class DirectorStudentController extends Controller
 
         DB::beginTransaction();
         try {
-            // Handle class schedule JSON
-            if (isset($validated['class_schedules'])) {
-                $validated['class_schedule'] = json_encode($validated['class_schedules']);
-                unset($validated['class_schedules']);
-            }
+            // class_schedule is automatically cast to JSON by the model
 
             // Remove course progression arrays from validated data (handled separately)
             $completedCourseIds = $validated['completed_course_ids'] ?? [];

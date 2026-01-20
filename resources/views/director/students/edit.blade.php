@@ -99,15 +99,16 @@
                                 @error('tutor_id') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Parent/Guardian</label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Link to Existing Parent (Optional)</label>
                                 <select name="parent_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                    <option value="">Select Parent</option>
+                                    <option value="">-- Select if parent account exists --</option>
                                     @foreach($parents as $parent)
                                         <option value="{{ $parent->id }}" {{ old('parent_id', $student->guardians->first()?->id) == $parent->id ? 'selected' : '' }}>
                                             {{ $parent->name }} ({{ $parent->email }})
                                         </option>
                                     @endforeach
                                 </select>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave blank to create new parent accounts below</p>
                                 @error('parent_id') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
@@ -137,6 +138,18 @@
                                     @endif
                                 </select>
                                 @error('current_course_id') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Coding Experience</label>
+                                <textarea name="coding_experience" rows="2"
+                                          class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">{{ old('coding_experience', $student->coding_experience) }}</textarea>
+                                @error('coding_experience') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Career Interest</label>
+                                <textarea name="career_interest" rows="2"
+                                          class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">{{ old('career_interest', $student->career_interest) }}</textarea>
+                                @error('career_interest') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
@@ -192,7 +205,7 @@
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                             Day <span x-text="index + 1"></span>
                                         </label>
-                                        <select :name="'class_schedules[' + index + '][day]'" x-model="slot.day"
+                                        <select :name="'class_schedule[' + index + '][day]'" x-model="slot.day"
                                                 class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                                             <option value="">Select Day</option>
                                             <option value="Monday">Monday</option>
@@ -207,7 +220,7 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time</label>
                                         <div class="flex items-center gap-1">
-                                            <input type="hidden" :name="'class_schedules[' + index + '][time]'" :value="slot.time">
+                                            <input type="hidden" :name="'class_schedule[' + index + '][time]'" :value="slot.time">
                                             <select x-model="slot.hour" @change="updateSlotTime(index)" class="w-16 px-2 py-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm">
                                                 <option value="">Hr</option>
                                                 <template x-for="h in 12" :key="h">
@@ -235,10 +248,10 @@
                     <!-- Parent Information -->
                     <div class="mb-8">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                            Parent/Guardian Information
+                            Parent Information
                         </h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                            If a new email is added, a parent account will be created and login credentials sent via email.
+                            Enter parent details below. Parent accounts will be created automatically if new emails are provided.
                         </p>
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             <!-- Father's Information -->

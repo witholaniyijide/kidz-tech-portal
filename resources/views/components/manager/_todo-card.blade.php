@@ -18,23 +18,37 @@
     </div>
 
     <div class="mt-4 pt-4 border-t border-white/10 dark:border-gray-700/10">
-        <div class="flex gap-2">
+        <div class="space-y-3">
             <input
                 type="text"
                 id="new-todo-input"
                 placeholder="Add a new task..."
-                class="flex-1 px-4 py-2 rounded-xl bg-white/20 dark:bg-gray-900/30 border border-white/10 dark:border-gray-700/10 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                class="w-full px-4 py-2 rounded-xl bg-white/20 dark:bg-gray-900/30 border border-white/10 dark:border-gray-700/10 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
                 aria-label="New task input"
             />
-            <button
-                id="add-todo-btn"
-                class="px-4 py-2 rounded-xl bg-gradient-manager text-white font-medium hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
-                aria-label="Add task"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-            </button>
+            <div class="flex gap-2">
+                <input
+                    type="date"
+                    id="new-todo-date"
+                    class="flex-1 px-4 py-2 rounded-xl bg-white/20 dark:bg-gray-900/30 border border-white/10 dark:border-gray-700/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                    aria-label="Task date"
+                />
+                <input
+                    type="time"
+                    id="new-todo-time"
+                    class="flex-1 px-4 py-2 rounded-xl bg-white/20 dark:bg-gray-900/30 border border-white/10 dark:border-gray-700/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                    aria-label="Task time"
+                />
+                <button
+                    id="add-todo-btn"
+                    class="px-4 py-2 rounded-xl bg-gradient-manager text-white font-medium hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+                    aria-label="Add task"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
 </x-ui.glass-card>
@@ -45,6 +59,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const todoList = document.getElementById('todo-list');
     const todoCount = document.getElementById('todo-count');
     const newTodoInput = document.getElementById('new-todo-input');
+    const newTodoDate = document.getElementById('new-todo-date');
+    const newTodoTime = document.getElementById('new-todo-time');
     const addTodoBtn = document.getElementById('add-todo-btn');
 
     // Load tasks from localStorage or use defaults
@@ -101,9 +117,22 @@ document.addEventListener('DOMContentLoaded', function() {
         checkbox.setAttribute('aria-label', `Mark ${task.text} as ${task.completed ? 'incomplete' : 'complete'}`);
         checkbox.addEventListener('change', () => toggleTask(task.id));
 
-        const span = document.createElement('span');
-        span.className = `flex-1 text-sm text-gray-700 dark:text-gray-300 ${task.completed ? 'line-through' : ''}`;
+        const textContainer = document.createElement('div');
+        textContainer.className = 'flex-1';
+
+        const span = document.createElement('div');
+        span.className = `text-sm text-gray-700 dark:text-gray-300 ${task.completed ? 'line-through' : ''}`;
         span.textContent = task.text;
+
+        textContainer.appendChild(span);
+
+        // Add date/time if present
+        if (task.date) {
+            const dateSpan = document.createElement('div');
+            dateSpan.className = 'text-xs text-gray-500 dark:text-gray-400 mt-0.5';
+            dateSpan.textContent = formatDateTime(task.date, task.time);
+            textContainer.appendChild(dateSpan);
+        }
 
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-500 transition-all';
@@ -112,10 +141,18 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteBtn.addEventListener('click', () => deleteTask(task.id));
 
         div.appendChild(checkbox);
-        div.appendChild(span);
+        div.appendChild(textContainer);
         div.appendChild(deleteBtn);
 
         return div;
+    }
+
+    // Format date and time
+    function formatDateTime(date, time) {
+        if (!date) return '';
+        const d = new Date(date);
+        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return time ? `${dateStr} at ${time}` : dateStr;
     }
 
     // Add new task
@@ -124,10 +161,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!text) return;
 
         const tasks = loadTasks();
-        tasks.push({ text, completed: false, id: Date.now() });
+        tasks.push({
+            text,
+            date: newTodoDate.value || null,
+            time: newTodoTime.value || null,
+            completed: false,
+            id: Date.now()
+        });
         saveTasks(tasks);
         renderTasks();
         newTodoInput.value = '';
+        newTodoDate.value = '';
+        newTodoTime.value = '';
     }
 
     // Toggle task completion
