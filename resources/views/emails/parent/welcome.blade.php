@@ -27,7 +27,7 @@
                     <tr>
                         <td style="padding: 40px 30px;">
                             <p style="margin: 0 0 20px 0; font-size: 16px; color: #1f2937; line-height: 1.6;">
-                                Dear {{ $parent->name }},
+                                {{ $salutation }},
                             </p>
 
                             <p style="margin: 0 0 20px 0; font-size: 16px; color: #1f2937; line-height: 1.6;">

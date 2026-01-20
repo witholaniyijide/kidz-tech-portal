@@ -22,8 +22,28 @@ class ParentAccountWelcomeMail extends Mailable implements ShouldQueue
         public User $parent,
         public Student $student,
         public string $password,
-        public string $loginUrl
+        public string $loginUrl,
+        public string $relationship = ''
     ) {
+    }
+
+    /**
+     * Get proper salutation based on relationship.
+     */
+    protected function getSalutation(): string
+    {
+        $name = $this->parent->name;
+
+        switch (strtolower($this->relationship)) {
+            case 'father':
+                return "Dear Mr. {$name}";
+            case 'mother':
+                return "Dear Mrs. {$name}";
+            case 'guardian':
+                return "Dear {$name}";
+            default:
+                return "Dear {$name}";
+        }
     }
 
     /**
@@ -48,6 +68,7 @@ class ParentAccountWelcomeMail extends Mailable implements ShouldQueue
                 'student' => $this->student,
                 'password' => $this->password,
                 'loginUrl' => $this->loginUrl,
+                'salutation' => $this->getSalutation(),
             ],
         );
     }
