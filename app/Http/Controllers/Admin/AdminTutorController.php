@@ -143,6 +143,8 @@ class AdminTutorController extends Controller
                     'name' => $validated['first_name'] . ' ' . $validated['last_name'],
                     'email' => $validated['email'],
                     'password' => Hash::make($defaultPassword),
+                    'email_verified_at' => now(), // Auto-verify since admin is creating the account
+                    'status' => 'active',
                     'password_change_required' => true,
                     'phone' => $validated['phone'] ?? null,
                 ]);
@@ -166,6 +168,7 @@ class AdminTutorController extends Controller
             });
 
         // Send welcome email to tutor
+        $emailSent = false;
         if ($user && $tutor && !empty($user->email)) {
             try {
                 $loginUrl = config('app.url') . '/login';
@@ -176,24 +179,42 @@ class AdminTutorController extends Controller
                     loginUrl: $loginUrl
                 ));
 
-                Log::info("Sent tutor welcome email", [
+                $emailSent = true;
+                Log::info("Successfully sent tutor welcome email", [
                     'user_id' => $user->id,
                     'email' => $user->email,
-                    'tutor_id' => $tutor->id
+                    'tutor_id' => $tutor->id,
+                    'tutor_name' => $tutor->first_name . ' ' . $tutor->last_name
                 ]);
             } catch (\Exception $e) {
-                Log::error("Failed to send tutor welcome email", [
+                Log::error("FAILED to send tutor welcome email", [
                     'user_id' => $user->id,
                     'email' => $user->email,
-                    'error' => $e->getMessage()
+                    'tutor_id' => $tutor->id,
+                    'error' => $e->getMessage(),
+                    'error_code' => $e->getCode(),
+                    'trace' => $e->getTraceAsString()
                 ]);
                 // Don't throw - email failure shouldn't break account creation
             }
+        } else {
+            Log::warning("Skipped sending tutor welcome email - missing data", [
+                'has_user' => (bool)$user,
+                'has_tutor' => (bool)$tutor,
+                'has_email' => !empty($user->email ?? null)
+            ]);
+        }
+
+        $successMessage = 'Tutor created successfully. ';
+        if ($emailSent) {
+            $successMessage .= 'A welcome email with login credentials has been sent to ' . $validated['email'] . '. Default password: password123';
+        } else {
+            $successMessage .= 'Please note: Welcome email could not be sent. Default password is: password123. Please share this with the tutor.';
         }
 
         return redirect()
             ->route('admin.tutors.index')
-            ->with('success', 'Tutor created successfully. A welcome email with login credentials has been sent to ' . $validated['email']);
+            ->with('success', $successMessage);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Re-throw validation exceptions so they display properly
