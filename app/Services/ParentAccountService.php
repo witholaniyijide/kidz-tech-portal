@@ -109,8 +109,8 @@ class ParentAccountService
             // Link to student
             $this->linkParentToStudent($user, $student, $relationship, $isPrimaryContact);
 
-            // Send welcome email
-            $this->sendWelcomeEmail($user, $student);
+            // Send welcome email with relationship for proper salutation
+            $this->sendWelcomeEmail($user, $student, $relationship);
 
             Log::info("Created new parent account", [
                 'user_id' => $user->id,
@@ -186,7 +186,7 @@ class ParentAccountService
     /**
      * Send welcome email to the parent with login credentials.
      */
-    protected function sendWelcomeEmail(User $user, Student $student): void
+    protected function sendWelcomeEmail(User $user, Student $student, string $relationship = ''): void
     {
         try {
             if (empty($user->email)) {
@@ -202,7 +202,8 @@ class ParentAccountService
                 parent: $user,
                 student: $student,
                 password: self::DEFAULT_PASSWORD,
-                loginUrl: $loginUrl
+                loginUrl: $loginUrl,
+                relationship: $relationship
             ));
 
             Log::info("Sent parent welcome email", [
