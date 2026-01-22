@@ -104,15 +104,34 @@ class DirectorDashboardController extends Controller
         $todayClasses = [];
 
         // If admin has posted a schedule for today, use that
-        if ($schedulePosted && $todayScheduleRecord && !empty($todayScheduleRecord->classes)) {
-            foreach ($todayScheduleRecord->classes as $class) {
-                $todayClasses[] = [
-                    'time' => $class['time'] ?? '09:00',
-                    'student' => $class['student_name'] ?? 'Unknown',
-                    'tutor' => $class['tutor_name'] ?? 'Unassigned',
-                    'level' => $class['level'] ?? 'Not set',
-                    'class_link' => $class['class_link'] ?? null,
-                ];
+        if ($schedulePosted && $todayScheduleRecord) {
+            // Process regular classes
+            if (!empty($todayScheduleRecord->classes)) {
+                foreach ($todayScheduleRecord->classes as $class) {
+                    $todayClasses[] = [
+                        'time' => $class['time'] ?? '09:00',
+                        'student' => $class['student_name'] ?? 'Unknown',
+                        'tutor' => $class['tutor_name'] ?? 'Unassigned',
+                        'level' => $class['level'] ?? 'Not set',
+                        'class_link' => $class['class_link'] ?? null,
+                        'is_rescheduled' => false,
+                    ];
+                }
+            }
+
+            // Process rescheduled classes
+            if (!empty($todayScheduleRecord->rescheduled_classes)) {
+                foreach ($todayScheduleRecord->rescheduled_classes as $class) {
+                    $todayClasses[] = [
+                        'time' => $class['time'] ?? '09:00',
+                        'student' => $class['student_name'] ?? 'Unknown',
+                        'tutor' => $class['tutor_name'] ?? 'Unassigned',
+                        'level' => $class['level'] ?? 'Not set',
+                        'class_link' => $class['class_link'] ?? null,
+                        'is_rescheduled' => true,
+                        'original_date' => $class['original_date'] ?? null,
+                    ];
+                }
             }
         } else {
             // Fallback to students' class_schedule

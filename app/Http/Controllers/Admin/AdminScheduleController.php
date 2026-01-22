@@ -288,8 +288,16 @@ class AdminScheduleController extends Controller
             'classes.*.student_id' => 'required|exists:students,id',
             'classes.*.tutor_id' => 'required|exists:tutors,id',
             'classes.*.time' => 'required',
+            'classes.*.end_time' => 'nullable',
             'classes.*.class_link' => 'nullable|url|max:500',
             'classes.*.notes' => 'nullable|string|max:500',
+            'rescheduled_classes' => 'nullable|array',
+            'rescheduled_classes.*.student_id' => 'required|exists:students,id',
+            'rescheduled_classes.*.tutor_id' => 'required|exists:tutors,id',
+            'rescheduled_classes.*.time' => 'required',
+            'rescheduled_classes.*.end_time' => 'nullable',
+            'rescheduled_classes.*.class_link' => 'nullable|url|max:500',
+            'rescheduled_classes.*.original_date' => 'nullable|date',
             'footer_note' => 'nullable|string|max:500',
         ]);
 
@@ -305,6 +313,7 @@ class AdminScheduleController extends Controller
                     'student_name' => $student ? $student->first_name . ' ' . $student->last_name : 'Unknown',
                     'tutor_name' => $tutor ? $tutor->first_name . ' ' . $tutor->last_name : 'Unknown',
                     'time' => $class['time'],
+                    'end_time' => $class['end_time'] ?? null,
                     'class_link' => $class['class_link'] ?? null,
                     'notes' => $class['notes'] ?? null,
                 ];
@@ -316,8 +325,33 @@ class AdminScheduleController extends Controller
             return strcmp($a['time'], $b['time']);
         });
 
+        // Process rescheduled classes
+        $rescheduledClasses = [];
+        if (!empty($validated['rescheduled_classes'])) {
+            foreach ($validated['rescheduled_classes'] as $class) {
+                $student = Student::find($class['student_id']);
+                $tutor = Tutor::find($class['tutor_id']);
+                $rescheduledClasses[] = [
+                    'student_id' => $class['student_id'],
+                    'tutor_id' => $class['tutor_id'],
+                    'student_name' => $student ? $student->first_name . ' ' . $student->last_name : 'Unknown',
+                    'tutor_name' => $tutor ? $tutor->first_name . ' ' . $tutor->last_name : 'Unknown',
+                    'time' => $class['time'],
+                    'end_time' => $class['end_time'] ?? null,
+                    'class_link' => $class['class_link'] ?? null,
+                    'original_date' => $class['original_date'] ?? null,
+                ];
+            }
+        }
+
+        // Sort rescheduled classes by time
+        usort($rescheduledClasses, function($a, $b) {
+            return strcmp($a['time'], $b['time']);
+        });
+
         $schedule->update([
             'classes' => $classes,
+            'rescheduled_classes' => $rescheduledClasses,
             'footer_note' => $validated['footer_note'] ?? null,
         ]);
 

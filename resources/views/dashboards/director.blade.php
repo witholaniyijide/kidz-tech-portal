@@ -89,13 +89,18 @@
                     @if(count($todayClasses) > 0)
                         <div class="space-y-3 max-h-80 overflow-y-auto">
                             @foreach($todayClasses as $index => $class)
-                                <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                                @php
+                                    $isRescheduled = isset($class['is_rescheduled']) && $class['is_rescheduled'];
+                                @endphp
+                                <div class="flex items-center p-3 rounded-lg transition-colors cursor-pointer {{ $isRescheduled ? 'bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-300 dark:border-amber-700/50 hover:bg-amber-100 dark:hover:bg-amber-900/30' : 'bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
                                      @click="openModal({
                                          time: '{{ $class['time'] }}',
                                          student: '{{ $class['student'] }}',
                                          tutor: '{{ $class['tutor'] }}',
                                          level: '{{ $class['level'] ?? 'Not specified' }}',
-                                         class_link: '{{ $class['class_link'] ?? '' }}'
+                                         class_link: '{{ $class['class_link'] ?? '' }}',
+                                         is_rescheduled: {{ $isRescheduled ? 'true' : 'false' }},
+                                         original_date: '{{ $class['original_date'] ?? '' }}'
                                      })">
                                     <div class="w-16 text-center">
                                         @php
@@ -105,22 +110,35 @@
                                                 $formattedTime = $class['time'];
                                             }
                                         @endphp
-                                        <span class="text-sm font-bold text-[#4F46E5] dark:text-[#818CF8]">{{ $formattedTime }}</span>
+                                        <span class="text-sm font-bold {{ $isRescheduled ? 'text-amber-600 dark:text-amber-400' : 'text-[#4F46E5] dark:text-[#818CF8]' }}">{{ $formattedTime }}</span>
                                     </div>
                                     <div class="flex-1 ml-4">
-                                        <p class="font-medium text-gray-900 dark:text-white">{{ $class['student'] }}</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        <div class="flex items-center gap-2">
+                                            <p class="font-medium text-gray-900 dark:text-white">{{ $class['student'] }}</p>
+                                            @if($isRescheduled)
+                                                <span class="inline-flex items-center text-xs px-2 py-0.5 rounded-full bg-amber-200 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 font-medium">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                                    </svg>
+                                                    Rescheduled
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <p class="text-sm {{ $isRescheduled ? 'text-amber-700 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400' }}">
                                             <span class="inline-flex items-center">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                                 </svg>
                                                 {{ $class['tutor'] }}
+                                                @if($isRescheduled && isset($class['original_date']))
+                                                    • From {{ \Carbon\Carbon::parse($class['original_date'])->format('M j') }}
+                                                @endif
                                             </span>
                                         </p>
                                     </div>
                                     <div class="text-right">
                                         @if(isset($class['class_link']) && $class['class_link'])
-                                            <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                            <span class="text-xs px-2 py-1 rounded-full {{ $isRescheduled ? 'bg-amber-200 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' }}">
                                                 Has Link
                                             </span>
                                         @else

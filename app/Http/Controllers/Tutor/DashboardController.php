@@ -98,10 +98,13 @@ class DashboardController extends Controller
             ->first();
 
         $todayClasses = collect();
+        $todayRescheduledClasses = collect();
         $schedulePosted = false;
 
         if ($todaySchedule) {
             $schedulePosted = true;
+
+            // Process regular classes
             if ($todaySchedule->classes) {
                 // Filter classes for this tutor's students
                 $todayClasses = collect($todaySchedule->classes)->filter(function ($class) use ($studentIds, $tutor) {
@@ -130,6 +133,26 @@ class DashboardController extends Controller
                     return $class;
                 })->sortBy('class_time')->values();
             }
+
+            // Process rescheduled classes
+            if ($todaySchedule->rescheduled_classes) {
+                $todayRescheduledClasses = collect($todaySchedule->rescheduled_classes)->filter(function ($class) use ($studentIds, $tutor) {
+                    return (isset($class['student_id']) && in_array($class['student_id'], $studentIds))
+                        || (isset($class['tutor_id']) && $class['tutor_id'] == $tutor->id);
+                })->map(function ($class) use ($students) {
+                    if (isset($class['student_id'])) {
+                        $student = $students->firstWhere('id', $class['student_id']);
+                        if ($student) {
+                            $class['student_name'] = $student->first_name . ' ' . $student->last_name;
+                        }
+                    }
+                    $class['is_rescheduled'] = true;
+                    return $class;
+                })->sortBy('class_time')->values();
+            }
+
+            // Merge both collections for total count
+            $todayClasses = $todayClasses->merge($todayRescheduledClasses)->sortBy('class_time')->values();
         }
 
         // Get this week's classes
