@@ -158,80 +158,107 @@ class ReportController extends Controller
      */
     public function store(Request $request)
     {
-        $tutor = Auth::user()->tutor;
+        try {
+            $tutor = Auth::user()->tutor;
 
-        if (!$tutor) {
-            abort(403, 'You do not have a tutor profile.');
-        }
+            if (!$tutor) {
+                abort(403, 'You do not have a tutor profile.');
+            }
 
-        // Validate the request
-        $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'month' => 'required|string',
-            'year' => 'required|string|size:4',
-            'courses' => 'nullable|array',
-            'skills_mastered' => 'nullable|array',
-            'new_skills' => 'nullable|array',
-            'projects' => 'nullable|array',
-            'areas_for_improvement' => 'nullable|string',
-            'goals_next_month' => 'nullable|string',
-            'assignments' => 'nullable|string',
-            'comments_observation' => 'nullable|string',
-            'status' => 'nullable|in:draft,submitted',
-        ]);
-
-        // Verify student belongs to this tutor
-        $student = Student::findOrFail($validated['student_id']);
-
-        if ($student->tutor_id !== $tutor->id) {
-            abort(403, 'You can only create reports for your assigned students.');
-        }
-
-        // Create report
-        $report = TutorReport::create([
-            'student_id' => $validated['student_id'],
-            'tutor_id' => $tutor->id,
-            'created_by' => Auth::id(),
-            'title' => $student->first_name . ' ' . $student->last_name . ' - ' . $validated['month'] . ' ' . $validated['year'],
-            'month' => $validated['month'],
-            'year' => $validated['year'],
-            'courses' => $validated['courses'] ?? [],
-            'skills_mastered' => $validated['skills_mastered'] ?? [],
-            'new_skills' => $validated['new_skills'] ?? [],
-            'projects' => $validated['projects'] ?? [],
-            'areas_for_improvement' => $validated['areas_for_improvement'] ?? null,
-            'goals_next_month' => $validated['goals_next_month'] ?? null,
-            'assignments' => $validated['assignments'] ?? null,
-            'comments_observation' => $validated['comments_observation'] ?? null,
-            'status' => $validated['status'] ?? 'draft',
-            'imported_from_artifact' => $request->boolean('imported_from_artifact', false),
-            'artifact_export_date' => $request->get('artifact_export_date'),
-        ]);
-
-        // If submitted, update timestamp and notify
-        if ($report->status === 'submitted') {
-            $report->update(['submitted_at' => now()]);
-
-            TutorNotification::create([
-                'tutor_id' => $tutor->id,
-                'title' => 'Report Submitted',
-                'body' => "Report for {$student->first_name} {$student->last_name} ({$report->month} {$report->year}) has been submitted for review.",
-                'type' => 'system',
-                'is_read' => false,
-                'meta' => ['report_id' => $report->id],
+            // Validate the request
+            $validated = $request->validate([
+                'student_id' => 'required|exists:students,id',
+                'month' => 'required|string',
+                'year' => 'required|string|size:4',
+                'courses' => 'nullable|array',
+                'skills_mastered' => 'nullable|array',
+                'new_skills' => 'nullable|array',
+                'projects' => 'nullable|array',
+                'areas_for_improvement' => 'nullable|string',
+                'goals_next_month' => 'nullable|string',
+                'assignments' => 'nullable|string',
+                'comments_observation' => 'nullable|string',
+                'status' => 'nullable|in:draft,submitted',
             ]);
 
-            // Notify managers about the new submission
-            app(NotificationService::class)->notifyReportSubmitted($report);
+            // Verify student belongs to this tutor
+            $student = Student::findOrFail($validated['student_id']);
+
+            if ($student->tutor_id !== $tutor->id) {
+                return redirect()->back()
+                    ->with('error', 'You can only create reports for your assigned students.')
+                    ->withInput();
+            }
+
+            // Create report
+            $report = TutorReport::create([
+                'student_id' => $validated['student_id'],
+                'tutor_id' => $tutor->id,
+                'created_by' => Auth::id(),
+                'title' => $student->first_name . ' ' . $student->last_name . ' - ' . $validated['month'] . ' ' . $validated['year'],
+                'month' => $validated['month'],
+                'year' => $validated['year'],
+                'courses' => $validated['courses'] ?? [],
+                'skills_mastered' => $validated['skills_mastered'] ?? [],
+                'new_skills' => $validated['new_skills'] ?? [],
+                'projects' => $validated['projects'] ?? [],
+                'areas_for_improvement' => $validated['areas_for_improvement'] ?? null,
+                'goals_next_month' => $validated['goals_next_month'] ?? null,
+                'assignments' => $validated['assignments'] ?? null,
+                'comments_observation' => $validated['comments_observation'] ?? null,
+                'status' => $validated['status'] ?? 'draft',
+                'imported_from_artifact' => $request->boolean('imported_from_artifact', false),
+                'artifact_export_date' => $request->get('artifact_export_date'),
+            ]);
+
+            // If submitted, update timestamp and notify
+            if ($report->status === 'submitted') {
+                $report->update(['submitted_at' => now()]);
+
+                try {
+                    TutorNotification::create([
+                        'tutor_id' => $tutor->id,
+                        'title' => 'Report Submitted',
+                        'body' => "Report for {$student->first_name} {$student->last_name} ({$report->month} {$report->year}) has been submitted for review.",
+                        'type' => 'system',
+                        'is_read' => false,
+                        'meta' => ['report_id' => $report->id],
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to create tutor notification: ' . $e->getMessage());
+                }
+
+                // Notify managers about the new submission
+                try {
+                    app(NotificationService::class)->notifyReportSubmitted($report);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to notify managers: ' . $e->getMessage());
+                }
+            }
+
+            $message = $report->status === 'draft'
+                ? 'Report saved as draft successfully!'
+                : 'Report submitted successfully! Awaiting manager review.';
+
+            return redirect()
+                ->route('tutor.reports.show', $report)
+                ->with('success', $message);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error storing tutor report: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'user' => Auth::id(),
+                'request_data' => $request->except(['_token'])
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'An error occurred while saving the report. Please try again or contact support if the problem persists.')
+                ->withInput();
         }
-
-        $message = $report->status === 'draft'
-            ? 'Report saved as draft successfully!'
-            : 'Report submitted successfully! Awaiting manager review.';
-
-        return redirect()
-            ->route('tutor.reports.show', $report)
-            ->with('success', $message);
     }
 
     /**
@@ -374,59 +401,82 @@ class ReportController extends Controller
      */
     public function submit(Request $request, TutorReport $report)
     {
-        $tutor = Auth::user()->tutor;
+        try {
+            $tutor = Auth::user()->tutor;
 
-        if (!$tutor || $report->tutor_id !== $tutor->id) {
-            abort(403, 'Unauthorized access.');
-        }
+            if (!$tutor || $report->tutor_id !== $tutor->id) {
+                return redirect()
+                    ->route('tutor.reports.show', $report)
+                    ->with('error', 'Unauthorized access.');
+            }
 
-        if (!in_array($report->status, ['draft', 'returned'])) {
+            if (!in_array($report->status, ['draft', 'returned'])) {
+                return redirect()
+                    ->route('tutor.reports.show', $report)
+                    ->with('error', 'Only draft or returned reports can be submitted.');
+            }
+
+            // Validate report has required content
+            $issues = [];
+            if (empty($report->skills_mastered) || count($report->skills_mastered) === 0) {
+                $issues[] = 'At least one skill mastered is required';
+            }
+            if (empty($report->areas_for_improvement)) {
+                $issues[] = 'Areas for improvement is required';
+            }
+            if (empty($report->goals_next_month)) {
+                $issues[] = 'Goals for next month is required';
+            }
+            if (empty($report->comments_observation)) {
+                $issues[] = 'Comments/Observation is required';
+            }
+
+            if (count($issues) > 0) {
+                return redirect()
+                    ->route('tutor.reports.edit', $report)
+                    ->with('error', 'Please complete all required sections before submitting: ' . implode(', ', $issues));
+            }
+
+            $report->update([
+                'status' => 'submitted',
+                'submitted_at' => now(),
+            ]);
+
+            try {
+                TutorNotification::create([
+                    'tutor_id' => $tutor->id,
+                    'title' => 'Report Submitted',
+                    'body' => "Report for {$report->student->first_name} {$report->student->last_name} ({$report->month} {$report->year}) has been submitted for review.",
+                    'type' => 'system',
+                    'is_read' => false,
+                    'meta' => ['report_id' => $report->id],
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Failed to create tutor notification: ' . $e->getMessage());
+            }
+
+            // Notify managers about the submission
+            try {
+                app(NotificationService::class)->notifyReportSubmitted($report);
+            } catch (\Exception $e) {
+                \Log::error('Failed to notify managers: ' . $e->getMessage());
+            }
+
             return redirect()
                 ->route('tutor.reports.show', $report)
-                ->with('error', 'Only draft or returned reports can be submitted.');
-        }
+                ->with('success', 'Report submitted successfully! Awaiting manager review.');
 
-        // Validate report has required content
-        $issues = [];
-        if (empty($report->skills_mastered) || count($report->skills_mastered) === 0) {
-            $issues[] = 'At least one skill mastered is required';
-        }
-        if (empty($report->areas_for_improvement)) {
-            $issues[] = 'Areas for improvement is required';
-        }
-        if (empty($report->goals_next_month)) {
-            $issues[] = 'Goals for next month is required';
-        }
-        if (empty($report->comments_observation)) {
-            $issues[] = 'Comments/Observation is required';
-        }
+        } catch (\Exception $e) {
+            \Log::error('Error submitting tutor report: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'user' => Auth::id(),
+                'report_id' => $report->id
+            ]);
 
-        if (count($issues) > 0) {
             return redirect()
-                ->route('tutor.reports.edit', $report)
-                ->with('error', 'Please complete all required sections before submitting: ' . implode(', ', $issues));
+                ->route('tutor.reports.show', $report)
+                ->with('error', 'An error occurred while submitting the report. Please try again or contact support if the problem persists.');
         }
-
-        $report->update([
-            'status' => 'submitted',
-            'submitted_at' => now(),
-        ]);
-
-        TutorNotification::create([
-            'tutor_id' => $tutor->id,
-            'title' => 'Report Submitted',
-            'body' => "Report for {$report->student->first_name} {$report->student->last_name} ({$report->month} {$report->year}) has been submitted for review.",
-            'type' => 'system',
-            'is_read' => false,
-            'meta' => ['report_id' => $report->id],
-        ]);
-
-        // Notify managers about the submission
-        app(NotificationService::class)->notifyReportSubmitted($report);
-
-        return redirect()
-            ->route('tutor.reports.show', $report)
-            ->with('success', 'Report submitted successfully! Awaiting manager review.');
     }
 
     /**

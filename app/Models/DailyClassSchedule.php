@@ -13,16 +13,20 @@ class DailyClassSchedule extends Model
         'schedule_date',
         'day_name',
         'classes',
+        'rescheduled_classes',
         'status',
         'posted_by',
         'posted_at',
         'footer_note',
+        'repeat_weekly',
     ];
 
     protected $casts = [
         'schedule_date' => 'date',
         'classes' => 'array',
+        'rescheduled_classes' => 'array',
         'posted_at' => 'datetime',
+        'repeat_weekly' => 'boolean',
     ];
 
     public function poster()

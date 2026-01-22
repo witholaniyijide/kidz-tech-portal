@@ -38,6 +38,7 @@ class AdminScheduleController extends Controller
 
         // If no schedule exists for this date, check for repeat_weekly schedules from previous weeks
         $classes = [];
+        $rescheduledClasses = [];
         $inheritedFromWeekly = false;
 
         if (!$todaySchedule) {
@@ -59,12 +60,18 @@ class AdminScheduleController extends Controller
             }
         } else {
             $classes = $todaySchedule->classes ?? [];
+            $rescheduledClasses = $todaySchedule->rescheduled_classes ?? [];
         }
 
         $schedulePosted = $todaySchedule && $todaySchedule->posted_at !== null;
 
         // Sort classes by time
         usort($classes, function($a, $b) {
+            return strcmp($a['time'] ?? '00:00', $b['time'] ?? '00:00');
+        });
+
+        // Sort rescheduled classes by time
+        usort($rescheduledClasses, function($a, $b) {
             return strcmp($a['time'] ?? '00:00', $b['time'] ?? '00:00');
         });
 
@@ -104,7 +111,7 @@ class AdminScheduleController extends Controller
         $tutors = Tutor::where('status', 'active')->orderBy('first_name')->get();
 
         return view('admin.schedules.index', compact(
-            'todaySchedule', 'schedulePosted', 'classes', 'weeklySchedules',
+            'todaySchedule', 'schedulePosted', 'classes', 'rescheduledClasses', 'weeklySchedules',
             'selectedDate', 'weekStart', 'weekEnd', 'students', 'tutors', 'inheritedFromWeekly'
         ));
     }
@@ -166,11 +173,21 @@ class AdminScheduleController extends Controller
             $entriesKey . '.*.time' => 'nullable', // For backwards compatibility
             $entriesKey . '.*.class_link' => 'nullable|url|max:500',
             $entriesKey . '.*.notes' => 'nullable|string|max:500',
+            'rescheduled_classes' => 'nullable|array',
+            'rescheduled_classes.*.student_id' => 'required|exists:students,id',
+            'rescheduled_classes.*.tutor_id' => 'required|exists:tutors,id',
+            'rescheduled_classes.*.start_time' => 'nullable',
+            'rescheduled_classes.*.end_time' => 'nullable',
+            'rescheduled_classes.*.time' => 'nullable',
+            'rescheduled_classes.*.class_link' => 'nullable|url|max:500',
+            'rescheduled_classes.*.notes' => 'nullable|string|max:500',
+            'rescheduled_classes.*.original_date' => 'nullable|date',
             'footer_note' => 'nullable|string|max:500',
         ]);
 
         $scheduleDate = Carbon::parse($validated['schedule_date']);
         $entries = $validated[$entriesKey] ?? [];
+        $rescheduledEntries = $validated['rescheduled_classes'] ?? [];
 
         // Enrich classes with names
         $classes = [];
@@ -199,11 +216,39 @@ class AdminScheduleController extends Controller
             return strcmp($a['time'], $b['time']);
         });
 
+        // Process rescheduled classes
+        $rescheduledClasses = [];
+        foreach ($rescheduledEntries as $entry) {
+            $student = Student::find($entry['student_id']);
+            $tutor = Tutor::find($entry['tutor_id']);
+
+            $time = $entry['start_time'] ?? $entry['time'] ?? '09:00';
+            $endTime = $entry['end_time'] ?? null;
+
+            $rescheduledClasses[] = [
+                'student_id' => $entry['student_id'],
+                'tutor_id' => $entry['tutor_id'],
+                'student_name' => $student ? $student->first_name . ' ' . $student->last_name : 'Unknown',
+                'tutor_name' => $tutor ? $tutor->first_name . ' ' . $tutor->last_name : 'Unknown',
+                'time' => $time,
+                'end_time' => $endTime,
+                'class_link' => $entry['class_link'] ?? null,
+                'notes' => $entry['notes'] ?? null,
+                'original_date' => $entry['original_date'] ?? null,
+            ];
+        }
+
+        // Sort rescheduled classes by time
+        usort($rescheduledClasses, function($a, $b) {
+            return strcmp($a['time'], $b['time']);
+        });
+
         $schedule = DailyClassSchedule::updateOrCreate(
             ['schedule_date' => $scheduleDate->toDateString()],
             [
                 'day_name' => $scheduleDate->format('l'),
                 'classes' => $classes,
+                'rescheduled_classes' => $rescheduledClasses,
                 'footer_note' => $validated['footer_note'] ?? null,
                 'repeat_weekly' => $request->boolean('repeat_weekly'),
             ]
@@ -217,8 +262,15 @@ class AdminScheduleController extends Controller
             'model_id' => $schedule->id,
         ]);
 
+        $totalEntries = count($classes) + count($rescheduledClasses);
+        $message = 'Schedule saved successfully with ' . count($classes) . ' regular class(es)';
+        if (count($rescheduledClasses) > 0) {
+            $message .= ' and ' . count($rescheduledClasses) . ' rescheduled class(es)';
+        }
+        $message .= '.';
+
         return redirect()->route('admin.schedules.index', ['date' => $validated['schedule_date']])
-            ->with('success', 'Schedule saved successfully with ' . count($classes) . ' class entries.');
+            ->with('success', $message);
     }
 
     public function edit(DailyClassSchedule $schedule)
@@ -316,33 +368,71 @@ class AdminScheduleController extends Controller
 
         $schedule = DailyClassSchedule::whereDate('schedule_date', $selectedDate)->first();
         $classes = $schedule ? ($schedule->classes ?? []) : [];
+        $rescheduledClasses = $schedule ? ($schedule->rescheduled_classes ?? []) : [];
 
         // Sort classes by time
         usort($classes, function($a, $b) {
             return strcmp($a['time'] ?? '00:00', $b['time'] ?? '00:00');
         });
 
+        usort($rescheduledClasses, function($a, $b) {
+            return strcmp($a['time'] ?? '00:00', $b['time'] ?? '00:00');
+        });
+
         $format = "📚 *Classes Scheduled for Today*\n";
         $format .= "📅 " . $selectedDate->format('l, M j, Y') . "\n\n";
 
-        $count = 1;
-        foreach ($classes as $class) {
-            $studentName = $class['student_name'] ?? 'Unknown';
-            $tutorName = $class['tutor_name'] ?? 'Unknown';
-            $time = $class['time'] ?? '00:00';
+        if (count($classes) > 0) {
+            $format .= "*Regular Classes:*\n";
+            $count = 1;
+            foreach ($classes as $class) {
+                $studentName = $class['student_name'] ?? 'Unknown';
+                $tutorName = $class['tutor_name'] ?? 'Unknown';
+                $time = $class['time'] ?? '00:00';
 
-            // Format time nicely
-            try {
-                $time = Carbon::parse($time)->format('g:ia');
-            } catch (\Exception $e) {
-                // Keep original time if parsing fails
+                // Format time nicely
+                try {
+                    $time = Carbon::parse($time)->format('g:ia');
+                } catch (\Exception $e) {
+                    // Keep original time if parsing fails
+                }
+
+                $format .= "{$count}. {$studentName} - {$time} by {$tutorName}\n";
+                $count++;
             }
-
-            $format .= "{$count}. {$studentName} - {$time} by {$tutorName}\n";
-            $count++;
         }
 
-        $format .= "\n✅ Total: " . ($count - 1) . " classes";
+        if (count($rescheduledClasses) > 0) {
+            $format .= "\n*Rescheduled Classes:*\n";
+            $count = 1;
+            foreach ($rescheduledClasses as $class) {
+                $studentName = $class['student_name'] ?? 'Unknown';
+                $tutorName = $class['tutor_name'] ?? 'Unknown';
+                $time = $class['time'] ?? '00:00';
+
+                // Format time nicely
+                try {
+                    $time = Carbon::parse($time)->format('g:ia');
+                } catch (\Exception $e) {
+                    // Keep original time if parsing fails
+                }
+
+                $originalDate = '';
+                if (isset($class['original_date'])) {
+                    try {
+                        $originalDate = ' (was ' . Carbon::parse($class['original_date'])->format('M j') . ')';
+                    } catch (\Exception $e) {
+                        $originalDate = '';
+                    }
+                }
+
+                $format .= "{$count}. {$studentName} - {$time} by {$tutorName}{$originalDate}\n";
+                $count++;
+            }
+        }
+
+        $totalClasses = count($classes) + count($rescheduledClasses);
+        $format .= "\n✅ Total: {$totalClasses} class" . ($totalClasses !== 1 ? 'es' : '');
 
         if ($schedule && $schedule->footer_note) {
             $format .= "\n\n📌 " . $schedule->footer_note;
