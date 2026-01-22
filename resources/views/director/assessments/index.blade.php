@@ -67,33 +67,58 @@
                 </div>
 
                 {{-- Header with Filters --}}
-                <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-                    <div>
-                        <h2 class="text-2xl font-semibold text-gray-800 dark:text-white" x-text="managementTab === 'pending' ? 'Pending Reviews' : 'Completed Reviews'"></h2>
-                        <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm" x-text="managementTab === 'pending' ? 'Review and approve manager-completed assessments' : 'View finalized assessments with applied actions'"></p>
-                    </div>
-                    <div class="flex gap-3 flex-wrap">
-                        <select x-model="filterTutor" class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
-                            <option value="">All Tutors</option>
-                            @foreach($tutors as $tutor)
-                                <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
-                            @endforeach
-                        </select>
-                        <select x-model="filterMonth" class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
-                            <option value="">All Months</option>
-                            @foreach($months ?? [] as $month)
-                                <option value="{{ $month }}">{{ $month }}</option>
-                            @endforeach
-                        </select>
+                <div class="mb-6">
+                    <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
+                        <div>
+                            <h2 class="text-2xl font-semibold text-gray-800 dark:text-white flex items-center gap-3">
+                                <span x-text="managementTab === 'pending' ? 'Pending Reviews' : 'Completed Reviews'"></span>
+                                <span x-show="managementTab === 'completed'" class="px-3 py-1 bg-emerald-500 text-white text-sm rounded-full" x-text="filteredCompletedAssessments.length"></span>
+                            </h2>
+                            <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm" x-text="managementTab === 'pending' ? 'Review and approve manager-completed assessments' : 'View finalized assessments with applied actions'"></p>
+                        </div>
                         <button @click="clearFilters()" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all">
                             Clear Filters
                         </button>
-                        <button @click="exportCSV()" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all">
-                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            Export CSV
-                        </button>
+                    </div>
+
+                    {{-- Enhanced Filters for Completed Tab --}}
+                    <div x-show="managementTab === 'completed'" class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Tutor</label>
+                                <select x-model="filterTutor" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg text-sm">
+                                    <option value="">All Tutors</option>
+                                    @foreach($tutors as $tutor)
+                                        <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Student</label>
+                                <select x-model="filterStudent" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg text-sm">
+                                    <option value="">All Students</option>
+                                    @foreach(\App\Models\Student::orderBy('first_name')->get() as $student)
+                                        <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Month</label>
+                                <input type="month" x-model="filterMonthInput" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Week</label>
+                                <input type="week" x-model="filterWeek" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div class="flex items-end">
+                                <button @click="exportCSV()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-all text-sm font-medium">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Export
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -224,58 +249,59 @@
                 </div>
 
                 {{-- Completed Assessments --}}
-                <div x-show="managementTab === 'completed'" class="space-y-4">
-                    @forelse($assessments->filter(function ($a) {
-                        return $a->status === 'approved-by-director';
-                    }) as $assessment)
+                <div x-show="managementTab === 'completed'" class="space-y-4 mt-6">
+                    <template x-for="assessment in filteredCompletedAssessments" :key="assessment.id">
                         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5 border-l-4 border-emerald-500">
                             <div class="flex flex-wrap justify-between items-start gap-4">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-3 mb-2">
-                                        <div class="font-semibold text-gray-800 dark:text-white text-lg">
-                                            {{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}
-                                        </div>
+                                        <div class="font-semibold text-gray-800 dark:text-white text-lg" x-text="assessment.tutor_name"></div>
                                         <span class="px-3 py-1 text-xs font-semibold bg-emerald-500 text-white rounded-full">Finalized</span>
                                     </div>
                                     <div class="text-gray-500 dark:text-gray-400 text-sm">
-                                        {{ $assessment->assessment_month }}
-                                        @if($assessment->approved_by_director_at)
-                                            · Approved {{ $assessment->approved_by_director_at->format('M j, Y') }}
-                                        @endif
+                                        <span x-text="assessment.assessment_month"></span>
+                                        <template x-if="assessment.approved_at">
+                                            <span> · Approved <span x-text="assessment.approved_at"></span></span>
+                                        </template>
+                                    </div>
+                                    <div class="text-gray-500 dark:text-gray-400 text-xs mt-1" x-show="assessment.student_name">
+                                        Student: <span x-text="assessment.student_name"></span>
                                     </div>
 
-                                    @if($assessment->performance_score)
+                                    <template x-if="assessment.performance_score">
                                         <div class="mt-3">
-                                            <span class="text-2xl font-bold text-emerald-600">{{ $assessment->performance_score }}%</span>
+                                            <span class="text-2xl font-bold text-emerald-600" x-text="assessment.performance_score + '%'"></span>
                                             <span class="text-sm text-gray-500 ml-2">Performance Score</span>
                                         </div>
-                                    @endif
+                                    </template>
 
-                                    @if($assessment->director_comment)
+                                    <template x-if="assessment.director_comment">
                                         <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800/30">
                                             <div class="font-semibold text-yellow-800 dark:text-yellow-300 mb-1 text-sm">Director's Remarks:</div>
-                                            <div class="text-yellow-700 dark:text-yellow-200 text-sm">{{ $assessment->director_comment }}</div>
+                                            <div class="text-yellow-700 dark:text-yellow-200 text-sm" x-text="assessment.director_comment"></div>
                                         </div>
-                                    @endif
+                                    </template>
                                 </div>
 
                                 <div class="flex gap-2">
-                                    <a href="{{ route('director.assessments.show', $assessment) }}" class="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors text-sm font-medium">
+                                    <a :href="'/director/assessments/' + assessment.id" class="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors text-sm font-medium">
                                         View Report
                                     </a>
-                                    <button @click="generateReportCard({{ $assessment->id }})" class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-sm font-medium">
+                                    <button @click="generateReportCard(assessment.id)" class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-sm font-medium">
                                         Print Report
                                     </button>
                                 </div>
                             </div>
                         </div>
-                    @empty
+                    </template>
+
+                    <template x-if="filteredCompletedAssessments.length === 0">
                         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-8 text-center">
                             <div class="text-6xl mb-4">✅</div>
-                            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Completed Reviews</h3>
-                            <p class="text-gray-500 dark:text-gray-400">Assessments with applied director actions will appear here</p>
+                            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Completed Reviews Found</h3>
+                            <p class="text-gray-500 dark:text-gray-400">Try adjusting your filters or check back later</p>
                         </div>
-                    @endforelse
+                    </template>
                 </div>
             </div>
 
@@ -597,6 +623,63 @@
                 
                 filterTutor: '',
                 filterMonth: '',
+                filterStudent: '',
+                filterMonthInput: '',
+                filterWeek: '',
+
+                // Completed assessments data
+                completedAssessments: [
+                    @foreach($assessments->filter(fn($a) => $a->status === 'approved-by-director') as $assessment)
+                        {
+                            id: {{ $assessment->id }},
+                            tutor_id: {{ $assessment->tutor_id }},
+                            tutor_name: '{{ ($assessment->tutor->first_name ?? '') . ' ' . ($assessment->tutor->last_name ?? '') }}',
+                            student_id: {{ $assessment->student_id ?? 'null' }},
+                            student_name: '{{ $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '' }}',
+                            assessment_month: '{{ $assessment->assessment_month }}',
+                            week: {{ $assessment->week ?? 'null' }},
+                            year: {{ $assessment->year ?? 'null' }},
+                            class_date: '{{ $assessment->class_date ?? '' }}',
+                            performance_score: {{ $assessment->performance_score ?? 'null' }},
+                            approved_at: '{{ $assessment->approved_by_director_at ? $assessment->approved_by_director_at->format("M j, Y") : "" }}',
+                            director_comment: '{{ addslashes($assessment->director_comment ?? '') }}'
+                        },
+                    @endforeach
+                ],
+
+                get filteredCompletedAssessments() {
+                    return this.completedAssessments.filter(assessment => {
+                        // Filter by tutor
+                        if (this.filterTutor && assessment.tutor_id != this.filterTutor) {
+                            return false;
+                        }
+
+                        // Filter by student
+                        if (this.filterStudent && assessment.student_id != this.filterStudent) {
+                            return false;
+                        }
+
+                        // Filter by month (YYYY-MM format)
+                        if (this.filterMonthInput) {
+                            const assessmentDate = new Date(assessment.class_date);
+                            const filterDate = new Date(this.filterMonthInput + '-01');
+                            if (assessmentDate.getFullYear() !== filterDate.getFullYear() ||
+                                assessmentDate.getMonth() !== filterDate.getMonth()) {
+                                return false;
+                            }
+                        }
+
+                        // Filter by week (YYYY-WXX format)
+                        if (this.filterWeek) {
+                            const [filterYear, filterWeek] = this.filterWeek.split('-W');
+                            if (assessment.year != filterYear || assessment.week != filterWeek) {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    });
+                },
 
                 // Reports tab
                 reportPeriod: 'all',
@@ -637,6 +720,9 @@
                 clearFilters() {
                     this.filterTutor = '';
                     this.filterMonth = '';
+                    this.filterStudent = '';
+                    this.filterMonthInput = '';
+                    this.filterWeek = '';
                 },
                 
                 exportCSV() {
