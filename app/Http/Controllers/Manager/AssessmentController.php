@@ -214,29 +214,49 @@ class AssessmentController extends Controller
      */
     public function update(Request $request, TutorAssessment $assessment)
     {
-        // Only allow updating drafts
-        if (!in_array($assessment->status, ['draft', 'submitted'])) {
+        try {
+            // Only allow updating drafts
+            if (!in_array($assessment->status, ['draft', 'submitted'])) {
+                return redirect()
+                    ->route('manager.assessments.show', $assessment)
+                    ->with('error', 'This assessment cannot be edited.');
+            }
+
+            $validated = $request->validate([
+                'performance_score' => 'nullable|integer|min:0|max:100',
+                'professionalism_rating' => 'nullable|integer|min:1|max:5',
+                'communication_rating' => 'nullable|integer|min:1|max:5',
+                'punctuality_rating' => 'nullable|integer|min:1|max:5',
+                'strengths' => 'nullable|string|max:2000',
+                'weaknesses' => 'nullable|string|max:2000',
+                'recommendations' => 'nullable|string|max:2000',
+                'manager_comment' => 'nullable|string|max:2000',
+                'criteria_assessed' => 'nullable|array',
+                'criteria_ratings' => 'nullable|array',
+            ]);
+
+            $assessment->update($validated);
+
             return redirect()
                 ->route('manager.assessments.show', $assessment)
-                ->with('error', 'This assessment cannot be edited.');
+                ->with('success', 'Assessment updated successfully.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error updating assessment: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'user' => Auth::id(),
+                'assessment_id' => $assessment->id
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'An error occurred while updating the assessment. Please try again.')
+                ->withInput();
         }
-
-        $validated = $request->validate([
-            'performance_score' => 'nullable|integer|min:0|max:100',
-            'professionalism_rating' => 'nullable|integer|min:1|max:5',
-            'communication_rating' => 'nullable|integer|min:1|max:5',
-            'punctuality_rating' => 'nullable|integer|min:1|max:5',
-            'strengths' => 'nullable|string|max:2000',
-            'weaknesses' => 'nullable|string|max:2000',
-            'recommendations' => 'nullable|string|max:2000',
-            'manager_comment' => 'nullable|string|max:2000',
-        ]);
-
-        $assessment->update($validated);
-
-        return redirect()
-            ->route('manager.assessments.show', $assessment)
-            ->with('success', 'Assessment updated successfully.');
     }
 
     /**
@@ -244,54 +264,67 @@ class AssessmentController extends Controller
      */
     public function markComplete(TutorAssessment $assessment)
     {
-        if ($assessment->status !== 'draft') {
+        try {
+            if ($assessment->status !== 'draft') {
+                return redirect()
+                    ->route('manager.assessments.index')
+                    ->with('error', 'Only draft assessments can be marked complete.');
+            }
+
+            // Verify all selected criteria have ratings
+            $criteriaRatings = $assessment->criteria_ratings ?? [];
+            $criteriaAssessed = $assessment->criteria_assessed ?? [];
+
+            if (empty($criteriaAssessed)) {
+                return redirect()
+                    ->route('manager.assessments.edit', $assessment)
+                    ->with('error', 'Please select and rate at least one criteria before marking complete.');
+            }
+
+            DB::transaction(function () use ($assessment) {
+                $assessment->update([
+                    'status' => 'pending_review',
+                    'approved_by_manager_at' => now(),
+                ]);
+
+                // Notify all directors
+                $directors = User::whereHas('roles', function($q) {
+                    $q->where('name', 'director');
+                })->get();
+
+                $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'Unknown Tutor';
+                $studentName = $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '';
+
+                foreach ($directors as $director) {
+                    DirectorNotification::create([
+                        'user_id' => $director->id,
+                        'title' => 'Assessment Ready for Review',
+                        'body' => "Assessment for {$tutorName}" . ($studentName ? " (Student: {$studentName})" : "") . " - Week {$assessment->week} is pending your review.",
+                        'type' => 'assessment',
+                        'is_read' => false,
+                        'meta' => [
+                            'assessment_id' => $assessment->id,
+                            'link' => route('director.assessments.show', $assessment->id),
+                        ],
+                    ]);
+                }
+            });
+
             return redirect()
                 ->route('manager.assessments.index')
-                ->with('error', 'Only draft assessments can be marked complete.');
-        }
+                ->with('success', 'Assessment marked complete and sent for director review.');
 
-        // Verify all selected criteria have ratings
-        $criteriaRatings = $assessment->criteria_ratings ?? [];
-        $criteriaAssessed = $assessment->criteria_assessed ?? [];
-
-        if (empty($criteriaAssessed)) {
-            return redirect()
-                ->route('manager.assessments.index')
-                ->with('error', 'Please select and rate at least one criteria before marking complete.');
-        }
-
-        DB::transaction(function () use ($assessment) {
-            $assessment->update([
-                'status' => 'pending_review',
-                'approved_by_manager_at' => now(),
+        } catch (\Exception $e) {
+            \Log::error('Error marking assessment complete: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'user' => Auth::id(),
+                'assessment_id' => $assessment->id
             ]);
 
-            // Notify all directors
-            $directors = User::whereHas('roles', function($q) {
-                $q->where('name', 'director');
-            })->get();
-
-            $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'Unknown Tutor';
-            $studentName = $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '';
-
-            foreach ($directors as $director) {
-                DirectorNotification::create([
-                    'user_id' => $director->id,
-                    'title' => 'Assessment Ready for Review',
-                    'body' => "Assessment for {$tutorName}" . ($studentName ? " (Student: {$studentName})" : "") . " - Week {$assessment->week} is pending your review.",
-                    'type' => 'assessment',
-                    'is_read' => false,
-                    'meta' => [
-                        'assessment_id' => $assessment->id,
-                        'link' => route('director.assessments.show', $assessment->id),
-                    ],
-                ]);
-            }
-        });
-
-        return redirect()
-            ->route('manager.assessments.index')
-            ->with('success', 'Assessment marked complete and sent for director review.');
+            return redirect()
+                ->back()
+                ->with('error', 'An error occurred while marking the assessment complete. Please try again or contact support if the problem persists.');
+        }
     }
 
     /**

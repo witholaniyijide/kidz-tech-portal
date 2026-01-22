@@ -137,7 +137,10 @@
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-8">
                 <div class="px-6 py-4 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg font-semibold">{{ $selectedDate->format('l, M j') }} Classes ({{ count($classes) }})</h3>
+                        <h3 class="text-lg font-semibold">
+                            {{ $selectedDate->format('l, M j') }} Classes
+                            ({{ count($classes) }}{{ count($rescheduledClasses) > 0 ? ' + ' . count($rescheduledClasses) . ' rescheduled' : '' }})
+                        </h3>
                         @if($inheritedFromWeekly ?? false)
                             <p class="text-xs text-white/70">🔄 Inherited from weekly repeat schedule</p>
                         @endif
@@ -214,6 +217,76 @@
                             </div>
                         @endforeach
                     </div>
+
+                    {{-- Rescheduled Classes Section --}}
+                    @if(count($rescheduledClasses) > 0)
+                        <div class="px-6 py-4 bg-amber-50/50 dark:bg-amber-900/10 border-t-2 border-amber-500">
+                            <h4 class="text-md font-semibold text-amber-800 dark:text-amber-300 mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Rescheduled Classes ({{ count($rescheduledClasses) }})
+                            </h4>
+                            <div class="space-y-2">
+                                @foreach($rescheduledClasses as $index => $class)
+                                    <div class="p-3 bg-white dark:bg-gray-800/50 rounded-lg border-l-4 border-amber-500">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-7 h-7 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full flex items-center justify-center font-bold text-xs">
+                                                    {{ $index + 1 }}
+                                                </div>
+                                                <div>
+                                                    <div class="font-semibold text-gray-900 dark:text-white text-sm">
+                                                        {{ $class['student_name'] ?? 'Unknown Student' }}
+                                                    </div>
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                        Tutor: {{ $class['tutor_name'] ?? 'Unknown Tutor' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-3">
+                                                <div class="text-right">
+                                                    <div class="font-medium text-gray-900 dark:text-white text-sm">
+                                                        @php
+                                                            try {
+                                                                $time = \Carbon\Carbon::parse($class['time'] ?? '00:00')->format('g:i A');
+                                                            } catch (\Exception $e) {
+                                                                $time = $class['time'] ?? '00:00';
+                                                            }
+                                                        @endphp
+                                                        {{ $time }}
+                                                    </div>
+                                                    @if(!empty($class['original_date']))
+                                                        <div class="text-xs text-amber-600 dark:text-amber-400">
+                                                            @php
+                                                                try {
+                                                                    $originalDate = \Carbon\Carbon::parse($class['original_date'])->format('M j');
+                                                                } catch (\Exception $e) {
+                                                                    $originalDate = $class['original_date'];
+                                                                }
+                                                            @endphp
+                                                            Was {{ $originalDate }}
+                                                        </div>
+                                                    @endif
+                                                    @if(!empty($class['class_link']))
+                                                        <a href="{{ $class['class_link'] }}" target="_blank" class="text-xs text-[#423A8E] hover:underline">Join Class</a>
+                                                    @endif
+                                                </div>
+                                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                                                    Rescheduled
+                                                </span>
+                                            </div>
+                                        </div>
+                                        @if(!empty($class['notes']))
+                                            <div class="mt-2 ml-10 text-xs text-gray-500 dark:text-gray-400">
+                                                {{ $class['notes'] }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
 
                     {{-- Delete Entire Schedule --}}
                     @if($todaySchedule)
