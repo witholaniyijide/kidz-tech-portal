@@ -376,59 +376,100 @@
 
             {{-- Completed Tab --}}
             <div x-show="view === 'completed'" x-transition>
-                <div class="mb-6">
-                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">Completed Assessments</h2>
-                    <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">Assessments approved by the Director</p>
+                <div class="mb-6 flex justify-between items-start">
+                    <div>
+                        <h2 class="text-2xl font-semibold text-gray-800 dark:text-white flex items-center gap-3">
+                            Completed Assessments
+                            <span class="px-3 py-1 bg-emerald-500 text-white text-sm rounded-full" x-text="filteredCompletedAssessments.length"></span>
+                        </h2>
+                        <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">Assessments approved by the Director</p>
+                    </div>
+                </div>
+
+                {{-- Filters --}}
+                <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Tutor</label>
+                            <select x-model="completedFilters.tutor" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
+                                <option value="">All Tutors</option>
+                                @foreach($tutors as $tutor)
+                                    <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Student</label>
+                            <select x-model="completedFilters.student" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
+                                <option value="">All Students</option>
+                                @foreach(\App\Models\Student::orderBy('first_name')->get() as $student)
+                                    <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Month</label>
+                            <input type="month" x-model="completedFilters.month" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Week</label>
+                            <input type="week" x-model="completedFilters.week" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
+                        </div>
+                        <div class="flex items-end">
+                            <button @click="clearCompletedFilters()" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all text-sm">
+                                Clear Filters
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="space-y-4">
-                    @forelse($assessments->filter(function ($a) {
-                        return $a->status === 'approved-by-director';
-                    }) as $assessment)
+                    <template x-for="assessment in filteredCompletedAssessments" :key="assessment.id">
                         <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 border-l-4 border-l-emerald-500">
                             <div class="flex flex-wrap justify-between items-start gap-4">
                                 <div class="flex-1">
                                     <div class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-                                        {{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}
+                                        <span x-text="assessment.tutor_name"></span>
                                         <span class="px-2 py-0.5 text-xs bg-emerald-500 text-white rounded-full">Completed</span>
                                     </div>
-                                    <div class="text-gray-500 dark:text-gray-400 text-sm">
-                                        {{ $assessment->assessment_month }}
+                                    <div class="text-gray-500 dark:text-gray-400 text-sm" x-text="assessment.assessment_month"></div>
+                                    <div class="text-gray-500 dark:text-gray-400 text-xs mt-1" x-show="assessment.student_name">
+                                        Student: <span x-text="assessment.student_name"></span>
                                     </div>
-                                    @if($assessment->performance_score)
+                                    <template x-if="assessment.performance_score">
                                         <div class="mt-2">
-                                            <span class="text-2xl font-bold text-emerald-600">{{ $assessment->performance_score }}%</span>
+                                            <span class="text-2xl font-bold text-emerald-600" x-text="assessment.performance_score + '%'"></span>
                                         </div>
-                                    @endif
+                                    </template>
                                 </div>
                                 <div class="text-right">
-                                    @if($assessment->approved_by_director_at)
-                                        <div class="text-xs text-gray-500">
-                                            Approved {{ $assessment->approved_by_director_at->format('M j, Y') }}
-                                        </div>
-                                    @endif
-                                    <a href="{{ route('manager.assessments.show', $assessment) }}" class="mt-2 inline-flex items-center text-xs px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors">
+                                    <template x-if="assessment.approved_at">
+                                        <div class="text-xs text-gray-500" x-text="'Approved ' + assessment.approved_at"></div>
+                                    </template>
+                                    <a :href="'/manager/assessments/' + assessment.id" class="mt-2 inline-flex items-center text-xs px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors">
                                         View Details
                                     </a>
                                 </div>
                             </div>
 
-                            @if($assessment->director_comment)
+                            <template x-if="assessment.director_comment">
                                 <div class="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800/30">
                                     <div class="font-semibold text-amber-800 dark:text-amber-300 mb-1 text-sm">Director's Remarks:</div>
-                                    <div class="text-amber-700 dark:text-amber-200 text-sm">{{ $assessment->director_comment }}</div>
+                                    <div class="text-amber-700 dark:text-amber-200 text-sm" x-text="assessment.director_comment"></div>
                                 </div>
-                            @endif
+                            </template>
                         </div>
-                    @empty
+                    </template>
+
+                    <template x-if="filteredCompletedAssessments.length === 0">
                         <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-8 text-center">
                             <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Completed Assessments Yet</h3>
-                            <p class="text-gray-500 dark:text-gray-400">Assessments will appear here after Director approval</p>
+                            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Completed Assessments Found</h3>
+                            <p class="text-gray-500 dark:text-gray-400">Try adjusting your filters or check back later</p>
                         </div>
-                    @endforelse
+                    </template>
                 </div>
             </div>
         </main>
@@ -608,6 +649,76 @@
                 clearDashFilters() {
                     this.dashFilterTutor = '';
                     this.dashFilterStatus = '';
+                },
+
+                // Completed assessments data
+                completedAssessments: [
+                    @foreach($assessments->filter(fn($a) => $a->status === 'approved-by-director') as $assessment)
+                        {
+                            id: {{ $assessment->id }},
+                            tutor_id: {{ $assessment->tutor_id }},
+                            tutor_name: '{{ ($assessment->tutor->first_name ?? '') . ' ' . ($assessment->tutor->last_name ?? '') }}',
+                            student_id: {{ $assessment->student_id ?? 'null' }},
+                            student_name: '{{ $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '' }}',
+                            assessment_month: '{{ $assessment->assessment_month }}',
+                            week: {{ $assessment->week ?? 'null' }},
+                            year: {{ $assessment->year ?? 'null' }},
+                            class_date: '{{ $assessment->class_date ?? '' }}',
+                            performance_score: {{ $assessment->performance_score ?? 'null' }},
+                            approved_at: '{{ $assessment->approved_by_director_at ? $assessment->approved_by_director_at->format("M j, Y") : "" }}',
+                            director_comment: '{{ addslashes($assessment->director_comment ?? '') }}'
+                        },
+                    @endforeach
+                ],
+
+                completedFilters: {
+                    tutor: '',
+                    student: '',
+                    month: '',
+                    week: '',
+                },
+
+                get filteredCompletedAssessments() {
+                    return this.completedAssessments.filter(assessment => {
+                        // Filter by tutor
+                        if (this.completedFilters.tutor && assessment.tutor_id != this.completedFilters.tutor) {
+                            return false;
+                        }
+
+                        // Filter by student
+                        if (this.completedFilters.student && assessment.student_id != this.completedFilters.student) {
+                            return false;
+                        }
+
+                        // Filter by month (YYYY-MM format)
+                        if (this.completedFilters.month) {
+                            const assessmentDate = new Date(assessment.class_date);
+                            const filterDate = new Date(this.completedFilters.month + '-01');
+                            if (assessmentDate.getFullYear() !== filterDate.getFullYear() ||
+                                assessmentDate.getMonth() !== filterDate.getMonth()) {
+                                return false;
+                            }
+                        }
+
+                        // Filter by week (YYYY-WXX format)
+                        if (this.completedFilters.week) {
+                            const [filterYear, filterWeek] = this.completedFilters.week.split('-W');
+                            if (assessment.year != filterYear || assessment.week != filterWeek) {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    });
+                },
+
+                clearCompletedFilters() {
+                    this.completedFilters = {
+                        tutor: '',
+                        student: '',
+                        month: '',
+                        week: '',
+                    };
                 },
 
                 async saveAssessment() {
