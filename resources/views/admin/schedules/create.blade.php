@@ -170,6 +170,132 @@
                     </div>
                 </div>
 
+                {{-- Rescheduled Classes --}}
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-6">
+                    <div class="px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Rescheduled Classes
+                            </h3>
+                            <p class="text-xs text-white/80 mt-1">Classes that were moved from another date to this day</p>
+                        </div>
+                        <span class="text-sm bg-white/20 px-3 py-1 rounded-full" x-text="rescheduledEntries.length + ' rescheduled'"></span>
+                    </div>
+                    <div class="p-6">
+                        <template x-if="rescheduledEntries.length === 0">
+                            <div class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+                                No rescheduled classes yet
+                            </div>
+                        </template>
+
+                        {{-- Table Header --}}
+                        <div x-show="rescheduledEntries.length > 0" class="hidden md:grid grid-cols-12 gap-3 mb-3 text-sm font-medium text-gray-600 dark:text-gray-400">
+                            <div class="col-span-2">Student</div>
+                            <div class="col-span-2">Tutor</div>
+                            <div class="col-span-2">Start Time</div>
+                            <div class="col-span-2">End Time</div>
+                            <div class="col-span-2">Original Date</div>
+                            <div class="col-span-1">Link</div>
+                            <div class="col-span-1"></div>
+                        </div>
+
+                        {{-- Rescheduled Entry Rows --}}
+                        <template x-for="(entry, index) in rescheduledEntries" :key="'r_'+index">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border-l-4 border-amber-500">
+                                {{-- Student --}}
+                                <div class="md:col-span-2">
+                                    <label class="md:hidden text-xs text-gray-500 mb-1 block">Student</label>
+                                    <select :name="'rescheduled_classes[' + index + '][student_id]'"
+                                            x-model="entry.student_id"
+                                            @change="onRescheduledStudentChange(index)"
+                                            required
+                                            class="w-full px-3 py-2 text-sm border border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-amber-500">
+                                        <option value="">Select Student</option>
+                                        @foreach($students as $student)
+                                            <option value="{{ $student->id }}"
+                                                    data-tutor="{{ $student->tutor_id }}"
+                                                    data-class-link="{{ $student->class_link }}">
+                                                {{ $student->first_name }} {{ $student->last_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Tutor --}}
+                                <div class="md:col-span-2">
+                                    <label class="md:hidden text-xs text-gray-500 mb-1 block">Tutor</label>
+                                    <select :name="'rescheduled_classes[' + index + '][tutor_id]'"
+                                            x-model="entry.tutor_id"
+                                            required
+                                            class="w-full px-3 py-2 text-sm border border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-amber-500">
+                                        <option value="">Select Tutor</option>
+                                        @foreach($tutors as $tutor)
+                                            <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Start Time --}}
+                                <div class="md:col-span-2">
+                                    <label class="md:hidden text-xs text-gray-500 mb-1 block">Start Time</label>
+                                    <input type="time" :name="'rescheduled_classes[' + index + '][start_time]'"
+                                           x-model="entry.start_time"
+                                           required
+                                           class="w-full px-3 py-2 text-sm border border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-amber-500">
+                                </div>
+
+                                {{-- End Time --}}
+                                <div class="md:col-span-2">
+                                    <label class="md:hidden text-xs text-gray-500 mb-1 block">End Time</label>
+                                    <input type="time" :name="'rescheduled_classes[' + index + '][end_time]'"
+                                           x-model="entry.end_time"
+                                           required
+                                           class="w-full px-3 py-2 text-sm border border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-amber-500">
+                                </div>
+
+                                {{-- Original Date --}}
+                                <div class="md:col-span-2">
+                                    <label class="md:hidden text-xs text-gray-500 mb-1 block">Original Date</label>
+                                    <input type="date" :name="'rescheduled_classes[' + index + '][original_date]'"
+                                           x-model="entry.original_date"
+                                           class="w-full px-3 py-2 text-sm border border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-amber-500">
+                                </div>
+
+                                {{-- Class Link --}}
+                                <div class="md:col-span-1">
+                                    <label class="md:hidden text-xs text-gray-500 mb-1 block">Link</label>
+                                    <input type="url" :name="'rescheduled_classes[' + index + '][class_link]'"
+                                           x-model="entry.class_link"
+                                           placeholder="URL"
+                                           class="w-full px-3 py-2 text-sm border border-amber-300 dark:border-amber-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-amber-500">
+                                </div>
+
+                                {{-- Delete Button --}}
+                                <div class="md:col-span-1 flex items-center justify-end">
+                                    <button type="button" @click="removeRescheduledEntry(index)"
+                                            class="p-2 text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+
+                        {{-- Add Rescheduled Entry Button --}}
+                        <button type="button" @click="addRescheduledEntry()"
+                                class="w-full py-3 border-2 border-dashed border-amber-300 dark:border-amber-600 rounded-xl text-amber-600 dark:text-amber-400 hover:border-amber-500 hover:text-amber-700 transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Add Rescheduled Class
+                        </button>
+                    </div>
+                </div>
+
                 {{-- Footer Note --}}
                 <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-6">
                     <div class="p-6">
@@ -202,6 +328,7 @@
                 entries: [
                     { student_id: '', tutor_id: '', start_time: '09:00', end_time: '10:00', class_link: '' }
                 ],
+                rescheduledEntries: [],
 
                 getDayName() {
                     if (!this.scheduleDate) return '';
@@ -240,6 +367,35 @@
                 onStudentChange(index) {
                     const entry = this.entries[index];
                     const select = document.querySelectorAll('select[name^="entries"][name$="[student_id]"]')[index];
+                    const option = select?.options[select.selectedIndex];
+
+                    if (option && option.value) {
+                        const tutorId = option.dataset.tutor;
+                        const classLink = option.dataset.classLink;
+
+                        if (tutorId) entry.tutor_id = tutorId;
+                        if (classLink) entry.class_link = classLink;
+                    }
+                },
+
+                addRescheduledEntry() {
+                    this.rescheduledEntries.push({
+                        student_id: '',
+                        tutor_id: '',
+                        start_time: '09:00',
+                        end_time: '10:00',
+                        class_link: '',
+                        original_date: ''
+                    });
+                },
+
+                removeRescheduledEntry(index) {
+                    this.rescheduledEntries.splice(index, 1);
+                },
+
+                onRescheduledStudentChange(index) {
+                    const entry = this.rescheduledEntries[index];
+                    const select = document.querySelectorAll('select[name^="rescheduled_classes"][name$="[student_id]"]')[index];
                     const option = select?.options[select.selectedIndex];
 
                     if (option && option.value) {
