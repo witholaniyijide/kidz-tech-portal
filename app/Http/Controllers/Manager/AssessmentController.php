@@ -104,10 +104,12 @@ class AssessmentController extends Controller
                 'session' => 'nullable|integer|min:1|max:3',
                 'criteria_assessed' => 'nullable|array',
                 'criteria_ratings' => 'nullable|array',
+                'action' => 'nullable|in:draft,send',
             ]);
 
+            $action = $validated['action'] ?? 'draft';
             $validated['manager_id'] = Auth::id();
-            $validated['status'] = 'draft';
+            $validated['status'] = $action === 'send' ? 'pending_review' : 'draft';
 
             // Extract ratings for separate processing
             $criteriaRatings = $validated['criteria_ratings'] ?? [];

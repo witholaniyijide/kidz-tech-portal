@@ -176,14 +176,14 @@
 
                         {{-- Action Buttons --}}
                         <div class="flex gap-3 flex-wrap">
-                            <button type="submit" class="bg-gradient-to-r from-[#C15F3C] to-[#DA7756] text-white px-5 py-2.5 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
-                                <span x-text="editing ? 'Update Assessment' : 'Save Assessment'"></span>
+                            <button type="button" @click="saveAssessment('draft')" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
+                                Save Assessment
                             </button>
-                            <button type="button" @click="resetForm()" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-all">
-                                Reset Form
+                            <button type="button" @click="saveAssessment('send')" class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
+                                Send to Director
                             </button>
-                            <button type="button" x-show="editing" @click="editing = null; view = 'dashboard'" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-all">
-                                Cancel Edit
+                            <button type="button" @click="cancelAssessment()" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-all">
+                                Cancel
                             </button>
                         </div>
                     </form>
@@ -721,7 +721,7 @@
                     };
                 },
 
-                async saveAssessment() {
+                async saveAssessment(action = 'draft') {
                     if (!this.formData.student_id || !this.formData.class_date) {
                         this.showToast('Please select a student and enter class date', 'error');
                         return;
@@ -732,37 +732,73 @@
                         return;
                     }
 
+                    // Validation for sending to director
+                    if (action === 'send') {
+                        const checkedCount = Object.keys(this.checkedCriteria).filter(k => this.checkedCriteria[k]).length;
+                        if (checkedCount === 0) {
+                            this.showToast('Please select at least one criteria to assess', 'error');
+                            return;
+                        }
+                    }
+
                     try {
+                        const payload = {
+                            ...this.formData,
+                            assessment_month: this.weekDisplay,
+                            session: this.session,
+                            criteria_assessed: Object.keys(this.checkedCriteria).filter(k => this.checkedCriteria[k]),
+                            criteria_ratings: this.ratings,
+                            action: action // 'draft' or 'send'
+                        };
+
                         const response = await fetch('{{ route("manager.assessments.store") }}', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
                             },
-                            body: JSON.stringify({
-                                ...this.formData,
-                                assessment_month: this.weekDisplay,
-                                session: this.session,
-                                criteria_assessed: Object.keys(this.checkedCriteria).filter(k => this.checkedCriteria[k]),
-                                criteria_ratings: this.ratings
-                            })
+                            body: JSON.stringify(payload)
                         });
+
+                        // Check if response is JSON
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            const text = await response.text();
+                            console.error('Non-JSON response:', text.substring(0, 500));
+                            this.showToast('Server error: Invalid response format. Please check the logs.', 'error');
+                            return;
+                        }
 
                         const data = await response.json();
 
                         if (response.ok && data.success) {
-                            this.showToast('Assessment saved successfully!');
+                            const message = action === 'send'
+                                ? 'Assessment sent to Director successfully!'
+                                : 'Assessment saved as draft!';
+                            this.showToast(message);
                             this.resetForm();
                             this.view = 'dashboard';
                             setTimeout(() => window.location.reload(), 1000);
                         } else {
                             const errorMsg = data.message || 'Failed to save assessment';
-                            console.error('Server error:', data);
-                            this.showToast(errorMsg, 'error');
+                            if (data.errors) {
+                                const errorList = Object.values(data.errors).flat().join(', ');
+                                this.showToast(errorMsg + ': ' + errorList, 'error');
+                            } else {
+                                this.showToast(errorMsg, 'error');
+                            }
                         }
                     } catch (e) {
                         console.error('Save error:', e);
-                        this.showToast('Network error: ' + e.message, 'error');
+                        this.showToast('Error: ' + e.message, 'error');
+                    }
+                },
+
+                cancelAssessment() {
+                    if (confirm('Are you sure you want to cancel? All unsaved changes will be lost.')) {
+                        this.resetForm();
+                        this.view = 'dashboard';
                     }
                 }
             };
