@@ -308,8 +308,14 @@
         // Fetch and render enrollments chart
         function loadEnrollmentsChart() {
             fetch('{{ route('director.analytics.enrollments') }}?year=' + selectedYear)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok: ' + res.statusText);
+                    }
+                    return res.json();
+                })
                 .then(data => {
+                    console.log('Enrollments data received:', data);
                     if (charts.enrollments) charts.enrollments.destroy();
 
                     if (!data.labels || data.labels.length === 0) {
@@ -317,7 +323,13 @@
                         return;
                     }
 
-                    charts.enrollments = new Chart(document.getElementById('enrollmentsChart'), {
+                    const ctx = document.getElementById('enrollmentsChart');
+                    if (!ctx) {
+                        console.error('Canvas element enrollmentsChart not found');
+                        return;
+                    }
+
+                    charts.enrollments = new Chart(ctx, {
                         type: 'line',
                         data: data,
                         options: {
@@ -335,29 +347,38 @@
                 })
                 .catch(err => {
                     console.error('Error loading enrollments:', err);
-                    showNoData('enrollmentsChart', 'Error loading enrollment data');
+                    showNoData('enrollmentsChart', 'Error loading enrollment data: ' + err.message);
                 });
         }
 
         // Fetch and render reports charts
         function loadReportsCharts() {
             fetch('{{ route('director.analytics.reports') }}?year=' + selectedYear)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok: ' + res.statusText);
+                    }
+                    return res.json();
+                })
                 .then(data => {
+                    console.log('Reports data received:', data);
                     // Monthly Reports Chart
                     if (charts.reportsMonthly) charts.reportsMonthly.destroy();
 
                     if (data.monthly && data.monthly.labels && data.monthly.labels.length > 0) {
-                        charts.reportsMonthly = new Chart(document.getElementById('reportsMonthlyChart'), {
-                            type: 'line',
-                            data: data.monthly,
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: { legend: { position: 'top' } },
-                                scales: { y: { beginAtZero: true } }
-                            }
-                        });
+                        const ctx = document.getElementById('reportsMonthlyChart');
+                        if (ctx) {
+                            charts.reportsMonthly = new Chart(ctx, {
+                                type: 'line',
+                                data: data.monthly,
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { position: 'top' } },
+                                    scales: { y: { beginAtZero: true } }
+                                }
+                            });
+                        }
                     } else {
                         showNoData('reportsMonthlyChart', 'No report data available for ' + selectedYear);
                     }
@@ -366,46 +387,58 @@
                     if (charts.reportsStatus) charts.reportsStatus.destroy();
 
                     if (data.status && data.status.datasets && data.status.datasets[0].data.some(v => v > 0)) {
-                        charts.reportsStatus = new Chart(document.getElementById('reportsStatusChart'), {
-                            type: 'doughnut',
-                            data: data.status,
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: { legend: { position: 'right' } }
-                            }
-                        });
+                        const ctx = document.getElementById('reportsStatusChart');
+                        if (ctx) {
+                            charts.reportsStatus = new Chart(ctx, {
+                                type: 'doughnut',
+                                data: data.status,
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { position: 'right' } }
+                                }
+                            });
+                        }
                     } else {
                         showNoData('reportsStatusChart', 'No report status data available');
                     }
                 })
                 .catch(err => {
                     console.error('Error loading reports:', err);
-                    showNoData('reportsMonthlyChart', 'Error loading report data');
-                    showNoData('reportsStatusChart', 'Error loading report data');
+                    showNoData('reportsMonthlyChart', 'Error loading report data: ' + err.message);
+                    showNoData('reportsStatusChart', 'Error loading report data: ' + err.message);
                 });
         }
 
         // Fetch and render tutor performance charts
         function loadTutorPerformanceCharts() {
             fetch('{{ route('director.analytics.tutors') }}?year=' + selectedYear)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok: ' + res.statusText);
+                    }
+                    return res.json();
+                })
                 .then(data => {
+                    console.log('Tutor performance data received:', data);
                     // Students per Tutor Chart
                     if (charts.studentsPerTutor) charts.studentsPerTutor.destroy();
 
                     if (data.students_per_tutor && data.students_per_tutor.labels && data.students_per_tutor.labels.length > 0) {
-                        charts.studentsPerTutor = new Chart(document.getElementById('studentsPerTutorChart'), {
-                            type: 'bar',
-                            data: data.students_per_tutor,
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                indexAxis: 'y',
-                                plugins: { legend: { display: false } },
-                                scales: { x: { beginAtZero: true } }
-                            }
-                        });
+                        const ctx = document.getElementById('studentsPerTutorChart');
+                        if (ctx) {
+                            charts.studentsPerTutor = new Chart(ctx, {
+                                type: 'bar',
+                                data: data.students_per_tutor,
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    indexAxis: 'y',
+                                    plugins: { legend: { display: false } },
+                                    scales: { x: { beginAtZero: true } }
+                                }
+                            });
+                        }
                     } else {
                         showNoData('studentsPerTutorChart', 'No tutor student data available');
                     }
@@ -414,47 +447,59 @@
                     if (charts.attendance) charts.attendance.destroy();
 
                     if (data.attendance && data.attendance.labels && data.attendance.labels.length > 0) {
-                        charts.attendance = new Chart(document.getElementById('attendanceChart'), {
-                            type: 'bar',
-                            data: data.attendance,
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                indexAxis: 'y',
-                                plugins: { legend: { display: false } },
-                                scales: { x: { beginAtZero: true, max: 100 } }
-                            }
-                        });
+                        const ctx = document.getElementById('attendanceChart');
+                        if (ctx) {
+                            charts.attendance = new Chart(ctx, {
+                                type: 'bar',
+                                data: data.attendance,
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    indexAxis: 'y',
+                                    plugins: { legend: { display: false } },
+                                    scales: { x: { beginAtZero: true, max: 100 } }
+                                }
+                            });
+                        }
                     } else {
                         showNoData('attendanceChart', 'No attendance data available');
                     }
                 })
                 .catch(err => {
                     console.error('Error loading tutor performance:', err);
-                    showNoData('studentsPerTutorChart', 'Error loading tutor data');
-                    showNoData('attendanceChart', 'Error loading attendance data');
+                    showNoData('studentsPerTutorChart', 'Error loading tutor data: ' + err.message);
+                    showNoData('attendanceChart', 'Error loading attendance data: ' + err.message);
                 });
         }
 
         // Fetch and render assessment charts
         function loadAssessmentCharts() {
             fetch('{{ route('director.analytics.assessments') }}?year=' + selectedYear)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok: ' + res.statusText);
+                    }
+                    return res.json();
+                })
                 .then(data => {
+                    console.log('Assessment data received:', data);
                     // Performance Trend Chart
                     if (charts.performance) charts.performance.destroy();
 
                     if (data.monthly_performance && data.monthly_performance.labels && data.monthly_performance.labels.length > 0) {
-                        charts.performance = new Chart(document.getElementById('performanceChart'), {
-                            type: 'line',
-                            data: data.monthly_performance,
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: { legend: { position: 'top' } },
-                                scales: { y: { beginAtZero: true, max: 100 } }
-                            }
-                        });
+                        const ctx = document.getElementById('performanceChart');
+                        if (ctx) {
+                            charts.performance = new Chart(ctx, {
+                                type: 'line',
+                                data: data.monthly_performance,
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { position: 'top' } },
+                                    scales: { y: { beginAtZero: true, max: 100 } }
+                                }
+                            });
+                        }
                     } else {
                         showNoData('performanceChart', 'No performance trend data available for ' + selectedYear);
                     }
@@ -463,15 +508,18 @@
                     if (charts.ratingDistribution) charts.ratingDistribution.destroy();
 
                     if (data.rating_distribution && data.rating_distribution.datasets && data.rating_distribution.datasets[0].data.some(v => v > 0)) {
-                        charts.ratingDistribution = new Chart(document.getElementById('ratingDistributionChart'), {
-                            type: 'doughnut',
-                            data: data.rating_distribution,
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: { legend: { position: 'right' } }
-                            }
-                        });
+                        const ctx = document.getElementById('ratingDistributionChart');
+                        if (ctx) {
+                            charts.ratingDistribution = new Chart(ctx, {
+                                type: 'doughnut',
+                                data: data.rating_distribution,
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { position: 'right' } }
+                                }
+                            });
+                        }
                     } else {
                         showNoData('ratingDistributionChart', 'No rating distribution data available');
                     }
@@ -480,45 +528,48 @@
                     if (charts.criteriaBreakdown) charts.criteriaBreakdown.destroy();
 
                     if (data.criteria_breakdown && data.criteria_breakdown.labels && data.criteria_breakdown.labels.length > 0) {
-                        charts.criteriaBreakdown = new Chart(document.getElementById('criteriaBreakdownChart'), {
-                            type: 'bar',
-                            data: data.criteria_breakdown,
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                indexAxis: 'y',
-                                plugins: {
-                                    legend: { display: false },
-                                    tooltip: {
-                                        callbacks: {
-                                            label: function(context) {
-                                                return context.raw + '%';
+                        const ctx = document.getElementById('criteriaBreakdownChart');
+                        if (ctx) {
+                            charts.criteriaBreakdown = new Chart(ctx, {
+                                type: 'bar',
+                                data: data.criteria_breakdown,
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    indexAxis: 'y',
+                                    plugins: {
+                                        legend: { display: false },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    return context.raw + '%';
+                                                }
                                             }
                                         }
-                                    }
-                                },
-                                scales: {
-                                    x: {
-                                        beginAtZero: true,
-                                        max: 100,
-                                        ticks: {
-                                            callback: function(value) {
-                                                return value + '%';
+                                    },
+                                    scales: {
+                                        x: {
+                                            beginAtZero: true,
+                                            max: 100,
+                                            ticks: {
+                                                callback: function(value) {
+                                                    return value + '%';
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        });
+                            });
+                        }
                     } else {
                         showNoData('criteriaBreakdownChart', 'No criteria data available. Assessments need to be approved by director to show here.');
                     }
                 })
                 .catch(err => {
                     console.error('Error loading assessments:', err);
-                    showNoData('performanceChart', 'Error loading performance data');
-                    showNoData('ratingDistributionChart', 'Error loading rating data');
-                    showNoData('criteriaBreakdownChart', 'Error loading criteria data');
+                    showNoData('performanceChart', 'Error loading performance data: ' + err.message);
+                    showNoData('ratingDistributionChart', 'Error loading rating data: ' + err.message);
+                    showNoData('criteriaBreakdownChart', 'Error loading criteria data: ' + err.message);
                 });
         }
 

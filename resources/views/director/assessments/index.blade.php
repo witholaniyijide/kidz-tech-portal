@@ -519,9 +519,42 @@
                 {{-- Charts Container --}}
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 mb-6">
                     <div style="height: 400px;" class="relative">
-                        <canvas x-show="selectedChart === 'overview'" id="performanceTrendChart"></canvas>
-                        <canvas x-show="selectedChart === 'tutors'" id="tutorComparisonChart"></canvas>
-                        <canvas x-show="selectedChart === 'criteria'" id="criteriaChart"></canvas>
+                        <div x-show="selectedChart === 'overview'" class="h-full relative">
+                            <canvas id="performanceTrendChart" class="h-full w-full"></canvas>
+                            <div id="noDataOverview" class="hidden absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800">
+                                <div class="text-center">
+                                    <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm">No performance data available yet</p>
+                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Complete and approve assessments to see trends</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div x-show="selectedChart === 'tutors'" class="h-full relative">
+                            <canvas id="tutorComparisonChart" class="h-full w-full"></canvas>
+                            <div id="noDataTutors" class="hidden absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800">
+                                <div class="text-center">
+                                    <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    </svg>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm">No tutor comparison data available</p>
+                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Complete and approve assessments to compare tutors</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div x-show="selectedChart === 'criteria'" class="h-full relative">
+                            <canvas id="criteriaChart" class="h-full w-full"></canvas>
+                            <div id="noDataCriteria" class="hidden absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800">
+                                <div class="text-center">
+                                    <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm">No criteria breakdown available</p>
+                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Complete and approve assessments to see criteria scores</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -759,19 +792,32 @@
                         if (chart) chart.destroy();
                     });
                     this.charts = {};
-                    
+
                     const chartData = @json($chartData ?? []);
-                    
+
+                    // Performance Trend Chart
                     if (this.selectedChart === 'overview') {
                         const ctx = document.getElementById('performanceTrendChart');
                         if (ctx) {
+                            // Check if we have actual data
+                            const hasData = chartData.months && chartData.months.length > 0 && chartData.scores && chartData.scores.length > 0;
+
+                            if (!hasData) {
+                                document.getElementById('noDataOverview').classList.remove('hidden');
+                                ctx.style.display = 'none';
+                                return;
+                            } else {
+                                document.getElementById('noDataOverview').classList.add('hidden');
+                                ctx.style.display = 'block';
+                            }
+
                             this.charts.performance = new Chart(ctx, {
                                 type: 'line',
                                 data: {
-                                    labels: chartData.months || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                                    labels: chartData.months,
                                     datasets: [{
                                         label: 'Average Score',
-                                        data: chartData.scores || [75, 78, 72, 80, 85, 82],
+                                        data: chartData.scores,
                                         borderColor: '#0ea5e9',
                                         backgroundColor: 'rgba(14, 165, 233, 0.1)',
                                         fill: true,
@@ -798,17 +844,29 @@
                             });
                         }
                     }
-                    
+
+                    // Tutor Comparison Chart
                     if (this.selectedChart === 'tutors') {
                         const ctx = document.getElementById('tutorComparisonChart');
                         if (ctx) {
+                            const hasData = chartData.tutorNames && chartData.tutorNames.length > 0 && chartData.tutorScores && chartData.tutorScores.length > 0;
+
+                            if (!hasData) {
+                                document.getElementById('noDataTutors').classList.remove('hidden');
+                                ctx.style.display = 'none';
+                                return;
+                            } else {
+                                document.getElementById('noDataTutors').classList.add('hidden');
+                                ctx.style.display = 'block';
+                            }
+
                             this.charts.tutors = new Chart(ctx, {
                                 type: 'bar',
                                 data: {
-                                    labels: chartData.tutorNames || @json($tutors->pluck('first_name')->take(10)),
+                                    labels: chartData.tutorNames,
                                     datasets: [{
                                         label: 'Average Score',
-                                        data: chartData.tutorScores || @json($tutors->take(10)->map(function () { return rand(60, 95); })),
+                                        data: chartData.tutorScores,
                                         backgroundColor: [
                                             '#10b981', '#0ea5e9', '#8b5cf6', '#f59e0b', '#ef4444',
                                             '#06b6d4', '#ec4899', '#14b8a6', '#f97316', '#6366f1'
@@ -836,11 +894,23 @@
                             });
                         }
                     }
-                    
+
+                    // Criteria Breakdown Chart
                     if (this.selectedChart === 'criteria') {
                         const ctx = document.getElementById('criteriaChart');
                         if (ctx) {
-                            const criteriaLabels = chartData.criteriaNames || ['Professionalism', 'Communication', 'Punctuality', 'Performance'];
+                            const hasData = chartData.criteriaNames && chartData.criteriaNames.length > 0 && chartData.criteriaScores && chartData.criteriaScores.length > 0;
+
+                            if (!hasData) {
+                                document.getElementById('noDataCriteria').classList.remove('hidden');
+                                ctx.style.display = 'none';
+                                return;
+                            } else {
+                                document.getElementById('noDataCriteria').classList.add('hidden');
+                                ctx.style.display = 'block';
+                            }
+
+                            const criteriaLabels = chartData.criteriaNames;
                             const criteriaColors = ['#10b981', '#0ea5e9', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#14b8a6'];
                             this.charts.criteria = new Chart(ctx, {
                                 type: 'bar',
@@ -848,7 +918,7 @@
                                     labels: criteriaLabels,
                                     datasets: [{
                                         label: 'Average Rating (out of 5)',
-                                        data: chartData.criteriaScores || [4.2, 3.8, 4.5, 3.9],
+                                        data: chartData.criteriaScores,
                                         backgroundColor: criteriaColors.slice(0, criteriaLabels.length),
                                         borderWidth: 1,
                                         borderRadius: 4
