@@ -125,20 +125,36 @@
             @else
                 <div class="space-y-3">
                     @foreach($todayClasses as $index => $class)
-                        <div class="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                            <div class="w-10 h-10 bg-gradient-to-br from-[#4B49AC] to-[#7DA0FA] rounded-full flex items-center justify-center text-white font-bold">
+                        @php
+                            $isRescheduled = isset($class['is_rescheduled']) && $class['is_rescheduled'];
+                        @endphp
+                        <div class="flex items-center gap-4 p-4 rounded-xl transition-colors {{ $isRescheduled ? 'bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-300 dark:border-amber-700/50 hover:bg-amber-100 dark:hover:bg-amber-900/30' : 'bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold {{ $isRescheduled ? 'bg-gradient-to-br from-amber-500 to-orange-500' : 'bg-gradient-to-br from-[#4B49AC] to-[#7DA0FA]' }}">
                                 {{ $index + 1 }}
                             </div>
                             <div class="flex-1">
-                                <p class="font-semibold text-slate-900 dark:text-white">
-                                    {{ $class['student_name'] ?? 'Student' }}
-                                </p>
-                                <p class="text-sm text-slate-500">
+                                <div class="flex items-center gap-2">
+                                    <p class="font-semibold text-slate-900 dark:text-white">
+                                        {{ $class['student_name'] ?? 'Student' }}
+                                    </p>
+                                    @if($isRescheduled)
+                                        <span class="inline-flex items-center text-xs px-2 py-0.5 rounded-full bg-amber-200 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 font-medium">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                            </svg>
+                                            Rescheduled
+                                        </span>
+                                    @endif
+                                </div>
+                                <p class="text-sm {{ $isRescheduled ? 'text-amber-700 dark:text-amber-400' : 'text-slate-500' }}">
                                     {{ isset($class['class_time']) ? \Carbon\Carbon::parse($class['class_time'])->format('g:i A') : 'Time TBD' }}
+                                    @if($isRescheduled && isset($class['original_date']))
+                                        • From {{ \Carbon\Carbon::parse($class['original_date'])->format('M j') }}
+                                    @endif
                                 </p>
                             </div>
                             @if(isset($class['class_link']) && $class['class_link'])
-                                <a href="{{ $class['class_link'] }}" target="_blank" class="px-4 py-2 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+                                <a href="{{ $class['class_link'] }}" target="_blank" class="px-4 py-2 text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 {{ $isRescheduled ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 'bg-gradient-to-r from-[#4B49AC] to-[#7978E9]' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                     </svg>

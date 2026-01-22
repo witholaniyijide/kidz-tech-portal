@@ -122,45 +122,95 @@
                     </span>
                 </div>
 
-                @if($todaySchedule && $todaySchedule->classes && count($todaySchedule->classes) > 0)
+                @if($todaySchedule && (($todaySchedule->classes && count($todaySchedule->classes) > 0) || ($todaySchedule->rescheduled_classes && count($todaySchedule->rescheduled_classes) > 0)))
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-80 overflow-y-auto">
-                        @foreach($todaySchedule->classes as $class)
-                            <div class="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 dark:border-gray-600/30 cursor-pointer hover:bg-white/70 dark:hover:bg-gray-700/70 transition-colors"
-                                 @click="openModal({
-                                     time: '{{ $class['time'] ?? 'TBD' }}',
-                                     student: '{{ $class['student_name'] ?? 'Student' }}',
-                                     tutor: '{{ $class['tutor_name'] ?? 'Assigned' }}',
-                                     class_link: '{{ $class['class_link'] ?? '' }}'
-                                 })">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div class="bg-gradient-to-r from-[#C15F3C] to-[#DA7756] w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                        {{ strtoupper(substr($class['student_name'] ?? 'S', 0, 1)) }}
+                        {{-- Regular Classes --}}
+                        @if($todaySchedule->classes && count($todaySchedule->classes) > 0)
+                            @foreach($todaySchedule->classes as $class)
+                                <div class="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 dark:border-gray-600/30 cursor-pointer hover:bg-white/70 dark:hover:bg-gray-700/70 transition-colors"
+                                     @click="openModal({
+                                         time: '{{ $class['time'] ?? 'TBD' }}',
+                                         student: '{{ $class['student_name'] ?? 'Student' }}',
+                                         tutor: '{{ $class['tutor_name'] ?? 'Assigned' }}',
+                                         class_link: '{{ $class['class_link'] ?? '' }}'
+                                     })">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="bg-gradient-to-r from-[#C15F3C] to-[#DA7756] w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                            {{ strtoupper(substr($class['student_name'] ?? 'S', 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-gray-900 dark:text-white">{{ $class['student_name'] ?? 'Student' }}</p>
+                                            @php
+                                                try {
+                                                    $formattedTime = \Carbon\Carbon::parse($class['time'])->format('g:i A');
+                                                } catch (\Exception $e) {
+                                                    $formattedTime = $class['time'] ?? 'TBD';
+                                                }
+                                            @endphp
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $formattedTime }}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-900 dark:text-white">{{ $class['student_name'] ?? 'Student' }}</p>
-                                        @php
-                                            try {
-                                                $formattedTime = \Carbon\Carbon::parse($class['time'])->format('g:i A');
-                                            } catch (\Exception $e) {
-                                                $formattedTime = $class['time'] ?? 'TBD';
-                                            }
-                                        @endphp
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $formattedTime }}</p>
-                                    </div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        <span class="font-medium">Tutor:</span> {{ $class['tutor_name'] ?? 'Assigned' }}
+                                    </p>
+                                    @if(isset($class['class_link']) && $class['class_link'])
+                                        <span class="inline-flex items-center mt-2 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/>
+                                            </svg>
+                                            Has Link
+                                        </span>
+                                    @endif
                                 </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    <span class="font-medium">Tutor:</span> {{ $class['tutor_name'] ?? 'Assigned' }}
-                                </p>
-                                @if(isset($class['class_link']) && $class['class_link'])
-                                    <span class="inline-flex items-center mt-2 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                            @endforeach
+                        @endif
+
+                        {{-- Rescheduled Classes --}}
+                        @if($todaySchedule->rescheduled_classes && count($todaySchedule->rescheduled_classes) > 0)
+                            @foreach($todaySchedule->rescheduled_classes as $class)
+                                <div class="bg-amber-50/70 dark:bg-amber-900/20 backdrop-blur-sm rounded-xl p-4 border-2 border-amber-300 dark:border-amber-700/50 cursor-pointer hover:bg-amber-100/70 dark:hover:bg-amber-900/30 transition-colors"
+                                     @click="openModal({
+                                         time: '{{ $class['time'] ?? 'TBD' }}',
+                                         student: '{{ $class['student_name'] ?? 'Student' }}',
+                                         tutor: '{{ $class['tutor_name'] ?? 'Assigned' }}',
+                                         class_link: '{{ $class['class_link'] ?? '' }}'
+                                     })">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="bg-gradient-to-r from-amber-500 to-orange-500 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                            {{ strtoupper(substr($class['student_name'] ?? 'S', 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-gray-900 dark:text-white">{{ $class['student_name'] ?? 'Student' }}</p>
+                                            @php
+                                                try {
+                                                    $formattedTime = \Carbon\Carbon::parse($class['time'])->format('g:i A');
+                                                } catch (\Exception $e) {
+                                                    $formattedTime = $class['time'] ?? 'TBD';
+                                                }
+                                            @endphp
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $formattedTime }}</p>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center text-xs px-2 py-1 rounded-full bg-amber-200 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 font-medium mb-2">
                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                                         </svg>
-                                        Has Link
+                                        Rescheduled from {{ isset($class['original_date']) ? \Carbon\Carbon::parse($class['original_date'])->format('M j') : 'earlier' }}
                                     </span>
-                                @endif
-                            </div>
-                        @endforeach
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        <span class="font-medium">Tutor:</span> {{ $class['tutor_name'] ?? 'Assigned' }}
+                                    </p>
+                                    @if(isset($class['class_link']) && $class['class_link'])
+                                        <span class="inline-flex items-center mt-2 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/>
+                                            </svg>
+                                            Has Link
+                                        </span>
+                                    @endif
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
                 @else
                     <div class="text-center py-12">
