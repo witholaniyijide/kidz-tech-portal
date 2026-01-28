@@ -177,7 +177,7 @@
                             </x-slot>
 
                             <x-slot name="content">
-                                <div class="w-80 md:w-96 max-h-96 overflow-y-auto">
+                                <div class="w-80 md:w-96 max-h-[70vh] md:max-h-[32rem] overflow-y-auto">
                                     <div class="px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 sticky top-0 flex items-center justify-between">
                                         <span>Notifications</span>
                                         @if($unreadCount > 0)

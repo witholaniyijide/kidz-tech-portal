@@ -403,29 +403,27 @@
                             class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
                             aria-label="New task input"
                         >
-                        <div class="flex flex-col sm:flex-row gap-2">
-                            <input
-                                type="date"
-                                x-model="newDate"
-                                class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
-                                aria-label="Task date"
-                            >
-                            <input
-                                type="time"
-                                x-model="newTime"
-                                class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
-                                aria-label="Task time"
-                            >
-                            <button
-                                type="submit"
-                                class="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5] focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
-                                aria-label="Add task"
-                            >
-                                <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                </svg>
-                            </button>
-                        </div>
+                        <input
+                            type="date"
+                            x-model="newDate"
+                            class="w-full px-4 py-2.5 text-sm text-gray-900 bg-white border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
+                            aria-label="Task date"
+                        >
+                        <input
+                            type="time"
+                            x-model="newTime"
+                            class="w-full px-4 py-2.5 text-sm text-gray-900 bg-white border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
+                            aria-label="Task time"
+                        >
+                        <button
+                            type="submit"
+                            class="w-full px-5 py-2.5 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5] focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
+                            aria-label="Add task"
+                        >
+                            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
                     </form>
 
                     <div class="p-3 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 border border-indigo-200 dark:border-indigo-700">

@@ -185,18 +185,16 @@
                             {{-- Tasks will be loaded by JavaScript --}}
                         </div>
 
-                        <div class="pt-4 border-t border-white/10">
-                            <input type="text" id="newTaskInput" placeholder="Add a new task..." class="w-full px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 mb-2">
-                            <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="date" id="newTaskDate" class="flex-1 px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500" aria-label="Task date">
-                                <input type="time" id="newTaskTime" class="flex-1 px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500" aria-label="Task time">
-                                <button id="addTaskBtn" class="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md">
-                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Tasks are saved automatically in your browser</p>
+                        <div class="pt-4 border-t border-white/10 space-y-2">
+                            <input type="text" id="newTaskInput" placeholder="Add a new task..." class="w-full px-4 py-2 bg-white dark:bg-gray-800/30 border border-gray-200 dark:border-white/10 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                            <input type="date" id="newTaskDate" class="w-full px-4 py-2 bg-white dark:bg-gray-800/30 border border-gray-200 dark:border-white/10 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500" aria-label="Task date">
+                            <input type="time" id="newTaskTime" class="w-full px-4 py-2 bg-white dark:bg-gray-800/30 border border-gray-200 dark:border-white/10 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500" aria-label="Task time">
+                            <button id="addTaskBtn" class="w-full px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md">
+                                <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 pt-1">Tasks are saved automatically in your browser</p>
                         </div>
                     </div>
 
