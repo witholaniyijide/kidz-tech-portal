@@ -59,11 +59,11 @@
                             <img
                                 src="{{ $student['avatar'] }}"
                                 alt="{{ $student['name'] ?? '' }}"
-                                class="h-10 w-10 rounded-full object-cover"
+                                class="h-10 w-10 flex-shrink-0 rounded-full object-cover"
                                 loading="lazy"
                             >
                             @else
-                            <div class="h-10 w-10 rounded-full {{ $student['avatarGradient'] ?? 'bg-gradient-to-br from-blue-500 to-[#00CCCD]' }} flex items-center justify-center text-white font-semibold text-sm shadow-md" aria-label="Avatar for {{ $student['name'] ?? '' }}">
+                            <div class="h-10 w-10 flex-shrink-0 rounded-full {{ $student['avatarGradient'] ?? 'bg-gradient-to-br from-blue-500 to-[#00CCCD]' }} flex items-center justify-center text-white font-semibold text-sm shadow-md" aria-label="Avatar for {{ $student['name'] ?? '' }}">
                                 {{ $student['initials'] ?? 'NA' }}
                             </div>
                             @endif

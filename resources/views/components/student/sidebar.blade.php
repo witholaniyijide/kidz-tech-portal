@@ -33,8 +33,8 @@
     }
 }"
 x-init="applyDarkMode()"
-:class="collapsed ? 'w-20' : 'w-64'"
-class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col transition-all duration-300 z-50 shadow-xl border-r border-gray-200 dark:border-slate-700">
+:class="collapsed ? 'md:w-20' : 'md:w-64'"
+class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 flex flex-col transition-all duration-300 z-50 shadow-xl border-r border-gray-200 dark:border-slate-700">
 
     {{-- Logo Section with Toggle --}}
     <div class="p-4 border-b border-gray-200 dark:border-slate-700">

@@ -150,8 +150,8 @@
                     collapsed = localStorage.getItem('studentSidebarCollapsed') === 'true';
                 });
              "
-             :class="collapsed ? 'ml-20' : 'ml-64'"
-             class="flex-1 flex flex-col overflow-hidden transition-all duration-300">
+             :class="collapsed ? 'md:ml-20' : 'md:ml-64'"
+             class="flex-1 flex flex-col overflow-hidden transition-all duration-300 w-full">
 
             <!-- Top Bar -->
             <header class="sticky top-0 z-40 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">

@@ -110,6 +110,63 @@
                 </div>
             </x-ui.glass-card>
 
+            {{-- To-Do List --}}
+            <x-ui.glass-card padding="p-6" class="mb-8">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                        Today's To-Do List
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Keep track of your daily tasks</p>
+                </div>
+
+                <div id="tutorTodoList" class="space-y-3 mb-6 max-h-64 overflow-y-auto"></div>
+
+                <form id="tutorTodoForm" class="space-y-3 mb-4">
+                    <input
+                        type="text"
+                        id="tutorNewTodo"
+                        placeholder="Add a new task..."
+                        class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-purple-600 dark:bg-slate-800 dark:text-white"
+                        aria-label="New task input"
+                    >
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input
+                            type="date"
+                            id="tutorNewDate"
+                            class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-purple-600 dark:bg-slate-800 dark:text-white"
+                            aria-label="Task date"
+                        >
+                        <input
+                            type="time"
+                            id="tutorNewTime"
+                            class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-purple-600 dark:bg-slate-800 dark:text-white"
+                            aria-label="Task time"
+                        >
+                        <button
+                            type="submit"
+                            class="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
+                            aria-label="Add task"
+                        >
+                            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="p-3 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border border-purple-200 dark:border-purple-700">
+                    <p class="text-xs text-gray-700 dark:text-gray-300 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-purple-600 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Tasks are saved automatically in your browser
+                    </p>
+                </div>
+            </x-ui.glass-card>
+
             {{-- Two-Column Grid: Recent Reports & My Students --}}
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
@@ -170,6 +227,134 @@
 
         </div>
     </div>
+
+    {{-- Tutor To-Do JavaScript --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const todoList = document.getElementById('tutorTodoList');
+            const todoForm = document.getElementById('tutorTodoForm');
+            const newTodoInput = document.getElementById('tutorNewTodo');
+            const newDateInput = document.getElementById('tutorNewDate');
+            const newTimeInput = document.getElementById('tutorNewTime');
+
+            const defaultTasks = [
+                'Prepare today\'s class materials',
+                'Review student progress reports',
+                'Submit attendance records',
+                'Follow up with struggling students'
+            ];
+
+            function formatDateTime(date, time) {
+                if (!date) return '';
+                const d = new Date(date);
+                const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                return time ? `${dateStr} at ${time}` : dateStr;
+            }
+
+            function loadTasks() {
+                const saved = localStorage.getItem('tutor_todos');
+                if (saved) {
+                    try { return JSON.parse(saved); } catch(e) {}
+                }
+                const tasks = defaultTasks.map((text, i) => ({
+                    id: Date.now() + i,
+                    text: text,
+                    date: null,
+                    time: null,
+                    completed: false
+                }));
+                saveTasks(tasks);
+                return tasks;
+            }
+
+            function saveTasks(tasks) {
+                localStorage.setItem('tutor_todos', JSON.stringify(tasks));
+            }
+
+            function renderTasks() {
+                const tasks = loadTasks();
+                todoList.innerHTML = '';
+
+                if (tasks.length === 0) {
+                    todoList.innerHTML = `
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center opacity-50">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                            </div>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">No tasks yet. Add one below!</p>
+                        </div>`;
+                    return;
+                }
+
+                tasks.forEach(task => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-start p-3 rounded-lg bg-white dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 group';
+
+                    const dateDisplay = task.date
+                        ? `<div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">${formatDateTime(task.date, task.time)}</div>`
+                        : '';
+
+                    div.innerHTML = `
+                        <input type="checkbox" ${task.completed ? 'checked' : ''}
+                            data-id="${task.id}"
+                            class="task-cb mt-0.5 w-5 h-5 text-purple-600 border-gray-300 dark:border-gray-600 rounded focus:ring-purple-600 focus:ring-2 cursor-pointer">
+                        <div class="flex-1 ml-3 cursor-pointer" onclick="this.previousElementSibling.click()">
+                            <div class="text-gray-800 dark:text-gray-200 text-sm ${task.completed ? 'line-through opacity-50' : ''}">${task.text}</div>
+                            ${dateDisplay}
+                        </div>
+                        <button class="task-remove opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 transition-opacity p-1" data-id="${task.id}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>`;
+
+                    todoList.appendChild(div);
+                });
+
+                document.querySelectorAll('.task-cb').forEach(cb => {
+                    cb.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        const tasks = loadTasks();
+                        const task = tasks.find(t => t.id === id);
+                        if (task) { task.completed = this.checked; saveTasks(tasks); renderTasks(); }
+                    });
+                });
+
+                document.querySelectorAll('.task-remove').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const id = parseInt(this.dataset.id);
+                        saveTasks(loadTasks().filter(t => t.id !== id));
+                        renderTasks();
+                    });
+                });
+            }
+
+            todoForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const text = newTodoInput.value.trim();
+                if (text) {
+                    const tasks = loadTasks();
+                    tasks.push({
+                        id: Date.now(),
+                        text: text,
+                        date: newDateInput.value || null,
+                        time: newTimeInput.value || null,
+                        completed: false
+                    });
+                    saveTasks(tasks);
+                    newTodoInput.value = '';
+                    newDateInput.value = '';
+                    newTimeInput.value = '';
+                    renderTasks();
+                }
+            });
+
+            renderTasks();
+        });
+    </script>
 
     {{-- Custom Animations --}}
     <style>

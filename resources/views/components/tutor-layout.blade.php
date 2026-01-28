@@ -79,7 +79,7 @@
              :class="collapsed ? 'md:ml-20' : 'md:ml-64'"
              class="flex-1 flex flex-col overflow-hidden transition-all duration-300 w-full">
 
-            <header class="sticky top-0 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
+            <header class="sticky top-0 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 safe-area-top">
                 <div class="flex items-center justify-between h-14 md:h-16 px-3 md:px-6">
                     <div class="flex items-center gap-3 flex-1 min-w-0">
                         <!-- Hamburger Menu Button (Mobile Only) -->
@@ -203,9 +203,9 @@
             <main class="flex-1 overflow-y-auto relative">
                 <div class="absolute top-0 left-0 w-72 h-72 bg-indigo-200 dark:bg-indigo-900/50 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-60 animate-float pointer-events-none"></div>
                 <div class="absolute top-0 right-0 w-72 h-72 bg-purple-200 dark:bg-purple-900/50 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-xl opacity-60 animate-float pointer-events-none" style="animation-delay: 2s;"></div>
-                <div class="relative z-10 p-6">{{ $slot }}</div>
-                <footer class="relative z-10 py-4 px-6 border-t border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
-                    <div class="text-center text-sm text-gray-500 dark:text-gray-400">&copy; {{ date('Y') }} Kidz Tech Coding Club</div>
+                <div class="relative z-10 p-4 md:p-6">{{ $slot }}</div>
+                <footer class="relative z-10 py-4 px-4 md:px-6 border-t border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm safe-area-bottom">
+                    <div class="text-center text-xs md:text-sm text-gray-500 dark:text-gray-400">&copy; {{ date('Y') }} With <span class="text-red-500">&hearts;</span> Kidz Tech Coding Club. All rights reserved.</div>
                 </footer>
             </main>
         </div>

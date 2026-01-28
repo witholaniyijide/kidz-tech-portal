@@ -232,6 +232,13 @@
         }
     </script>
 
+    <!-- Alpine Store for Mobile Menu -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('mobileMenu', { open: false });
+        });
+    </script>
+
     @stack('styles')
 </head>
 <body class="h-full font-sans antialiased">
@@ -245,17 +252,37 @@
         <!-- Sidebar -->
         <x-manager.sidebar />
 
+        <!-- Mobile Overlay -->
+        <div x-show="$store.mobileMenu.open"
+             x-cloak
+             @click="$store.mobileMenu.open = false"
+             x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-linear duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 md:hidden"></div>
+
         <!-- Main Content Area -->
-        <div :class="collapsed ? 'ml-20' : 'ml-64'"
-             class="flex-1 flex flex-col overflow-hidden transition-all duration-300">
+        <div :class="collapsed ? 'md:ml-20' : 'md:ml-64'"
+             class="flex-1 flex flex-col overflow-hidden transition-all duration-300 w-full">
 
             <!-- Top Bar -->
             <header class="sticky top-0 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 safe-area-top">
-                <div class="flex items-center justify-between h-14 md:h-16 px-4 md:px-6">
-                    <!-- Left: Title -->
-                    <div class="flex items-center gap-3">
+                <div class="flex items-center justify-between h-14 md:h-16 px-3 md:px-6">
+                    <!-- Left: Hamburger + Title -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <!-- Hamburger Menu Button (Mobile Only) -->
+                        <button @click="$store.mobileMenu.open = !$store.mobileMenu.open"
+                                class="md:hidden p-2 -ml-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
+
                         <!-- Page Title -->
-                        <div class="min-w-0">
+                        <div class="min-w-0 flex-1">
                             @if (isset($header))
                                 <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white truncate">{{ $header }}</h1>
                             @elseif (isset($title))

@@ -121,7 +121,7 @@
             class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#423A8E] focus:border-[#423A8E] dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-[#423A8E]"
             aria-label="New task input"
         >
-        <div class="flex gap-2">
+        <div class="flex flex-col sm:flex-row gap-2">
             <input
                 type="date"
                 x-model="newDate"
@@ -136,10 +136,10 @@
             >
             <button
                 type="submit"
-                class="px-5 py-2.5 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#423A8E] focus-visible:ring-2 focus-visible:ring-[#423A8E]"
+                class="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#423A8E] focus-visible:ring-2 focus-visible:ring-[#423A8E]"
                 aria-label="Add task"
             >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
             </button>

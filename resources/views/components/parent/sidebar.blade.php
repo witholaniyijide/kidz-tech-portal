@@ -3,50 +3,66 @@
 {{-- Parent Portal Theme: #F5A623 (Primary Orange/Amber) --}}
 <aside x-data="{
     collapsed: localStorage.getItem('parentSidebarCollapsed') === 'true',
-    darkMode: localStorage.getItem('darkMode') === 'true',
+    darkMode: localStorage.getItem('darkMode') !== null ? localStorage.getItem('darkMode') === 'true' : window.matchMedia('(prefers-color-scheme: dark)').matches,
     toggleCollapse() {
         this.collapsed = !this.collapsed;
         localStorage.setItem('parentSidebarCollapsed', this.collapsed);
         window.dispatchEvent(new Event('parent-sidebar-toggled'));
     },
     toggleDarkMode() {
+        document.documentElement.classList.add('theme-transitioning');
         this.darkMode = !this.darkMode;
         localStorage.setItem('darkMode', this.darkMode);
+        this.applyDarkMode();
+        setTimeout(() => {
+            document.documentElement.classList.remove('theme-transitioning');
+        }, 400);
+    },
+    applyDarkMode() {
         if (this.darkMode) {
             document.documentElement.classList.add('dark');
+            document.body.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
+            document.body.classList.remove('dark');
         }
     }
 }"
-:class="collapsed ? 'w-20' : 'w-64'"
-class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col transition-all duration-300 z-50 shadow-xl border-r border-gray-200 dark:border-slate-700">
+x-init="applyDarkMode()"
+x-show="$store.mobileMenu.open || window.innerWidth >= 768"
+x-cloak
+x-transition:enter="transition ease-out duration-300 transform md:transition-none"
+x-transition:enter-start="-translate-x-full md:translate-x-0"
+x-transition:enter-end="translate-x-0"
+x-transition:leave="transition ease-in duration-200 transform md:transition-none"
+x-transition:leave-start="translate-x-0 md:translate-x-0"
+x-transition:leave-end="-translate-x-full md:translate-x-0"
+:class="collapsed ? 'md:w-20' : 'md:w-64'"
+class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 flex flex-col transition-all duration-300 z-50 shadow-xl border-r border-gray-200 dark:border-slate-700">
 
-    {{-- Logo Section --}}
-    <div class="p-4 border-b border-gray-200 dark:border-slate-700">
-        <div class="flex items-center" :class="collapsed ? 'justify-center' : 'justify-between'">
-            <a href="{{ route('parent.dashboard') }}" class="flex-shrink-0 flex items-center justify-center">
-                <img x-cloak x-show="!darkMode" src="{{ asset('images/logo_light.png') }}" alt="KidzTech Logo"
-                     :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
-                     class="object-contain transition-all duration-300" onerror="this.style.display='none'">
-                <img x-cloak x-show="darkMode" src="{{ asset('images/logo_dark.png') }}" alt="KidzTech Logo"
-                     :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
-                     class="object-contain transition-all duration-300" onerror="this.style.display='none'">
-                {{-- Fallback logo that shows immediately, hides once Alpine initializes --}}
-                <img x-data x-init="$el.remove()" src="{{ asset('images/logo_light.png') }}" alt="KidzTech Logo"
-                     class="w-16 h-16 object-contain" onerror="this.style.display='none'">
+    {{-- Logo Section with Toggle --}}
+    <div class="p-4 border-b border-gray-200 dark:border-slate-700 safe-area-top">
+        <div class="flex items-center justify-between">
+            {{-- Logo --}}
+            <a href="{{ route('parent.dashboard') }}" class="flex-shrink-0 flex items-center justify-center" x-cloak>
+                {{-- Light Mode Logo --}}
+                <img x-show="!darkMode"
+                     src="{{ asset('images/logo_light.png') }}"
+                     alt="KidzTech Logo"
+                     class="w-12 h-12 md:w-14 md:h-14 object-contain transition-all duration-300"
+                     onerror="this.style.display='none'">
+                {{-- Dark Mode Logo --}}
+                <img x-show="darkMode"
+                     src="{{ asset('images/logo_dark.png') }}"
+                     alt="KidzTech Logo"
+                     class="w-12 h-12 md:w-14 md:h-14 object-contain transition-all duration-300"
+                     onerror="this.style.display='none'">
             </a>
-            <button @click="toggleCollapse()" x-show="!collapsed || window.innerWidth < 768"
+            {{-- Collapse Toggle --}}
+            <button @click="toggleCollapse()"
                     class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 transition-transform duration-300" :class="collapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-                </svg>
-            </button>
-        </div>
-        <div x-show="collapsed" class="flex justify-center mt-2">
-            <button @click="toggleCollapse()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
                 </svg>
             </button>
         </div>
