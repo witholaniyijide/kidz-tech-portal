@@ -111,15 +111,19 @@
                         </div>
 
                         <div x-data="{ notifOpen: false }" class="relative">
-                            <button @click="notifOpen = !notifOpen" class="relative p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <button @click="notifOpen = !notifOpen" class="relative p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target">
                                 <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                 </svg>
                                 @php
-                                    $tutorUnreadCount = \App\Models\TutorNotification::where('tutor_id', Auth::user()->tutor?->id)->where('is_read', false)->count();
+                                    try {
+                                        $tutorUnreadCount = \App\Models\TutorNotification::where('tutor_id', Auth::user()->tutor?->id)->where('is_read', false)->count();
+                                    } catch (\Exception $e) {
+                                        $tutorUnreadCount = 0;
+                                    }
                                 @endphp
                                 @if($tutorUnreadCount > 0)
-                                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                                    <span class="absolute top-0 right-0 w-4 h-4 md:w-5 md:h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
                                         {{ $tutorUnreadCount > 9 ? '9+' : $tutorUnreadCount }}
                                     </span>
                                 @endif
@@ -127,14 +131,14 @@
 
                             {{-- Notifications Dropdown --}}
                             <div x-show="notifOpen" x-cloak @click.away="notifOpen = false" x-transition
-                                 class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
-                                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 flex justify-between items-center">
-                                    <span class="font-semibold text-gray-900 dark:text-white">Notifications</span>
+                                 class="absolute right-0 mt-2 w-[calc(100vw-1.5rem)] sm:w-80 md:w-96 max-h-[70vh] md:max-h-[32rem] bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+                                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 flex justify-between items-center sticky top-0">
+                                    <span class="font-semibold text-gray-900 dark:text-white text-sm">Notifications</span>
                                     @if($tutorUnreadCount > 0)
                                         <span class="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">{{ $tutorUnreadCount }} new</span>
                                     @endif
                                 </div>
-                                <div class="max-h-80 overflow-y-auto">
+                                <div class="overflow-y-auto max-h-[calc(70vh-3rem)] md:max-h-[calc(32rem-3rem)]">
                                     @php
                                         $recentNotifications = \App\Models\TutorNotification::where('tutor_id', Auth::user()->tutor?->id)
                                             ->orderBy('created_at', 'desc')

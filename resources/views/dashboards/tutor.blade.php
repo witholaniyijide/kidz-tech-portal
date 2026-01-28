@@ -129,32 +129,30 @@
                         type="text"
                         id="tutorNewTodo"
                         placeholder="Add a new task..."
-                        class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-purple-600 dark:bg-slate-800 dark:text-white"
+                        class="w-full px-4 py-2.5 text-sm text-gray-900 bg-white border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
                         aria-label="New task input"
                     >
-                    <div class="flex flex-col sm:flex-row gap-2">
-                        <input
-                            type="date"
-                            id="tutorNewDate"
-                            class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-purple-600 dark:bg-slate-800 dark:text-white"
-                            aria-label="Task date"
-                        >
-                        <input
-                            type="time"
-                            id="tutorNewTime"
-                            class="flex-1 px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-purple-600 dark:bg-slate-800 dark:text-white"
-                            aria-label="Task time"
-                        >
-                        <button
-                            type="submit"
-                            class="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
-                            aria-label="Add task"
-                        >
-                            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                        </button>
-                    </div>
+                    <input
+                        type="date"
+                        id="tutorNewDate"
+                        class="w-full px-4 py-2.5 text-sm text-gray-900 bg-white border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
+                        aria-label="Task date"
+                    >
+                    <input
+                        type="time"
+                        id="tutorNewTime"
+                        class="w-full px-4 py-2.5 text-sm text-gray-900 bg-white border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
+                        aria-label="Task time"
+                    >
+                    <button
+                        type="submit"
+                        class="w-full px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
+                        aria-label="Add task"
+                    >
+                        <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
                 </form>
 
                 <div class="p-3 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border border-purple-200 dark:border-purple-700">

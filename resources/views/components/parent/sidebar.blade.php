@@ -58,11 +58,28 @@ class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 flex flex-col
                      class="w-12 h-12 md:w-14 md:h-14 object-contain transition-all duration-300"
                      onerror="this.style.display='none'">
             </a>
-            {{-- Collapse Toggle --}}
+            {{-- Close button for mobile --}}
+            <button @click="$store.mobileMenu.open = false"
+                    class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            {{-- Toggle Button (desktop only, only when expanded) --}}
             <button @click="toggleCollapse()"
-                    class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400">
-                <svg class="w-5 h-5 transition-transform duration-300" :class="collapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    x-show="!collapsed"
+                    class="hidden md:block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                </svg>
+            </button>
+        </div>
+        {{-- Expand button (centered below logo when collapsed) - desktop only --}}
+        <div x-show="collapsed" class="hidden md:flex justify-center mt-2">
+            <button @click="toggleCollapse()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
                 </svg>
             </button>
         </div>
