@@ -1,5 +1,5 @@
 // KidzTech Portal Service Worker
-const CACHE_NAME = 'kidztech-cache-v1';
+const CACHE_NAME = 'kidztech-cache-v2';
 const urlsToCache = [
     '/',
     '/css/app.css',
