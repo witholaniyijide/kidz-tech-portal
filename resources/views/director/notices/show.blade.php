@@ -5,7 +5,7 @@
     <x-slot name="title">{{ $notice->title }}</x-slot>
 
     <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Action Buttons -->
             <div class="flex justify-end space-x-3 mb-4">
                 <a href="{{ route('director.notices.edit', $notice) }}" class="inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg transition-all">

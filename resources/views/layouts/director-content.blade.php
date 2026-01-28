@@ -266,7 +266,7 @@
                 </header>
 
                 <!-- Page Content -->
-                <main class="flex-1">
+                <main class="flex-1 p-4 md:p-0">
                     {{ $slot }}
                 </main>
 
