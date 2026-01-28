@@ -1,13 +1,21 @@
-<nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+<nav x-data="{ mobileMenuOpen: false }" class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div class="flex justify-between h-14 md:h-16">
             <!-- Logo & Brand -->
-            <div class="flex items-center">
-                <a href="{{ route('parent.dashboard') }}" class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-parent-gradient rounded-xl flex items-center justify-center shadow-lg">
-                        <span class="text-white font-heading font-bold text-lg">K</span>
+            <div class="flex items-center gap-2 md:gap-0">
+                <!-- Hamburger Button (Mobile Only) -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen"
+                        class="md:hidden p-2 -ml-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+
+                <a href="{{ route('parent.dashboard') }}" class="flex items-center space-x-2 md:space-x-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-parent-gradient rounded-xl flex items-center justify-center shadow-lg">
+                        <span class="text-white font-heading font-bold text-base md:text-lg">K</span>
                     </div>
-                    <span class="font-heading font-bold text-lg text-gray-800 dark:text-white hidden sm:block">
+                    <span class="font-heading font-bold text-base md:text-lg text-gray-800 dark:text-white hidden sm:block">
                         Kidz Tech Portal
                     </span>
                 </a>
@@ -73,10 +81,10 @@
             </div>
 
             <!-- Right Section: Notifications & Profile -->
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center gap-2 md:gap-3">
                 <!-- Notifications -->
                 <a href="{{ route('parent.notifications.index') }}" class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
                     @php
@@ -92,25 +100,25 @@
                 <!-- Dark Mode Toggle -->
                 <button type="button"
                         onclick="toggleDarkMode()"
-                        class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
-                    <svg class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="hidden md:block p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
-                    <svg class="w-6 h-6 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                     </svg>
                 </button>
 
                 <!-- Profile Dropdown -->
                 <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" class="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                        <div class="w-8 h-8 bg-parent-gradient rounded-full flex items-center justify-center text-white font-semibold">
+                    <button @click="open = !open" class="flex items-center gap-1 md:gap-2 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <div class="w-7 h-7 md:w-8 md:h-8 bg-parent-gradient rounded-full flex items-center justify-center text-white text-xs md:text-sm font-semibold">
                             {{ substr(auth()->user()->name, 0, 1) }}
                         </div>
-                        <span class="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <span class="hidden sm:block text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300">
                             {{ auth()->user()->name }}
                         </span>
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3 h-3 md:w-4 md:h-4 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
@@ -148,21 +156,52 @@
                         </form>
                     </div>
                 </div>
-
-                <!-- Mobile Menu Button -->
-                <button type="button"
-                        class="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
-                        onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
             </div>
         </div>
     </div>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+    <!-- Mobile Overlay -->
+    <div x-show="mobileMenuOpen"
+         x-cloak
+         @click="mobileMenuOpen = false"
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 md:hidden"></div>
+
+    <!-- Mobile Menu Sidebar -->
+    <div x-show="mobileMenuOpen"
+         x-cloak
+         x-transition:enter="transition ease-out duration-300 transform"
+         x-transition:enter-start="-translate-x-full"
+         x-transition:enter-end="translate-x-0"
+         x-transition:leave="transition ease-in duration-200 transform"
+         x-transition:leave-start="translate-x-0"
+         x-transition:leave-end="-translate-x-full"
+         class="fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-800 z-50 md:hidden shadow-xl">
+
+        <!-- Mobile Menu Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-parent-gradient rounded-xl flex items-center justify-center shadow-lg">
+                    <span class="text-white font-heading font-bold text-sm">K</span>
+                </div>
+                <span class="font-heading font-bold text-base text-gray-800 dark:text-white">
+                    Kidz Tech
+                </span>
+            </div>
+            <button @click="mobileMenuOpen = false" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-500 dark:text-gray-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Items -->
+        <div class="p-4 space-y-1 overflow-y-auto" style="max-height: calc(100vh - 80px);">
         <div class="px-4 py-3 space-y-1">
             <a href="{{ route('parent.dashboard') }}"
                class="flex items-center px-3 py-2 rounded-lg text-sm font-medium
@@ -235,6 +274,20 @@
                 </svg>
                 Settings
             </a>
+
+            <!-- Dark Mode Toggle (Mobile) -->
+            <button type="button"
+                    onclick="toggleDarkMode()"
+                    class="flex items-center w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                <svg class="w-5 h-5 mr-3 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                <svg class="w-5 h-5 mr-3 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+                <span class="hidden dark:block">Light Mode</span>
+                <span class="block dark:hidden">Dark Mode</span>
+            </button>
         </div>
     </div>
 </nav>

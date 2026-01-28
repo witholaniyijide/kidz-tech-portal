@@ -29,42 +29,56 @@
     }
 }"
 x-init="applyDarkMode()"
-:class="collapsed ? 'w-20' : 'w-64'"
-class="fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 flex flex-col transition-all duration-300 z-50 shadow-xl border-r border-gray-200 dark:border-slate-700">
+x-show="$parent.mobileMenuOpen || window.innerWidth >= 768"
+x-cloak
+x-transition:enter="transition ease-out duration-300 transform md:transition-none"
+x-transition:enter-start="-translate-x-full md:translate-x-0"
+x-transition:enter-end="translate-x-0"
+x-transition:leave="transition ease-in duration-200 transform md:transition-none"
+x-transition:leave-start="translate-x-0 md:translate-x-0"
+x-transition:leave-end="-translate-x-full md:translate-x-0"
+:class="collapsed ? 'md:w-20' : 'md:w-64'"
+class="fixed left-0 top-0 h-screen w-64 md:w-auto bg-white dark:bg-slate-900 flex flex-col transition-all duration-300 z-50 shadow-xl border-r border-gray-200 dark:border-slate-700">
 
     {{-- Logo Section with Toggle --}}
     <div class="p-4 border-b border-gray-200 dark:border-slate-700 safe-area-top">
-        <div class="flex items-center" :class="collapsed ? 'justify-center' : 'justify-between'">
+        <div class="flex items-center justify-between">
             {{-- Logo --}}
             <a href="{{ route('admin.dashboard') }}" class="flex-shrink-0 flex items-center justify-center" x-cloak>
                 {{-- Light Mode Logo --}}
                 <img x-show="!darkMode"
                      src="{{ asset('images/logo_light.png') }}"
                      alt="KidzTech Logo"
-                     :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
-                     class="object-contain transition-all duration-300"
+                     class="w-12 h-12 md:w-14 md:h-14 object-contain transition-all duration-300"
                      onerror="this.style.display='none'">
                 {{-- Dark Mode Logo --}}
                 <img x-show="darkMode"
                      src="{{ asset('images/logo_dark.png') }}"
                      alt="KidzTech Logo"
-                     :class="collapsed ? 'w-10 h-10' : 'w-16 h-16'"
-                     class="object-contain transition-all duration-300"
+                     class="w-12 h-12 md:w-14 md:h-14 object-contain transition-all duration-300"
                      onerror="this.style.display='none'">
             </a>
 
-            {{-- Toggle Button (only when expanded) --}}
+            {{-- Close button for mobile --}}
+            <button @click="$parent.mobileMenuOpen = false"
+                    class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            {{-- Toggle Button (desktop only, only when expanded) --}}
             <button @click="toggleCollapse()"
                     x-show="!collapsed"
-                    class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white"
+                    class="hidden md:block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white"
                     title="Collapse Sidebar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
                 </svg>
             </button>
         </div>
-        {{-- Expand button (centered below logo when collapsed) --}}
-        <div x-show="collapsed" class="flex justify-center mt-2">
+        {{-- Expand button (centered below logo when collapsed) - desktop only --}}
+        <div x-show="collapsed" class="hidden md:flex justify-center mt-2">
             <button @click="toggleCollapse()"
                     class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white"
                     title="Expand Sidebar">
