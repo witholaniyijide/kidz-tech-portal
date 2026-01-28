@@ -186,10 +186,12 @@
                         </div>
 
                         <div class="pt-4 border-t border-white/10">
-                            <div class="flex gap-2">
-                                <input type="text" id="newTaskInput" placeholder="Add a new task..." class="flex-1 px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                                <button id="addTaskBtn" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <input type="text" id="newTaskInput" placeholder="Add a new task..." class="w-full px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 mb-2">
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="date" id="newTaskDate" class="flex-1 px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500" aria-label="Task date">
+                                <input type="time" id="newTaskTime" class="flex-1 px-4 py-2 bg-white/30 dark:bg-gray-800/30 border border-white/10 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500" aria-label="Task time">
+                                <button id="addTaskBtn" class="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-sky-500 to-cyan-400 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md">
+                                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                     </svg>
                                 </button>
@@ -462,6 +464,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             const todoList = document.getElementById('todoList');
             const newTaskInput = document.getElementById('newTaskInput');
+            const newTaskDate = document.getElementById('newTaskDate');
+            const newTaskTime = document.getElementById('newTaskTime');
             const addTaskBtn = document.getElementById('addTaskBtn');
 
             // Default tasks
@@ -473,12 +477,22 @@
                 'View pending assessments'
             ];
 
+            // Format date and time for display
+            function formatDateTime(date, time) {
+                if (!date) return '';
+                const d = new Date(date);
+                const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                return time ? `${dateStr} at ${time}` : dateStr;
+            }
+
             // Load tasks from localStorage or use defaults
             function loadTasks() {
                 const savedTasks = localStorage.getItem('managerTodos');
                 return savedTasks ? JSON.parse(savedTasks) : defaultTasks.map((text, index) => ({
                     id: Date.now() + index,
                     text: text,
+                    date: null,
+                    time: null,
                     checked: false
                 }));
             }
@@ -494,17 +508,22 @@
                 todoList.innerHTML = '';
 
                 tasks.forEach(task => {
-                    const taskEl = document.createElement('label');
-                    taskEl.className = 'flex items-center gap-3 p-3 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-lg border border-white/10 hover:bg-white/40 dark:hover:bg-gray-800/40 transition-all cursor-pointer group';
+                    const taskEl = document.createElement('div');
+                    taskEl.className = 'flex items-start gap-3 p-3 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-lg border border-white/10 hover:bg-white/40 dark:hover:bg-gray-800/40 transition-all group';
+
+                    const dateDisplay = task.date ? `<div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">${formatDateTime(task.date, task.time)}</div>` : '';
 
                     taskEl.innerHTML = `
                         <input type="checkbox" ${task.checked ? 'checked' : ''}
                             data-id="${task.id}"
-                            class="task-checkbox w-5 h-5 text-sky-500 border-gray-300 rounded focus:ring-sky-500 focus:ring-2">
-                        <span class="text-gray-700 dark:text-gray-300 flex-1 ${task.checked ? 'line-through opacity-60' : ''}">${task.text}</span>
+                            class="task-checkbox mt-0.5 w-5 h-5 text-sky-500 border-gray-300 rounded focus:ring-sky-500 focus:ring-2 cursor-pointer">
+                        <div class="flex-1 cursor-pointer" onclick="this.previousElementSibling.click()">
+                            <div class="text-gray-700 dark:text-gray-300 text-sm ${task.checked ? 'line-through opacity-60' : ''}">${task.text}</div>
+                            ${dateDisplay}
+                        </div>
                         <button class="remove-task opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 p-1" data-id="${task.id}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
                     `;
@@ -552,10 +571,14 @@
                     tasks.push({
                         id: Date.now(),
                         text: taskText,
+                        date: newTaskDate.value || null,
+                        time: newTaskTime.value || null,
                         checked: false
                     });
                     saveTasks(tasks);
                     newTaskInput.value = '';
+                    newTaskDate.value = '';
+                    newTaskTime.value = '';
                     renderTasks();
                 }
             }

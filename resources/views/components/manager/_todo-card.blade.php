@@ -26,7 +26,7 @@
                 class="w-full px-4 py-2 rounded-xl bg-white/20 dark:bg-gray-900/30 border border-white/10 dark:border-gray-700/10 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
                 aria-label="New task input"
             />
-            <div class="flex gap-2">
+            <div class="flex flex-col sm:flex-row gap-2">
                 <input
                     type="date"
                     id="new-todo-date"
@@ -41,10 +41,10 @@
                 />
                 <button
                     id="add-todo-btn"
-                    class="px-4 py-2 rounded-xl bg-gradient-manager text-white font-medium hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+                    class="w-full sm:w-auto px-4 py-2 rounded-xl bg-gradient-manager text-white font-medium hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
                     aria-label="Add task"
                 >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                 </button>

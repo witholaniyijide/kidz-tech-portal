@@ -30,10 +30,10 @@ x-transition:leave-end="-translate-x-full md:translate-x-0"
 :class="collapsed ? 'md:w-20' : 'md:w-64'"
 class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 flex flex-col transition-all duration-300 z-50 shadow-xl border-r border-gray-200 dark:border-slate-700">
 
-    {{-- Logo Section --}}
-    <div class="p-4 border-b border-gray-200 dark:border-slate-700">
+    {{-- Logo Section with Toggle --}}
+    <div class="p-4 border-b border-gray-200 dark:border-slate-700 safe-area-top">
         <div class="flex items-center justify-between">
-            <a href="{{ route('tutor.dashboard') }}" class="flex-shrink-0 flex items-center justify-center">
+            <a href="{{ route('tutor.dashboard') }}" class="flex-shrink-0 flex items-center justify-center" x-cloak>
                 <img x-cloak x-show="!darkMode" src="{{ asset('images/logo_light.png') }}" alt="KidzTech Logo"
                      class="w-12 h-12 md:w-14 md:h-14 object-contain transition-all duration-300" onerror="this.style.display='none'">
                 <img x-cloak x-show="darkMode" src="{{ asset('images/logo_dark.png') }}" alt="KidzTech Logo"
