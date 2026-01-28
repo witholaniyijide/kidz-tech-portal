@@ -38,16 +38,22 @@
         </style>
 
         @stack('styles')
+        <!-- Alpine Store for Mobile Menu -->
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.store('mobileMenu', { open: false });
+            });
+        </script>
     </head>
     <body class="min-h-screen bg-gray-100 dark:bg-gray-900 font-sans antialiased">
         <!-- Flash Messages -->
         <x-ui.flash-messages />
 
-        <div class="flex min-h-screen" x-data="{ mobileMenuOpen: false }">
+        <div class="flex min-h-screen">
             <!-- Mobile Overlay -->
-            <div x-show="mobileMenuOpen"
+            <div x-show="$store.mobileMenu.open"
                  x-cloak
-                 @click="mobileMenuOpen = false"
+                 @click="$store.mobileMenu.open = false"
                  x-transition:enter="transition-opacity ease-linear duration-300"
                  x-transition:enter-start="opacity-0"
                  x-transition:enter-end="opacity-100"
@@ -75,7 +81,7 @@
                         <!-- Left Side: Hamburger + Page Title -->
                         <div class="flex items-center gap-3 flex-1 min-w-0">
                             <!-- Hamburger Menu Button (Mobile Only) -->
-                            <button @click="mobileMenuOpen = !mobileMenuOpen"
+                            <button @click="$store.mobileMenu.open = !$store.mobileMenu.open"
                                     class="md:hidden p-2 -ml-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>

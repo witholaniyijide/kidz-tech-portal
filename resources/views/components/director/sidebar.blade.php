@@ -29,7 +29,7 @@
     }
 }"
 x-init="applyDarkMode()"
-x-show="$parent.mobileMenuOpen || window.innerWidth >= 768"
+x-show="$store.mobileMenu.open || window.innerWidth >= 768"
 x-cloak
 x-transition:enter="transition ease-out duration-300 transform md:transition-none"
 x-transition:enter-start="-translate-x-full md:translate-x-0"
@@ -60,7 +60,7 @@ class="fixed left-0 top-0 h-screen w-64 md:w-auto bg-white dark:bg-slate-900 fle
             </a>
 
             {{-- Close button for mobile --}}
-            <button @click="$parent.mobileMenuOpen = false"
+            <button @click="$store.mobileMenu.open = false"
                     class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
