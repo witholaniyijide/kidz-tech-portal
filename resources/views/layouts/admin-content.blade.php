@@ -65,32 +65,52 @@
         <!-- Flash Messages -->
         <x-ui.flash-messages />
 
-        <div x-data="{ collapsed: localStorage.getItem('adminSidebarCollapsed') === 'true' }"
+        <div x-data="{ collapsed: localStorage.getItem('adminSidebarCollapsed') === 'true', mobileMenuOpen: false }"
              x-init="window.addEventListener('admin-sidebar-toggled', () => { collapsed = localStorage.getItem('adminSidebarCollapsed') === 'true'; })"
              class="flex min-h-screen">
 
             <!-- Admin Sidebar -->
             <x-admin.sidebar />
 
+            <!-- Mobile Overlay -->
+            <div x-show="mobileMenuOpen"
+                 x-cloak
+                 @click="mobileMenuOpen = false"
+                 x-transition:enter="transition-opacity ease-linear duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition-opacity ease-linear duration-300"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 md:hidden"></div>
+
             <!-- Main Content Area -->
-            <div :class="collapsed ? 'ml-20' : 'ml-64'"
-                 class="flex-1 flex flex-col min-h-screen transition-all duration-300">
+            <div :class="collapsed ? 'md:ml-20' : 'md:ml-64'"
+                 class="flex-1 flex flex-col min-h-screen transition-all duration-300 w-full">
 
                 <!-- Top Bar -->
                 <header class="sticky top-0 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 safe-area-top">
-                    <div class="flex items-center justify-between h-14 md:h-16 px-4 md:px-6">
-                        <!-- Left: Title -->
-                        <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-between h-14 md:h-16 px-3 md:px-6">
+                        <!-- Left: Hamburger + Title -->
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                            <!-- Hamburger Menu Button (Mobile Only) -->
+                            <button @click="mobileMenuOpen = !mobileMenuOpen"
+                                    class="md:hidden p-2 -ml-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                </svg>
+                            </button>
+
                             <!-- Page Title -->
-                            <div class="min-w-0">
+                            <div class="min-w-0 flex-1">
                                 @if (isset($header))
-                                    <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white truncate">{{ $header }}</h1>
+                                    <h1 class="text-base md:text-xl font-bold text-gray-900 dark:text-white truncate">{{ $header }}</h1>
                                 @elseif (isset($title))
-                                    <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white truncate">{{ $title }}</h1>
+                                    <h1 class="text-base md:text-xl font-bold text-gray-900 dark:text-white truncate">{{ $title }}</h1>
                                 @else
-                                    <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white">Admin Portal</h1>
+                                    <h1 class="text-base md:text-xl font-bold text-gray-900 dark:text-white truncate">Admin Portal</h1>
                                 @endif
-                                <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">{{ now()->format('l, F j, Y') }}</p>
+                                <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 hidden md:block">{{ now()->format('l, F j, Y') }}</p>
                             </div>
                         </div>
 
@@ -108,7 +128,7 @@
                             <!-- Notifications -->
                             <x-dropdown align="right" width="96">
                                 <x-slot name="trigger">
-                                    <button class="relative p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target">
+                                    <button class="relative p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                         <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                         </svg>
@@ -194,9 +214,9 @@
                             <div x-data="{ open: false }" class="relative">
                                 <button
                                     @click="open = !open"
-                                    class="flex items-center gap-2 md:gap-3 px-2 md:px-3 py-1.5 md:py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all touch-target"
+                                    class="flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 rounded-lg md:rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
                                 >
-                                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-[#423A8E] to-[#00CCCD] flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-[#423A8E] to-[#00CCCD] flex items-center justify-center text-white font-bold text-xs md:text-sm shadow-lg flex-shrink-0">
                                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                     </div>
                                     <div class="text-left hidden md:block">

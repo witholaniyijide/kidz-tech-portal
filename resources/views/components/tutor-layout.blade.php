@@ -52,31 +52,51 @@
 <body class="h-full font-sans antialiased">
     <x-ui.flash-messages />
 
-    <div class="flex h-screen overflow-hidden bg-gradient-to-br from-indigo-50/50 via-purple-50/30 to-blue-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div x-data="{ mobileMenuOpen: false }" class="flex h-screen overflow-hidden bg-gradient-to-br from-indigo-50/50 via-purple-50/30 to-blue-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <x-tutor.sidebar />
+
+        <!-- Mobile Overlay -->
+        <div x-show="mobileMenuOpen"
+             x-cloak
+             @click="mobileMenuOpen = false"
+             x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-linear duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 md:hidden"></div>
 
         <div x-data="{ collapsed: localStorage.getItem('tutorSidebarCollapsed') === 'true' }"
              x-init="window.addEventListener('tutor-sidebar-toggled', () => { collapsed = localStorage.getItem('tutorSidebarCollapsed') === 'true'; })"
-             :class="collapsed ? 'ml-20' : 'ml-64'"
-             class="flex-1 flex flex-col overflow-hidden transition-all duration-300">
+             :class="collapsed ? 'md:ml-20' : 'md:ml-64'"
+             class="flex-1 flex flex-col overflow-hidden transition-all duration-300 w-full">
 
             <header class="sticky top-0 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
-                <div class="flex items-center justify-between h-16 px-6">
-                    <div class="flex items-center gap-3">
-                        <div class="min-w-0">
+                <div class="flex items-center justify-between h-14 md:h-16 px-3 md:px-6">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <!-- Hamburger Menu Button (Mobile Only) -->
+                        <button @click="$parent.mobileMenuOpen = !$parent.mobileMenuOpen"
+                                class="md:hidden p-2 -ml-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
+
+                        <div class="min-w-0 flex-1">
                             @if (isset($header))
-                                <h1 class="text-xl font-bold text-gray-900 dark:text-white truncate">{{ $header }}</h1>
+                                <h1 class="text-base md:text-xl font-bold text-gray-900 dark:text-white truncate">{{ $header }}</h1>
                             @elseif (isset($title))
-                                <h1 class="text-xl font-bold text-gray-900 dark:text-white truncate">{{ $title }}</h1>
+                                <h1 class="text-base md:text-xl font-bold text-gray-900 dark:text-white truncate">{{ $title }}</h1>
                             @else
-                                <h1 class="text-xl font-bold text-gray-900 dark:text-white">Tutor Portal</h1>
+                                <h1 class="text-base md:text-xl font-bold text-gray-900 dark:text-white truncate">Tutor Portal</h1>
                             @endif
-                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ now()->format('l, F j, Y') }}</p>
+                            <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 hidden md:block">{{ now()->format('l, F j, Y') }}</p>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-4">
-                        <div class="relative">
+                    <div class="flex items-center gap-2 md:gap-4">
+                        <div class="relative hidden lg:block">
                             <input type="text" placeholder="Search..." class="w-64 pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#4B49AC]">
                             <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -84,8 +104,8 @@
                         </div>
 
                         <div x-data="{ notifOpen: false }" class="relative">
-                            <button @click="notifOpen = !notifOpen" class="relative p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button @click="notifOpen = !notifOpen" class="relative p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                 </svg>
                                 @php
@@ -144,11 +164,11 @@
                         </div>
 
                         <div x-data="{ open: false }" class="relative">
-                            <button @click="open = !open" class="flex items-center gap-3 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
-                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#4B49AC] to-[#7978E9] flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                            <button @click="open = !open" class="flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 rounded-lg md:rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
+                                <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-[#4B49AC] to-[#7978E9] flex items-center justify-center text-white font-bold text-xs md:text-sm shadow-lg flex-shrink-0">
                                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                 </div>
-                                <div class="text-left">
+                                <div class="text-left hidden md:block">
                                     <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ Auth::user()->name }}</div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400">Tutor</div>
                                 </div>
