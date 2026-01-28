@@ -28,7 +28,7 @@ x-transition:leave="transition ease-in duration-200 transform md:transition-none
 x-transition:leave-start="translate-x-0 md:translate-x-0"
 x-transition:leave-end="-translate-x-full md:translate-x-0"
 :class="collapsed ? 'md:w-20' : 'md:w-64'"
-class="fixed left-0 top-0 h-screen w-64 md:w-auto bg-white dark:bg-slate-900 flex flex-col transition-all duration-300 z-50 shadow-xl border-r border-gray-200 dark:border-slate-700">
+class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 flex flex-col transition-all duration-300 z-50 shadow-xl border-r border-gray-200 dark:border-slate-700">
 
     {{-- Logo Section --}}
     <div class="p-4 border-b border-gray-200 dark:border-slate-700">
