@@ -188,4 +188,39 @@ class User extends Authenticatable
     {
         return $this->hasMany(ManagerNotification::class)->where('is_read', false);
     }
+
+    /**
+     * Get the appropriate title (Mr./Mrs.) based on the parent's relationship
+     */
+    public function getTitle(): string
+    {
+        // Only applicable for parents
+        if (!$this->isParent()) {
+            return '';
+        }
+
+        // Get the relationship from the first child (assuming same relationship for all children)
+        $firstChild = $this->guardiansOf()->first();
+
+        if (!$firstChild) {
+            return '';
+        }
+
+        $relationship = strtolower($firstChild->pivot->relationship ?? '');
+
+        return match($relationship) {
+            'father' => 'Mr.',
+            'mother' => 'Mrs.',
+            default => '',
+        };
+    }
+
+    /**
+     * Get full name with title for display
+     */
+    public function getNameWithTitle(): string
+    {
+        $title = $this->getTitle();
+        return $title ? "$title $this->name" : $this->name;
+    }
 }

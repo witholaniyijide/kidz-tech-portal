@@ -1,5 +1,5 @@
 <x-parent-layout>
-    <x-slot name="title">Welcome Back, {{ auth()->user()->name }}</x-slot>
+    <x-slot name="title">Welcome back, {{ auth()->user()->getNameWithTitle() }}</x-slot>
     <x-slot name="subtitle">Track your children's coding journey</x-slot>
 
     <div class="space-y-6">
