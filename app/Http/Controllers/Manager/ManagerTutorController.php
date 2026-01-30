@@ -68,7 +68,7 @@ class ManagerTutorController extends Controller
     public function show(Tutor $tutor)
     {
         // Load relationships
-        $tutor->load(['students', 'user']);
+        $tutor->load(['students', 'user', 'availabilities']);
 
         // Get tutor's recent reports
         $recentReports = Report::where('instructor_id', $tutor->user_id ?? null)

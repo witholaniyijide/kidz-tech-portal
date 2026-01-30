@@ -262,7 +262,7 @@ class AdminTutorController extends Controller
      */
     public function show(Tutor $tutor)
     {
-        $tutor->load(['students', 'attendances', 'user']);
+        $tutor->load(['students', 'attendances', 'user', 'availabilities']);
         return view('admin.tutors.show', compact('tutor'));
     }
 
