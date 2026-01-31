@@ -171,7 +171,7 @@
                     @php
                         $availabilities = $tutor->availabilities ?? collect();
                         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                        $availabilityByDay = $availabilities->groupBy('day_of_week');
+                        $availabilityByDay = $availabilities->groupBy('day');
                     @endphp
 
                     @if($availabilities->isEmpty())
