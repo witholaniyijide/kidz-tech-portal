@@ -253,7 +253,7 @@
                                                         @foreach($studentSchedule as $schedule)
                                                             @if(isset($schedule['day']) && isset($schedule['time']))
                                                                 <span class="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-[10px] sm:text-xs">
-                                                                    {{ ucfirst($schedule['day']) }} @ {{ $schedule['time'] }}
+                                                                    {{ ucfirst($schedule['day']) }} @ {{ \Carbon\Carbon::parse($schedule['time'])->format('g:i A') }}
                                                                 </span>
                                                             @endif
                                                         @endforeach

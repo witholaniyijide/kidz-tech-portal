@@ -41,7 +41,7 @@
                                     @foreach(array_slice($child->class_schedule, 0, 2) as $schedule)
                                         <p class="text-xs text-gray-600 dark:text-gray-300">
                                             @if(is_array($schedule))
-                                                {{ $schedule['day'] ?? '' }} {{ $schedule['time'] ?? '' }}
+                                                {{ $schedule['day'] ?? '' }} {{ isset($schedule['time']) ? \Carbon\Carbon::parse($schedule['time'])->format('g:i A') : '' }}
                                             @else
                                                 {{ $schedule }}
                                             @endif
