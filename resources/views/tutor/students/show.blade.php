@@ -93,24 +93,11 @@
                         <span class="text-gray-600 dark:text-gray-400 block mb-2">Class Days & Times <span class="text-xs text-amber-600 dark:text-amber-400">(NG Time)</span>:</span>
                         <div class="space-y-2">
                             @foreach($classSchedule as $schedule)
-                                @php
-                                    // Convert 24-hour to 12-hour format
-                                    $time = $schedule['time'] ?? '';
-                                    $displayTime = $time;
-                                    if ($time && strpos($time, ':') !== false) {
-                                        $parts = explode(':', $time);
-                                        $h = (int)$parts[0];
-                                        $m = $parts[1] ?? '00';
-                                        $period = $h >= 12 ? 'PM' : 'AM';
-                                        $h12 = $h % 12 ?: 12;
-                                        $displayTime = $h12 . ':' . $m . ' ' . $period;
-                                    }
-                                @endphp
                                 <div class="flex items-center gap-2 p-2 bg-white/30 dark:bg-gray-800/30 rounded-lg">
                                     <svg class="w-4 h-4 text-[#4B49AC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                     </svg>
-                                    <span class="font-medium text-gray-900 dark:text-white capitalize">{{ $schedule['day'] ?? 'N/A' }} at {{ $displayTime }}</span>
+                                    <span class="font-medium text-gray-900 dark:text-white capitalize">{{ $schedule['day'] ?? 'N/A' }} at {{ isset($schedule['time']) ? \Carbon\Carbon::parse($schedule['time'])->format('g:i A') : 'N/A' }}</span>
                                 </div>
                             @endforeach
                         </div>

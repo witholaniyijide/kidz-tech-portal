@@ -190,7 +190,7 @@
                                         <span class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-xs sm:text-sm">
                                             <span class="font-medium">{{ ucfirst($schedule['day']) }}</span>
                                             <span class="mx-1">-</span>
-                                            <span>{{ $schedule['time'] }}</span>
+                                            <span>{{ \Carbon\Carbon::parse($schedule['time'])->format('g:i A') }}</span>
                                         </span>
                                     @endif
                                 @endforeach

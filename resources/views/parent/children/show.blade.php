@@ -121,7 +121,7 @@
                                 </svg>
                                 <span>
                                     @if(isset($schedule['day']))
-                                        {{ $schedule['day'] }} {{ $schedule['time'] ?? '' }}
+                                        {{ $schedule['day'] }} {{ isset($schedule['time']) ? \Carbon\Carbon::parse($schedule['time'])->format('g:i A') : '' }}
                                     @elseif(isset($schedule['schedule']))
                                         {{ $schedule['schedule'] }}
                                     @endif

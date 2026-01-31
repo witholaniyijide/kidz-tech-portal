@@ -284,7 +284,7 @@
                                     {{ is_array($schedule) ? ($schedule['day'] ?? $schedule['label'] ?? 'Class') : $schedule }}
                                 </p>
                                 @if(is_array($schedule) && isset($schedule['time']))
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $schedule['time'] }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ \Carbon\Carbon::parse($schedule['time'])->format('g:i A') }}</p>
                                 @endif
                             </div>
                         </div>

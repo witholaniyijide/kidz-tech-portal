@@ -112,7 +112,7 @@
                             @foreach($student->class_schedule as $schedule)
                                 <p class="text-gray-900 dark:text-white">
                                     <span class="font-medium">{{ $schedule['day'] ?? '' }}</span>
-                                    <span class="text-gray-600 dark:text-gray-400 ml-2">{{ $schedule['time'] ?? '' }}</span>
+                                    <span class="text-gray-600 dark:text-gray-400 ml-2">{{ isset($schedule['time']) ? \Carbon\Carbon::parse($schedule['time'])->format('g:i A') : '' }}</span>
                                 </p>
                             @endforeach
                         </div>
