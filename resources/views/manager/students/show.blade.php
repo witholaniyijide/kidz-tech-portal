@@ -69,24 +69,22 @@
                         <p class="text-gray-900 dark:text-white">{{ $student->email ?? 'N/A' }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Phone</label>
-                        <p class="text-gray-900 dark:text-white">{{ $student->phone ?? 'N/A' }}</p>
-                    </div>
-                    <div>
                         <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Date of Birth</label>
                         <p class="text-gray-900 dark:text-white">{{ $student->date_of_birth ? $student->date_of_birth->format('M d, Y') : 'N/A' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Location</label>
-                        <p class="text-gray-900 dark:text-white">{{ $student->location ?? 'N/A' }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Enrollment Date</label>
                         <p class="text-gray-900 dark:text-white">{{ $student->enrollment_date ? $student->enrollment_date->format('M d, Y') : 'N/A' }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Current Period</label>
-                        <p class="text-gray-900 dark:text-white">{{ $student->current_period ?? 'N/A' }}</p>
+                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Current Course</label>
+                        <p class="text-gray-900 dark:text-white">
+                            @if($student->currentCourse)
+                                {{ $student->currentCourse->full_name }}
+                            @else
+                                Not set
+                            @endif
+                        </p>
                     </div>
                 </div>
             </div>

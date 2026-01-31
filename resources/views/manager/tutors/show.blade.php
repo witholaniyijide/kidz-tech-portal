@@ -76,24 +76,76 @@
             <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Assigned Students ({{ $tutor->students->count() }})</h3>
                 @if($tutor->students->count() > 0)
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         @foreach($tutor->students as $student)
-                            <div class="flex items-center justify-between p-3 bg-gray-50/50 dark:bg-gray-700/30 rounded-lg">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-[#C15F3C] to-[#DA7756] flex items-center justify-center text-white font-bold text-sm">
-                                        {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
+                            <div class="p-4 bg-gray-50/50 dark:bg-gray-700/30 rounded-lg">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-[#C15F3C] to-[#DA7756] flex items-center justify-center text-white font-bold text-sm">
+                                            {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900 dark:text-white">{{ $student->first_name }} {{ $student->last_name }}</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $student->student_id ?? 'N/A' }}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="font-medium text-gray-900 dark:text-white">{{ $student->first_name }} {{ $student->last_name }}</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $student->student_id ?? 'N/A' }}</p>
-                                    </div>
+                                    <span class="px-2 py-1 text-xs rounded-full font-medium
+                                        @if($student->status === 'active') bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300
+                                        @else bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
+                                        @endif">
+                                        {{ ucfirst($student->status) }}
+                                    </span>
                                 </div>
-                                <span class="px-2 py-1 text-xs rounded-full font-medium
-                                    @if($student->status === 'active') bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300
-                                    @else bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
-                                    @endif">
-                                    {{ ucfirst($student->status) }}
-                                </span>
+
+                                {{-- Class Schedule --}}
+                                @if($student->class_schedule && is_array($student->class_schedule) && count($student->class_schedule) > 0)
+                                    <div class="mb-3">
+                                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Class Schedule (NG Time)</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($student->class_schedule as $schedule)
+                                                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-xs">
+                                                    <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <span class="font-medium text-blue-700 dark:text-blue-300">
+                                                        {{ is_array($schedule) ? ($schedule['day'] ?? $schedule['label'] ?? 'Class') : $schedule }}
+                                                        @if(is_array($schedule) && isset($schedule['time']))
+                                                            - {{ \Carbon\Carbon::parse($schedule['time'])->format('g:i A') }}
+                                                        @endif
+                                                    </span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                {{-- Class Links --}}
+                                @if($student->class_link || $student->google_classroom_link)
+                                    <div class="flex flex-wrap gap-2">
+                                        @if($student->class_link)
+                                            <a href="{{ $student->class_link }}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#C15F3C]/10 dark:bg-[#C15F3C]/20 text-[#C15F3C] dark:text-[#DA7756] rounded-lg text-xs font-medium hover:bg-[#C15F3C]/20 dark:hover:bg-[#C15F3C]/30 transition-colors">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                </svg>
+                                                Class Link
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                </svg>
+                                            </a>
+                                        @endif
+                                        @if($student->google_classroom_link)
+                                            <a href="{{ $student->google_classroom_link }}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 rounded-lg text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+                                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M12 0C5.372 0 0 5.373 0 12s5.372 12 12 12 12-5.373 12-12S18.628 0 12 0zm5.82 16.32a.75.75 0 01-1.06 0L12 11.56l-4.76 4.76a.75.75 0 01-1.06-1.06l4.76-4.76-4.76-4.76a.75.75 0 011.06-1.06L12 9.44l4.76-4.76a.75.75 0 011.06 1.06l-4.76 4.76 4.76 4.76a.75.75 0 010 1.06z"/>
+                                                </svg>
+                                                Google Classroom
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                </svg>
+                                            </a>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         @endforeach
                     </div>
