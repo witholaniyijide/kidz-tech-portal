@@ -423,6 +423,8 @@ Route::prefix('manager')
             ->name('tutor-reports.pdf');
         Route::get('/tutor-reports/{report}/print', [App\Http\Controllers\Manager\ReportReviewController::class, 'print'])
             ->name('tutor-reports.print');
+        Route::get('/tutor-reports/{report}/whatsapp', [App\Http\Controllers\Manager\ReportReviewController::class, 'exportWhatsApp'])
+            ->name('tutor-reports.whatsapp');
 
         // Notice Board (can create, with restrictions)
         Route::get('/notices', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'index'])
@@ -526,6 +528,8 @@ Route::prefix('director')
             ->name('reports.pdf');
         Route::get('/reports/{report}/print', [App\Http\Controllers\Director\DirectorReportController::class, 'print'])
             ->name('reports.print');
+        Route::get('/reports/{report}/whatsapp', [App\Http\Controllers\Director\DirectorReportController::class, 'exportWhatsApp'])
+            ->name('reports.whatsapp');
 
         // Director Assessments
         Route::get('/assessments', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'index'])

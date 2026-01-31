@@ -214,4 +214,34 @@ class ReportReviewController extends Controller
 
         return view('tutor.reports.print', compact('report'));
     }
+
+    /**
+     * Export report as JSON for WhatsApp.
+     */
+    public function exportWhatsApp(TutorReport $report)
+    {
+        // Load relationships
+        $report->load(['student', 'tutor']);
+
+        $projectsList = collect($report->projects ?? [])
+            ->filter(fn($p) => !empty($p['title']))
+            ->map(fn($p, $i) => "Project " . ($i + 1) . ": " . $p['title'] . ($p['link'] ? " – " . $p['link'] : ''))
+            ->implode("\n");
+
+        $text = "*Kidz Tech Coding Club: Monthly Progress Report*\n\n"
+            . "*Student:* " . $report->student->first_name . " " . $report->student->last_name . "\n"
+            . "*Month:* " . $report->month . " " . $report->year . "\n"
+            . "*Instructor:* " . $report->tutor->first_name . " " . $report->tutor->last_name . "\n"
+            . "*Course(s):* " . implode(', ', $report->courses ?? []) . "\n\n"
+            . "*1. Progress Overview:*\n"
+            . "*Skills Mastered:* " . implode(', ', $report->skills_mastered ?? []) . "\n"
+            . "*New Skills:* " . (count($report->new_skills ?? []) > 0 ? implode(', ', $report->new_skills) : 'N/A') . "\n\n"
+            . "*2. Projects/Activities Completed:*\n" . $projectsList . "\n\n"
+            . "*3. Areas for Improvement:*\n" . ($report->areas_for_improvement ?? 'N/A') . "\n\n"
+            . "*4. Goals for Next Month:*\n" . ($report->goals_next_month ?? 'N/A') . "\n\n"
+            . "*5. Assignment/Projects during the month:*\n" . ($report->assignments ?? 'N/A') . "\n\n"
+            . "*6. Comments/Observation:*\n" . ($report->comments_observation ?? 'N/A');
+
+        return response()->json(['success' => true, 'text' => $text]);
+    }
 }
