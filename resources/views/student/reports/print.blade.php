@@ -5,16 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Progress Report - {{ $report->student->fullName() }} - {{ $report->month }}</title>
     <style>
-        @page {
-            margin: 20mm 15mm;
-        }
-
         body {
             font-family: 'Arial', sans-serif;
             line-height: 1.6;
             color: #333;
             max-width: 800px;
             margin: 0 auto;
+            padding: 15mm 20mm;
         }
         .header {
             text-align: center;
