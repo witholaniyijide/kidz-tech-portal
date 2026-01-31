@@ -76,7 +76,14 @@
             </div>
             <div class="ml-4 flex-1">
                 <div class="text-gray-900 dark:text-gray-100 font-semibold">
-                    {{ $class['time'] ?? '' }}
+                    @php
+                        try {
+                            $formattedTime = \Carbon\Carbon::parse($class['time'])->format('g:i A');
+                        } catch (\Exception $e) {
+                            $formattedTime = $class['time'] ?? '';
+                        }
+                    @endphp
+                    {{ $formattedTime }}
                 </div>
                 <div class="text-gray-700 dark:text-gray-300 mt-1">
                     <span class="font-medium">{{ $class['name'] ?? '' }}</span>

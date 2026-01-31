@@ -33,7 +33,14 @@
                                         </p>
                                     @endif
                                 </div>
-                                <span class="text-sm font-medium text-amber-600 dark:text-amber-400">{{ $class['time'] }}</span>
+                                @php
+                                    try {
+                                        $formattedTime = \Carbon\Carbon::parse($class['time'])->format('g:i A');
+                                    } catch (\Exception $e) {
+                                        $formattedTime = $class['time'];
+                                    }
+                                @endphp
+                                <span class="text-sm font-medium text-amber-600 dark:text-amber-400">{{ $formattedTime }}</span>
                             </div>
                         </div>
                     @endforeach
@@ -93,7 +100,14 @@
                                                     </p>
                                                 @endif
                                             </div>
-                                            <span class="text-sm font-semibold text-[#F5A623]">{{ $class['time'] }}</span>
+                                            @php
+                                                try {
+                                                    $formattedTime = \Carbon\Carbon::parse($class['time'])->format('g:i A');
+                                                } catch (\Exception $e) {
+                                                    $formattedTime = $class['time'];
+                                                }
+                                            @endphp
+                                            <span class="text-sm font-semibold text-[#F5A623]">{{ $formattedTime }}</span>
                                         </div>
                                     </div>
                                 @endforeach
