@@ -188,7 +188,9 @@
                                 @if(isset($availabilityByDay[$fullDays[$index]]) && $availabilityByDay[$fullDays[$index]]->count() > 0)
                                     @foreach($availabilityByDay[$fullDays[$index]] as $slot)
                                         <div class="px-1 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded text-xs mb-1">
-                                            {{ \Carbon\Carbon::parse($slot->start_time)->format('g:i') }}
+                                            {{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }}
+                                            -
+                                            {{ \Carbon\Carbon::parse($slot->end_time)->format('g:i A') }}
                                         </div>
                                     @endforeach
                                 @else

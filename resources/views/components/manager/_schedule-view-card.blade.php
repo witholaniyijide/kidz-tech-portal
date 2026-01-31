@@ -39,7 +39,14 @@
                         @endif
                     </div>
                     <div class="text-right ml-4">
-                        <p class="text-sm font-semibold text-sky-600 dark:text-sky-400">{{ $class['time'] ?? '10:00 AM' }}</p>
+                        @php
+                            try {
+                                $formattedTime = \Carbon\Carbon::parse($class['time'])->format('g:i A');
+                            } catch (\Exception $e) {
+                                $formattedTime = $class['time'] ?? '10:00 AM';
+                            }
+                        @endphp
+                        <p class="text-sm font-semibold text-sky-600 dark:text-sky-400">{{ $formattedTime }}</p>
                         @if(isset($class['duration']))
                         <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">{{ $class['duration'] }}</p>
                         @endif

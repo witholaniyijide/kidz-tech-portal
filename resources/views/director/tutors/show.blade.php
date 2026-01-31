@@ -191,6 +191,8 @@
                                             @foreach($availabilityByDay[$day] as $slot)
                                                 <div class="px-1 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded text-[10px] sm:text-xs">
                                                     {{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }}
+                                                    -
+                                                    {{ \Carbon\Carbon::parse($slot->end_time)->format('g:i A') }}
                                                 </div>
                                             @endforeach
                                         </div>

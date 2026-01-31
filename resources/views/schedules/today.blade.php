@@ -66,7 +66,14 @@
                                                 {{ $index + 1 }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                {{ $class['time'] ?? 'N/A' }}
+                                                @php
+                                                    try {
+                                                        $formattedTime = \Carbon\Carbon::parse($class['time'])->format('g:i A');
+                                                    } catch (\Exception $e) {
+                                                        $formattedTime = $class['time'] ?? 'N/A';
+                                                    }
+                                                @endphp
+                                                {{ $formattedTime }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {{ $class['student_name'] ?? 'N/A' }}
