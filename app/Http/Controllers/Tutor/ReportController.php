@@ -594,7 +594,7 @@ class ReportController extends Controller
             . "*5. Assignment/Projects during the month:*\n" . ($report->assignments ?? 'N/A') . "\n\n"
             . "*6. Comments/Observation:*\n" . ($report->comments_observation ?? 'N/A');
 
-        return response()->json(['text' => $text]);
+        return response()->json(['success' => true, 'text' => $text]);
     }
 
     /**
