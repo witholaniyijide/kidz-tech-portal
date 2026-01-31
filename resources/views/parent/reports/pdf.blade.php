@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Progress Report - {{ $report->student->first_name ?? 'Student' }} {{ $report->student->last_name ?? '' }}</title>
     <style>
-        @page {
-            margin: 20mm 15mm;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -20,6 +16,7 @@
             font-size: 10pt;
             line-height: 1.5;
             color: #333;
+            padding: 15mm 20mm;
         }
 
         .header {
@@ -176,11 +173,8 @@
         }
 
         .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 15px;
+            margin-top: 30px;
+            padding: 15px 0;
             border-top: 2px solid #423A8E;
             font-size: 8pt;
             color: #6b7280;
