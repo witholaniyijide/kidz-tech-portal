@@ -361,11 +361,15 @@ function closeWhatsAppModal() {
     document.getElementById('whatsappModal').classList.add('hidden');
 }
 
-function copyWhatsAppText() {
-    const text = document.getElementById('whatsappText');
-    text.select();
-    document.execCommand('copy');
-    alert('Copied to clipboard!');
+async function copyWhatsAppText() {
+    try {
+        const text = document.getElementById('whatsappText').value;
+        await navigator.clipboard.writeText(text);
+        alert('Copied to clipboard!');
+    } catch (error) {
+        console.error('Failed to copy:', error);
+        alert('Failed to copy to clipboard');
+    }
 }
 </script>
 @endpush

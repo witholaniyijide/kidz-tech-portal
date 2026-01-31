@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Progress Report - {{ $report->student->first_name ?? 'Student' }} {{ $report->student->last_name ?? '' }}</title>
     <style>
+        @page {
+            margin: 20mm 15mm;
+        }
+
         * {
             margin: 0;
             padding: 0;
