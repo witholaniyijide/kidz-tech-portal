@@ -150,11 +150,27 @@ class AdminScheduleController extends Controller
         $students = Student::where('status', 'active')->with('tutor')->orderBy('first_name')->get();
         $tutors = Tutor::where('status', 'active')->orderBy('first_name')->get();
         $date = request('date', Carbon::today()->toDateString());
+        $selectedDate = Carbon::parse($date);
 
         // Check if schedule already exists for this date
         $existingSchedule = DailyClassSchedule::whereDate('schedule_date', $date)->first();
+        $inheritedFromWeekly = false;
 
-        return view('admin.schedules.create', compact('students', 'tutors', 'date', 'existingSchedule'));
+        // If no schedule exists, check for inherited weekly schedule
+        if (!$existingSchedule) {
+            $repeatSchedule = DailyClassSchedule::where('repeat_weekly', true)
+                ->where('day_name', $selectedDate->format('l'))
+                ->whereDate('schedule_date', '<', $selectedDate)
+                ->orderBy('schedule_date', 'desc')
+                ->first();
+
+            if ($repeatSchedule) {
+                $existingSchedule = $repeatSchedule;
+                $inheritedFromWeekly = true;
+            }
+        }
+
+        return view('admin.schedules.create', compact('students', 'tutors', 'date', 'existingSchedule', 'inheritedFromWeekly'));
     }
 
     public function store(Request $request)
