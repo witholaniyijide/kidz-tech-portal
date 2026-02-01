@@ -226,12 +226,6 @@ Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('
     Route::get('/notifications/recent', [App\Http\Controllers\Parent\ParentNotificationController::class, 'recent'])
         ->name('notifications.recent');
 
-    // Attendance
-    Route::get('/attendance', [App\Http\Controllers\Parent\ParentAttendanceController::class, 'index'])
-        ->name('attendance.index');
-    Route::get('/attendance/{attendance}', [App\Http\Controllers\Parent\ParentAttendanceController::class, 'show'])
-        ->name('attendance.show');
-
     // Schedule
     Route::get('/schedule', [App\Http\Controllers\Parent\ParentScheduleController::class, 'index'])
         ->name('schedule.index');
@@ -676,6 +670,8 @@ Route::prefix('tutor')
             ->name('attendance.store');
         Route::get('/attendance/{attendance}', [App\Http\Controllers\Tutor\AttendanceController::class, 'show'])
             ->name('attendance.show');
+        Route::post('/attendance/check-duplicate', [App\Http\Controllers\Tutor\AttendanceController::class, 'checkDuplicate'])
+            ->name('attendance.check-duplicate');
 
         // Performance (Assessments - view only, Director-approved)
         Route::get('/performance', [App\Http\Controllers\Tutor\PerformanceController::class, 'index'])

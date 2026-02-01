@@ -30,11 +30,19 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Class Date</p>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $attendance->class_date ? \Carbon\Carbon::parse($attendance->class_date)->format('M d, Y') : 'N/A' }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $attendance->class_date ? \Carbon\Carbon::parse($attendance->class_date)->format('l, M d, Y') : 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Class Time</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $attendance->class_time ? \Carbon\Carbon::parse($attendance->class_time)->format('g:i A') : 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Duration</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $attendance->duration_minutes ?? 60 }} minutes</p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Submitted At</p>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $attendance->created_at->format('M d, Y H:i') }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ $attendance->created_at->format('M d, Y g:i A') }}</p>
                     </div>
                     @if($attendance->is_late_submission)
                     <div>
@@ -48,6 +56,38 @@
                     </div>
                     @endif
                 </div>
+
+                <!-- Course(s) Covered -->
+                @if($attendance->courses_covered && count($attendance->courses_covered) > 0)
+                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Course(s) Covered</p>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($attendance->courses_covered as $course)
+                            <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300">
+                                {{ $course }}
+                            </span>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                <!-- Topic -->
+                @if($attendance->topic)
+                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Topic/Lesson Details</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ $attendance->topic }}</p>
+                </div>
+                @endif
+
+                <!-- Notes -->
+                @if($attendance->notes)
+                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Session Notes</p>
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $attendance->notes }}</p>
+                    </div>
+                </div>
+                @endif
 
                 @if($attendance->status == 'pending')
                 <div class="mt-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">

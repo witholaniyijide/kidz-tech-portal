@@ -302,4 +302,56 @@ class AttendanceController extends Controller
 
         return view('tutor.attendance.show', compact('attendance', 'isStandIn'));
     }
+
+    /**
+     * Check for duplicate attendance records.
+     */
+    public function checkDuplicate(Request $request)
+    {
+        $tutor = Auth::user()->tutor;
+
+        if (!$tutor) {
+            return response()->json(['error' => 'No tutor profile'], 403);
+        }
+
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'class_date' => 'required|date',
+            'class_time' => 'nullable|string',
+        ]);
+
+        $student = Student::find($request->student_id);
+
+        // Check for existing attendance on the same date
+        $query = AttendanceRecord::where('student_id', $request->student_id)
+            ->whereDate('class_date', $request->class_date);
+
+        // If time is provided, also check for same time (within 30 min window)
+        $duplicates = $query->get();
+
+        if ($duplicates->isEmpty()) {
+            return response()->json([
+                'has_duplicate' => false,
+            ]);
+        }
+
+        // Format the duplicates for display
+        $duplicateInfo = $duplicates->map(function ($record) {
+            return [
+                'id' => $record->id,
+                'time' => $record->class_time ? \Carbon\Carbon::parse($record->class_time)->format('g:i A') : 'N/A',
+                'status' => ucfirst($record->status),
+                'tutor' => $record->tutor ? $record->tutor->first_name . ' ' . $record->tutor->last_name : 'Unknown',
+                'submitted_at' => $record->created_at->format('M j, Y g:i A'),
+            ];
+        });
+
+        return response()->json([
+            'has_duplicate' => true,
+            'count' => $duplicates->count(),
+            'student_name' => $student->first_name . ' ' . $student->last_name,
+            'date' => \Carbon\Carbon::parse($request->class_date)->format('l, M j, Y'),
+            'duplicates' => $duplicateInfo,
+        ]);
+    }
 }

@@ -58,9 +58,21 @@
                         <dt class="text-sm text-gray-500 dark:text-gray-400">Duration</dt>
                         <dd class="text-gray-900 dark:text-white font-medium">{{ $attendance->duration ?? 60 }} minutes</dd>
                     </div>
+                    @if($attendance->courses_covered && count($attendance->courses_covered) > 0)
+                        <div>
+                            <dt class="text-sm text-gray-500 dark:text-gray-400 mb-2">Course(s) Covered</dt>
+                            <dd class="flex flex-wrap gap-2">
+                                @foreach($attendance->courses_covered as $course)
+                                    <span class="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-[#C15F3C]/10 text-[#C15F3C] dark:bg-[#C15F3C]/20 dark:text-orange-300">
+                                        {{ $course }}
+                                    </span>
+                                @endforeach
+                            </dd>
+                        </div>
+                    @endif
                     @if($attendance->topic)
                         <div>
-                            <dt class="text-sm text-gray-500 dark:text-gray-400">Topic Covered</dt>
+                            <dt class="text-sm text-gray-500 dark:text-gray-400">Topic/Lesson Details</dt>
                             <dd class="text-gray-900 dark:text-white font-medium">{{ $attendance->topic }}</dd>
                         </div>
                     @endif
