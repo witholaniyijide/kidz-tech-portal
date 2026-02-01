@@ -371,28 +371,61 @@ class AdminScheduleController extends Controller
     public function postSchedule(Request $request)
     {
         $date = $request->get('date', Carbon::today()->toDateString());
+        $selectedDate = Carbon::parse($date);
 
         $schedule = DailyClassSchedule::whereDate('schedule_date', $date)->first();
 
-        if ($schedule) {
-            $schedule->update([
-                'status' => 'posted',
-                'posted_at' => now(),
-                'posted_by' => Auth::id(),
-            ]);
+        // If no schedule exists, check for inherited weekly schedule
+        if (!$schedule) {
+            $repeatSchedule = DailyClassSchedule::where('repeat_weekly', true)
+                ->where('day_name', $selectedDate->format('l'))
+                ->whereDate('schedule_date', '<', $selectedDate)
+                ->orderBy('schedule_date', 'desc')
+                ->first();
 
-            ActivityLog::create([
-                'user_id' => Auth::id(),
-                'action' => 'posted_schedule',
-                'description' => "Posted schedule for " . Carbon::parse($date)->format('l, M j, Y'),
-                'model_type' => DailyClassSchedule::class,
-                'model_id' => $schedule->id,
-            ]);
+            if ($repeatSchedule) {
+                // Create a new schedule from the inherited weekly schedule
+                $schedule = DailyClassSchedule::create([
+                    'schedule_date' => $selectedDate->toDateString(),
+                    'day_name' => $selectedDate->format('l'),
+                    'classes' => $repeatSchedule->classes,
+                    'rescheduled_classes' => [],
+                    'footer_note' => $repeatSchedule->footer_note,
+                    'repeat_weekly' => false, // Don't repeat the newly created schedule
+                    'status' => 'posted',
+                    'posted_at' => now(),
+                    'posted_by' => Auth::id(),
+                ]);
 
-            return redirect()->back()->with('success', 'Schedule posted successfully!');
+                ActivityLog::create([
+                    'user_id' => Auth::id(),
+                    'action' => 'posted_schedule',
+                    'description' => "Created and posted schedule for " . $selectedDate->format('l, M j, Y') . " from weekly template",
+                    'model_type' => DailyClassSchedule::class,
+                    'model_id' => $schedule->id,
+                ]);
+
+                return redirect()->back()->with('success', 'Schedule created from weekly template and posted successfully!');
+            }
+
+            return redirect()->back()->with('error', 'No schedule found for this date.');
         }
 
-        return redirect()->back()->with('error', 'No schedule found for this date.');
+        $schedule->update([
+            'status' => 'posted',
+            'posted_at' => now(),
+            'posted_by' => Auth::id(),
+        ]);
+
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'posted_schedule',
+            'description' => "Posted schedule for " . Carbon::parse($date)->format('l, M j, Y'),
+            'model_type' => DailyClassSchedule::class,
+            'model_id' => $schedule->id,
+        ]);
+
+        return redirect()->back()->with('success', 'Schedule posted successfully!');
     }
 
     public function getWhatsAppFormat(Request $request)
@@ -401,8 +434,24 @@ class AdminScheduleController extends Controller
         $selectedDate = Carbon::parse($date);
 
         $schedule = DailyClassSchedule::whereDate('schedule_date', $selectedDate)->first();
-        $classes = $schedule ? ($schedule->classes ?? []) : [];
-        $rescheduledClasses = $schedule ? ($schedule->rescheduled_classes ?? []) : [];
+        $classes = [];
+        $rescheduledClasses = [];
+
+        if ($schedule) {
+            $classes = $schedule->classes ?? [];
+            $rescheduledClasses = $schedule->rescheduled_classes ?? [];
+        } else {
+            // Check for inherited weekly schedule
+            $repeatSchedule = DailyClassSchedule::where('repeat_weekly', true)
+                ->where('day_name', $selectedDate->format('l'))
+                ->whereDate('schedule_date', '<', $selectedDate)
+                ->orderBy('schedule_date', 'desc')
+                ->first();
+
+            if ($repeatSchedule) {
+                $classes = $repeatSchedule->classes ?? [];
+            }
+        }
 
         // Sort classes by time
         usort($classes, function($a, $b) {
