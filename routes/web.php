@@ -676,6 +676,8 @@ Route::prefix('tutor')
             ->name('attendance.store');
         Route::get('/attendance/{attendance}', [App\Http\Controllers\Tutor\AttendanceController::class, 'show'])
             ->name('attendance.show');
+        Route::post('/attendance/check-duplicate', [App\Http\Controllers\Tutor\AttendanceController::class, 'checkDuplicate'])
+            ->name('attendance.check-duplicate');
 
         // Performance (Assessments - view only, Director-approved)
         Route::get('/performance', [App\Http\Controllers\Tutor\PerformanceController::class, 'index'])

@@ -1,4 +1,49 @@
 <x-tutor-layout title="Submit Attendance">
+<!-- Duplicate Attendance Warning Modal -->
+<div id="duplicateModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 bg-amber-500 rounded-t-2xl">
+            <div class="flex items-center gap-3">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-white">Duplicate Attendance Warning</h3>
+            </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+            <p class="text-slate-700 dark:text-slate-300 mb-4">
+                You have already submitted attendance for <strong id="duplicateStudentName" class="text-slate-900 dark:text-white"></strong> on <strong id="duplicateDate" class="text-slate-900 dark:text-white"></strong>.
+            </p>
+
+            <div id="duplicateDetails" class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 mb-4">
+                <p class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Previous submission(s):</p>
+                <div id="duplicateList" class="space-y-2">
+                    <!-- Duplicates will be listed here -->
+                </div>
+            </div>
+
+            <p class="text-sm text-amber-600 dark:text-amber-400">
+                Are you sure you want to submit another attendance record for this student on the same day?
+            </p>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-3 rounded-b-2xl">
+            <button type="button" onclick="closeDuplicateModal()"
+                    class="px-5 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition-colors">
+                Cancel
+            </button>
+            <button type="button" onclick="submitAnyway()"
+                    class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors">
+                Yes, Submit Anyway
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="space-y-6">
     <!-- Page Header -->
     <div class="flex flex-wrap items-center justify-between gap-4">
@@ -58,7 +103,7 @@
 
     <!-- Attendance Form -->
     <div class="max-w-3xl">
-        <form action="{{ route('tutor.attendance.store') }}" method="POST" class="glass-card rounded-2xl shadow-lg overflow-hidden">
+        <form id="attendanceForm" action="{{ route('tutor.attendance.store') }}" method="POST" class="glass-card rounded-2xl shadow-lg overflow-hidden" onsubmit="return handleFormSubmit(event)">
             @csrf
             <input type="hidden" name="is_stand_in" value="{{ $isStandIn ? '1' : '0' }}">
 
@@ -463,6 +508,8 @@
 
 @push('scripts')
 <script>
+    let skipDuplicateCheck = false;
+
     function setDuration(minutes) {
         document.getElementById('duration_minutes').value = minutes;
     }
@@ -472,12 +519,113 @@
         const selectedDate = new Date(this.value);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         const warningEl = document.getElementById('late-warning');
         if (selectedDate < today) {
             warningEl.classList.remove('hidden');
         } else {
             warningEl.classList.add('hidden');
+        }
+    });
+
+    // Handle form submission with duplicate check
+    async function handleFormSubmit(event) {
+        // If we already checked and user confirmed, allow submission
+        if (skipDuplicateCheck) {
+            skipDuplicateCheck = false;
+            return true;
+        }
+
+        event.preventDefault();
+
+        const studentId = document.getElementById('student_id').value;
+        const classDate = document.getElementById('class_date').value;
+        const classTime = document.querySelector('input[name="class_time"]').value;
+
+        if (!studentId || !classDate) {
+            // Let the form validation handle missing fields
+            document.getElementById('attendanceForm').submit();
+            return false;
+        }
+
+        try {
+            const response = await fetch('{{ route("tutor.attendance.check-duplicate") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    class_date: classDate,
+                    class_time: classTime
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.has_duplicate) {
+                showDuplicateModal(data);
+                return false;
+            } else {
+                // No duplicates, submit the form
+                document.getElementById('attendanceForm').submit();
+            }
+        } catch (error) {
+            console.error('Error checking for duplicates:', error);
+            // On error, allow submission anyway
+            document.getElementById('attendanceForm').submit();
+        }
+
+        return false;
+    }
+
+    function showDuplicateModal(data) {
+        document.getElementById('duplicateStudentName').textContent = data.student_name;
+        document.getElementById('duplicateDate').textContent = data.date;
+
+        const listEl = document.getElementById('duplicateList');
+        listEl.innerHTML = '';
+
+        data.duplicates.forEach(dup => {
+            const item = document.createElement('div');
+            item.className = 'flex items-center justify-between p-2 bg-white dark:bg-slate-600 rounded-lg text-sm';
+            item.innerHTML = `
+                <div>
+                    <span class="font-medium text-slate-900 dark:text-white">${dup.time}</span>
+                    <span class="text-slate-500 dark:text-slate-400">by ${dup.tutor}</span>
+                </div>
+                <span class="px-2 py-1 rounded-full text-xs font-medium ${
+                    dup.status === 'Pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                    dup.status === 'Approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                }">${dup.status}</span>
+            `;
+            listEl.appendChild(item);
+        });
+
+        const modal = document.getElementById('duplicateModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeDuplicateModal() {
+        const modal = document.getElementById('duplicateModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function submitAnyway() {
+        closeDuplicateModal();
+        skipDuplicateCheck = true;
+        document.getElementById('attendanceForm').submit();
+    }
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeDuplicateModal();
         }
     });
 
