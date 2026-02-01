@@ -1,6 +1,6 @@
 <x-app-layout>
-    <x-slot name="header">{{ __('Create Daily Schedule') }}</x-slot>
-    <x-slot name="title">{{ __('Admin - Create Schedule') }}</x-slot>
+    <x-slot name="header">{{ $existingSchedule ? __('Edit Daily Schedule') : __('Create Daily Schedule') }}</x-slot>
+    <x-slot name="title">{{ $existingSchedule ? __('Admin - Edit Schedule') : __('Admin - Create Schedule') }}</x-slot>
 
     <div class="min-h-screen bg-gradient-to-br from-[#423A8E]/5 via-[#00CCCD]/5 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 relative overflow-hidden">
         <div class="absolute top-0 left-0 w-72 h-72 bg-[#423A8E]/30 dark:bg-[#423A8E]/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
@@ -10,8 +10,8 @@
             {{-- Header --}}
             <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create Daily Schedule</h1>
-                    <p class="text-gray-600 dark:text-gray-400 mt-1">Add multiple class entries for a single day</p>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $existingSchedule ? 'Edit Daily Schedule' : 'Create Daily Schedule' }}</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $existingSchedule ? 'Modify class entries for this day' : 'Add multiple class entries for a single day' }}</p>
                 </div>
                 <a href="{{ route('admin.schedules.index', ['date' => request('date', date('Y-m-d'))]) }}" class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,6 +28,28 @@
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
+                </div>
+            @endif
+
+            @if($existingSchedule && ($inheritedFromWeekly ?? false))
+                <div class="mb-6 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-400 text-emerald-800 dark:text-emerald-400 px-6 py-4 rounded-xl flex items-start">
+                    <svg class="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <p class="font-medium">Editing inherited weekly schedule</p>
+                        <p class="text-sm mt-1">This schedule is inherited from the weekly repeat template. You can modify classes or add rescheduled classes. Saving will create a new schedule for this specific date.</p>
+                    </div>
+                </div>
+            @elseif($existingSchedule)
+                <div class="mb-6 bg-blue-100 dark:bg-blue-900/30 border border-blue-400 text-blue-800 dark:text-blue-400 px-6 py-4 rounded-xl flex items-start">
+                    <svg class="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <p class="font-medium">Editing existing schedule</p>
+                        <p class="text-sm mt-1">A schedule already exists for this date. You can modify the classes below. Saving will update the existing schedule.</p>
+                    </div>
                 </div>
             @endif
 
@@ -322,13 +344,47 @@
     @push('scripts')
     <script>
         function scheduleForm() {
+            @php
+                $existingClasses = [];
+                $existingRescheduled = [];
+                if ($existingSchedule) {
+                    $classes = $existingSchedule->classes ?? [];
+                    foreach ($classes as $class) {
+                        $existingClasses[] = [
+                            'student_id' => $class['student_id'] ?? '',
+                            'tutor_id' => $class['tutor_id'] ?? '',
+                            'start_time' => $class['start_time'] ?? ($class['time'] ?? '09:00'),
+                            'end_time' => $class['end_time'] ?? '10:00',
+                            'class_link' => $class['class_link'] ?? '',
+                        ];
+                    }
+                    // Only load rescheduled classes if this is an actual schedule for this date (not inherited)
+                    if (!($inheritedFromWeekly ?? false)) {
+                        $rescheduled = $existingSchedule->rescheduled_classes ?? [];
+                        foreach ($rescheduled as $class) {
+                            $existingRescheduled[] = [
+                                'student_id' => $class['student_id'] ?? '',
+                                'tutor_id' => $class['tutor_id'] ?? '',
+                                'start_time' => $class['start_time'] ?? ($class['time'] ?? '09:00'),
+                                'end_time' => $class['end_time'] ?? '10:00',
+                                'class_link' => $class['class_link'] ?? '',
+                                'original_date' => $class['original_date'] ?? '',
+                            ];
+                        }
+                    }
+                }
+            @endphp
+
+            const existingClasses = @json($existingClasses);
+            const existingRescheduled = @json($existingRescheduled);
+
             return {
                 scheduleDate: '{{ old("schedule_date", request("date", date("Y-m-d"))) }}',
-                repeatWeekly: {{ old('repeat_weekly', 0) ? 'true' : 'false' }},
-                entries: [
+                repeatWeekly: {{ old('repeat_weekly', ($existingSchedule && !($inheritedFromWeekly ?? false) ? $existingSchedule->repeat_weekly : 0)) ? 'true' : 'false' }},
+                entries: existingClasses.length > 0 ? existingClasses : [
                     { student_id: '', tutor_id: '', start_time: '09:00', end_time: '10:00', class_link: '' }
                 ],
-                rescheduledEntries: [],
+                rescheduledEntries: existingRescheduled,
 
                 getDayName() {
                     if (!this.scheduleDate) return '';
