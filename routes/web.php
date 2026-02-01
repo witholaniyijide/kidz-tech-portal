@@ -226,12 +226,6 @@ Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('
     Route::get('/notifications/recent', [App\Http\Controllers\Parent\ParentNotificationController::class, 'recent'])
         ->name('notifications.recent');
 
-    // Attendance
-    Route::get('/attendance', [App\Http\Controllers\Parent\ParentAttendanceController::class, 'index'])
-        ->name('attendance.index');
-    Route::get('/attendance/{attendance}', [App\Http\Controllers\Parent\ParentAttendanceController::class, 'show'])
-        ->name('attendance.show');
-
     // Schedule
     Route::get('/schedule', [App\Http\Controllers\Parent\ParentScheduleController::class, 'index'])
         ->name('schedule.index');
