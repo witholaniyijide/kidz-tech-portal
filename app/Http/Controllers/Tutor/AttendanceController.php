@@ -195,10 +195,16 @@ class AttendanceController extends Controller
         }
 
         // Determine if submission is late
-        // Policy: Class typically ends at 6pm, tutor has 6-hour grace period (until midnight)
-        // If submitting after midnight of the class date, it's late
+        // Policy: Tutor has 6-hour grace period after class ends
+        // Class end time = class_date + class_time + duration_minutes
+        // Deadline = class end time + 6 hours
         $classDate = Carbon::parse($request->class_date);
-        $deadline = $classDate->copy()->endOfDay(); // Midnight of class date
+        $classTime = $request->class_time ?? '18:00'; // Default to 6pm if no time provided
+        $durationMinutes = $request->duration_minutes ?? 60;
+
+        $classEndTime = Carbon::parse($request->class_date . ' ' . $classTime)
+            ->addMinutes($durationMinutes);
+        $deadline = $classEndTime->copy()->addHours(6);
         $isLate = now()->gt($deadline);
 
         // Check if this is a rescheduled class
