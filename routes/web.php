@@ -150,6 +150,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/notifications/{notification}/mark-read', [App\Http\Controllers\Admin\AdminNotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-read', [App\Http\Controllers\Admin\AdminNotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
     Route::delete('/notifications/{notification}', [App\Http\Controllers\Admin\AdminNotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    // Certificates (Create certificates and insert into WordPress database)
+    Route::get('/certificates', [App\Http\Controllers\Admin\AdminCertificateController::class, 'index'])->name('certificates.index');
+    Route::post('/certificates', [App\Http\Controllers\Admin\AdminCertificateController::class, 'store'])->name('certificates.store');
 });
 
 // Legacy admin route redirect
