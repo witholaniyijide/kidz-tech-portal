@@ -81,10 +81,13 @@ class AdminCertificateController extends Controller
         $courseName = $this->courses[$courseCode];
         $studentName = trim($student->first_name . ' ' . ($student->other_name ? $student->other_name . ' ' : '') . $student->last_name);
 
-        // Generate unique certificate ID
-        $certificateId = $this->generateCertificateId($courseCode);
-
         try {
+            // Test WordPress database connection first
+            DB::connection('wordpress')->getPdo();
+
+            // Generate unique certificate ID
+            $certificateId = $this->generateCertificateId($courseCode);
+
             // Insert into WordPress database
             DB::connection('wordpress')->table('wpnm_certificates')->insert([
                 'certificate_id' => $certificateId,
@@ -107,6 +110,20 @@ class AdminCertificateController extends Controller
                 ->with('student_name', $studentName)
                 ->with('course_name', $courseName);
 
+        } catch (\PDOException $e) {
+            return redirect()->route('admin.certificates.index')
+                ->with('error', 'WordPress database connection failed. Please check your .env credentials (WP_DB_HOST, WP_DB_DATABASE, WP_DB_USERNAME, WP_DB_PASSWORD).')
+                ->withInput();
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Check if it's a table not found error
+            if (str_contains($e->getMessage(), "doesn't exist")) {
+                return redirect()->route('admin.certificates.index')
+                    ->with('error', 'The wpnm_certificates table does not exist in your WordPress database. Please create it first.')
+                    ->withInput();
+            }
+            return redirect()->route('admin.certificates.index')
+                ->with('error', 'Database error: ' . $e->getMessage())
+                ->withInput();
         } catch (\Exception $e) {
             return redirect()->route('admin.certificates.index')
                 ->with('error', 'Failed to create certificate: ' . $e->getMessage())
