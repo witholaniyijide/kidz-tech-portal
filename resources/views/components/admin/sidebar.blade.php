@@ -213,6 +213,17 @@ class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 flex flex-col
             <span x-show="!collapsed || window.innerWidth < 768" x-transition class="ml-3 font-medium">Analytics</span>
         </a>
 
+        {{-- 10. Certificates --}}
+        <a href="{{ route('admin.certificates.index') }}"
+           class="flex items-center px-3 py-3 md:py-2.5 rounded-xl transition-all duration-200 group no-select
+                  {{ request()->routeIs('admin.certificates.*') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+           :title="collapsed ? 'Certificates' : ''">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+            </svg>
+            <span x-show="!collapsed || window.innerWidth < 768" x-transition class="ml-3 font-medium">Certificates</span>
+        </a>
+
         {{-- Divider --}}
         <div class="my-4 border-t border-gray-200 dark:border-slate-700"></div>
 
