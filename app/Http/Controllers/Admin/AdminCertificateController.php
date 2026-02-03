@@ -112,7 +112,7 @@ class AdminCertificateController extends Controller
 
         } catch (\PDOException $e) {
             return redirect()->route('admin.certificates.index')
-                ->with('error', 'WordPress database connection failed. Please check your .env credentials (WP_DB_HOST, WP_DB_DATABASE, WP_DB_USERNAME, WP_DB_PASSWORD).')
+                ->with('error', 'WordPress database connection failed: ' . $e->getMessage())
                 ->withInput();
         } catch (\Illuminate\Database\QueryException $e) {
             // Check if it's a table not found error
