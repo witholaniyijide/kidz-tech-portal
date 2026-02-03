@@ -1,5 +1,14 @@
 @props(['user' => null])
 
+@php
+    // Calculate unread notices count for admin
+    $readNoticeIds = session('read_notices', []);
+    $unreadNoticesCount = \App\Models\Notice::where('status', 'published')
+        ->whereJsonContains('visible_to', 'admin')
+        ->whereNotIn('id', $readNoticeIds)
+        ->count();
+@endphp
+
 {{-- Admin Purple Theme: #423A8E (Primary) with Accent: #00CCCD (Teal) / Supporting: #FFC107, #DC3545, #198754, #0D6EFD --}}
 <aside x-data="{
     collapsed: localStorage.getItem('adminSidebarCollapsed') === 'true',
@@ -171,13 +180,25 @@ class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 flex flex-col
 
         {{-- 8. Notices --}}
         <a href="{{ route('admin.notices.index') }}"
-           class="flex items-center px-3 py-3 md:py-2.5 rounded-xl transition-all duration-200 group no-select
+           class="flex items-center px-3 py-3 md:py-2.5 rounded-xl transition-all duration-200 group no-select relative
                   {{ request()->routeIs('admin.notices.*') ? 'bg-gradient-to-r from-[#423A8E] to-[#00CCCD] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Notices' : ''">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
-            </svg>
-            <span x-show="!collapsed || window.innerWidth < 768" x-transition class="ml-3 font-medium">Notices</span>
+            <div class="relative">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                </svg>
+                @if($unreadNoticesCount > 0)
+                    <span x-show="collapsed" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        {{ $unreadNoticesCount > 9 ? '9+' : $unreadNoticesCount }}
+                    </span>
+                @endif
+            </div>
+            <span x-show="!collapsed || window.innerWidth < 768" x-transition class="ml-3 font-medium flex-1">Notices</span>
+            @if($unreadNoticesCount > 0)
+                <span x-show="!collapsed || window.innerWidth < 768" x-transition class="ml-auto px-2 py-0.5 text-xs font-bold rounded-full {{ request()->routeIs('admin.notices.*') ? 'bg-white/20 text-white' : 'bg-red-500 text-white' }}">
+                    {{ $unreadNoticesCount > 99 ? '99+' : $unreadNoticesCount }}
+                </span>
+            @endif
         </a>
 
         {{-- 9. Analytics --}}
