@@ -68,9 +68,15 @@ class AttendanceController extends Controller
         foreach ($attendanceRecords as $attendance) {
             $classMonth = $attendance->class_date->format('Y-m');
 
-            // Get all approved attendance for this student in the same month
+            // Get student's assigned tutor
+            $student = $attendance->student;
+            $assignedTutorId = $student->tutor_id;
+
+            // For main tutor's count: only count NON-stand-in approved attendance
+            // This ensures stand-in classes don't interrupt the main tutor's count
             $monthlyApproved = AttendanceRecord::where('student_id', $attendance->student_id)
                 ->where('status', 'approved')
+                ->where('is_stand_in', false) // Exclude stand-in records
                 ->whereYear('class_date', $attendance->class_date->year)
                 ->whereMonth('class_date', $attendance->class_date->month)
                 ->whereDate('class_date', '<=', $attendance->class_date)
@@ -80,7 +86,6 @@ class AttendanceController extends Controller
                 ->toArray();
 
             // Calculate expected monthly classes based on student's schedule
-            $student = $attendance->student;
             $expectedMonthlyClasses = 0;
 
             if ($student && $student->class_schedule && is_array($student->class_schedule)) {
@@ -95,16 +100,24 @@ class AttendanceController extends Controller
                 // Expected classes = classes per week * weeks in month
                 $expectedMonthlyClasses = $classesPerWeek * $weeksInMonth;
             } else {
-                // Fallback to counting actual attendance records if schedule not available
+                // Fallback to counting actual non-stand-in attendance records if schedule not available
                 $expectedMonthlyClasses = AttendanceRecord::where('student_id', $attendance->student_id)
+                    ->where('is_stand_in', false)
                     ->whereYear('class_date', $attendance->class_date->year)
                     ->whereMonth('class_date', $attendance->class_date->month)
                     ->count();
             }
 
             // Find position of this attendance in the approved list
-            $position = array_search($attendance->id, $monthlyApproved);
-            $attendance->monthly_position = $attendance->status === 'approved' ? ($position !== false ? $position + 1 : 0) : 0;
+            // Stand-in attendance won't have a position in the main count
+            if ($attendance->is_stand_in) {
+                $attendance->monthly_position = 0; // Stand-in doesn't count towards main tutor's tally
+                $attendance->is_stand_in_display = true;
+            } else {
+                $position = array_search($attendance->id, $monthlyApproved);
+                $attendance->monthly_position = $attendance->status === 'approved' ? ($position !== false ? $position + 1 : 0) : 0;
+                $attendance->is_stand_in_display = false;
+            }
             $attendance->monthly_total = $expectedMonthlyClasses;
         }
 

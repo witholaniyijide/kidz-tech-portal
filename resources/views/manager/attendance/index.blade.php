@@ -179,12 +179,23 @@
                                     {{ strtoupper(substr($record->student->first_name ?? 'S', 0, 1)) }}{{ strtoupper(substr($record->student->last_name ?? '', 0, 1)) }}
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-gray-900 dark:text-white">{{ $record->student->first_name ?? 'N/A' }} {{ $record->student->last_name ?? '' }}</p>
+                                    <p class="font-semibold text-gray-900 dark:text-white">
+                                        {{ $record->student->first_name ?? 'N/A' }} {{ $record->student->last_name ?? '' }}
+                                        @if($record->is_stand_in)
+                                            <span class="ml-1 px-1.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded">Stand-in</span>
+                                        @endif
+                                    </p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">ID: {{ $record->student->student_id ?? 'N/A' }}</p>
                                     @if(isset($record->monthly_attended) && isset($record->monthly_total))
-                                        <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
-                                            {{ $record->monthly_attended }}/{{ $record->monthly_total }} this month
-                                        </p>
+                                        @if($record->is_stand_in)
+                                            <p class="text-xs text-blue-600 dark:text-blue-400 mt-1 font-medium">
+                                                Stand-in (not counted)
+                                            </p>
+                                        @else
+                                            <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+                                                {{ $record->monthly_attended }}/{{ $record->monthly_total }} this month
+                                            </p>
+                                        @endif
                                     @endif
                                 </div>
                             </div>

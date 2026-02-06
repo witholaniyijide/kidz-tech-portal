@@ -72,9 +72,11 @@ class AdminAttendanceController extends Controller
         // Add monthly attendance counter for each record
         foreach ($attendances as $attendance) {
             if ($attendance->student && $attendance->class_date) {
-                // Count approved attendance for this student in the same month
+                // Count approved NON-stand-in attendance for this student in the same month
+                // Stand-in classes don't count towards the main tutor's tally
                 $approvedCount = AttendanceRecord::where('student_id', $attendance->student_id)
                     ->where('status', 'approved')
+                    ->where('is_stand_in', false) // Exclude stand-in records
                     ->whereYear('class_date', $attendance->class_date->year)
                     ->whereMonth('class_date', $attendance->class_date->month)
                     ->count();
@@ -95,8 +97,9 @@ class AdminAttendanceController extends Controller
                     // Expected classes = classes per week * weeks in month
                     $expectedMonthlyClasses = $classesPerWeek * $weeksInMonth;
                 } else {
-                    // Fallback to total attendance records for the month
+                    // Fallback to total non-stand-in attendance records for the month
                     $expectedMonthlyClasses = AttendanceRecord::where('student_id', $attendance->student_id)
+                        ->where('is_stand_in', false)
                         ->whereYear('class_date', $attendance->class_date->year)
                         ->whereMonth('class_date', $attendance->class_date->month)
                         ->count();
