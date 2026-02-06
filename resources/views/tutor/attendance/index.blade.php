@@ -183,13 +183,22 @@
                                                 </svg>
                                                 {{ $attendance->duration_minutes }} mins
                                             </span>
-                                            @if($attendance->status === 'approved' && $attendance->monthly_position > 0)
-                                                <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                    </svg>
-                                                    {{ $attendance->monthly_position }}/{{ $attendance->monthly_total }} this month
-                                                </span>
+                                            @if($attendance->status === 'approved')
+                                                @if($attendance->is_stand_in)
+                                                    <span class="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-medium">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                                                        </svg>
+                                                        Stand-in (not counted)
+                                                    </span>
+                                                @elseif($attendance->monthly_position > 0)
+                                                    <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        {{ $attendance->monthly_position }}/{{ $attendance->monthly_total }} this month
+                                                    </span>
+                                                @endif
                                             @endif
                                         </div>
                                         @if($attendance->topic)
