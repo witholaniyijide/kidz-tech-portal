@@ -123,11 +123,22 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                                    <div>{{ $record->student->first_name ?? 'N/A' }} {{ $record->student->last_name ?? '' }}</div>
+                                    <div class="flex items-center gap-2">
+                                        <span>{{ $record->student->first_name ?? 'N/A' }} {{ $record->student->last_name ?? '' }}</span>
+                                        @if($record->is_stand_in)
+                                            <span class="px-1.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded">Stand-in</span>
+                                        @endif
+                                    </div>
                                     @if(isset($record->monthly_attended) && isset($record->monthly_total))
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            Attendance: {{ $record->monthly_attended }}/{{ $record->monthly_total }} this month
-                                        </div>
+                                        @if($record->is_stand_in)
+                                            <p class="text-xs text-blue-600 dark:text-blue-400 mt-1 font-medium">
+                                                Stand-in (not counted)
+                                            </p>
+                                        @else
+                                            <div class="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+                                                {{ $record->monthly_attended }}/{{ $record->monthly_total }} this month
+                                            </div>
+                                        @endif
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
