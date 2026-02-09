@@ -183,10 +183,13 @@
 
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl">
                         <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Reports by Status (This Month)</h2>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Courses Taught</h2>
+                                <p class="text-sm text-gray-500 dark:text-gray-400" id="courseStats"></p>
+                            </div>
                         </div>
                         <div class="h-64">
-                            <canvas id="reportsStatusChart"></canvas>
+                            <canvas id="coursesChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -245,18 +248,15 @@
                 </div>
 
                 {{-- Student Learning Tracker --}}
-                <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl" x-data="studentLearningTracker()">
+                <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl" x-data="studentLearningTracker()" x-init="init()">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Student Learning Tracker</h2>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Track courses and topics taught to each student</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-3">
-                            <select x-model="selectedStudent" @change="loadStudentData()" class="px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5] min-w-[200px]">
+                            <select id="studentSelect" x-ref="studentSelect" @change="selectedStudent = $event.target.value; loadStudentData()" class="px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5] min-w-[200px]">
                                 <option value="">Select a student...</option>
-                                <template x-for="student in students" :key="student.id">
-                                    <option :value="student.id" x-text="student.name + (student.student_id ? ' (' + student.student_id + ')' : '')"></option>
-                                </template>
                             </select>
                             <input type="date" x-model="dateFrom" @change="loadStudentData()" class="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5]">
                             <span class="text-gray-500">to</span>
@@ -399,6 +399,7 @@
         function loadAllCharts() {
             loadEnrollmentsChart();
             loadReportsCharts();
+            loadCoursesChart();
             loadTutorPerformanceCharts();
             loadAssessmentCharts();
         }
@@ -480,16 +481,38 @@
                     } else {
                         showNoData('reportsMonthlyChart', 'No report data available for ' + selectedYear);
                     }
+                })
+                .catch(err => {
+                    console.error('Error loading reports:', err);
+                    showNoData('reportsMonthlyChart', 'Error loading report data: ' + err.message);
+                });
+        }
 
-                    // Reports Status Chart
-                    if (charts.reportsStatus) charts.reportsStatus.destroy();
+        // Fetch and render courses chart
+        function loadCoursesChart() {
+            fetch('{{ route('director.analytics.courses') }}?year=' + selectedYear)
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok: ' + res.statusText);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('Courses data received:', data);
+                    if (charts.courses) charts.courses.destroy();
 
-                    if (data.status && data.status.datasets && data.status.datasets[0].data.some(v => v > 0)) {
-                        const ctx = document.getElementById('reportsStatusChart');
+                    // Update stats text
+                    const statsEl = document.getElementById('courseStats');
+                    if (statsEl && data.total_classes) {
+                        statsEl.textContent = `${data.unique_courses} courses across ${data.total_classes} classes`;
+                    }
+
+                    if (data.courses && data.courses.labels && data.courses.labels.length > 0) {
+                        const ctx = document.getElementById('coursesChart');
                         if (ctx) {
-                            charts.reportsStatus = new Chart(ctx, {
+                            charts.courses = new Chart(ctx, {
                                 type: 'doughnut',
-                                data: data.status,
+                                data: data.courses,
                                 options: {
                                     responsive: true,
                                     maintainAspectRatio: false,
@@ -498,13 +521,12 @@
                             });
                         }
                     } else {
-                        showNoData('reportsStatusChart', 'No report status data available');
+                        showNoData('coursesChart', 'No course data available for ' + selectedYear);
                     }
                 })
                 .catch(err => {
-                    console.error('Error loading reports:', err);
-                    showNoData('reportsMonthlyChart', 'Error loading report data: ' + err.message);
-                    showNoData('reportsStatusChart', 'Error loading report data: ' + err.message);
+                    console.error('Error loading courses:', err);
+                    showNoData('coursesChart', 'Error loading course data: ' + err.message);
                 });
         }
 
@@ -693,6 +715,19 @@
                         const response = await fetch('{{ route('director.analytics.student-learning') }}');
                         const data = await response.json();
                         this.students = data.students || [];
+
+                        // Populate select dropdown with options
+                        const select = this.$refs.studentSelect || document.getElementById('studentSelect');
+                        if (select && this.students.length > 0) {
+                            // Clear existing options except first
+                            select.innerHTML = '<option value="">Select a student...</option>';
+                            this.students.forEach(student => {
+                                const option = document.createElement('option');
+                                option.value = student.id;
+                                option.textContent = student.name + (student.student_id ? ' (' + student.student_id + ')' : '');
+                                select.appendChild(option);
+                            });
+                        }
                     } catch (error) {
                         console.error('Error loading students:', error);
                     }
@@ -708,6 +743,7 @@
                     try {
                         const response = await fetch(`{{ route('director.analytics.student-learning') }}?student_id=${this.selectedStudent}&date_from=${this.dateFrom}&date_to=${this.dateTo}`);
                         this.studentData = await response.json();
+                        console.log('Student data loaded:', this.studentData);
                     } catch (error) {
                         console.error('Error loading student data:', error);
                         this.studentData = null;
