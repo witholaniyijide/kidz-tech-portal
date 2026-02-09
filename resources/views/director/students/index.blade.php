@@ -104,7 +104,6 @@
                                             </div>
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $student->first_name }} {{ $student->last_name }}</div>
-                                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ $student->email }}</div>
                                             </div>
                                         </div>
                                     </td>

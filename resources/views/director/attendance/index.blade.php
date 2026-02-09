@@ -104,6 +104,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Date</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Student</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tutor</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Topic</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
                             </tr>
@@ -144,6 +145,14 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     {{ $record->tutor->first_name ?? 'N/A' }} {{ $record->tutor->last_name ?? '' }}
                                 </td>
+                                <td class="px-6 py-4">
+                                    @if($record->courses_covered && count($record->courses_covered) > 0)
+                                        <div class="text-xs text-[#4F46E5] dark:text-[#818CF8] font-medium truncate max-w-xs" title="{{ implode(', ', $record->courses_covered) }}">
+                                            {{ Str::limit(implode(', ', $record->courses_covered), 30) }}
+                                        </div>
+                                    @endif
+                                    <div class="text-sm text-gray-900 dark:text-white max-w-xs truncate">{{ $record->topic ?? '-' }}</div>
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <x-ui.status-badge :status="$record->status" />
                                 </td>
@@ -167,7 +176,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">No attendance records found.</td>
+                                <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">No attendance records found.</td>
                             </tr>
                             @endforelse
                         </tbody>

@@ -566,6 +566,8 @@ Route::prefix('director')
             ->name('analytics.reports.export');
         Route::get('/analytics/tutors/export', [App\Http\Controllers\Director\AnalyticsController::class, 'exportTutorsCsv'])
             ->name('analytics.tutors.export');
+        Route::get('/analytics/student-learning', [App\Http\Controllers\Director\AnalyticsController::class, 'getStudentLearningData'])
+            ->name('analytics.student-learning');
 
         // Director Settings
         Route::get('/settings', [App\Http\Controllers\Director\DirectorSettingsController::class, 'index'])

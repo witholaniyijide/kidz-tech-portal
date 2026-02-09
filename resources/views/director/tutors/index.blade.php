@@ -98,12 +98,16 @@
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
-                                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-semibold">
-                                                {{ strtoupper(substr($tutor->first_name, 0, 1) . substr($tutor->last_name, 0, 1)) }}
-                                            </div>
+                                            @if($tutor->profile_photo)
+                                                <img src="{{ Storage::url($tutor->profile_photo) }}" alt="" class="w-10 h-10 rounded-full object-cover">
+                                            @else
+                                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-semibold">
+                                                    {{ strtoupper(substr($tutor->first_name, 0, 1) . substr($tutor->last_name, 0, 1)) }}
+                                                </div>
+                                            @endif
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $tutor->first_name }} {{ $tutor->last_name }}</div>
-                                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ $tutor->email }}</div>
+                                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ $tutor->occupation ?? 'Tutor' }}</div>
                                             </div>
                                         </div>
                                     </td>
