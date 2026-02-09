@@ -107,7 +107,22 @@ class AdminAttendanceController extends Controller
                     $attendance->monthly_attended = 0; // Stand-in doesn't count
                 } else {
                     $position = array_search($attendance->id, $monthlyApproved);
-                    $attendance->monthly_attended = ($attendance->status === 'approved' && $position !== false) ? $position + 1 : 0;
+                    if ($attendance->status === 'approved' && $position !== false) {
+                        // Approved: show actual position
+                        $attendance->monthly_attended = $position + 1;
+                    } elseif ($attendance->status === 'pending') {
+                        // Pending: show expected position (count of approved before this date + 1)
+                        $approvedBeforeCount = AttendanceRecord::where('student_id', $attendance->student_id)
+                            ->where('status', 'approved')
+                            ->where('is_stand_in', false)
+                            ->whereYear('class_date', $attendance->class_date->year)
+                            ->whereMonth('class_date', $attendance->class_date->month)
+                            ->whereDate('class_date', '<', $attendance->class_date)
+                            ->count();
+                        $attendance->monthly_attended = $approvedBeforeCount + 1;
+                    } else {
+                        $attendance->monthly_attended = 0;
+                    }
                 }
                 $attendance->monthly_total = max($expectedMonthlyClasses, 1);
             }
