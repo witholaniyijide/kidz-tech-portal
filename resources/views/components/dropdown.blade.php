@@ -1,6 +1,8 @@
-@props(['align' => 'right', 'width' => '48', 'contentClasses' => 'py-1 bg-white dark:bg-gray-700'])
+@props(['align' => 'right', 'width' => '48', 'contentClasses' => 'py-1 bg-white dark:bg-gray-700', 'mobileFullWidth' => false])
 
 @php
+$isMobileFullWidth = $width === '96';
+
 switch ($align) {
     case 'left':
         $alignmentClasses = 'ltr:origin-top-left rtl:origin-top-right start-0';
@@ -19,8 +21,9 @@ switch ($width) {
         $width = 'w-48';
         break;
     case '96':
-        // Notification dropdown - mobile responsive: full width on mobile, fixed width on desktop
-        $width = 'w-[calc(100vw-2rem)] sm:w-96 right-0 sm:right-auto';
+        // Notification dropdown - use fixed position on mobile for better control
+        $width = 'w-80 sm:w-96';
+        $alignmentClasses = 'right-0';
         break;
 }
 @endphp
@@ -30,6 +33,23 @@ switch ($width) {
         {{ $trigger }}
     </div>
 
+    @if($isMobileFullWidth)
+    {{-- Mobile-optimized notification dropdown --}}
+    <div x-show="open"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="fixed sm:absolute z-50 mt-2 left-2 right-2 sm:left-auto sm:right-0 {{ $width }} rounded-md shadow-lg"
+            style="display: none;"
+            @click="open = false">
+        <div class="rounded-md ring-1 ring-black ring-opacity-5 {{ $contentClasses }}">
+            {{ $content }}
+        </div>
+    </div>
+    @else
     <div x-show="open"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-95"
@@ -44,4 +64,5 @@ switch ($width) {
             {{ $content }}
         </div>
     </div>
+    @endif
 </div>

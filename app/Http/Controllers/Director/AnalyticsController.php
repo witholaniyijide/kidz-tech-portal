@@ -259,42 +259,52 @@ class AnalyticsController extends Controller
         Cache::forget("director.analytics.tutor_performance.{$year}");
 
         $data = Cache::remember("director.analytics.tutor_performance.{$year}", 300, function () use ($year) {
-            // Students per tutor for selected year (top 20)
+            // Students per tutor - use actual student.tutor_id relationship
             $studentsPerTutor = DB::table('tutors')
-                ->leftJoin('tutor_reports', function($join) use ($year) {
-                    $join->on('tutors.id', '=', 'tutor_reports.tutor_id')
-                         ->whereYear('tutor_reports.created_at', $year);
-                })
+                ->leftJoin('students', 'tutors.id', '=', 'students.tutor_id')
                 ->select(
                     'tutors.first_name',
                     'tutors.last_name',
-                    DB::raw('COUNT(DISTINCT tutor_reports.student_id) as student_count')
+                    DB::raw('COUNT(DISTINCT students.id) as student_count')
                 )
                 ->where('tutors.status', 'active')
+                ->where(function($query) {
+                    $query->where('students.status', 'active')
+                          ->orWhereNull('students.id');
+                })
                 ->groupBy('tutors.id', 'tutors.first_name', 'tutors.last_name')
                 ->orderBy('student_count', 'desc')
                 ->limit(20)
                 ->get();
 
-            // Average attendance by tutor for selected year
+            // Average attendance by tutor - use actual attendance_records table
+            // Calculate attendance rate: approved classes / total classes submitted
             $attendanceByTutor = DB::table('tutors')
-                ->leftJoin('tutor_reports', function($join) use ($year) {
-                    $join->on('tutors.id', '=', 'tutor_reports.tutor_id')
-                         ->whereYear('tutor_reports.created_at', $year);
+                ->leftJoin('attendance_records', function($join) use ($year) {
+                    $join->on('tutors.id', '=', 'attendance_records.tutor_id')
+                         ->whereYear('attendance_records.class_date', $year);
                 })
                 ->select(
                     'tutors.first_name',
                     'tutors.last_name',
                     'tutors.id',
-                    DB::raw('AVG(tutor_reports.attendance_score) as avg_attendance')
+                    DB::raw('COUNT(attendance_records.id) as total_classes'),
+                    DB::raw('SUM(CASE WHEN attendance_records.status = "approved" THEN 1 ELSE 0 END) as approved_classes')
                 )
                 ->where('tutors.status', 'active')
-                ->whereNotNull('tutor_reports.attendance_score')
                 ->groupBy('tutors.id', 'tutors.first_name', 'tutors.last_name')
-                ->having('avg_attendance', '>', 0)
-                ->orderBy('avg_attendance', 'desc')
+                ->having('total_classes', '>', 0)
+                ->orderBy('total_classes', 'desc')
                 ->limit(20)
-                ->get();
+                ->get()
+                ->map(function($tutor) {
+                    $tutor->avg_attendance = $tutor->total_classes > 0
+                        ? round(($tutor->approved_classes / $tutor->total_classes) * 100, 1)
+                        : 0;
+                    return $tutor;
+                })
+                ->sortByDesc('avg_attendance')
+                ->values();
 
             // Tutors with low attendance (<70%)
             $lowAttendanceTutors = $attendanceByTutor->filter(function ($tutor) {
@@ -306,7 +316,7 @@ class AnalyticsController extends Controller
                     'labels' => $studentsPerTutor->map(fn($t) => $t->first_name . ' ' . $t->last_name)->toArray(),
                     'datasets' => [
                         [
-                            'label' => 'Students per Tutor',
+                            'label' => 'Students Assigned',
                             'data' => $studentsPerTutor->pluck('student_count')->toArray(),
                             'backgroundColor' => 'rgba(124, 58, 237, 0.7)',
                         ]
@@ -316,7 +326,7 @@ class AnalyticsController extends Controller
                     'labels' => $attendanceByTutor->map(fn($t) => $t->first_name . ' ' . $t->last_name)->toArray(),
                     'datasets' => [
                         [
-                            'label' => 'Average Attendance %',
+                            'label' => 'Approval Rate %',
                             'data' => $attendanceByTutor->pluck('avg_attendance')->toArray(),
                             'backgroundColor' => $attendanceByTutor->map(function($t) {
                                 return $t->avg_attendance >= 90 ? 'rgba(34, 197, 94, 0.7)' :
@@ -327,6 +337,78 @@ class AnalyticsController extends Controller
                     ]
                 ],
                 'low_attendance_tutors' => $lowAttendanceTutors->toArray()
+            ];
+        });
+
+        return response()->json($data);
+    }
+
+    /**
+     * Get course analytics data (JSON) - courses covered in attendance.
+     */
+    public function getCourseAnalyticsData(Request $request)
+    {
+        $year = $request->input('year', now()->year);
+
+        // Clear cache for fresh data
+        Cache::forget("director.analytics.courses.{$year}");
+
+        $data = Cache::remember("director.analytics.courses.{$year}", 300, function () use ($year) {
+            // Get all attendance records with courses_covered for the year
+            $attendanceWithCourses = DB::table('attendance_records')
+                ->whereYear('class_date', $year)
+                ->where('status', 'approved')
+                ->whereNotNull('courses_covered')
+                ->select('courses_covered')
+                ->get();
+
+            // Parse and count courses
+            $courseCounts = [];
+            foreach ($attendanceWithCourses as $record) {
+                $courses = json_decode($record->courses_covered, true);
+                if (is_array($courses)) {
+                    foreach ($courses as $course) {
+                        $course = trim($course);
+                        if (!empty($course)) {
+                            $courseCounts[$course] = ($courseCounts[$course] ?? 0) + 1;
+                        }
+                    }
+                }
+            }
+
+            // Sort by count descending
+            arsort($courseCounts);
+
+            // Get top 10 courses
+            $topCourses = array_slice($courseCounts, 0, 10, true);
+
+            // Generate colors for each course
+            $colors = [
+                'rgba(79, 70, 229, 0.7)',
+                'rgba(129, 140, 248, 0.7)',
+                'rgba(124, 58, 237, 0.7)',
+                'rgba(167, 139, 250, 0.7)',
+                'rgba(99, 102, 241, 0.7)',
+                'rgba(139, 92, 246, 0.7)',
+                'rgba(67, 56, 202, 0.7)',
+                'rgba(109, 40, 217, 0.7)',
+                'rgba(55, 48, 163, 0.7)',
+                'rgba(91, 33, 182, 0.7)',
+            ];
+
+            return [
+                'courses' => [
+                    'labels' => array_keys($topCourses),
+                    'datasets' => [
+                        [
+                            'label' => 'Classes Taught',
+                            'data' => array_values($topCourses),
+                            'backgroundColor' => array_slice($colors, 0, count($topCourses)),
+                        ]
+                    ]
+                ],
+                'total_classes' => array_sum($courseCounts),
+                'unique_courses' => count($courseCounts),
             ];
         });
 
