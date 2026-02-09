@@ -142,12 +142,13 @@ class AnalyticsController extends Controller
      */
     public function getReportsData(Request $request)
     {
-        $year = $request->input('year', now()->year);
+        try {
+            $year = $request->input('year', now()->year);
 
-        // Clear cache for fresh data
-        Cache::forget("director.analytics.reports.{$year}");
+            // Clear cache for fresh data
+            Cache::forget("director.analytics.reports.{$year}");
 
-        $data = Cache::remember("director.analytics.reports.{$year}", 300, function () use ($year) {
+            $data = Cache::remember("director.analytics.reports.{$year}", 300, function () use ($year) {
             // Monthly report submissions for selected year
             $monthlyReports = DB::table('tutor_reports')
                 ->select(
@@ -245,7 +246,15 @@ class AnalyticsController extends Controller
             ];
         });
 
-        return response()->json($data);
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json([
+                'monthly' => ['labels' => [], 'datasets' => []],
+                'status' => ['labels' => [], 'datasets' => []],
+                'top_tutors' => [],
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -558,102 +567,90 @@ class AnalyticsController extends Controller
      */
     public function getStudentLearningData(Request $request)
     {
-        $studentId = $request->input('student_id');
-        $dateFrom = $request->input('date_from', now()->subMonths(3)->format('Y-m-d'));
-        $dateTo = $request->input('date_to', now()->format('Y-m-d'));
+        try {
+            $studentId = $request->input('student_id');
+            $dateFrom = $request->input('date_from', now()->subMonths(3)->format('Y-m-d'));
+            $dateTo = $request->input('date_to', now()->format('Y-m-d'));
 
-        if (!$studentId) {
-            // Return list of students for dropdown
-            $students = Student::where('status', 'active')
-                ->orderBy('first_name')
-                ->get(['id', 'first_name', 'last_name', 'student_id']);
+            if (!$studentId) {
+                // Return list of students for dropdown
+                $students = Student::where('status', 'active')
+                    ->orderBy('first_name')
+                    ->get(['id', 'first_name', 'last_name', 'student_id']);
 
-            return response()->json([
-                'students' => $students->map(fn($s) => [
-                    'id' => $s->id,
-                    'name' => $s->first_name . ' ' . $s->last_name,
-                    'student_id' => $s->student_id
-                ])
-            ]);
-        }
-
-        // Get student info
-        $student = Student::with(['tutor', 'currentCourse'])->find($studentId);
-        if (!$student) {
-            return response()->json(['error' => 'Student not found'], 404);
-        }
-
-        // Get attendance records with topics covered
-        $attendanceRecords = \App\Models\AttendanceRecord::where('student_id', $studentId)
-            ->whereBetween('class_date', [$dateFrom, $dateTo])
-            ->where('status', 'approved')
-            ->orderBy('class_date', 'desc')
-            ->get(['class_date', 'topic', 'courses_covered', 'tutor_id', 'notes']);
-
-        // Get tutor reports with topics
-        $tutorReports = \App\Models\TutorReport::where('student_id', $studentId)
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
-            ->orderBy('created_at', 'desc')
-            ->get(['created_at', 'month', 'topics_covered', 'challenges', 'tutor_id', 'status']);
-
-        // Compile topics list
-        $topicsList = collect();
-
-        foreach ($attendanceRecords as $record) {
-            if ($record->topic) {
-                $topicsList->push([
-                    'date' => $record->class_date->format('Y-m-d'),
-                    'topic' => $record->topic,
-                    'course' => is_array($record->courses_covered) ? implode(', ', $record->courses_covered) : null,
-                    'type' => 'attendance',
-                    'tutor_id' => $record->tutor_id,
+                return response()->json([
+                    'students' => $students->map(fn($s) => [
+                        'id' => $s->id,
+                        'name' => $s->first_name . ' ' . $s->last_name,
+                        'student_id' => $s->student_id
+                    ])
                 ]);
             }
-        }
 
-        foreach ($tutorReports as $report) {
-            if ($report->topics_covered) {
-                $topics = is_array($report->topics_covered) ? $report->topics_covered : [$report->topics_covered];
-                foreach ($topics as $topic) {
+            // Get student info
+            $student = Student::with(['tutor'])->find($studentId);
+            if (!$student) {
+                return response()->json(['error' => 'Student not found'], 404);
+            }
+
+            // Get attendance records with topics covered
+            $attendanceRecords = \App\Models\AttendanceRecord::where('student_id', $studentId)
+                ->whereBetween('class_date', [$dateFrom, $dateTo])
+                ->where('status', 'approved')
+                ->orderBy('class_date', 'desc')
+                ->get();
+
+            // Compile topics list from attendance
+            $topicsList = collect();
+
+            foreach ($attendanceRecords as $record) {
+                if ($record->topic) {
+                    $courses = $record->courses_covered;
+                    $courseStr = null;
+                    if (is_array($courses) && count($courses) > 0) {
+                        $courseStr = implode(', ', $courses);
+                    } elseif (is_string($courses) && !empty($courses)) {
+                        $courseStr = $courses;
+                    }
+
                     $topicsList->push([
-                        'date' => $report->created_at->format('Y-m-d'),
-                        'topic' => $topic,
-                        'course' => null,
-                        'type' => 'report',
-                        'tutor_id' => $report->tutor_id,
-                        'month' => $report->month,
+                        'date' => $record->class_date ? $record->class_date->format('Y-m-d') : null,
+                        'topic' => $record->topic,
+                        'course' => $courseStr,
+                        'type' => 'attendance',
                     ]);
                 }
             }
+
+            // Get unique topics count
+            $uniqueTopics = $topicsList->pluck('topic')->filter()->unique()->count();
+
+            // Get classes count
+            $classesCount = $attendanceRecords->count();
+
+            return response()->json([
+                'student' => [
+                    'id' => $student->id,
+                    'name' => $student->first_name . ' ' . $student->last_name,
+                    'student_id' => $student->student_id,
+                    'tutor' => $student->tutor ? $student->tutor->first_name . ' ' . $student->tutor->last_name : 'Unassigned',
+                    'current_course' => $student->current_level ? 'Level ' . $student->current_level : 'N/A',
+                ],
+                'summary' => [
+                    'total_classes' => $classesCount,
+                    'unique_topics' => $uniqueTopics,
+                    'date_range' => $dateFrom . ' to ' . $dateTo,
+                ],
+                'topics' => $topicsList->sortByDesc('date')->values()->toArray(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error loading student data: ' . $e->getMessage(),
+                'student' => null,
+                'summary' => ['total_classes' => 0, 'unique_topics' => 0],
+                'topics' => []
+            ], 200); // Return 200 with error message so Alpine.js can display it
         }
-
-        // Get unique topics count
-        $uniqueTopics = $topicsList->pluck('topic')->unique()->count();
-
-        // Get classes count
-        $classesCount = $attendanceRecords->count();
-
-        return response()->json([
-            'student' => [
-                'id' => $student->id,
-                'name' => $student->first_name . ' ' . $student->last_name,
-                'student_id' => $student->student_id,
-                'tutor' => $student->tutor ? $student->tutor->first_name . ' ' . $student->tutor->last_name : 'Unassigned',
-                'current_course' => $student->currentCourse ? $student->currentCourse->name : ($student->current_level ? 'Level ' . $student->current_level : 'N/A'),
-            ],
-            'summary' => [
-                'total_classes' => $classesCount,
-                'unique_topics' => $uniqueTopics,
-                'date_range' => $dateFrom . ' to ' . $dateTo,
-            ],
-            'topics' => $topicsList->sortByDesc('date')->values()->toArray(),
-            'attendance' => $attendanceRecords->map(fn($r) => [
-                'date' => $r->class_date->format('Y-m-d'),
-                'topic' => $r->topic,
-                'courses' => $r->courses_covered,
-                'notes' => $r->notes,
-            ])->toArray(),
-        ]);
     }
 
     /**
