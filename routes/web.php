@@ -199,6 +199,8 @@ Route::middleware(['auth', 'verified', 'role:parent'])->prefix('parent')->name('
         ->name('children.show');
     Route::post('/children/request-course', [App\Http\Controllers\Parent\ParentChildrenController::class, 'requestCourse'])
         ->name('children.request-course');
+    Route::get('/children/{student}/course-learning', [App\Http\Controllers\Parent\ParentChildrenController::class, 'getCourseLearningData'])
+        ->name('children.course-learning');
 
     // Performance
     Route::get('/performance', [App\Http\Controllers\Parent\ParentPerformanceController::class, 'index'])
