@@ -154,17 +154,100 @@
             {{-- Charts Section --}}
             <div class="space-y-8">
 
+                {{-- Student Learning Tracker - Moved to top --}}
+                <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl" x-data="studentLearningTracker()" x-init="init()">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Student Learning Tracker</h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Track courses and topics taught to each student</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <select id="studentSelect" x-ref="studentSelect" @change="selectedStudent = $event.target.value; loadStudentData()" class="px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5] min-w-[200px]">
+                                <option value="">Select a student...</option>
+                            </select>
+                            <input type="date" x-model="dateFrom" @change="if(selectedStudent) loadStudentData()" class="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5]">
+                            <span class="text-gray-500">to</span>
+                            <input type="date" x-model="dateTo" @change="if(selectedStudent) loadStudentData()" class="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5]">
+                        </div>
+                    </div>
+
+                    {{-- Content Area --}}
+                    <div class="max-h-96 overflow-y-auto">
+                        {{-- No Student Selected --}}
+                        <div x-show="!selectedStudent" class="text-center py-12">
+                            <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            <p class="text-gray-500 dark:text-gray-400">Select a student to view their learning history</p>
+                        </div>
+
+                        {{-- Loading State --}}
+                        <div x-show="loading" x-cloak class="text-center py-12">
+                            <svg class="animate-spin h-8 w-8 mx-auto text-[#4F46E5]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="text-gray-500 dark:text-gray-400 mt-2">Loading...</p>
+                        </div>
+
+                        {{-- Student Data Display --}}
+                        <div x-show="selectedStudent && !loading && studentData" x-cloak>
+                            {{-- Student Info Summary --}}
+                            <div x-show="studentData && studentData.student" class="mb-6 p-4 bg-gradient-to-r from-[#4F46E5]/10 to-[#818CF8]/10 rounded-xl border border-[#4F46E5]/20">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Student</p>
+                                        <p class="font-semibold text-gray-900 dark:text-white" x-text="studentData?.student?.name || '-'"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Current Tutor</p>
+                                        <p class="font-semibold text-gray-900 dark:text-white" x-text="studentData?.student?.tutor || '-'"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Total Classes</p>
+                                        <p class="font-semibold text-[#4F46E5]" x-text="studentData?.summary?.total_classes || 0"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Unique Topics Covered</p>
+                                        <p class="font-semibold text-[#4F46E5]" x-text="studentData?.summary?.unique_topics || 0"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- No Topics --}}
+                            <div x-show="studentData && studentData.topics && studentData.topics.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                No topics recorded for this period
+                            </div>
+
+                            {{-- Topics Timeline --}}
+                            <div x-show="studentData && studentData.topics && studentData.topics.length > 0" class="space-y-3">
+                                <template x-for="(topic, index) in (studentData?.topics || [])" :key="index">
+                                    <div class="flex items-start gap-4 p-4 bg-white/50 dark:bg-gray-800/50 rounded-xl border border-white/10">
+                                        <div class="flex-shrink-0 w-20 text-right">
+                                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400" x-text="topic.date"></span>
+                                        </div>
+                                        <div class="w-1 min-h-[2rem] bg-gradient-to-b from-[#4F46E5] to-[#818CF8] rounded-full"></div>
+                                        <div class="flex-1">
+                                            <p class="font-medium text-gray-900 dark:text-white" x-text="topic.topic"></p>
+                                            <span x-show="topic.course" class="inline-block mt-1 px-2 py-0.5 text-xs bg-[#4F46E5]/10 text-[#4F46E5] dark:text-[#818CF8] rounded-full" x-text="topic.course"></span>
+                                        </div>
+                                        <span class="text-xs px-2 py-1 rounded-full"
+                                              :class="topic.type === 'attendance' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'"
+                                              x-text="topic.type === 'attendance' ? 'Attendance' : 'Report'"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Enrollment & Growth --}}
                 <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Enrollment & Growth</h2>
-                        <button onclick="toggleTable('enrollments')" class="text-sm text-[#4F46E5] dark:text-[#818CF8] hover:underline">View Data Table</button>
                     </div>
                     <div class="h-80">
                         <canvas id="enrollmentsChart"></canvas>
-                    </div>
-                    <div id="enrollments-table" class="hidden mt-6 overflow-x-auto">
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Loading data...</p>
                     </div>
                 </div>
 
@@ -173,12 +256,10 @@
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl">
                         <div class="flex justify-between items-center mb-6">
                             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Monthly Report Submissions</h2>
-                            <button onclick="toggleTable('reports')" class="text-sm text-[#4F46E5] dark:text-[#818CF8] hover:underline">View Table</button>
                         </div>
                         <div class="h-64">
                             <canvas id="reportsMonthlyChart"></canvas>
                         </div>
-                        <div id="reports-table" class="hidden mt-4"></div>
                     </div>
 
                     <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl">
@@ -247,101 +328,6 @@
                     </div>
                 </div>
 
-                {{-- Student Learning Tracker --}}
-                <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl" x-data="studentLearningTracker()" x-init="init()">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Student Learning Tracker</h2>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Track courses and topics taught to each student</p>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-3">
-                            <select id="studentSelect" x-ref="studentSelect" @change="selectedStudent = $event.target.value; loadStudentData()" class="px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5] min-w-[200px]">
-                                <option value="">Select a student...</option>
-                            </select>
-                            <input type="date" x-model="dateFrom" @change="loadStudentData()" class="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5]">
-                            <span class="text-gray-500">to</span>
-                            <input type="date" x-model="dateTo" @change="loadStudentData()" class="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5]">
-                        </div>
-                    </div>
-
-                    {{-- Student Info Summary --}}
-                    <template x-if="studentData && studentData.student">
-                        <div class="mb-6 p-4 bg-gradient-to-r from-[#4F46E5]/10 to-[#818CF8]/10 rounded-xl border border-[#4F46E5]/20">
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Student</p>
-                                    <p class="font-semibold text-gray-900 dark:text-white" x-text="studentData.student.name"></p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Current Tutor</p>
-                                    <p class="font-semibold text-gray-900 dark:text-white" x-text="studentData.student.tutor"></p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Total Classes</p>
-                                    <p class="font-semibold text-[#4F46E5]" x-text="studentData.summary.total_classes"></p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Unique Topics Covered</p>
-                                    <p class="font-semibold text-[#4F46E5]" x-text="studentData.summary.unique_topics"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-
-                    {{-- Topics Timeline --}}
-                    <div class="max-h-96 overflow-y-auto">
-                        <template x-if="!selectedStudent">
-                            <div class="text-center py-12">
-                                <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                </svg>
-                                <p class="text-gray-500 dark:text-gray-400">Select a student to view their learning history</p>
-                            </div>
-                        </template>
-
-                        <template x-if="loading">
-                            <div class="text-center py-12">
-                                <svg class="animate-spin h-8 w-8 mx-auto text-[#4F46E5]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <p class="text-gray-500 dark:text-gray-400 mt-2">Loading...</p>
-                            </div>
-                        </template>
-
-                        <template x-if="selectedStudent && !loading && studentData && studentData.topics">
-                            <div>
-                                <template x-if="studentData.topics.length === 0">
-                                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                                        No topics recorded for this period
-                                    </div>
-                                </template>
-                                <template x-if="studentData.topics.length > 0">
-                                    <div class="space-y-3">
-                                        <template x-for="(topic, index) in studentData.topics" :key="index">
-                                            <div class="flex items-start gap-4 p-4 bg-white/50 dark:bg-gray-800/50 rounded-xl border border-white/10">
-                                                <div class="flex-shrink-0 w-20 text-right">
-                                                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400" x-text="topic.date"></span>
-                                                </div>
-                                                <div class="w-px h-full bg-gradient-to-b from-[#4F46E5] to-[#818CF8] self-stretch"></div>
-                                                <div class="flex-1">
-                                                    <p class="font-medium text-gray-900 dark:text-white" x-text="topic.topic"></p>
-                                                    <template x-if="topic.course">
-                                                        <span class="inline-block mt-1 px-2 py-0.5 text-xs bg-[#4F46E5]/10 text-[#4F46E5] dark:text-[#818CF8] rounded-full" x-text="topic.course"></span>
-                                                    </template>
-                                                </div>
-                                                <span class="text-xs px-2 py-1 rounded-full"
-                                                      :class="topic.type === 'attendance' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'"
-                                                      x-text="topic.type === 'attendance' ? 'Attendance' : 'Report'"></span>
-                                            </div>
-                                        </template>
-                                    </div>
-                                </template>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
             </div>
 
         </div>
@@ -367,19 +353,6 @@
         // Store chart instances for updating
         let charts = {};
         let selectedYear = new Date().getFullYear();
-
-        // Toggle table visibility
-        function toggleTable(id) {
-            const table = document.getElementById(id + '-table');
-            table.classList.toggle('hidden');
-        }
-
-        // Show loading state
-        function showLoading(canvasId) {
-            const canvas = document.getElementById(canvasId);
-            const parent = canvas.parentElement;
-            parent.innerHTML = '<div class="flex items-center justify-center h-full"><p class="text-gray-500">Loading data...</p></div><canvas id="' + canvasId + '"></canvas>';
-        }
 
         // Show no data message
         function showNoData(canvasId, message = 'No data available') {
