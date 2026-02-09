@@ -83,35 +83,32 @@ class DirectorAttendanceController extends Controller
 
         $attendance = $query->orderBy('created_at', 'desc')->paginate(20);
 
-        // Add monthly attendance counter for each record
+        // Add monthly attendance counter for each record - showing position (1/8, 2/8, 3/8)
         foreach ($attendance as $record) {
             if ($record->student && $record->class_date) {
-                // Count approved NON-stand-in attendance for this student in the same month
-                // Stand-in classes don't count towards the main tutor's tally
-                $approvedCount = AttendanceRecord::where('student_id', $record->student_id)
+                // Get all approved NON-stand-in attendance for this student in the same month, ordered chronologically
+                $monthlyApproved = AttendanceRecord::where('student_id', $record->student_id)
                     ->where('status', 'approved')
-                    ->where('is_stand_in', false) // Exclude stand-in records
+                    ->where('is_stand_in', false)
                     ->whereYear('class_date', $record->class_date->year)
                     ->whereMonth('class_date', $record->class_date->month)
-                    ->count();
+                    ->whereDate('class_date', '<=', $record->class_date)
+                    ->orderBy('class_date', 'asc')
+                    ->orderBy('class_time', 'asc')
+                    ->pluck('id')
+                    ->toArray();
 
                 // Calculate expected monthly classes based on student's schedule
                 $student = $record->student;
                 $expectedMonthlyClasses = 0;
 
                 if ($student->class_schedule && is_array($student->class_schedule)) {
-                    // Count classes per week from student's schedule
                     $classesPerWeek = count($student->class_schedule);
-
-                    // Calculate number of weeks in the month (same logic as tutor portal)
                     $monthStart = \Carbon\Carbon::create($record->class_date->year, $record->class_date->month, 1);
                     $monthEnd = $monthStart->copy()->endOfMonth();
                     $weeksInMonth = ceil($monthEnd->diffInDays($monthStart) / 7);
-
-                    // Expected classes = classes per week * weeks in month
                     $expectedMonthlyClasses = $classesPerWeek * $weeksInMonth;
                 } else {
-                    // Fallback to total non-stand-in attendance records for the month
                     $expectedMonthlyClasses = AttendanceRecord::where('student_id', $record->student_id)
                         ->where('is_stand_in', false)
                         ->whereYear('class_date', $record->class_date->year)
@@ -119,8 +116,14 @@ class DirectorAttendanceController extends Controller
                         ->count();
                 }
 
-                $record->monthly_attended = $approvedCount;
-                $record->monthly_total = max($expectedMonthlyClasses, 1); // Ensure at least 1 to avoid division by zero
+                // Find position of this record in the chronological approved list (incremental: 1/8, 2/8, 3/8)
+                if ($record->is_stand_in) {
+                    $record->monthly_attended = 0; // Stand-in doesn't count
+                } else {
+                    $position = array_search($record->id, $monthlyApproved);
+                    $record->monthly_attended = ($record->status === 'approved' && $position !== false) ? $position + 1 : 0;
+                }
+                $record->monthly_total = max($expectedMonthlyClasses, 1);
             }
         }
 

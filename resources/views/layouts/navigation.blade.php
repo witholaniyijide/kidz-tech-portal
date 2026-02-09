@@ -209,7 +209,7 @@ class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 s
                     </x-slot>
 
                     <x-slot name="content">
-                        <div class="w-96 max-h-[32rem] overflow-y-auto">
+                        <div class="w-full sm:w-96 max-h-[32rem] overflow-y-auto">
                             <div class="px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 sticky top-0">
                                 Notifications
                             </div>

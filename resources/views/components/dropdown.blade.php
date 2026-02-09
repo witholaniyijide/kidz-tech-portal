@@ -18,6 +18,10 @@ switch ($width) {
     case '48':
         $width = 'w-48';
         break;
+    case '96':
+        // Notification dropdown - mobile responsive: full width on mobile, fixed width on desktop
+        $width = 'w-[calc(100vw-2rem)] sm:w-96 right-0 sm:right-auto';
+        break;
 }
 @endphp
 

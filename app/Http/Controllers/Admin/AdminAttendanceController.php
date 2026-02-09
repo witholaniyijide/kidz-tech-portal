@@ -69,35 +69,32 @@ class AdminAttendanceController extends Controller
         $perPage = $request->get('per_page', 20);
         $attendances = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
-        // Add monthly attendance counter for each record
+        // Add monthly attendance counter for each record - showing position (1/8, 2/8, 3/8)
         foreach ($attendances as $attendance) {
             if ($attendance->student && $attendance->class_date) {
-                // Count approved NON-stand-in attendance for this student in the same month
-                // Stand-in classes don't count towards the main tutor's tally
-                $approvedCount = AttendanceRecord::where('student_id', $attendance->student_id)
+                // Get all approved NON-stand-in attendance for this student in the same month, ordered chronologically
+                $monthlyApproved = AttendanceRecord::where('student_id', $attendance->student_id)
                     ->where('status', 'approved')
-                    ->where('is_stand_in', false) // Exclude stand-in records
+                    ->where('is_stand_in', false)
                     ->whereYear('class_date', $attendance->class_date->year)
                     ->whereMonth('class_date', $attendance->class_date->month)
-                    ->count();
+                    ->whereDate('class_date', '<=', $attendance->class_date)
+                    ->orderBy('class_date', 'asc')
+                    ->orderBy('class_time', 'asc')
+                    ->pluck('id')
+                    ->toArray();
 
                 // Calculate expected monthly classes based on student's schedule
                 $student = $attendance->student;
                 $expectedMonthlyClasses = 0;
 
                 if ($student->class_schedule && is_array($student->class_schedule)) {
-                    // Count classes per week from student's schedule
                     $classesPerWeek = count($student->class_schedule);
-
-                    // Calculate number of weeks in the month (same logic as tutor portal)
                     $monthStart = Carbon::create($attendance->class_date->year, $attendance->class_date->month, 1);
                     $monthEnd = $monthStart->copy()->endOfMonth();
                     $weeksInMonth = ceil($monthEnd->diffInDays($monthStart) / 7);
-
-                    // Expected classes = classes per week * weeks in month
                     $expectedMonthlyClasses = $classesPerWeek * $weeksInMonth;
                 } else {
-                    // Fallback to total non-stand-in attendance records for the month
                     $expectedMonthlyClasses = AttendanceRecord::where('student_id', $attendance->student_id)
                         ->where('is_stand_in', false)
                         ->whereYear('class_date', $attendance->class_date->year)
@@ -105,8 +102,14 @@ class AdminAttendanceController extends Controller
                         ->count();
                 }
 
-                $attendance->monthly_attended = $approvedCount;
-                $attendance->monthly_total = max($expectedMonthlyClasses, 1); // Ensure at least 1 to avoid division by zero
+                // Find position of this record in the chronological approved list (incremental: 1/8, 2/8, 3/8)
+                if ($attendance->is_stand_in) {
+                    $attendance->monthly_attended = 0; // Stand-in doesn't count
+                } else {
+                    $position = array_search($attendance->id, $monthlyApproved);
+                    $attendance->monthly_attended = ($attendance->status === 'approved' && $position !== false) ? $position + 1 : 0;
+                }
+                $attendance->monthly_total = max($expectedMonthlyClasses, 1);
             }
         }
 

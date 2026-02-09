@@ -120,7 +120,9 @@
                                                     <div class="font-semibold text-gray-900 dark:text-white">
                                                         {{ $student->first_name }} {{ $student->other_name }} {{ $student->last_name }}
                                                     </div>
-                                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ $student->email ?? 'No email' }}</div>
+                                                    @if($student->student_id)
+                                                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ $student->student_id }}</div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </td>
