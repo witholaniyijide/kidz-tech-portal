@@ -98,7 +98,7 @@
                         </div>
 
                         <!-- Class Time -->
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Time</label>
                                 <input type="time" name="class_start_time" value="{{ old('class_start_time', $attendance->class_start_time ? \Carbon\Carbon::parse($attendance->class_start_time)->format('H:i') : '') }}"
