@@ -74,12 +74,15 @@
                                 </select>
                             </div>
 
-                            {{-- Tutor (Auto-selected) --}}
+                            {{-- Tutor (Auto-selected or Stand-in) --}}
                             <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Assigned Tutor</label>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                                    <span x-show="!formData.is_stand_in">Assigned Tutor</span>
+                                    <span x-show="formData.is_stand_in">Original Tutor (Being stood in for)</span>
+                                </label>
                                 <div class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-600">
                                     <span x-text="selectedTutorName || 'Select a student first'" :class="selectedTutorName ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'"></span>
-                                    <input type="hidden" x-model="formData.tutor_id">
+                                    <input type="hidden" x-model="formData.original_tutor_id">
                                 </div>
                             </div>
 
@@ -88,6 +91,35 @@
                                 <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Date Class Taken *</label>
                                 <input type="date" x-model="formData.class_date" @change="updateWeekFromDate()" required
                                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
+                            </div>
+                        </div>
+
+                        {{-- Stand-in Assessment Toggle --}}
+                        <div class="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 rounded-xl" x-show="formData.student_id">
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" x-model="formData.is_stand_in" @change="handleStandInToggle()"
+                                           class="w-5 h-5 text-amber-600 rounded border-gray-300 focus:ring-amber-500">
+                                    <span class="ml-3 font-medium text-amber-800 dark:text-amber-300">This is a stand-in class</span>
+                                </label>
+                            </div>
+                            <p class="text-sm text-amber-600 dark:text-amber-400 mt-2">
+                                Check this if the class was taken by a different tutor than the student's assigned tutor.
+                            </p>
+
+                            {{-- Stand-in Tutor Selection --}}
+                            <div x-show="formData.is_stand_in" x-transition class="mt-4 pt-4 border-t border-amber-200 dark:border-amber-800/30">
+                                <label class="block text-sm font-medium mb-2 text-amber-800 dark:text-amber-300">Stand-in Tutor (Who took the class) *</label>
+                                <select x-model="formData.tutor_id" required
+                                        class="w-full border border-amber-300 dark:border-amber-700 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Select stand-in tutor</option>
+                                    @foreach($tutors as $tutor)
+                                        <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
+                                    @endforeach
+                                </select>
+                                <p class="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                                    This assessment will be filed under the stand-in tutor's record.
+                                </p>
                             </div>
                         </div>
 
@@ -251,14 +283,22 @@
                         <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 border-l-4 {{ $assessment->status === 'draft' ? 'border-l-amber-400' : 'border-l-[#C15F3C]' }}">
                             <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
                                 <div class="flex-1">
-                                    <div class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                                    <div class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2 flex-wrap">
                                         {{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}
+                                        @if($assessment->is_stand_in)
+                                            <span class="px-2 py-0.5 text-xs bg-purple-500 text-white rounded-full">Stand-in</span>
+                                        @endif
                                         @if($assessment->status === 'approved-by-manager')
                                             <span class="px-2 py-0.5 text-xs bg-[#C15F3C] text-white rounded-full">Awaiting Director</span>
                                         @elseif($assessment->status === 'draft')
                                             <span class="px-2 py-0.5 text-xs bg-amber-500 text-white rounded-full">Draft</span>
                                         @endif
                                     </div>
+                                    @if($assessment->is_stand_in && $assessment->originalTutor)
+                                        <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                                            Standing in for: {{ $assessment->originalTutor->first_name }} {{ $assessment->originalTutor->last_name }}
+                                        </div>
+                                    @endif
                                     <div class="text-gray-500 dark:text-gray-400 text-sm">
                                         {{ $assessment->assessment_month }} | Session {{ $assessment->session ?? 1 }}
                                     </div>
@@ -428,9 +468,13 @@
                         <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 border-l-4 border-l-emerald-500">
                             <div class="flex flex-wrap justify-between items-start gap-4">
                                 <div class="flex-1">
-                                    <div class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                                    <div class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2 flex-wrap">
                                         <span x-text="assessment.tutor_name"></span>
+                                        <span x-show="assessment.is_stand_in" class="px-2 py-0.5 text-xs bg-purple-500 text-white rounded-full">Stand-in</span>
                                         <span class="px-2 py-0.5 text-xs bg-emerald-500 text-white rounded-full">Completed</span>
+                                    </div>
+                                    <div x-show="assessment.is_stand_in && assessment.original_tutor_name" class="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                                        Standing in for: <span x-text="assessment.original_tutor_name"></span>
                                     </div>
                                     <div class="text-gray-500 dark:text-gray-400 text-sm" x-text="assessment.assessment_month"></div>
                                     <div class="text-gray-500 dark:text-gray-400 text-xs mt-1" x-show="assessment.student_name">
@@ -530,6 +574,8 @@
                 formData: {
                     student_id: '',
                     tutor_id: '',
+                    original_tutor_id: '',
+                    is_stand_in: false,
                     class_date: '',
                     week: {{ date('W') }},
                     year: {{ date('Y') }},
@@ -596,11 +642,32 @@
                     const select = document.querySelector('select[x-model="formData.student_id"]');
                     const option = select.options[select.selectedIndex];
                     if (option && option.value) {
-                        this.formData.tutor_id = option.dataset.tutorId || '';
-                        this.selectedTutorName = option.dataset.tutorName || 'No Tutor Assigned';
+                        const tutorId = option.dataset.tutorId || '';
+                        const tutorName = option.dataset.tutorName || 'No Tutor Assigned';
+                        // Store original tutor info
+                        this.formData.original_tutor_id = tutorId;
+                        this.selectedTutorName = tutorName;
+                        // If not stand-in, tutor_id is same as original
+                        if (!this.formData.is_stand_in) {
+                            this.formData.tutor_id = tutorId;
+                        }
                     } else {
                         this.formData.tutor_id = '';
+                        this.formData.original_tutor_id = '';
                         this.selectedTutorName = '';
+                    }
+                    // Reset stand-in when changing student
+                    this.formData.is_stand_in = false;
+                },
+
+                // Handle stand-in toggle
+                handleStandInToggle() {
+                    if (this.formData.is_stand_in) {
+                        // Clear tutor_id so user must select stand-in tutor
+                        this.formData.tutor_id = '';
+                    } else {
+                        // Restore original tutor
+                        this.formData.tutor_id = this.formData.original_tutor_id;
                     }
                 },
 
@@ -629,6 +696,8 @@
                     this.formData = {
                         student_id: '',
                         tutor_id: '',
+                        original_tutor_id: '',
+                        is_stand_in: false,
                         class_date: '',
                         week: {{ date('W') }},
                         year: {{ date('Y') }},
@@ -666,7 +735,9 @@
                             class_date: '{{ $assessment->class_date ?? '' }}',
                             performance_score: {{ $assessment->performance_score ?? 'null' }},
                             approved_at: '{{ $assessment->approved_by_director_at ? $assessment->approved_by_director_at->format("M j, Y") : "" }}',
-                            director_comment: '{{ addslashes($assessment->director_comment ?? '') }}'
+                            director_comment: '{{ addslashes($assessment->director_comment ?? '') }}',
+                            is_stand_in: {{ $assessment->is_stand_in ? 'true' : 'false' }},
+                            original_tutor_name: '{{ $assessment->is_stand_in && $assessment->originalTutor ? ($assessment->originalTutor->first_name . ' ' . $assessment->originalTutor->last_name) : '' }}'
                         },
                     @endforeach
                 ],
@@ -728,7 +799,11 @@
                     }
 
                     if (!this.formData.tutor_id) {
-                        this.showToast('Selected student has no assigned tutor', 'error');
+                        if (this.formData.is_stand_in) {
+                            this.showToast('Please select the stand-in tutor who took the class', 'error');
+                        } else {
+                            this.showToast('Selected student has no assigned tutor', 'error');
+                        }
                         return;
                     }
 
@@ -748,7 +823,9 @@
                             session: this.session,
                             criteria_assessed: Object.keys(this.checkedCriteria).filter(k => this.checkedCriteria[k]),
                             criteria_ratings: this.ratings,
-                            action: action // 'draft' or 'send'
+                            action: action, // 'draft' or 'send'
+                            is_stand_in: this.formData.is_stand_in,
+                            original_tutor_id: this.formData.is_stand_in ? this.formData.original_tutor_id : null
                         };
 
                         const response = await fetch('{{ route("manager.assessments.store") }}', {

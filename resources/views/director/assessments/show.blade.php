@@ -12,8 +12,18 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="mb-8 flex justify-between items-start">
                 <div>
-                    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">Tutor Assessment — {{ $assessment->assessment_month }}</h1>
-                    <p class="text-gray-600 dark:text-gray-400">{{ $assessment->tutor->fullName() }}</p>
+                    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3 flex-wrap">
+                        Tutor Assessment — {{ $assessment->assessment_month }}
+                        @if($assessment->is_stand_in)
+                            <span class="px-3 py-1 text-sm font-semibold bg-purple-500 text-white rounded-full">Stand-in Class</span>
+                        @endif
+                    </h1>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        {{ $assessment->tutor->fullName() }}
+                        @if($assessment->is_stand_in && $assessment->originalTutor)
+                            <span class="text-purple-600 dark:text-purple-400">(Standing in for {{ $assessment->originalTutor->first_name }} {{ $assessment->originalTutor->last_name }})</span>
+                        @endif
+                    </p>
                 </div>
                 <div class="flex items-center gap-3">
                     <x-ui.status-badge :status="$assessment->status" />
@@ -43,9 +53,19 @@
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Assessment Details</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Tutor</label>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                    Tutor
+                                    @if($assessment->is_stand_in)
+                                        <span class="ml-2 px-2 py-0.5 text-xs font-semibold bg-purple-500 text-white rounded-full">Stand-in</span>
+                                    @endif
+                                </label>
                                 <p class="text-gray-900 dark:text-white font-medium">{{ $assessment->tutor->fullName() }}</p>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">{{ $assessment->tutor->email }}</p>
+                                @if($assessment->is_stand_in && $assessment->originalTutor)
+                                    <p class="text-sm text-purple-600 dark:text-purple-400 mt-1">
+                                        Standing in for: {{ $assessment->originalTutor->first_name }} {{ $assessment->originalTutor->last_name }}
+                                    </p>
+                                @endif
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Student Assessed</label>

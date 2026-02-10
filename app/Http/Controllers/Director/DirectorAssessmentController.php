@@ -44,7 +44,7 @@ class DirectorAssessmentController extends Controller
         $this->authorize('viewAny', TutorAssessment::class);
 
         // Get all assessments that are relevant to director
-        $query = TutorAssessment::with(['tutor', 'manager', 'director', 'student', 'ratings.criteria', 'directorAction'])
+        $query = TutorAssessment::with(['tutor', 'manager', 'director', 'student', 'ratings.criteria', 'directorAction', 'originalTutor'])
             ->whereIn('status', ['pending_review', 'approved-by-manager', 'approved-by-director'])
             ->orderBy('created_at', 'desc');
 
