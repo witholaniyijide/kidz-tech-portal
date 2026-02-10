@@ -27,7 +27,7 @@ class AssessmentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = TutorAssessment::with(['tutor', 'manager', 'student', 'ratings.criteria']);
+        $query = TutorAssessment::with(['tutor', 'manager', 'student', 'ratings.criteria', 'originalTutor']);
 
         // Filter by status
         if ($request->filled('status')) {
@@ -105,6 +105,8 @@ class AssessmentController extends Controller
                 'criteria_assessed' => 'nullable|array',
                 'criteria_ratings' => 'nullable|array',
                 'action' => 'nullable|in:draft,send',
+                'is_stand_in' => 'nullable|boolean',
+                'original_tutor_id' => 'nullable|exists:tutors,id',
             ]);
 
             $action = $validated['action'] ?? 'draft';
@@ -189,7 +191,7 @@ class AssessmentController extends Controller
      */
     public function show(TutorAssessment $assessment)
     {
-        $assessment->load(['tutor', 'manager', 'director']);
+        $assessment->load(['tutor', 'manager', 'director', 'originalTutor']);
 
         return view('manager.assessments.show', compact('assessment'));
     }

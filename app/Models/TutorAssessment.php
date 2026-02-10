@@ -33,6 +33,8 @@ class TutorAssessment extends Model
         'approved_by_manager_at',
         'approved_by_director_at',
         'status',
+        'is_stand_in',
+        'original_tutor_id',
     ];
 
     protected $casts = [
@@ -42,14 +44,23 @@ class TutorAssessment extends Model
         'performance_score' => 'integer',
         'criteria_assessed' => 'array',
         'criteria_ratings' => 'array',
+        'is_stand_in' => 'boolean',
     ];
 
     /**
-     * Get the tutor that this assessment is for.
+     * Get the tutor that this assessment is for (stand-in tutor if applicable).
      */
     public function tutor()
     {
         return $this->belongsTo(Tutor::class);
+    }
+
+    /**
+     * Get the original assigned tutor (student's regular tutor) for stand-in assessments.
+     */
+    public function originalTutor()
+    {
+        return $this->belongsTo(Tutor::class, 'original_tutor_id');
     }
 
     /**
@@ -333,5 +344,36 @@ class TutorAssessment extends Model
     public function scopeForMonth($query, int $month)
     {
         return $query->whereMonth('class_date', $month);
+    }
+
+    /**
+     * Scope to get stand-in assessments.
+     */
+    public function scopeStandIn($query)
+    {
+        return $query->where('is_stand_in', true);
+    }
+
+    /**
+     * Check if this is a stand-in assessment.
+     */
+    public function isStandIn(): bool
+    {
+        return (bool) $this->is_stand_in;
+    }
+
+    /**
+     * Get the display name for the assessed tutor (shows stand-in indicator if applicable).
+     */
+    public function getAssessedTutorDisplayAttribute(): string
+    {
+        $tutorName = $this->tutor ? ($this->tutor->first_name . ' ' . $this->tutor->last_name) : 'Unknown';
+
+        if ($this->is_stand_in && $this->originalTutor) {
+            $originalName = $this->originalTutor->first_name . ' ' . $this->originalTutor->last_name;
+            return $tutorName . ' (Stand-in for ' . $originalName . ')';
+        }
+
+        return $tutorName;
     }
 }

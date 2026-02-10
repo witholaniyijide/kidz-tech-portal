@@ -131,9 +131,17 @@
                                 <div class="lg:col-span-2">
                                     <div class="flex items-start justify-between mb-3">
                                         <div>
-                                            <div class="font-semibold text-gray-800 dark:text-white text-lg">
+                                            <div class="font-semibold text-gray-800 dark:text-white text-lg flex items-center gap-2 flex-wrap">
                                                 Tutor: {{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}
+                                                @if($assessment->is_stand_in)
+                                                    <span class="px-2 py-0.5 text-xs font-semibold bg-purple-500 text-white rounded-full">Stand-in</span>
+                                                @endif
                                             </div>
+                                            @if($assessment->is_stand_in && $assessment->originalTutor)
+                                                <div class="text-purple-600 dark:text-purple-400 text-xs mt-1">
+                                                    Standing in for: {{ $assessment->originalTutor->first_name }} {{ $assessment->originalTutor->last_name }}
+                                                </div>
+                                            @endif
                                             @if($assessment->student)
                                                 <div class="text-sky-600 dark:text-sky-400 text-sm font-medium mt-1">
                                                     Student: {{ $assessment->student->first_name }} {{ $assessment->student->last_name }}
@@ -254,9 +262,13 @@
                         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5 border-l-4 border-emerald-500">
                             <div class="flex flex-wrap justify-between items-start gap-4">
                                 <div class="flex-1">
-                                    <div class="flex items-center gap-3 mb-2">
+                                    <div class="flex items-center gap-3 mb-2 flex-wrap">
                                         <div class="font-semibold text-gray-800 dark:text-white text-lg" x-text="assessment.tutor_name"></div>
+                                        <span x-show="assessment.is_stand_in" class="px-3 py-1 text-xs font-semibold bg-purple-500 text-white rounded-full">Stand-in</span>
                                         <span class="px-3 py-1 text-xs font-semibold bg-emerald-500 text-white rounded-full">Finalized</span>
+                                    </div>
+                                    <div x-show="assessment.is_stand_in && assessment.original_tutor_name" class="text-xs text-purple-600 dark:text-purple-400 mb-1">
+                                        Standing in for: <span x-text="assessment.original_tutor_name"></span>
                                     </div>
                                     <div class="text-gray-500 dark:text-gray-400 text-sm">
                                         <span x-text="assessment.assessment_month"></span>
@@ -675,7 +687,9 @@
                             class_date: '{{ $assessment->class_date ?? '' }}',
                             performance_score: {{ $assessment->performance_score ?? 'null' }},
                             approved_at: '{{ $assessment->approved_by_director_at ? $assessment->approved_by_director_at->format("M j, Y") : "" }}',
-                            director_comment: {!! json_encode($assessment->director_comment ?? '') !!}
+                            director_comment: {!! json_encode($assessment->director_comment ?? '') !!},
+                            is_stand_in: {{ $assessment->is_stand_in ? 'true' : 'false' }},
+                            original_tutor_name: {!! json_encode($assessment->is_stand_in && $assessment->originalTutor ? ($assessment->originalTutor->first_name . ' ' . $assessment->originalTutor->last_name) : '') !!}
                         },
                     @endforeach
                 ],
