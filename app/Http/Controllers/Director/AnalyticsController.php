@@ -617,6 +617,7 @@ class AnalyticsController extends Controller
                         'date' => $record->class_date ? $record->class_date->format('Y-m-d') : null,
                         'topic' => $record->topic,
                         'course' => $courseStr,
+                        'notes' => $record->notes,
                         'type' => 'attendance',
                     ]);
                 }
