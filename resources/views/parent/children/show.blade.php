@@ -232,7 +232,7 @@
                                     </div>
                                 </div>
                             @endif
-                            <p class="text-[10px] text-center mt-2 text-gray-500 dark:text-gray-400">Click to view details</p>
+                            <p class="text-[10px] text-center mt-2 text-gray-500 dark:text-gray-400">View topics</p>
                         </button>
                         @else
                         <div class="p-4 rounded-xl border-2 transition-all duration-200 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 opacity-60">
@@ -291,10 +291,10 @@
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeCourseLearningModal()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6">
                     <!-- Header -->
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center">
                             <div id="courseLearningIcon" class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-sky-100 dark:bg-sky-900/30">
                                 <svg class="h-6 w-6 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,40 +323,16 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <p class="mt-2 text-gray-500 dark:text-gray-400">Loading course data...</p>
+                        <p class="mt-2 text-gray-500 dark:text-gray-400">Loading topics...</p>
                     </div>
 
                     <!-- Content -->
                     <div id="courseLearningContent" class="hidden">
-                        <!-- Stats -->
-                        <div class="grid grid-cols-2 gap-4 mb-6">
-                            <div class="bg-sky-50 dark:bg-sky-900/30 rounded-xl p-4 text-center">
-                                <p class="text-3xl font-bold text-sky-600 dark:text-sky-400" id="totalClassesCount">0</p>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Total Classes</p>
-                            </div>
-                            <div class="bg-purple-50 dark:bg-purple-900/30 rounded-xl p-4 text-center">
-                                <p class="text-3xl font-bold text-purple-600 dark:text-purple-400" id="uniqueTopicsCount">0</p>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Unique Topics</p>
-                            </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Topics your child has learned in this course:</p>
+                        <div id="topicsList" class="flex flex-wrap gap-2 max-h-64 overflow-y-auto">
+                            <!-- Topics will be populated here -->
                         </div>
-
-                        <!-- Topics Section -->
-                        <div class="mb-6">
-                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">Topics Covered</h4>
-                            <div id="topicsList" class="flex flex-wrap gap-2">
-                                <!-- Topics will be populated here -->
-                            </div>
-                            <p id="noTopicsMessage" class="hidden text-gray-500 dark:text-gray-400 text-sm">No topics recorded for this course yet.</p>
-                        </div>
-
-                        <!-- Classes Section -->
-                        <div>
-                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">Class History</h4>
-                            <div id="classesList" class="max-h-64 overflow-y-auto space-y-2">
-                                <!-- Classes will be populated here -->
-                            </div>
-                            <p id="noClassesMessage" class="hidden text-gray-500 dark:text-gray-400 text-sm text-center py-4">No classes recorded for this course yet.</p>
-                        </div>
+                        <p id="noTopicsMessage" class="hidden text-gray-500 dark:text-gray-400 text-sm text-center py-4">No topics have been recorded for this course yet.</p>
                     </div>
 
                     <!-- Error State -->
@@ -364,7 +340,7 @@
                         <svg class="w-12 h-12 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <p class="text-red-600 dark:text-red-400" id="courseLearningErrorMessage">Failed to load course data</p>
+                        <p class="text-red-600 dark:text-red-400" id="courseLearningErrorMessage">Failed to load topics</p>
                     </div>
                 </div>
                 <div class="bg-gray-50 dark:bg-gray-900/50 px-4 py-3 sm:px-6 flex justify-end">
@@ -473,61 +449,31 @@
                 if (data.success) {
                     document.getElementById('courseLearningContent').classList.remove('hidden');
 
-                    // Populate stats
-                    document.getElementById('totalClassesCount').textContent = data.data.total_classes;
-                    document.getElementById('uniqueTopicsCount').textContent = data.data.unique_topics_count;
-
-                    // Populate topics
                     const topicsList = document.getElementById('topicsList');
                     const noTopicsMsg = document.getElementById('noTopicsMessage');
                     topicsList.innerHTML = '';
 
-                    if (data.data.unique_topics && data.data.unique_topics.length > 0) {
+                    if (data.data.topics && data.data.topics.length > 0) {
                         noTopicsMsg.classList.add('hidden');
-                        data.data.unique_topics.forEach(topic => {
+                        data.data.topics.forEach(topic => {
                             const badge = document.createElement('span');
-                            badge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
+                            badge.className = 'inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800';
                             badge.textContent = topic;
                             topicsList.appendChild(badge);
                         });
                     } else {
                         noTopicsMsg.classList.remove('hidden');
                     }
-
-                    // Populate classes
-                    const classesList = document.getElementById('classesList');
-                    const noClassesMsg = document.getElementById('noClassesMessage');
-                    classesList.innerHTML = '';
-
-                    if (data.data.classes && data.data.classes.length > 0) {
-                        noClassesMsg.classList.add('hidden');
-                        data.data.classes.forEach(cls => {
-                            const classItem = document.createElement('div');
-                            classItem.className = 'flex items-start justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg';
-                            classItem.innerHTML = `
-                                <div class="flex-1">
-                                    <p class="font-medium text-gray-800 dark:text-white text-sm">${cls.topic}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        ${cls.date} • Tutor: ${cls.tutor}
-                                        ${cls.is_stand_in ? '<span class="ml-2 px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded text-xs">Stand-in</span>' : ''}
-                                    </p>
-                                </div>
-                            `;
-                            classesList.appendChild(classItem);
-                        });
-                    } else {
-                        noClassesMsg.classList.remove('hidden');
-                    }
                 } else {
                     document.getElementById('courseLearningError').classList.remove('hidden');
-                    document.getElementById('courseLearningErrorMessage').textContent = data.error || 'Failed to load course data';
+                    document.getElementById('courseLearningErrorMessage').textContent = data.error || 'Failed to load topics';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 document.getElementById('courseLearningLoading').classList.add('hidden');
                 document.getElementById('courseLearningError').classList.remove('hidden');
-                document.getElementById('courseLearningErrorMessage').textContent = 'An error occurred while loading course data';
+                document.getElementById('courseLearningErrorMessage').textContent = 'An error occurred while loading topics';
             });
         }
 

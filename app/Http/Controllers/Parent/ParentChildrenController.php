@@ -246,34 +246,20 @@ class ParentChildrenController extends Controller
 
             // Get unique topics covered
             $topicsSet = [];
-            $classes = [];
 
             foreach ($attendanceRecords as $record) {
-                // Collect topics
                 if ($record->topic) {
                     $topicsSet[$record->topic] = true;
                 }
-
-                // Build class list
-                $classes[] = [
-                    'date' => $record->class_date->format('M d, Y'),
-                    'topic' => $record->topic ?? 'No topic recorded',
-                    'tutor' => $record->tutor ? $record->tutor->first_name . ' ' . $record->tutor->last_name : 'Unknown',
-                    'is_stand_in' => $record->is_stand_in ?? false,
-                ];
             }
 
-            $uniqueTopics = array_keys($topicsSet);
+            $topics = array_keys($topicsSet);
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'course_id' => $courseId,
                     'course_title' => $courseTitle,
-                    'total_classes' => count($classes),
-                    'unique_topics_count' => count($uniqueTopics),
-                    'unique_topics' => $uniqueTopics,
-                    'classes' => $classes,
+                    'topics' => $topics,
                 ]
             ]);
         } catch (\Exception $e) {
