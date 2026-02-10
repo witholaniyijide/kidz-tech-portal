@@ -357,12 +357,31 @@
                 </div>
             </div>
             <div class="p-4">
-                @if(!isset($recentNotices) || $recentNotices->isEmpty())
+                <div class="space-y-3 max-h-64 overflow-y-auto">
+                    {{-- Birthday Notifications --}}
+                    @if(!empty($todaysBirthdays))
+                        @foreach($todaysBirthdays as $birthday)
+                            <div class="p-4 bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 rounded-xl border-l-4 border-pink-500">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-2xl">🎂</span>
+                                    <div>
+                                        <p class="font-semibold text-gray-800 dark:text-white">
+                                            Today is {{ $birthday['name'] }}'s Birthday!
+                                        </p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                                            {{ $birthday['role'] }} • Celebrate them! 🎉
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+
+                @if((!isset($recentNotices) || $recentNotices->isEmpty()) && empty($todaysBirthdays))
                     <div class="text-center py-6">
                         <p class="text-slate-500 dark:text-slate-400">No notices at this time.</p>
                     </div>
-                @else
-                    <div class="space-y-3 max-h-64 overflow-y-auto">
+                @elseif(isset($recentNotices) && $recentNotices->isNotEmpty())
                         @foreach($recentNotices as $notice)
                             <a href="{{ route('tutor.notices.show', $notice) }}" class="block p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                 <div class="flex items-start gap-3">
@@ -386,8 +405,8 @@
                                 </div>
                             </a>
                         @endforeach
-                    </div>
                 @endif
+                </div>
             </div>
         </div>
 

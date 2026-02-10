@@ -86,6 +86,9 @@ class AdminDashboardController extends Controller
             ->take(3)
             ->get();
 
+        // Today's Birthdays
+        $todaysBirthdays = $this->getTodaysBirthdays();
+
         // Recent Students (last 5 added)
         $recentStudents = Student::with('tutor')
             ->orderBy('created_at', 'desc')
@@ -116,6 +119,7 @@ class AdminDashboardController extends Controller
             'schedulePostedAt',
             'recentActivities',
             'notices',
+            'todaysBirthdays',
             'recentStudents',
             'recentTutors',
             'adminTodos'
@@ -277,5 +281,44 @@ class AdminDashboardController extends Controller
         $todo->delete();
 
         return redirect()->route('admin.dashboard')->with('success', 'To-do item deleted!');
+    }
+
+    /**
+     * Get today's birthdays for students and tutors.
+     */
+    private function getTodaysBirthdays(): array
+    {
+        $today = Carbon::today();
+        $birthdays = [];
+
+        // Get students with birthday today
+        $studentBirthdays = Student::whereMonth('date_of_birth', $today->month)
+            ->whereDay('date_of_birth', $today->day)
+            ->where('status', 'active')
+            ->get();
+
+        foreach ($studentBirthdays as $student) {
+            $birthdays[] = [
+                'name' => $student->first_name . ' ' . $student->last_name,
+                'role' => 'Student',
+                'type' => 'student',
+            ];
+        }
+
+        // Get tutors with birthday today
+        $tutorBirthdays = Tutor::whereMonth('date_of_birth', $today->month)
+            ->whereDay('date_of_birth', $today->day)
+            ->where('status', 'active')
+            ->get();
+
+        foreach ($tutorBirthdays as $tutor) {
+            $birthdays[] = [
+                'name' => $tutor->first_name . ' ' . $tutor->last_name,
+                'role' => 'Tutor',
+                'type' => 'tutor',
+            ];
+        }
+
+        return $birthdays;
     }
 }

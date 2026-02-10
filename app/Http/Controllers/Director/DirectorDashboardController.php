@@ -263,6 +263,9 @@ class DirectorDashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Today's Birthdays
+        $todaysBirthdays = $this->getTodaysBirthdays();
+
         $data = [
             'totalStudents' => $totalStudents,
             'activeStudents' => $activeStudents,
@@ -286,8 +289,48 @@ class DirectorDashboardController extends Controller
             'todos' => $todos,
             'recentActivities' => $recentActivities,
             'notices' => $notices,
+            'todaysBirthdays' => $todaysBirthdays,
         ];
 
         return view('dashboards.director', $data);
+    }
+
+    /**
+     * Get today's birthdays for students and tutors.
+     */
+    private function getTodaysBirthdays(): array
+    {
+        $today = Carbon::today();
+        $birthdays = [];
+
+        // Get students with birthday today
+        $studentBirthdays = Student::whereMonth('date_of_birth', $today->month)
+            ->whereDay('date_of_birth', $today->day)
+            ->where('status', 'active')
+            ->get();
+
+        foreach ($studentBirthdays as $student) {
+            $birthdays[] = [
+                'name' => $student->first_name . ' ' . $student->last_name,
+                'role' => 'Student',
+                'type' => 'student',
+            ];
+        }
+
+        // Get tutors with birthday today
+        $tutorBirthdays = Tutor::whereMonth('date_of_birth', $today->month)
+            ->whereDay('date_of_birth', $today->day)
+            ->where('status', 'active')
+            ->get();
+
+        foreach ($tutorBirthdays as $tutor) {
+            $birthdays[] = [
+                'name' => $tutor->first_name . ' ' . $tutor->last_name,
+                'role' => 'Tutor',
+                'type' => 'tutor',
+            ];
+        }
+
+        return $birthdays;
     }
 }

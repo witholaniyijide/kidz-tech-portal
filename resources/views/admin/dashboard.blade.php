@@ -479,9 +479,30 @@
                         </a>
                     </div>
                     <div class="p-5">
-                        @if(($notices ?? collect())->isEmpty())
+                        {{-- Birthday Notifications --}}
+                        @if(!empty($todaysBirthdays))
+                            <div class="mb-4 space-y-2">
+                                @foreach($todaysBirthdays as $birthday)
+                                    <div class="p-4 bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 rounded-xl border-l-4 border-pink-500">
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-2xl">🎂</span>
+                                            <div>
+                                                <p class="font-semibold text-gray-800 dark:text-white">
+                                                    Today is {{ $birthday['name'] }}'s Birthday!
+                                                </p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                    {{ $birthday['role'] }} • Celebrate them! 🎉
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        @if(($notices ?? collect())->isEmpty() && empty($todaysBirthdays))
                             <div class="text-center py-8 text-gray-500">No notices published</div>
-                        @else
+                        @elseif(($notices ?? collect())->isNotEmpty())
                             <div class="space-y-4">
                                 @foreach($notices as $notice)
                                     <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border-l-4 

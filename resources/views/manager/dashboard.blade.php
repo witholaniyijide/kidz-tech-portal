@@ -439,6 +439,25 @@
                 </div>
 
                 <div class="space-y-3 max-h-64 overflow-y-auto">
+                    {{-- Birthday Notifications --}}
+                    @if(!empty($todaysBirthdays))
+                        @foreach($todaysBirthdays as $birthday)
+                            <div class="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 rounded-xl p-4 border-l-4 border-pink-500">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-2xl">🎂</span>
+                                    <div>
+                                        <p class="font-semibold text-gray-800 dark:text-white">
+                                            Today is {{ $birthday['name'] }}'s Birthday!
+                                        </p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                                            {{ $birthday['role'] }} • Celebrate them! 🎉
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+
                     @forelse($notices as $notice)
                         <div class="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 dark:border-gray-600/30">
                             <div class="flex items-start justify-between">
@@ -450,9 +469,11 @@
                             </div>
                         </div>
                     @empty
-                        <div class="text-center py-8">
-                            <p class="text-gray-500 dark:text-gray-400">No notices yet</p>
-                        </div>
+                        @if(empty($todaysBirthdays))
+                            <div class="text-center py-8">
+                                <p class="text-gray-500 dark:text-gray-400">No notices yet</p>
+                            </div>
+                        @endif
                     @endforelse
                 </div>
 
