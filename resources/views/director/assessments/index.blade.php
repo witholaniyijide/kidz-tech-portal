@@ -666,16 +666,16 @@
                         {
                             id: {{ $assessment->id }},
                             tutor_id: {{ $assessment->tutor_id }},
-                            tutor_name: '{{ ($assessment->tutor->first_name ?? '') . ' ' . ($assessment->tutor->last_name ?? '') }}',
+                            tutor_name: {!! json_encode(($assessment->tutor->first_name ?? '') . ' ' . ($assessment->tutor->last_name ?? '')) !!},
                             student_id: {{ $assessment->student_id ?? 'null' }},
-                            student_name: '{{ $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '' }}',
+                            student_name: {!! json_encode($assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '') !!},
                             assessment_month: '{{ $assessment->assessment_month }}',
                             week: {{ $assessment->week ?? 'null' }},
                             year: {{ $assessment->year ?? 'null' }},
                             class_date: '{{ $assessment->class_date ?? '' }}',
                             performance_score: {{ $assessment->performance_score ?? 'null' }},
                             approved_at: '{{ $assessment->approved_by_director_at ? $assessment->approved_by_director_at->format("M j, Y") : "" }}',
-                            director_comment: '{{ addslashes($assessment->director_comment ?? '') }}'
+                            director_comment: {!! json_encode($assessment->director_comment ?? '') !!}
                         },
                     @endforeach
                 ],

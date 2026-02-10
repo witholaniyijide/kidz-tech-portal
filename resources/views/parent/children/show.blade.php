@@ -444,7 +444,9 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Course Learning Data:', data);
+                console.log('Course Learning Data:', JSON.stringify(data, null, 2));
+                console.log('Topics:', data.data?.topics);
+                console.log('Debug:', data.debug);
                 document.getElementById('courseLearningLoading').classList.add('hidden');
 
                 if (data.success) {
