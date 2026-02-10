@@ -103,6 +103,23 @@
                                 <li>Communicate with the Director</li>
                             </ul>
 
+                            <!-- Video Guide Section -->
+                            <table role="presentation" style="width: 100%; border-collapse: collapse; margin: 25px 0; background-color: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #166534;">
+                                            📺 Video Guide Available
+                                        </h3>
+                                        <p style="margin: 0 0 15px 0; font-size: 14px; color: #15803d; line-height: 1.6;">
+                                            This link will take you to a video guide we have prepared for you to show you around our newly launched portal. Kindly take your time to go through it.
+                                        </p>
+                                        <a href="https://tinyurl.com/kidztechportalguide" style="display: inline-block; background-color: #22c55e; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: bold;">
+                                            Watch Video Guide
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
                             <p style="margin: 20px 0 0 0; font-size: 14px; color: #6b7280; line-height: 1.6;">
                                 If you have any questions or concerns, please contact our support team.
                             </p>
