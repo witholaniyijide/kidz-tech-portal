@@ -161,18 +161,20 @@
                             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Student Learning Tracker</h2>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Track courses and topics taught to each student</p>
                         </div>
-                        <div class="flex flex-wrap items-center gap-3">
-                            <select id="studentSelect" x-ref="studentSelect" @change="selectedStudent = $event.target.value; loadStudentData()" class="px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5] min-w-[200px]">
+                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                            <select id="studentSelect" x-ref="studentSelect" @change="selectedStudent = $event.target.value; loadStudentData()" class="w-full sm:w-auto px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5] sm:min-w-[200px]">
                                 <option value="">Select a student...</option>
                             </select>
-                            <input type="date" x-model="dateFrom" @change="if(selectedStudent) loadStudentData()" class="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5]">
-                            <span class="text-gray-500">to</span>
-                            <input type="date" x-model="dateTo" @change="if(selectedStudent) loadStudentData()" class="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5]">
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <input type="date" x-model="dateFrom" @change="if(selectedStudent) loadStudentData()" class="flex-1 sm:flex-initial px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5]">
+                                <span class="text-gray-500">to</span>
+                                <input type="date" x-model="dateTo" @change="if(selectedStudent) loadStudentData()" class="flex-1 sm:flex-initial px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-[#4F46E5]">
+                            </div>
                         </div>
                     </div>
 
                     {{-- Content Area --}}
-                    <div class="max-h-96 overflow-y-auto">
+                    <div class="max-h-96 overflow-y-auto overflow-x-hidden">
                         {{-- No Student Selected --}}
                         <div x-show="!selectedStudent" class="text-center py-12">
                             <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,20 +280,20 @@
 
                 {{-- Tutor Performance --}}
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl">
+                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl overflow-hidden">
                         <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Students per Tutor</h2>
+                            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Students per Tutor</h2>
                         </div>
-                        <div class="h-80 overflow-y-auto">
+                        <div class="h-64 sm:h-80">
                             <canvas id="studentsPerTutorChart"></canvas>
                         </div>
                     </div>
 
-                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl">
+                    <div class="backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/10 rounded-2xl p-6 shadow-xl overflow-hidden">
                         <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Average Attendance by Tutor</h2>
+                            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Average Attendance by Tutor</h2>
                         </div>
-                        <div class="h-80 overflow-y-auto">
+                        <div class="h-64 sm:h-80">
                             <canvas id="attendanceChart"></canvas>
                         </div>
                     </div>
