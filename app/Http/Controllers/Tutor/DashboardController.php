@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Tutor;
 use App\Http\Controllers\Controller;
 use App\Models\DailyClassSchedule;
 use App\Models\Notice;
+use App\Models\Student;
+use App\Models\Tutor;
 use App\Models\TutorTodo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -212,6 +214,9 @@ class DashboardController extends Controller
             ->orderBy('due_date')
             ->get();
 
+        // Today's Birthdays (only show students assigned to this tutor)
+        $todaysBirthdays = $this->getTodaysBirthdays($tutor->id);
+
         return view('tutor.dashboard', compact(
             'tutor',
             'students',
@@ -232,7 +237,8 @@ class DashboardController extends Controller
             'classesTodayCount',
             'schedulePosted',
             'recentNotices',
-            'customTodos'
+            'customTodos',
+            'todaysBirthdays'
         ));
     }
 
@@ -324,5 +330,31 @@ class DashboardController extends Controller
         $todo->delete();
 
         return back()->with('success', 'Todo deleted.');
+    }
+
+    /**
+     * Get today's birthdays for students assigned to this tutor.
+     */
+    private function getTodaysBirthdays(int $tutorId): array
+    {
+        $today = Carbon::today();
+        $birthdays = [];
+
+        // Get students with birthday today (only assigned to this tutor)
+        $studentBirthdays = Student::whereMonth('date_of_birth', $today->month)
+            ->whereDay('date_of_birth', $today->day)
+            ->where('tutor_id', $tutorId)
+            ->where('status', 'active')
+            ->get();
+
+        foreach ($studentBirthdays as $student) {
+            $birthdays[] = [
+                'name' => $student->first_name . ' ' . $student->last_name,
+                'role' => 'Student',
+                'type' => 'student',
+            ];
+        }
+
+        return $birthdays;
     }
 }

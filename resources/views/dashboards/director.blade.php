@@ -448,14 +448,33 @@
                             <a href="{{ route('director.notices.create') }}" class="text-sm text-[#4F46E5] dark:text-[#818CF8] hover:underline font-medium">+ Create Notice</a>
                         </div>
                         <div class="space-y-4 flex-1 overflow-y-auto min-h-0">
-                            @if(($notices ?? collect())->isEmpty())
+                            {{-- Birthday Notifications --}}
+                            @if(!empty($todaysBirthdays))
+                                @foreach($todaysBirthdays as $birthday)
+                                    <div class="p-4 bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 rounded-xl border-l-4 border-pink-500">
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-2xl">🎂</span>
+                                            <div>
+                                                <p class="font-semibold text-gray-800 dark:text-white">
+                                                    Today is {{ $birthday['name'] }}'s Birthday!
+                                                </p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                    {{ $birthday['role'] }} • Celebrate them! 🎉
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
+
+                            @if(($notices ?? collect())->isEmpty() && empty($todaysBirthdays))
                                 <div class="text-center py-8 text-gray-500 dark:text-gray-400">
                                     <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
                                     </svg>
                                     <p>No notices published yet</p>
                                 </div>
-                            @else
+                            @elseif(($notices ?? collect())->isNotEmpty())
                                 @foreach($notices as $notice)
                                     <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border-l-4
                                         @if($notice->priority === 'urgent') border-red-500

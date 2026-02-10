@@ -228,21 +228,31 @@ class ParentChildrenController extends Controller
                 return response()->json(['error' => 'Course ID is required'], 400);
             }
 
+            // Build the course prefix pattern (e.g., "01 - ", "02 - ")
+            $coursePrefix = str_pad($courseId, 2, '0', STR_PAD_LEFT) . ' - ';
+
             // Get all approved attendance records for this student that include this course
             $attendanceRecords = AttendanceRecord::where('student_id', $student->id)
                 ->where('status', 'approved')
-                ->where(function ($query) use ($courseId, $courseTitle) {
-                    // Check courses_covered JSON array or course_id column if it exists
-                    $query->whereJsonContains('courses_covered', (string) $courseId)
-                        ->orWhereJsonContains('courses_covered', (int) $courseId);
-
-                    // Also check by course title if provided
-                    if ($courseTitle) {
-                        $query->orWhereJsonContains('courses_covered', $courseTitle);
+                ->get()
+                ->filter(function ($record) use ($coursePrefix, $courseTitle) {
+                    $courses = $record->courses_covered;
+                    if (!is_array($courses)) {
+                        return false;
                     }
-                })
-                ->orderBy('class_date', 'desc')
-                ->get();
+
+                    foreach ($courses as $course) {
+                        // Match by course prefix (e.g., "01 - Introduction to Computer Science")
+                        if (str_starts_with($course, $coursePrefix)) {
+                            return true;
+                        }
+                        // Also match by title if it contains the course title
+                        if ($courseTitle && stripos($course, $courseTitle) !== false) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
 
             // Get unique topics covered
             $topicsSet = [];
