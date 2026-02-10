@@ -231,33 +231,53 @@ class ParentChildrenController extends Controller
             // Build the course prefix pattern (e.g., "01 - ", "02 - ")
             $coursePrefix = str_pad($courseId, 2, '0', STR_PAD_LEFT) . ' - ';
 
-            // Get all approved attendance records for this student that include this course
-            $attendanceRecords = AttendanceRecord::where('student_id', $student->id)
+            // Get all approved attendance records for this student
+            $allRecords = AttendanceRecord::where('student_id', $student->id)
                 ->where('status', 'approved')
-                ->get()
-                ->filter(function ($record) use ($coursePrefix, $courseTitle) {
-                    $courses = $record->courses_covered;
-                    if (!is_array($courses)) {
-                        return false;
-                    }
+                ->orderBy('class_date', 'desc')
+                ->get();
 
-                    foreach ($courses as $course) {
-                        // Match by course prefix (e.g., "01 - Introduction to Computer Science")
-                        if (str_starts_with($course, $coursePrefix)) {
-                            return true;
-                        }
-                        // Also match by title if it contains the course title
-                        if ($courseTitle && stripos($course, $courseTitle) !== false) {
-                            return true;
-                        }
-                    }
-                    return false;
-                });
+            // Filter records that match this course
+            $matchingRecords = [];
+            $recordsWithCourses = 0;
 
-            // Get unique topics covered
+            foreach ($allRecords as $record) {
+                $courses = $record->courses_covered;
+
+                // Handle different formats of courses_covered
+                if (is_string($courses)) {
+                    $courses = json_decode($courses, true) ?? [$courses];
+                }
+
+                // Skip if no courses data
+                if (!is_array($courses) || empty($courses)) {
+                    continue;
+                }
+
+                $recordsWithCourses++;
+
+                foreach ($courses as $course) {
+                    // Match by course prefix (e.g., "01 - Introduction to Computer Science")
+                    if (str_starts_with($course, $coursePrefix)) {
+                        $matchingRecords[] = $record;
+                        break;
+                    }
+                    // Also match by title if it contains the course title
+                    if ($courseTitle && stripos($course, $courseTitle) !== false) {
+                        $matchingRecords[] = $record;
+                        break;
+                    }
+                }
+            }
+
+            // Get unique topics covered from matching records
             $topicsSet = [];
 
-            foreach ($attendanceRecords as $record) {
+            // If no records matched by course, but there are approved records with topics,
+            // show topics from all attendance (for older records without courses_covered)
+            $recordsToUse = count($matchingRecords) > 0 ? $matchingRecords : ($recordsWithCourses === 0 ? $allRecords->all() : []);
+
+            foreach ($recordsToUse as $record) {
                 if ($record->topic) {
                     $topicsSet[$record->topic] = true;
                 }
@@ -270,6 +290,15 @@ class ParentChildrenController extends Controller
                 'data' => [
                     'course_title' => $courseTitle,
                     'topics' => $topics,
+                ],
+                'debug' => [
+                    'student_id' => $student->id,
+                    'course_id' => $courseId,
+                    'course_prefix' => $coursePrefix,
+                    'total_approved_records' => $allRecords->count(),
+                    'records_with_courses' => $recordsWithCourses,
+                    'matching_records' => count($matchingRecords),
+                    'showing_all_topics' => count($matchingRecords) === 0 && $recordsWithCourses === 0,
                 ]
             ]);
         } catch (\Exception $e) {
