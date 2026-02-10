@@ -156,6 +156,7 @@ class ParentChildrenController extends Controller
     /**
      * Get the curriculum roadmap with progress for a student.
      * Uses explicit progression system if student has starting_course_id set.
+     * Progress for current course is calculated from attendance records.
      */
     private function getCurriculumRoadmap(Student $student): array
     {
@@ -174,12 +175,24 @@ class ParentChildrenController extends Controller
             12 => 'robot',
         ];
 
+        // Check for auto-completion of current course based on attendance
+        if ($student->usesExplicitProgression()) {
+            $student->autoCompleteCourseIfReady();
+            // Refresh the student to get updated statuses
+            $student->refresh();
+        }
+
         // Use explicit progression if student has it, otherwise fall back to legacy
         if ($student->usesExplicitProgression()) {
             $curriculumWithStatuses = $student->getExplicitCurriculumWithStatuses();
         } else {
             $curriculumWithStatuses = $student->getCurriculumWithStatuses();
         }
+
+        // Get attendance-based progress for current course (for explicit system)
+        $currentCourseProgress = $student->usesExplicitProgression()
+            ? $student->getCurrentCourseProgress()
+            : ($student->roadmap_progress ?? 0);
 
         $courses = [];
         foreach ($curriculumWithStatuses as $course) {
@@ -194,12 +207,19 @@ class ParentChildrenController extends Controller
             // Use 'level' for explicit system, 'id' for legacy
             $courseId = $course['level'] ?? $course['id'];
 
+            // Determine progress for this course
+            $progress = match($displayStatus) {
+                'completed' => 100,
+                'current' => $currentCourseProgress,
+                default => 0,
+            };
+
             $courses[] = [
                 'id' => $courseId,
                 'title' => $course['title'] ?? $course['full_name'] ?? "Level {$courseId}",
                 'icon' => $icons[$courseId] ?? 'book',
                 'status' => $displayStatus,
-                'progress' => $displayStatus === 'completed' ? 100 : ($displayStatus === 'current' ? ($student->roadmap_progress ?? 0) : 0),
+                'progress' => $progress,
             ];
         }
 

@@ -703,6 +703,162 @@ class Student extends Model
     }
 
     /**
+     * Count approved attendance records for a specific course.
+     *
+     * @param int $courseId The course ID (level number 1-12)
+     * @return int Number of approved attendance records for this course
+     */
+    public function getAttendanceCountForCourse(int $courseId): int
+    {
+        // Build the course prefix pattern (e.g., "01 - ", "02 - ")
+        $coursePrefix = str_pad($courseId, 2, '0', STR_PAD_LEFT) . ' - ';
+
+        // Get the course to also match by title
+        $course = Course::findByLevel($courseId);
+        $courseTitle = $course?->full_name;
+
+        // Get all approved attendance records for this student
+        $records = AttendanceRecord::where('student_id', $this->id)
+            ->where('status', 'approved')
+            ->get();
+
+        $count = 0;
+
+        foreach ($records as $record) {
+            $courses = $record->courses_covered;
+
+            // Handle different formats of courses_covered
+            if (is_string($courses)) {
+                $courses = json_decode($courses, true) ?? [$courses];
+            }
+
+            // Skip if no courses data
+            if (!is_array($courses) || empty($courses)) {
+                continue;
+            }
+
+            // Check if any course matches our target
+            foreach ($courses as $courseName) {
+                if (str_starts_with($courseName, $coursePrefix)) {
+                    $count++;
+                    break;
+                }
+                if ($courseTitle && stripos($courseName, $courseTitle) !== false) {
+                    $count++;
+                    break;
+                }
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * Get attendance-based progress percentage for the current course.
+     * Returns percentage based on (attended classes / expected classes) * 100
+     *
+     * @return int Progress percentage (0-100)
+     */
+    public function getAttendanceBasedProgress(): int
+    {
+        // Only works for explicit progression system with a current course
+        if (!$this->usesExplicitProgression() || !$this->current_course_id) {
+            return $this->roadmap_progress ?? 0;
+        }
+
+        // Get the current course
+        $currentCourse = $this->currentCourse;
+        if (!$currentCourse) {
+            return $this->roadmap_progress ?? 0;
+        }
+
+        // Count attendance for this course
+        $attendanceCount = $this->getAttendanceCountForCourse($currentCourse->level);
+
+        // Get expected classes (default to 8 if not set)
+        $expectedClasses = $currentCourse->expected_classes ?? 8;
+
+        // Calculate percentage (cap at 100)
+        $percentage = $expectedClasses > 0
+            ? min(100, (int) (($attendanceCount / $expectedClasses) * 100))
+            : 0;
+
+        return $percentage;
+    }
+
+    /**
+     * Check if the current course should be auto-completed based on attendance.
+     * Returns true if attendance count >= expected classes.
+     *
+     * @return bool
+     */
+    public function shouldAutoCompleteCourse(): bool
+    {
+        if (!$this->usesExplicitProgression() || !$this->current_course_id) {
+            return false;
+        }
+
+        $currentCourse = $this->currentCourse;
+        if (!$currentCourse) {
+            return false;
+        }
+
+        $attendanceCount = $this->getAttendanceCountForCourse($currentCourse->level);
+        $expectedClasses = $currentCourse->expected_classes ?? 8;
+
+        return $attendanceCount >= $expectedClasses;
+    }
+
+    /**
+     * Auto-complete the current course if attendance threshold is met.
+     * Marks the course as completed but does NOT advance to next course.
+     * Admin must manually set the next current_course_id.
+     *
+     * @return bool True if course was auto-completed, false otherwise
+     */
+    public function autoCompleteCourseIfReady(): bool
+    {
+        if (!$this->shouldAutoCompleteCourse()) {
+            return false;
+        }
+
+        $currentCourse = $this->currentCourse;
+        if (!$currentCourse) {
+            return false;
+        }
+
+        // Check if already completed
+        if ($this->hasCourseCompleted($currentCourse->id)) {
+            return false;
+        }
+
+        // Mark course as completed (source: 'attendance' to indicate auto-completion)
+        $this->markCourseCompleted($currentCourse->id, 'attendance');
+
+        // Set current_course_id to null to await admin to set next course
+        $this->current_course_id = null;
+        $this->roadmap_progress = 0;
+        $this->save();
+
+        return true;
+    }
+
+    /**
+     * Get the current course progress considering both attendance and manual progress.
+     * Returns the higher of attendance-based or manually set progress.
+     *
+     * @return int Progress percentage (0-100)
+     */
+    public function getCurrentCourseProgress(): int
+    {
+        $attendanceProgress = $this->getAttendanceBasedProgress();
+        $manualProgress = $this->roadmap_progress ?? 0;
+
+        // Return the higher value to prevent regression
+        return max($attendanceProgress, $manualProgress);
+    }
+
+    /**
      * Check if using the new explicit progression system.
      * Returns true if starting_course_id is set.
      *

@@ -269,7 +269,9 @@ class ManagerAttendanceController extends Controller
      */
     public function approve(AttendanceRecord $attendance)
     {
-        \DB::transaction(function () use ($attendance) {
+        $wasAutoCompleted = false;
+
+        \DB::transaction(function () use ($attendance, &$wasAutoCompleted) {
             $attendance->status = 'approved';
             $attendance->approved_by = auth()->id();
             $attendance->approved_at = now();
@@ -278,8 +280,17 @@ class ManagerAttendanceController extends Controller
             // Increment student's completed_periods
             if ($attendance->student) {
                 $attendance->student->increment('completed_periods', 1);
+
+                // Check if student's current course should be auto-completed based on attendance
+                if ($attendance->student->usesExplicitProgression()) {
+                    $wasAutoCompleted = $attendance->student->autoCompleteCourseIfReady();
+                }
             }
         });
+
+        if ($wasAutoCompleted) {
+            return redirect()->back()->with('success', 'Attendance approved. Student\'s current course has been marked as complete based on attendance count.');
+        }
 
         return redirect()->back()->with('success', 'Attendance approved successfully.');
     }

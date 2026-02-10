@@ -14,6 +14,7 @@ class Course extends Model
         'name',
         'full_name',
         'description',
+        'expected_classes',
         'certificate_eligible',
         'sort_order',
         'is_active',
@@ -21,6 +22,7 @@ class Course extends Model
 
     protected $casts = [
         'level' => 'integer',
+        'expected_classes' => 'integer',
         'certificate_eligible' => 'boolean',
         'is_active' => 'boolean',
         'sort_order' => 'integer',

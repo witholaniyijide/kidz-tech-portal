@@ -200,6 +200,15 @@ class DirectorAttendanceController extends Controller
                 'user_agent' => $request->userAgent(),
             ]);
 
+            // Check if student's current course should be auto-completed based on attendance
+            $student = $attendance->student;
+            if ($student && $student->usesExplicitProgression()) {
+                $wasAutoCompleted = $student->autoCompleteCourseIfReady();
+                if ($wasAutoCompleted) {
+                    return back()->with('success', 'Attendance approved. Student\'s current course has been marked as complete based on attendance count. Admin can now assign the next course.');
+                }
+            }
+
             return back()->with('success', 'Attendance approved successfully.');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to approve attendance: ' . $e->getMessage());
