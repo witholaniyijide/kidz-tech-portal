@@ -240,6 +240,7 @@ class ParentChildrenController extends Controller
             // Filter records that match this course
             $matchingRecords = [];
             $recordsWithCourses = 0;
+            $sampleCourses = []; // Debug: collect sample courses_covered values
 
             foreach ($allRecords as $record) {
                 $courses = $record->courses_covered;
@@ -255,6 +256,13 @@ class ParentChildrenController extends Controller
                 }
 
                 $recordsWithCourses++;
+
+                // Debug: collect first few course values
+                if (count($sampleCourses) < 5) {
+                    foreach ($courses as $c) {
+                        $sampleCourses[] = $c;
+                    }
+                }
 
                 foreach ($courses as $course) {
                     // Match by course prefix (e.g., "01 - Introduction to Computer Science")
@@ -295,10 +303,12 @@ class ParentChildrenController extends Controller
                     'student_id' => $student->id,
                     'course_id' => $courseId,
                     'course_prefix' => $coursePrefix,
+                    'course_title_search' => $courseTitle,
                     'total_approved_records' => $allRecords->count(),
                     'records_with_courses' => $recordsWithCourses,
                     'matching_records' => count($matchingRecords),
                     'showing_all_topics' => count($matchingRecords) === 0 && $recordsWithCourses === 0,
+                    'sample_courses_in_db' => array_unique(array_slice($sampleCourses, 0, 5)),
                 ]
             ]);
         } catch (\Exception $e) {
