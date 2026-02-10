@@ -234,10 +234,13 @@ class ParentChildrenController extends Controller
             // Get all approved attendance records for this student
             $allRecords = AttendanceRecord::where('student_id', $student->id)
                 ->where('status', 'approved')
+                ->orderBy('class_date', 'desc')
                 ->get();
 
             // Filter records that match this course
             $matchingRecords = [];
+            $recordsWithCourses = 0;
+
             foreach ($allRecords as $record) {
                 $courses = $record->courses_covered;
 
@@ -246,9 +249,12 @@ class ParentChildrenController extends Controller
                     $courses = json_decode($courses, true) ?? [$courses];
                 }
 
+                // Skip if no courses data
                 if (!is_array($courses) || empty($courses)) {
                     continue;
                 }
+
+                $recordsWithCourses++;
 
                 foreach ($courses as $course) {
                     // Match by course prefix (e.g., "01 - Introduction to Computer Science")
@@ -264,10 +270,14 @@ class ParentChildrenController extends Controller
                 }
             }
 
-            // Get unique topics covered
+            // Get unique topics covered from matching records
             $topicsSet = [];
 
-            foreach ($matchingRecords as $record) {
+            // If no records matched by course, but there are approved records with topics,
+            // show topics from all attendance (for older records without courses_covered)
+            $recordsToUse = count($matchingRecords) > 0 ? $matchingRecords : ($recordsWithCourses === 0 ? $allRecords->all() : []);
+
+            foreach ($recordsToUse as $record) {
                 if ($record->topic) {
                     $topicsSet[$record->topic] = true;
                 }
@@ -286,7 +296,9 @@ class ParentChildrenController extends Controller
                     'course_id' => $courseId,
                     'course_prefix' => $coursePrefix,
                     'total_approved_records' => $allRecords->count(),
+                    'records_with_courses' => $recordsWithCourses,
                     'matching_records' => count($matchingRecords),
+                    'showing_all_topics' => count($matchingRecords) === 0 && $recordsWithCourses === 0,
                 ]
             ]);
         } catch (\Exception $e) {
