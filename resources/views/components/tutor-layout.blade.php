@@ -131,7 +131,7 @@
 
                             {{-- Notifications Dropdown --}}
                             <div x-show="notifOpen" x-cloak @click.away="notifOpen = false" x-transition
-                                 class="absolute right-0 mt-2 w-[calc(100vw-1.5rem)] sm:w-80 md:w-96 max-h-[70vh] md:max-h-[32rem] bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+                                 class="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 mt-2 sm:w-80 md:w-96 max-h-[70vh] md:max-h-[32rem] bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
                                 <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 flex justify-between items-center sticky top-0">
                                     <span class="font-semibold text-gray-900 dark:text-white text-sm">Notifications</span>
                                     @if($tutorUnreadCount > 0)

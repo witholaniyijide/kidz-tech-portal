@@ -437,10 +437,11 @@
                 <!-- Topic -->
                 <div>
                     <label for="topic" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                        Topic Covered (Details)
+                        Topic Covered <span class="text-red-500">*</span>
                     </label>
                     <input type="text" id="topic" name="topic"
                            value="{{ old('topic') }}"
+                           required
                            maxlength="255"
                            placeholder="e.g., Variables and Data Types, Creating First Animation"
                            class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
@@ -453,9 +454,9 @@
                 <!-- Notes -->
                 <div>
                     <label for="notes" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                        Notes
+                        Notes <span class="text-red-500">*</span>
                     </label>
-                    <textarea id="notes" name="notes" rows="4" maxlength="2000"
+                    <textarea id="notes" name="notes" rows="4" maxlength="2000" required
                               placeholder="Any additional notes about the class, student progress, homework assigned..."
                               class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#7978E9] focus:border-transparent resize-none">{{ old('notes') }}</textarea>
                     @error('notes')

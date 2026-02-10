@@ -230,6 +230,7 @@
                                         <div class="flex-1">
                                             <p class="font-medium text-gray-900 dark:text-white" x-text="topic.topic"></p>
                                             <span x-show="topic.course" class="inline-block mt-1 px-2 py-0.5 text-xs bg-[#4F46E5]/10 text-[#4F46E5] dark:text-[#818CF8] rounded-full" x-text="topic.course"></span>
+                                            <p x-show="topic.notes" class="mt-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2" x-text="topic.notes"></p>
                                         </div>
                                         <span class="text-xs px-2 py-1 rounded-full"
                                               :class="topic.type === 'attendance' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'"

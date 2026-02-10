@@ -207,14 +207,13 @@
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 @foreach($curriculumRoadmap as $course)
                     <div class="relative">
-                        <div class="p-4 rounded-xl border-2 transition-all duration-200
-                                    {{ $course['status'] === 'completed' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' :
-                                       ($course['status'] === 'current' ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20' :
-                                       'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800') }}">
+                        @if($course['status'] === 'completed' || $course['status'] === 'current')
+                        <button onclick="openCourseLearningModal({{ $student->id }}, {{ $course['id'] }}, '{{ addslashes($course['title']) }}', '{{ $course['status'] }}')"
+                                class="w-full text-left p-4 rounded-xl border-2 transition-all duration-200 hover:shadow-lg hover:scale-105 cursor-pointer
+                                    {{ $course['status'] === 'completed' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30' :
+                                       'border-sky-500 bg-sky-50 dark:bg-sky-900/20 hover:bg-sky-100 dark:hover:bg-sky-900/30' }}">
                             <div class="w-10 h-10 mx-auto mb-2 rounded-lg flex items-center justify-center
-                                        {{ $course['status'] === 'completed' ? 'bg-emerald-500 text-white' :
-                                           ($course['status'] === 'current' ? 'bg-sky-500 text-white' :
-                                           'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400') }}">
+                                        {{ $course['status'] === 'completed' ? 'bg-emerald-500 text-white' : 'bg-sky-500 text-white' }}">
                                 @include('parent.partials.course-icon', ['icon' => $course['icon']])
                             </div>
                             <p class="text-xs text-center font-medium text-gray-700 dark:text-gray-300 line-clamp-2">
@@ -226,14 +225,25 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
                                 </div>
-                            @elseif($course['status'] === 'current')
+                            @else
                                 <div class="mt-2">
                                     <div class="h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
                                         <div class="h-1 bg-sky-500 rounded-full" style="width: {{ $course['progress'] }}%"></div>
                                     </div>
                                 </div>
                             @endif
+                            <p class="text-[10px] text-center mt-2 text-gray-500 dark:text-gray-400">View topics</p>
+                        </button>
+                        @else
+                        <div class="p-4 rounded-xl border-2 transition-all duration-200 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 opacity-60">
+                            <div class="w-10 h-10 mx-auto mb-2 rounded-lg flex items-center justify-center bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400">
+                                @include('parent.partials.course-icon', ['icon' => $course['icon']])
+                            </div>
+                            <p class="text-xs text-center font-medium text-gray-700 dark:text-gray-300 line-clamp-2">
+                                {{ $course['title'] }}
+                            </p>
                         </div>
+                        @endif
                     </div>
                 @endforeach
             </div>
@@ -272,6 +282,73 @@
                 @else
                     <p class="text-center text-gray-500 dark:text-gray-400 py-4">No reports yet</p>
                 @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Learning Modal -->
+    <div id="courseLearningModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="course-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeCourseLearningModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center">
+                            <div id="courseLearningIcon" class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-sky-100 dark:bg-sky-900/30">
+                                <svg class="h-6 w-6 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg leading-6 font-bold text-gray-900 dark:text-white" id="course-modal-title">
+                                    <span id="courseLearningTitle">Course Details</span>
+                                </h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    <span id="courseLearningStatus" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"></span>
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="closeCourseLearningModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="courseLearningLoading" class="py-8 text-center">
+                        <svg class="animate-spin h-8 w-8 text-sky-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="mt-2 text-gray-500 dark:text-gray-400">Loading topics...</p>
+                    </div>
+
+                    <!-- Content -->
+                    <div id="courseLearningContent" class="hidden">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Topics your child has learned in this course:</p>
+                        <div id="topicsList" class="flex flex-wrap gap-2 max-h-64 overflow-y-auto">
+                            <!-- Topics will be populated here -->
+                        </div>
+                        <p id="noTopicsMessage" class="hidden text-gray-500 dark:text-gray-400 text-sm text-center py-4">No topics have been recorded for this course yet.</p>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="courseLearningError" class="hidden py-8 text-center">
+                        <svg class="w-12 h-12 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p class="text-red-600 dark:text-red-400" id="courseLearningErrorMessage">Failed to load topics</p>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-900/50 px-4 py-3 sm:px-6 flex justify-end">
+                    <button type="button" onclick="closeCourseLearningModal()"
+                            class="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 sm:text-sm">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -334,6 +411,76 @@
 
     @push('scripts')
     <script>
+        // Course Learning Modal Functions
+        function openCourseLearningModal(studentId, courseId, courseTitle, status) {
+            // Show modal
+            document.getElementById('courseLearningModal').classList.remove('hidden');
+
+            // Set title and status badge
+            document.getElementById('courseLearningTitle').textContent = courseTitle;
+            const statusBadge = document.getElementById('courseLearningStatus');
+            if (status === 'completed') {
+                statusBadge.textContent = 'Completed';
+                statusBadge.className = 'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400';
+                document.getElementById('courseLearningIcon').className = 'flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30';
+            } else {
+                statusBadge.textContent = 'In Progress';
+                statusBadge.className = 'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400';
+                document.getElementById('courseLearningIcon').className = 'flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-sky-100 dark:bg-sky-900/30';
+            }
+
+            // Show loading, hide content and error
+            document.getElementById('courseLearningLoading').classList.remove('hidden');
+            document.getElementById('courseLearningContent').classList.add('hidden');
+            document.getElementById('courseLearningError').classList.add('hidden');
+
+            // Fetch data
+            fetch(`/parent/children/${studentId}/course-learning?course_id=${courseId}&course_title=${encodeURIComponent(courseTitle)}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('courseLearningLoading').classList.add('hidden');
+
+                if (data.success) {
+                    document.getElementById('courseLearningContent').classList.remove('hidden');
+
+                    const topicsList = document.getElementById('topicsList');
+                    const noTopicsMsg = document.getElementById('noTopicsMessage');
+                    topicsList.innerHTML = '';
+
+                    if (data.data.topics && data.data.topics.length > 0) {
+                        noTopicsMsg.classList.add('hidden');
+                        data.data.topics.forEach(topic => {
+                            const badge = document.createElement('span');
+                            badge.className = 'inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800';
+                            badge.textContent = topic;
+                            topicsList.appendChild(badge);
+                        });
+                    } else {
+                        noTopicsMsg.classList.remove('hidden');
+                    }
+                } else {
+                    document.getElementById('courseLearningError').classList.remove('hidden');
+                    document.getElementById('courseLearningErrorMessage').textContent = data.error || 'Failed to load topics';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('courseLearningLoading').classList.add('hidden');
+                document.getElementById('courseLearningError').classList.remove('hidden');
+                document.getElementById('courseLearningErrorMessage').textContent = 'An error occurred while loading topics';
+            });
+        }
+
+        function closeCourseLearningModal() {
+            document.getElementById('courseLearningModal').classList.add('hidden');
+        }
+
         function openRequestCourseModal(studentId, studentName) {
             document.getElementById('requestCourseStudentId').value = studentId;
             document.getElementById('requestCourseStudentName').textContent = studentName;

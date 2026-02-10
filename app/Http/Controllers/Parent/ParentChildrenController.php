@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Parent;
 
 use App\Http\Controllers\Controller;
+use App\Models\AttendanceRecord;
 use App\Models\DirectorNotification;
 use App\Models\Message;
 use App\Models\Student;
@@ -203,6 +204,70 @@ class ParentChildrenController extends Controller
         }
 
         return $courses;
+    }
+
+    /**
+     * Get course learning data for a specific course.
+     */
+    public function getCourseLearningData(Request $request, Student $student)
+    {
+        try {
+            $user = Auth::user();
+
+            // Ensure this student belongs to the logged-in parent
+            abort_unless(
+                $user->isGuardianOf($student) || $user->hasRole('admin'),
+                403,
+                'Unauthorized: You can only view your own children.'
+            );
+
+            $courseId = $request->query('course_id');
+            $courseTitle = $request->query('course_title');
+
+            if (!$courseId) {
+                return response()->json(['error' => 'Course ID is required'], 400);
+            }
+
+            // Get all approved attendance records for this student that include this course
+            $attendanceRecords = AttendanceRecord::where('student_id', $student->id)
+                ->where('status', 'approved')
+                ->where(function ($query) use ($courseId, $courseTitle) {
+                    // Check courses_covered JSON array or course_id column if it exists
+                    $query->whereJsonContains('courses_covered', (string) $courseId)
+                        ->orWhereJsonContains('courses_covered', (int) $courseId);
+
+                    // Also check by course title if provided
+                    if ($courseTitle) {
+                        $query->orWhereJsonContains('courses_covered', $courseTitle);
+                    }
+                })
+                ->orderBy('class_date', 'desc')
+                ->get();
+
+            // Get unique topics covered
+            $topicsSet = [];
+
+            foreach ($attendanceRecords as $record) {
+                if ($record->topic) {
+                    $topicsSet[$record->topic] = true;
+                }
+            }
+
+            $topics = array_keys($topicsSet);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'course_title' => $courseTitle,
+                    'topics' => $topics,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to load course learning data',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
