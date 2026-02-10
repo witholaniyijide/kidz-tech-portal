@@ -332,7 +332,15 @@
                         <div id="topicsList" class="flex flex-wrap gap-2 max-h-64 overflow-y-auto">
                             <!-- Topics will be populated here -->
                         </div>
-                        <p id="noTopicsMessage" class="hidden text-gray-500 dark:text-gray-400 text-sm text-center py-4">No topics have been recorded for this course yet.</p>
+                        <div id="noTopicsMessage" class="hidden text-center py-4">
+                            <p class="text-gray-500 dark:text-gray-400 text-sm mb-3">No topics have been recorded for this course yet.</p>
+                            <div id="availableCoursesSection" class="hidden">
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mb-2">Classes have been taken for:</p>
+                                <div id="availableCoursesList" class="flex flex-wrap gap-1 justify-center">
+                                    <!-- Available courses will be shown here -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Error State -->
@@ -444,9 +452,6 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Course Learning Data:', JSON.stringify(data, null, 2));
-                console.log('Topics:', data.data?.topics);
-                console.log('Debug:', data.debug);
                 document.getElementById('courseLearningLoading').classList.add('hidden');
 
                 if (data.success) {
@@ -454,10 +459,14 @@
 
                     const topicsList = document.getElementById('topicsList');
                     const noTopicsMsg = document.getElementById('noTopicsMessage');
+                    const availableSection = document.getElementById('availableCoursesSection');
+                    const availableCoursesList = document.getElementById('availableCoursesList');
                     topicsList.innerHTML = '';
+                    availableCoursesList.innerHTML = '';
 
                     if (data.data.topics && data.data.topics.length > 0) {
                         noTopicsMsg.classList.add('hidden');
+                        availableSection.classList.add('hidden');
                         data.data.topics.forEach(topic => {
                             const badge = document.createElement('span');
                             badge.className = 'inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800';
@@ -466,6 +475,19 @@
                         });
                     } else {
                         noTopicsMsg.classList.remove('hidden');
+
+                        // Show available courses if any
+                        if (data.data.available_courses && data.data.available_courses.length > 0) {
+                            availableSection.classList.remove('hidden');
+                            data.data.available_courses.forEach(course => {
+                                const badge = document.createElement('span');
+                                badge.className = 'inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
+                                badge.textContent = course;
+                                availableCoursesList.appendChild(badge);
+                            });
+                        } else {
+                            availableSection.classList.add('hidden');
+                        }
                     }
                 } else {
                     document.getElementById('courseLearningError').classList.remove('hidden');

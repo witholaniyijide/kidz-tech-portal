@@ -237,10 +237,9 @@ class ParentChildrenController extends Controller
                 ->orderBy('class_date', 'desc')
                 ->get();
 
-            // Filter records that match this course
+            // Filter records that match this course and collect all available courses
             $matchingRecords = [];
-            $recordsWithCourses = 0;
-            $sampleCourses = []; // Debug: collect sample courses_covered values
+            $availableCourses = []; // Courses the student has actually taken classes for
 
             foreach ($allRecords as $record) {
                 $courses = $record->courses_covered;
@@ -252,15 +251,18 @@ class ParentChildrenController extends Controller
 
                 // Skip if no courses data
                 if (!is_array($courses) || empty($courses)) {
+                    // For older records without courses_covered, use topic directly
+                    if ($record->topic) {
+                        // These are legacy records - include them for this course if we have no other matches
+                        continue;
+                    }
                     continue;
                 }
 
-                $recordsWithCourses++;
-
-                // Debug: collect first few course values
-                if (count($sampleCourses) < 5) {
-                    foreach ($courses as $c) {
-                        $sampleCourses[] = $c;
+                // Collect all courses this student has records for
+                foreach ($courses as $course) {
+                    if (!empty($course) && !in_array($course, $availableCourses)) {
+                        $availableCourses[] = $course;
                     }
                 }
 
@@ -281,35 +283,36 @@ class ParentChildrenController extends Controller
             // Get unique topics covered from matching records
             $topicsSet = [];
 
-            // If no records matched by course, but there are approved records with topics,
-            // show topics from all attendance (for older records without courses_covered)
-            $recordsToUse = count($matchingRecords) > 0 ? $matchingRecords : ($recordsWithCourses === 0 ? $allRecords->all() : []);
-
-            foreach ($recordsToUse as $record) {
-                if ($record->topic) {
-                    $topicsSet[$record->topic] = true;
+            // If no matching records, check for legacy records without courses_covered
+            if (count($matchingRecords) === 0 && count($availableCourses) === 0) {
+                // All records are legacy (no courses_covered) - show all topics
+                foreach ($allRecords as $record) {
+                    if ($record->topic) {
+                        $topicsSet[$record->topic] = true;
+                    }
+                }
+            } else {
+                // Use only matching records
+                foreach ($matchingRecords as $record) {
+                    if ($record->topic) {
+                        $topicsSet[$record->topic] = true;
+                    }
                 }
             }
 
             $topics = array_keys($topicsSet);
+
+            // Sort available courses naturally
+            sort($availableCourses, SORT_NATURAL);
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'course_title' => $courseTitle,
                     'topics' => $topics,
+                    'available_courses' => $availableCourses,
+                    'has_matching_records' => count($matchingRecords) > 0,
                 ],
-                'debug' => [
-                    'student_id' => $student->id,
-                    'course_id' => $courseId,
-                    'course_prefix' => $coursePrefix,
-                    'course_title_search' => $courseTitle,
-                    'total_approved_records' => $allRecords->count(),
-                    'records_with_courses' => $recordsWithCourses,
-                    'matching_records' => count($matchingRecords),
-                    'showing_all_topics' => count($matchingRecords) === 0 && $recordsWithCourses === 0,
-                    'sample_courses_in_db' => array_unique(array_slice($sampleCourses, 0, 5)),
-                ]
             ]);
         } catch (\Exception $e) {
             return response()->json([
