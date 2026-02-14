@@ -83,7 +83,10 @@
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ now()->format('l, M j') }}</p>
                             @endif
                         </div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ count($todayClasses) }} classes</span>
+                        <div class="text-right">
+                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ now()->format('l, M j, Y') }}</p>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ count($todayClasses) }} classes</span>
+                        </div>
                     </div>
 
                     @if(count($todayClasses) > 0)
