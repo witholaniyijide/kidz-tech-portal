@@ -89,7 +89,8 @@ class AssessmentController extends Controller
             $validated = $request->validate([
                 'tutor_id' => 'required|exists:tutors,id',
                 'student_id' => 'nullable|exists:students,id',
-                'assessment_month' => 'required|string|max:50',
+                'assessment_month' => 'required|string|max:7',
+                'assessment_date' => 'required|date',
                 'class_date' => 'nullable|date',
                 'week' => 'nullable|integer|min:1|max:53',
                 'year' => 'nullable|integer',
@@ -107,11 +108,43 @@ class AssessmentController extends Controller
                 'action' => 'nullable|in:draft,send',
                 'is_stand_in' => 'nullable|boolean',
                 'original_tutor_id' => 'nullable|exists:tutors,id',
+                'punctuality_late_count' => 'nullable|integer|min:0',
+                'video_off_count' => 'nullable|integer|min:0',
+                'student_chips' => 'nullable|array',
             ]);
+
+            // Block duplicate: one assessment per tutor per month
+            $existing = TutorAssessment::where('tutor_id', $validated['tutor_id'])
+                ->where('assessment_month', $validated['assessment_month'])
+                ->first();
+
+            if ($existing) {
+                $tutorName = Tutor::find($validated['tutor_id'])?->first_name ?? 'This tutor';
+                $monthLabel = Carbon::createFromFormat('Y-m', $validated['assessment_month'])->format('F Y');
+                $message = "{$tutorName} already has an assessment for {$monthLabel}. Only one assessment per tutor per month is allowed.";
+
+                if ($request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $message], 422);
+                }
+                return redirect()->back()->with('error', $message)->withInput();
+            }
 
             $action = $validated['action'] ?? 'draft';
             $validated['manager_id'] = Auth::id();
             $validated['status'] = $action === 'send' ? 'pending_review' : 'draft';
+
+            // Calculate penalties from incident counts
+            $punctualityLateCount = $validated['punctuality_late_count'] ?? 0;
+            $videoOffCount = $validated['video_off_count'] ?? 0;
+            $punctualityPenalty = $punctualityLateCount * 500;
+            $videoPenalty = $videoOffCount * 1000;
+            $totalPenalty = $punctualityPenalty + $videoPenalty;
+
+            $validated['punctuality_late_count'] = $punctualityLateCount;
+            $validated['video_off_count'] = $videoOffCount;
+            $validated['punctuality_penalty'] = $punctualityPenalty;
+            $validated['video_penalty'] = $videoPenalty;
+            $validated['total_penalty_deductions'] = $totalPenalty;
 
             // Extract ratings for separate processing
             $criteriaRatings = $validated['criteria_ratings'] ?? [];
@@ -128,7 +161,7 @@ class AssessmentController extends Controller
             DB::transaction(function () use ($validated, $criteriaRatings) {
                 $assessment = TutorAssessment::create($validated);
 
-                // Create individual rating records (if new tables exist)
+                // Create individual rating records
                 if (!empty($criteriaRatings)) {
                     try {
                         $criteriaMap = AssessmentCriteria::active()->pluck('id', 'code');
@@ -144,7 +177,6 @@ class AssessmentController extends Controller
                             }
                         }
                     } catch (\Exception $e) {
-                        // If new tables don't exist, ratings are still stored in JSON fields
                         \Log::warning('Could not create assessment ratings: ' . $e->getMessage());
                     }
                 }
@@ -297,13 +329,13 @@ class AssessmentController extends Controller
                 })->get();
 
                 $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'Unknown Tutor';
-                $studentName = $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '';
+                $monthLabel = $assessment->assessment_period;
 
                 foreach ($directors as $director) {
                     DirectorNotification::create([
                         'user_id' => $director->id,
                         'title' => 'Assessment Ready for Review',
-                        'body' => "Assessment for {$tutorName}" . ($studentName ? " (Student: {$studentName})" : "") . " - Week {$assessment->week} is pending your review.",
+                        'body' => "Assessment for {$tutorName} — {$monthLabel} is pending your review.",
                         'type' => 'assessment',
                         'is_read' => false,
                         'meta' => [

@@ -53,84 +53,51 @@
 
                     <form @submit.prevent="saveAssessment()">
                         {{-- Selection Grid --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                            {{-- Student --}}
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            {{-- Tutor Selection --}}
                             <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Student *</label>
-                                <select x-model="formData.student_id" @change="selectStudent()" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
-                                    <option value="">Select student</option>
-                                    @foreach($students ?? [] as $student)
-                                        @php
-                                            $tutorName = $student->tutor
-                                                ? $student->tutor->first_name . ' ' . $student->tutor->last_name
-                                                : 'No Tutor Assigned';
-                                        @endphp
-                                        <option value="{{ $student->id }}"
-                                                data-tutor-id="{{ $student->tutor_id }}"
-                                                data-tutor-name="{{ $tutorName }}">
-                                            {{ $student->first_name }} {{ $student->last_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            {{-- Tutor (Auto-selected or Stand-in) --}}
-                            <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                                    <span x-show="!formData.is_stand_in">Assigned Tutor</span>
-                                    <span x-show="formData.is_stand_in">Original Tutor (Being stood in for)</span>
-                                </label>
-                                <div class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-600">
-                                    <span x-text="selectedTutorName || 'Select a student first'" :class="selectedTutorName ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'"></span>
-                                    <input type="hidden" x-model="formData.original_tutor_id">
-                                </div>
-                            </div>
-
-                            {{-- Date Class Taken --}}
-                            <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Date Class Taken *</label>
-                                <input type="date" x-model="formData.class_date" @change="updateWeekFromDate()" required
-                                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
-                            </div>
-                        </div>
-
-                        {{-- Stand-in Assessment Toggle --}}
-                        <div class="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/30 rounded-xl" x-show="formData.student_id">
-                            <div class="flex items-center gap-3">
-                                <label class="flex items-center cursor-pointer">
-                                    <input type="checkbox" x-model="formData.is_stand_in" @change="handleStandInToggle()"
-                                           class="w-5 h-5 text-amber-600 rounded border-gray-300 focus:ring-amber-500">
-                                    <span class="ml-3 font-medium text-amber-800 dark:text-amber-300">This is a stand-in class</span>
-                                </label>
-                            </div>
-                            <p class="text-sm text-amber-600 dark:text-amber-400 mt-2">
-                                Check this if the class was taken by a different tutor than the student's assigned tutor.
-                            </p>
-
-                            {{-- Stand-in Tutor Selection --}}
-                            <div x-show="formData.is_stand_in" x-transition class="mt-4 pt-4 border-t border-amber-200 dark:border-amber-800/30">
-                                <label class="block text-sm font-medium mb-2 text-amber-800 dark:text-amber-300">Stand-in Tutor (Who took the class) *</label>
-                                <select x-model="formData.tutor_id" required
-                                        class="w-full border border-amber-300 dark:border-amber-700 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
-                                    <option value="">Select stand-in tutor</option>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Tutor *</label>
+                                <select x-model="formData.tutor_id" @change="loadTutorStudents()" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
+                                    <option value="">Select tutor</option>
                                     @foreach($tutors as $tutor)
                                         <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
                                     @endforeach
                                 </select>
-                                <p class="text-xs text-amber-600 dark:text-amber-400 mt-2">
-                                    This assessment will be filed under the stand-in tutor's record.
-                                </p>
+                            </div>
+
+                            {{-- Assessment Month --}}
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Assessment Month *</label>
+                                <input type="month" x-model="formData.assessment_month" required
+                                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
+                            </div>
+
+                            {{-- Assessment Date --}}
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Assessment Date *</label>
+                                <input type="date" x-model="formData.assessment_date" required
+                                       class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
                             </div>
                         </div>
 
-                        {{-- Week Display --}}
-                        <div class="mb-6 p-4 bg-[#C15F3C]/10 dark:bg-[#C15F3C]/20 rounded-xl" x-show="formData.class_date">
-                            <div class="flex items-center gap-3">
-                                <svg class="w-5 h-5 text-[#C15F3C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <span class="font-medium text-[#C15F3C] dark:text-[#DA7756]" x-text="weekDisplay"></span>
+                        {{-- Student Chips --}}
+                        <div x-show="formData.tutor_id && tutorStudents.length > 0" x-transition class="mb-6">
+                            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Students assigned to this tutor this month</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="student in tutorStudents" :key="student.id">
+                                    <div class="flex items-center gap-2 bg-[#C15F3C]/10 dark:bg-[#C15F3C]/20 border border-[#C15F3C]/30 rounded-full px-3 py-1.5">
+                                        <span class="text-sm font-medium text-gray-800 dark:text-white" x-text="student.name"></span>
+                                        <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                                            <span>(</span>
+                                            <input type="number" x-model.number="student.classes_attended" min="0" :max="student.total_classes" class="w-8 text-center border-b border-gray-400 bg-transparent text-xs focus:outline-none focus:border-[#C15F3C]">
+                                            <span>/</span>
+                                            <input type="number" x-model.number="student.total_classes" min="0" class="w-8 text-center border-b border-gray-400 bg-transparent text-xs focus:outline-none focus:border-[#C15F3C]">
+                                            <span>)</span>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
+                            <p class="text-xs text-gray-400 mt-2">Format: Name (classes attended / total classes this month)</p>
                         </div>
 
                         {{-- Criteria Selection - 8 criteria --}}
@@ -169,6 +136,34 @@
                                                         x-text="opt">
                                                 </button>
                                             </template>
+                                        </div>
+
+                                        {{-- Punctuality incident count --}}
+                                        <div x-show="criterion.id === 'punctuality'" x-transition class="mt-3 flex items-center gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800/30">
+                                            <label class="text-sm font-medium text-amber-800 dark:text-amber-300 whitespace-nowrap">Times late this month</label>
+                                            <input type="number" x-model.number="incidentCounts.punctualityLate" min="0"
+                                                   class="w-16 text-center border border-amber-300 dark:border-amber-700 dark:bg-gray-700 dark:text-white px-2 py-1 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                            <span class="text-xs text-amber-600 dark:text-amber-400" x-show="incidentCounts.punctualityLate > 0"
+                                                  x-text="'Penalty: ' + incidentCounts.punctualityLate + ' x &#8358;500 = &#8358;' + (incidentCounts.punctualityLate * 500).toLocaleString()"></span>
+                                        </div>
+
+                                        {{-- Video-off incident count --}}
+                                        <div x-show="criterion.id === 'video'" x-transition class="mt-3 flex items-center gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800/30">
+                                            <label class="text-sm font-medium text-amber-800 dark:text-amber-300 whitespace-nowrap">Video-off incidents</label>
+                                            <input type="number" x-model.number="incidentCounts.videoOff" min="0"
+                                                   class="w-16 text-center border border-amber-300 dark:border-amber-700 dark:bg-gray-700 dark:text-white px-2 py-1 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                            <span class="text-xs text-amber-600 dark:text-amber-400" x-show="incidentCounts.videoOff > 0"
+                                                  x-text="'Penalty: ' + incidentCounts.videoOff + ' x &#8358;1,000 = &#8358;' + (incidentCounts.videoOff * 1000).toLocaleString()"></span>
+                                        </div>
+
+                                        {{-- Professional conduct alert --}}
+                                        <div x-show="criterion.id === 'professional' && ratings['professional'] === 'Unacceptable'" x-transition class="mt-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800/30">
+                                            <div class="flex items-center gap-2 text-red-700 dark:text-red-300">
+                                                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                                </svg>
+                                                <span class="text-sm font-medium">Unacceptable professional conduct flagged. This will be escalated to the Director for review.</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>
@@ -572,18 +567,18 @@
                 },
 
                 formData: {
-                    student_id: '',
                     tutor_id: '',
-                    original_tutor_id: '',
-                    is_stand_in: false,
-                    class_date: '',
-                    week: {{ date('W') }},
+                    assessment_month: new Date().toISOString().slice(0, 7),
+                    assessment_date: new Date().toISOString().split('T')[0],
                     year: {{ date('Y') }},
                     performance_score: '',
                     strengths: '',
                     weaknesses: '',
                     recommendations: ''
                 },
+
+                tutorStudents: [],
+                incidentCounts: { punctualityLate: 0, videoOff: 0 },
 
                 // 8 Assessment Criteria from database
                 criteria: @json($criteriaForJs),
@@ -607,84 +602,18 @@
                     this.updateWeekDateRange();
                 },
 
-                // Get week date range in format "Dec 21 - Dec 27"
-                getWeekDateRange(weekNum, year) {
-                    const simple = new Date(year, 0, 1 + (weekNum - 1) * 7);
-                    const dow = simple.getDay();
-                    const startDate = new Date(simple);
-                    startDate.setDate(simple.getDate() - dow + 1); // Monday
-                    const endDate = new Date(startDate);
-                    endDate.setDate(startDate.getDate() + 6); // Sunday
-
-                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                    return `${months[startDate.getMonth()]} ${startDate.getDate()} - ${months[endDate.getMonth()]} ${endDate.getDate()}`;
-                },
-
-                updateWeekDateRange() {
-                    this.weekDateRange = this.getWeekDateRange(this.weekView, this.weekYear);
-                    this.dashboardWeekDisplay = `Tutor assessments for Week ${this.weekView} (${this.weekDateRange})`;
-                },
-
-                changeWeek(delta) {
-                    this.weekView += delta;
-                    if (this.weekView < 1) {
-                        this.weekView = 52;
-                        this.weekYear--;
-                    } else if (this.weekView > 52) {
-                        this.weekView = 1;
-                        this.weekYear++;
-                    }
-                    this.updateWeekDateRange();
-                },
-
-                // Select student and auto-fill tutor
-                selectStudent() {
-                    const select = document.querySelector('select[x-model="formData.student_id"]');
-                    const option = select.options[select.selectedIndex];
-                    if (option && option.value) {
-                        const tutorId = option.dataset.tutorId || '';
-                        const tutorName = option.dataset.tutorName || 'No Tutor Assigned';
-                        // Store original tutor info
-                        this.formData.original_tutor_id = tutorId;
-                        this.selectedTutorName = tutorName;
-                        // If not stand-in, tutor_id is same as original
-                        if (!this.formData.is_stand_in) {
-                            this.formData.tutor_id = tutorId;
-                        }
-                    } else {
-                        this.formData.tutor_id = '';
-                        this.formData.original_tutor_id = '';
-                        this.selectedTutorName = '';
-                    }
-                    // Reset stand-in when changing student
-                    this.formData.is_stand_in = false;
-                },
-
-                // Handle stand-in toggle
-                handleStandInToggle() {
-                    if (this.formData.is_stand_in) {
-                        // Clear tutor_id so user must select stand-in tutor
-                        this.formData.tutor_id = '';
-                    } else {
-                        // Restore original tutor
-                        this.formData.tutor_id = this.formData.original_tutor_id;
-                    }
-                },
-
-                // Update week from selected date
-                updateWeekFromDate() {
-                    if (this.formData.class_date) {
-                        const date = new Date(this.formData.class_date);
-                        const oneJan = new Date(date.getFullYear(), 0, 1);
-                        const numberOfDays = Math.floor((date - oneJan) / (24 * 60 * 60 * 1000));
-                        const weekNum = Math.ceil((date.getDay() + 1 + numberOfDays) / 7);
-
-                        this.formData.week = weekNum;
-                        this.formData.year = date.getFullYear();
-
-                        const weekRange = this.getWeekDateRange(weekNum, date.getFullYear());
-                        this.weekDisplay = `Week ${weekNum} (${weekRange})`;
-                    }
+                loadTutorStudents() {
+                    const students = @json($students ?? []);
+                    const tutorId = parseInt(this.formData.tutor_id);
+                    if (!tutorId) { this.tutorStudents = []; return; }
+                    this.tutorStudents = students
+                        .filter(s => s.tutor_id == tutorId && s.status === 'active')
+                        .map(s => ({
+                            id: s.id,
+                            name: s.first_name + ' ' + s.last_name,
+                            classes_attended: 0,
+                            total_classes: 0
+                        }));
                 },
 
                 showToast(message, type = 'success') {
@@ -694,20 +623,17 @@
 
                 resetForm() {
                     this.formData = {
-                        student_id: '',
                         tutor_id: '',
-                        original_tutor_id: '',
-                        is_stand_in: false,
-                        class_date: '',
-                        week: {{ date('W') }},
+                        assessment_month: new Date().toISOString().slice(0, 7),
+                        assessment_date: new Date().toISOString().split('T')[0],
                         year: {{ date('Y') }},
                         performance_score: '',
                         strengths: '',
                         weaknesses: '',
                         recommendations: ''
                     };
-                    this.selectedTutorName = '';
-                    this.weekDisplay = '';
+                    this.tutorStudents = [];
+                    this.incidentCounts = { punctualityLate: 0, videoOff: 0 };
                     this.criteria.forEach(c => {
                         this.checkedCriteria[c.id] = false;
                     });
@@ -793,17 +719,13 @@
                 },
 
                 async saveAssessment(action = 'draft') {
-                    if (!this.formData.student_id || !this.formData.class_date) {
-                        this.showToast('Please select a student and enter class date', 'error');
+                    if (!this.formData.tutor_id) {
+                        this.showToast('Please select a tutor', 'error');
                         return;
                     }
 
-                    if (!this.formData.tutor_id) {
-                        if (this.formData.is_stand_in) {
-                            this.showToast('Please select the stand-in tutor who took the class', 'error');
-                        } else {
-                            this.showToast('Selected student has no assigned tutor', 'error');
-                        }
+                    if (!this.formData.assessment_month || !this.formData.assessment_date) {
+                        this.showToast('Please enter assessment month and date', 'error');
                         return;
                     }
 
@@ -819,13 +741,16 @@
                     try {
                         const payload = {
                             ...this.formData,
-                            assessment_month: this.weekDisplay,
-                            session: this.session,
                             criteria_assessed: Object.keys(this.checkedCriteria).filter(k => this.checkedCriteria[k]),
                             criteria_ratings: this.ratings,
                             action: action, // 'draft' or 'send'
-                            is_stand_in: this.formData.is_stand_in,
-                            original_tutor_id: this.formData.is_stand_in ? this.formData.original_tutor_id : null
+                            punctuality_late_count: this.incidentCounts.punctualityLate,
+                            video_off_count: this.incidentCounts.videoOff,
+                            student_chips: this.tutorStudents.map(s => ({
+                                name: s.name,
+                                classes_attended: s.classes_attended,
+                                total_classes: s.total_classes
+                            })),
                         };
 
                         const response = await fetch('{{ route("manager.assessments.store") }}', {

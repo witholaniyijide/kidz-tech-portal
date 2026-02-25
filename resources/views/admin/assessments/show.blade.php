@@ -10,7 +10,7 @@
             {{-- Header --}}
             <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Tutor Assessment — {{ $assessment->assessment_month }}</h1>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Tutor Assessment — {{ $assessment->assessment_period }}</h1>
                     <p class="text-gray-600 dark:text-gray-400 mt-1">{{ $assessment->tutor->fullName() ?? $assessment->tutor->first_name . ' ' . $assessment->tutor->last_name }}</p>
                 </div>
                 <div class="flex gap-2">
@@ -55,15 +55,11 @@
                                 <p class="text-sm text-gray-600 dark:text-gray-400">{{ $assessment->tutor->email ?? '-' }}</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Student Assessed</label>
-                                <p class="text-gray-900 dark:text-white font-medium">{{ $assessment->student ? $assessment->student->first_name . ' ' . $assessment->student->last_name : 'N/A' }}</p>
-                                @if($assessment->student && $assessment->student->email)
-                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ $assessment->student->email }}</p>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Assessment Period</label>
+                                <p class="text-gray-900 dark:text-white font-medium">{{ $assessment->assessment_period }}</p>
+                                @if($assessment->assessment_date)
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Date: {{ $assessment->assessment_date->format('d M Y') }}</p>
                                 @endif
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Assessment Month</label>
-                                <p class="text-gray-900 dark:text-white">{{ $assessment->assessment_month }}</p>
                             </div>
                             @if($assessment->class_date)
                             <div>
@@ -144,6 +140,51 @@
                                         {{ $rating }}
                                     </span>
                                 </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Unacceptable Conduct Alert --}}
+                    @if(is_array($assessment->criteria_ratings) && in_array('Unacceptable', $assessment->criteria_ratings))
+                    <div class="mb-4 p-4 bg-red-100 dark:bg-red-900/30 border-2 border-red-600 rounded-xl">
+                        <p class="text-red-700 dark:text-red-400 font-bold text-lg">⚠️ UNACCEPTABLE CONDUCT — Immediate action required.</p>
+                    </div>
+                    @endif
+
+                    {{-- Penalty Deductions --}}
+                    @if(($assessment->punctuality_late_count ?? 0) > 0 || ($assessment->video_off_count ?? 0) > 0)
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
+                        <h3 class="text-lg font-semibold text-red-800 dark:text-red-300 mb-3">Penalty Deductions</h3>
+                        @if(($assessment->punctuality_late_count ?? 0) > 0)
+                        <div class="flex justify-between py-2 border-b">
+                            <span>Punctuality — {{ $assessment->punctuality_late_count }} late incident(s)</span>
+                            <span class="font-medium text-red-600">₦{{ number_format($assessment->punctuality_penalty ?? 0) }}</span>
+                        </div>
+                        @endif
+                        @if(($assessment->video_off_count ?? 0) > 0)
+                        <div class="flex justify-between py-2 border-b">
+                            <span>Video-off — {{ $assessment->video_off_count }} incident(s)</span>
+                            <span class="font-medium text-red-600">₦{{ number_format($assessment->video_penalty ?? 0) }}</span>
+                        </div>
+                        @endif
+                        <div class="flex justify-between py-2 font-bold">
+                            <span>Total Deductions</span>
+                            <span class="text-red-600">₦{{ number_format($assessment->total_penalty_deductions ?? 0) }}</span>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Student Chips --}}
+                    @if($assessment->student_chips && count($assessment->student_chips) > 0)
+                    <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Students Assigned</h3>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($assessment->student_chips as $chip)
+                                <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full text-sm">
+                                    <span class="font-medium">{{ $chip['name'] ?? '' }}</span>
+                                    <span class="text-gray-500">({{ $chip['classes_attended'] ?? 0 }}/{{ $chip['total_classes'] ?? 0 }})</span>
+                                </span>
                             @endforeach
                         </div>
                     </div>
