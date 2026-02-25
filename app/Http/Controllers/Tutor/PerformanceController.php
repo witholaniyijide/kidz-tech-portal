@@ -36,16 +36,10 @@ class PerformanceController extends Controller
 
         // Filter by month
         if ($request->filled('month')) {
-            $query->whereMonth('class_date', $request->month);
+            $query->where('assessment_month', 'like', '%-' . str_pad($request->month, 2, '0', STR_PAD_LEFT));
         }
 
-        // Filter by student
-        if ($request->filled('student_id')) {
-            $query->where('student_id', $request->student_id);
-        }
-
-        $assessments = $query->orderBy('class_date', 'desc')
-            ->orderBy('created_at', 'desc')
+        $assessments = $query->orderBy('created_at', 'desc')
             ->paginate(12)
             ->appends($request->except('page'));
 
@@ -58,19 +52,13 @@ class PerformanceController extends Controller
             ->orderBy('year', 'desc')
             ->pluck('year');
 
-        // Get students for filter
-        $students = Student::where('tutor_id', $tutor->id)
-            ->where('status', 'active')
-            ->orderBy('first_name')
-            ->get();
-
         // Calculate stats
         $stats = $this->calculateStats($tutor->id);
 
         // Get assessment criteria
         $criteria = AssessmentCriteria::active()->ordered()->get();
 
-        return view('tutor.performance.index', compact('assessments', 'years', 'students', 'stats', 'criteria'));
+        return view('tutor.performance.index', compact('assessments', 'years', 'stats', 'criteria'));
     }
 
     /**
@@ -166,14 +154,6 @@ class PerformanceController extends Controller
         $strengthSummary = getStrengthSummary($strengths);
         $weaknessSummary = getWeaknessSummary($weaknesses);
 
-        // Get total sessions for this student/tutor combo in this period
-        $totalSessions = TutorAssessment::where('tutor_id', $tutor->id)
-            ->where('student_id', $assessment->student_id)
-            ->where('status', 'approved-by-director')
-            ->where('year', $assessment->year)
-            ->whereMonth('class_date', $assessment->class_date?->month ?? date('m'))
-            ->count();
-
         return view('tutor.performance.report-card', compact(
             'assessment',
             'criteriaList',
@@ -182,8 +162,7 @@ class PerformanceController extends Controller
             'strengths',
             'weaknesses',
             'strengthSummary',
-            'weaknessSummary',
-            'totalSessions'
+            'weaknessSummary'
         ));
     }
 

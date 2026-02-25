@@ -33,31 +33,26 @@
             <h2 class="text-lg font-semibold mt-1">Tutor Performance Report</h2>
         </div>
 
-        {{-- Tutor/Student Info --}}
+        {{-- Tutor Info --}}
         <div class="p-6 border-b border-slate-200 dark:border-slate-700">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                     <span class="text-sm text-slate-500 dark:text-slate-400">Tutor Name</span>
                     <p class="font-semibold text-slate-800 dark:text-white">{{ $assessment->tutor->first_name }} {{ $assessment->tutor->last_name }}</p>
                 </div>
                 <div>
-                    <span class="text-sm text-slate-500 dark:text-slate-400">Student Name</span>
-                    <p class="font-semibold text-slate-800 dark:text-white">{{ $assessment->student ? $assessment->student->first_name . ' ' . $assessment->student->last_name : 'N/A' }}</p>
+                    <span class="text-sm text-slate-500 dark:text-slate-400">Assessment Period</span>
+                    <p class="font-semibold text-slate-800 dark:text-white">{{ $assessment->assessment_period }}</p>
+                    @if($assessment->assessment_date)
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Date: {{ $assessment->assessment_date->format('d M Y') }}</p>
+                    @endif
                 </div>
                 <div>
-                    <span class="text-sm text-slate-500 dark:text-slate-400">Week / Session</span>
-                    <p class="font-semibold text-slate-800 dark:text-white">Week {{ $assessment->week ?? 'N/A' }} / Session {{ $assessment->session ?? 1 }}</p>
+                    <span class="text-sm text-slate-500 dark:text-slate-400">Total Penalties</span>
+                    <p class="font-semibold {{ ($assessment->directorAction?->penalty_amount ?? 0) > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }}">
+                        {{ ($assessment->directorAction?->penalty_amount ?? 0) > 0 ? '₦' . number_format($assessment->directorAction->penalty_amount, 2) : 'None' }}
+                    </p>
                 </div>
-                <div>
-                    <span class="text-sm text-slate-500 dark:text-slate-400">Class Date</span>
-                    <p class="font-semibold text-slate-800 dark:text-white">{{ $assessment->class_date ? $assessment->class_date->format('M d, Y') : ($assessment->assessment_month ?? 'N/A') }}</p>
-                </div>
-            </div>
-            <div class="mt-4">
-                <span class="text-sm text-slate-500 dark:text-slate-400">Total Penalties</span>
-                <p class="font-semibold {{ ($assessment->directorAction?->penalty_amount ?? 0) > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }}">
-                    {{ ($assessment->directorAction?->penalty_amount ?? 0) > 0 ? '₦' . number_format($assessment->directorAction->penalty_amount, 2) : 'None' }}
-                </p>
             </div>
         </div>
 
@@ -118,6 +113,44 @@
                 <span class="text-lg ml-2 text-slate-700 dark:text-slate-300">({{ $overallInfo['label'] }})</span>
             </div>
         </div>
+
+        {{-- Penalty Deductions --}}
+        @if(($assessment->punctuality_late_count ?? 0) > 0 || ($assessment->video_off_count ?? 0) > 0)
+        <div class="p-6 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-lg font-semibold text-red-800 dark:text-red-300 mb-3">Penalty Deductions</h3>
+            @if(($assessment->punctuality_late_count ?? 0) > 0)
+            <div class="flex justify-between py-2 border-b border-slate-200 dark:border-slate-700">
+                <span class="text-slate-700 dark:text-slate-300">Punctuality — {{ $assessment->punctuality_late_count }} late incident(s)</span>
+                <span class="font-medium text-red-600">₦{{ number_format($assessment->punctuality_penalty ?? 0) }}</span>
+            </div>
+            @endif
+            @if(($assessment->video_off_count ?? 0) > 0)
+            <div class="flex justify-between py-2 border-b border-slate-200 dark:border-slate-700">
+                <span class="text-slate-700 dark:text-slate-300">Video-off — {{ $assessment->video_off_count }} incident(s)</span>
+                <span class="font-medium text-red-600">₦{{ number_format($assessment->video_penalty ?? 0) }}</span>
+            </div>
+            @endif
+            <div class="flex justify-between py-2 font-bold">
+                <span class="text-slate-900 dark:text-white">Total Deductions</span>
+                <span class="text-red-600">₦{{ number_format($assessment->total_penalty_deductions ?? 0) }}</span>
+            </div>
+        </div>
+        @endif
+
+        {{-- Student Chips --}}
+        @if($assessment->student_chips && count($assessment->student_chips) > 0)
+        <div class="p-6 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-3">Students Assigned</h3>
+            <div class="flex flex-wrap gap-2">
+                @foreach($assessment->student_chips as $chip)
+                    <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-sky-100 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-700 rounded-full text-sm">
+                        <span class="font-medium text-slate-800 dark:text-white">{{ $chip['name'] ?? '' }}</span>
+                        <span class="text-slate-500 dark:text-slate-400">({{ $chip['classes_attended'] ?? 0 }}/{{ $chip['total_classes'] ?? 0 }})</span>
+                    </span>
+                @endforeach
+            </div>
+        </div>
+        @endif
 
         {{-- Strengths & Weaknesses Summary --}}
         <div class="p-6 bg-amber-50 dark:bg-amber-900/20 border-t border-amber-200 dark:border-amber-800">
