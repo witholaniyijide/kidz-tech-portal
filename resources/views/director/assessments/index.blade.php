@@ -142,14 +142,20 @@
                                                     Standing in for: {{ $assessment->originalTutor->first_name }} {{ $assessment->originalTutor->last_name }}
                                                 </div>
                                             @endif
-                                            @if($assessment->student)
-                                                <div class="text-sky-600 dark:text-sky-400 text-sm font-medium mt-1">
-                                                    Student: {{ $assessment->student->first_name }} {{ $assessment->student->last_name }}
+                                            <div class="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                                                {{ $assessment->assessment_period }} @if($assessment->assessment_date) · {{ $assessment->assessment_date->format('d M Y') }} @endif
+                                            </div>
+                                            @if($assessment->total_penalty_deductions > 0)
+                                                <div class="mt-1 text-sm font-medium text-red-600 dark:text-red-400">
+                                                    Penalty Deductions: ₦{{ number_format($assessment->total_penalty_deductions) }}
+                                                    <span class="text-xs text-gray-400 ml-2">(Punctuality: ₦{{ number_format($assessment->punctuality_penalty ?? 0) }} | Video: ₦{{ number_format($assessment->video_penalty ?? 0) }})</span>
                                                 </div>
                                             @endif
-                                            <div class="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                                                {{ $assessment->assessment_month }} · Session {{ $assessment->session ?? 1 }} @if($assessment->class_date) · {{ $assessment->class_date->format('M d, Y') }} @endif
-                                            </div>
+                                            @if($assessment->hasUnacceptableConduct())
+                                                <div class="mt-2 p-2 bg-red-100 dark:bg-red-900/30 border border-red-500 rounded-lg">
+                                                    <p class="text-red-700 dark:text-red-400 font-bold text-sm">⚠️ UNACCEPTABLE CONDUCT FLAGGED</p>
+                                                </div>
+                                            @endif
                                         </div>
                                         <span class="px-3 py-1 text-xs font-semibold bg-amber-500 text-white rounded-full">Pending Review</span>
                                     </div>
@@ -682,6 +688,8 @@
                             student_id: {{ $assessment->student_id ?? 'null' }},
                             student_name: {!! json_encode($assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '') !!},
                             assessment_month: '{{ $assessment->assessment_month }}',
+                            assessment_month_display: {!! json_encode($assessment->assessment_period) !!},
+                            assessment_date: '{{ $assessment->assessment_date ? $assessment->assessment_date->format("d M Y") : "" }}',
                             week: {{ $assessment->week ?? 'null' }},
                             year: {{ $assessment->year ?? 'null' }},
                             class_date: '{{ $assessment->class_date ?? '' }}',
@@ -689,7 +697,11 @@
                             approved_at: '{{ $assessment->approved_by_director_at ? $assessment->approved_by_director_at->format("M j, Y") : "" }}',
                             director_comment: {!! json_encode($assessment->director_comment ?? '') !!},
                             is_stand_in: {{ $assessment->is_stand_in ? 'true' : 'false' }},
-                            original_tutor_name: {!! json_encode($assessment->is_stand_in && $assessment->originalTutor ? ($assessment->originalTutor->first_name . ' ' . $assessment->originalTutor->last_name) : '') !!}
+                            original_tutor_name: {!! json_encode($assessment->is_stand_in && $assessment->originalTutor ? ($assessment->originalTutor->first_name . ' ' . $assessment->originalTutor->last_name) : '') !!},
+                            total_penalty_deductions: {{ $assessment->total_penalty_deductions ?? 0 }},
+                            punctuality_penalty: {{ $assessment->punctuality_penalty ?? 0 }},
+                            video_penalty: {{ $assessment->video_penalty ?? 0 }},
+                            has_unacceptable_conduct: {{ $assessment->hasUnacceptableConduct() ? 'true' : 'false' }}
                         },
                     @endforeach
                 ],

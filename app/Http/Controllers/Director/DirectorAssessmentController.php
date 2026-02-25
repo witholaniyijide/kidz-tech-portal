@@ -284,7 +284,7 @@ class DirectorAssessmentController extends Controller
                         'tutor_id' => $assessment->tutor_id,
                         'director_action_id' => $directorAction->id,
                         'amount' => $validated['penalty_amount'],
-                        'reason' => 'Assessment penalty for Week ' . $assessment->week,
+                        'reason' => 'Assessment penalty for ' . $assessment->assessment_period,
                         'week_number' => $assessment->week ?? 1,
                         'year' => $assessment->year ?? date('Y'),
                         'month' => $assessment->class_date ? $assessment->class_date->month : date('m'),
@@ -396,7 +396,8 @@ class DirectorAssessmentController extends Controller
         $studentName = $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '';
 
         $title = 'Assessment Approved';
-        $body = "Your assessment for Week {$assessment->week}" . ($studentName ? " (Student: {$studentName})" : "") . " has been reviewed.";
+        $monthLabel = $assessment->assessment_period;
+        $body = "Your assessment for {$monthLabel} has been reviewed.";
 
         if ($penaltyAmount > 0) {
             $body .= " Penalty applied: ₦" . number_format($penaltyAmount, 2);
@@ -424,7 +425,7 @@ class DirectorAssessmentController extends Controller
             ManagerNotification::create([
                 'user_id' => $assessment->manager_id,
                 'title' => 'Assessment Approved by Director',
-                'body' => "Assessment for {$tutorName}" . ($studentName ? " (Student: {$studentName})" : "") . " - Week {$assessment->week} has been approved.",
+                'body' => "Assessment for {$tutorName} — {$monthLabel} has been approved.",
                 'type' => 'assessment',
                 'is_read' => false,
                 'meta' => [

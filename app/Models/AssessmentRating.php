@@ -42,11 +42,13 @@ class AssessmentRating extends Model
     public function getPercentageAttribute(): float
     {
         return match ($this->rating) {
-            'Excellent', 'On Time' => 100,
-            'Good' => 85,
-            'Acceptable' => 65,
-            'Needs Improvement', 'Late' => 40,
-            'Unacceptable' => 20,
+            'Excellent' => 90,
+            'On Time' => 90,
+            'Good' => 70,
+            'Acceptable' => 55,
+            'Needs Improvement' => 20,
+            'Late' => 20,
+            'Unacceptable' => 0,
             default => 0
         };
     }

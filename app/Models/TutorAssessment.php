@@ -35,16 +35,30 @@ class TutorAssessment extends Model
         'status',
         'is_stand_in',
         'original_tutor_id',
+        'punctuality_late_count',
+        'video_off_count',
+        'punctuality_penalty',
+        'video_penalty',
+        'total_penalty_deductions',
+        'student_chips',
+        'assessment_date',
     ];
 
     protected $casts = [
         'class_date' => 'date',
+        'assessment_date' => 'date',
         'approved_by_manager_at' => 'datetime',
         'approved_by_director_at' => 'datetime',
         'performance_score' => 'integer',
         'criteria_assessed' => 'array',
         'criteria_ratings' => 'array',
+        'student_chips' => 'array',
         'is_stand_in' => 'boolean',
+        'punctuality_late_count' => 'integer',
+        'video_off_count' => 'integer',
+        'punctuality_penalty' => 'integer',
+        'video_penalty' => 'integer',
+        'total_penalty_deductions' => 'integer',
     ];
 
     /**
@@ -145,10 +159,21 @@ class TutorAssessment extends Model
      */
     public function getAssessmentPeriodAttribute(): string
     {
+        if ($this->assessment_month && preg_match('/^\d{4}-\d{2}$/', $this->assessment_month)) {
+            return \Carbon\Carbon::createFromFormat('Y-m', $this->assessment_month)->format('F Y');
+        }
         if ($this->class_date) {
             return $this->class_date->format('F j, Y');
         }
         return $this->assessment_month ?? 'N/A';
+    }
+
+    /**
+     * Check if any rating is 'Unacceptable'.
+     */
+    public function hasUnacceptableConduct(): bool
+    {
+        return $this->ratings()->where('rating', 'Unacceptable')->exists();
     }
 
     /**
