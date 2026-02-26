@@ -64,6 +64,18 @@
             background: #FEF3C7;
             color: #92400E;
         }
+        .type-report_submitted {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+        .type-assessment_deleted {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        .type-report_returned {
+            background: #FEF3C7;
+            color: #92400E;
+        }
         .type-notice, .type-message {
             background: #F3E8FF;
             color: #6B21A8;
@@ -132,6 +144,15 @@
                         @break
                     @case('course_change')
                         Course Update
+                        @break
+                    @case('report_submitted')
+                        Report Submitted
+                        @break
+                    @case('report_returned')
+                        Report Returned
+                        @break
+                    @case('assessment_deleted')
+                        Assessment Deleted
                         @break
                     @case('notice')
                         Notice
