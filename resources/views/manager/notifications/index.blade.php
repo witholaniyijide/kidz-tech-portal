@@ -38,11 +38,18 @@
                                         @case('report_approved')
                                             bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400
                                             @break
+                                        @case('report_submitted')
+                                            bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400
+                                            @break
                                         @case('report_rejected')
+                                        @case('report_returned')
                                             bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400
                                             @break
                                         @case('assessment_approved')
                                             bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400
+                                            @break
+                                        @case('assessment')
+                                            bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400
                                             @break
                                         @case('notice')
                                             bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400

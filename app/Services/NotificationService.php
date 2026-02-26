@@ -18,18 +18,21 @@ class NotificationService
 {
     /**
      * Send notification when Tutor submits a report for review
-     * Recipients: Manager
+     * Recipients: Manager (in-app + email)
      */
     public function notifyReportSubmitted(TutorReport $report): void
     {
         $report->load(['tutor', 'student']);
 
+        $tutorName = ($report->tutor->first_name ?? '') . ' ' . ($report->tutor->last_name ?? '');
+        $studentName = ($report->student->first_name ?? '') . ' ' . ($report->student->last_name ?? '');
+
         $managers = User::role('manager')->get();
         foreach ($managers as $manager) {
             $this->notifyManager(
                 $manager,
-                'New Report Submitted',
-                "Tutor {$report->tutor->first_name} {$report->tutor->last_name} has submitted a report for {$report->student->first_name} {$report->student->last_name} ({$report->month} {$report->year}). Please review.",
+                'Student Report Submitted',
+                "Tutor {$tutorName} has submitted a student report for {$studentName} ({$report->month} {$report->year}). This is time-sensitive — please review at your earliest convenience.",
                 'report_submitted',
                 ['report_id' => $report->id, 'tutor_id' => $report->tutor_id, 'student_id' => $report->student_id]
             );
@@ -155,22 +158,52 @@ class NotificationService
 
     /**
      * Send notification when Director approves assessment
-     * Recipients: Manager
+     * Recipients: Manager (in-app + email)
      */
     public function notifyAssessmentApproved($assessment): void
     {
         $assessment->load(['tutor', 'student']);
 
+        $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'a tutor';
+        $studentName = $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '';
+        $periodLabel = $assessment->assessment_period ?? '';
+
+        $body = "Assessment for tutor {$tutorName}";
+        if ($studentName) {
+            $body .= " (student: {$studentName})";
+        }
+        $body .= " — {$periodLabel} has been approved by the Director.";
+
         $managers = User::role('manager')->get();
         foreach ($managers as $manager) {
             $this->notifyManager(
                 $manager,
-                'Assessment Approved',
-                "Assessment for {$assessment->student->first_name} {$assessment->student->last_name} has been approved by the Director.",
+                'Assessment Approved by Director',
+                $body,
                 'assessment_approved',
                 ['assessment_id' => $assessment->id]
             );
         }
+    }
+
+    /**
+     * Send email notification when Director deletes an assessment
+     * Recipients: Manager
+     */
+    public function sendAssessmentDeletedEmail(User $manager, string $tutorName, string $period, ?string $reason = null): void
+    {
+        $body = "The assessment for {$tutorName} — {$period} has been deleted by the Director.";
+        if ($reason) {
+            $body .= "\n\nReason: {$reason}";
+        }
+
+        $this->sendEmailNotification(
+            $manager->email,
+            'Assessment Deleted by Director',
+            $body,
+            'assessment_deleted',
+            ['tutor_name' => $tutorName, 'period' => $period]
+        );
     }
 
     /**
@@ -366,8 +399,10 @@ class NotificationService
             'meta' => $meta,
         ]);
 
-        // Email notification
-        $this->sendEmailNotification($manager->email, $title, $body, $type, $meta);
+        // Email notification (respect notify_email preference)
+        if (($manager->notify_email ?? true) && $manager->email) {
+            $this->sendEmailNotification($manager->email, $title, $body, $type, $meta);
+        }
 
         Log::info("Notification sent to Manager", ['manager_id' => $manager->id, 'type' => $type]);
     }
@@ -398,16 +433,36 @@ class NotificationService
     /**
      * Helper: Send email notification
      */
-    protected function sendEmailNotification(string $email, string $subject, string $body, string $type, array $meta = []): void
+    public function sendEmailNotification(string $email, string $subject, string $body, string $type, array $meta = []): void
     {
         try {
+            // Validate email before attempting to send
+            if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                Log::warning("Skipping email notification: invalid email address", ['email' => $email]);
+                return;
+            }
+
+            // Check if mail is properly configured
+            $fromAddress = config('mail.from.address');
+            if (empty($fromAddress) || $fromAddress === 'hello@example.com') {
+                Log::warning("Email notification skipped: MAIL_FROM_ADDRESS is not configured", [
+                    'email' => $email,
+                    'from' => $fromAddress,
+                    'subject' => $subject,
+                ]);
+                return;
+            }
+
+            $fromName = config('mail.from.name', config('app.name', 'Kidz Tech Coding Club'));
+
             Mail::send('emails.notification', [
                 'subject' => $subject,
                 'body' => $body,
                 'type' => $type,
                 'meta' => $meta,
-            ], function ($message) use ($email, $subject) {
-                $message->to($email)
+            ], function ($message) use ($email, $subject, $fromAddress, $fromName) {
+                $message->from($fromAddress, $fromName)
+                    ->to($email)
                     ->subject($subject);
             });
 
@@ -415,7 +470,12 @@ class NotificationService
         } catch (\Exception $e) {
             Log::error("Failed to send email notification", [
                 'email' => $email,
-                'error' => $e->getMessage()
+                'subject' => $subject,
+                'mailer' => config('mail.default'),
+                'host' => config('mail.mailers.smtp.host'),
+                'port' => config('mail.mailers.smtp.port'),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }

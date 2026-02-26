@@ -548,6 +548,8 @@ Route::prefix('director')
             ->name('assessments.approve-no-penalty');
         Route::post('/assessments/{assessment}/comment', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'comment'])
             ->name('assessments.comment');
+        Route::delete('/assessments/{assessment}', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'destroy'])
+            ->name('assessments.destroy');
         Route::get('/assessments-export', [App\Http\Controllers\Director\DirectorAssessmentController::class, 'export'])
             ->name('assessments.export');
 
