@@ -504,19 +504,20 @@
     </div>
 
     @php
-        // Prepare criteria data for JavaScript (moved out of @json for Blade compatibility)
-        $criteriaForJs = $criteria->map(function($c) {
-            $penaltyLabels = [];
-            foreach ($c->penalty_rules ?? [] as $rating => $rule) {
-                if (isset($rule['label'])) {
-                    $penaltyLabels[] = $rule['label'];
-                }
-            }
+        // Standard rating options (ensures DB is not stale)
+        $standardOptions = ['Excellent', 'Good', 'Acceptable', 'Needs Improvement'];
+        $professionalOptions = ['Excellent', 'Good', 'Acceptable', 'Needs Improvement', 'Unacceptable'];
+
+        // Prepare criteria data for JavaScript
+        $criteriaForJs = $criteria->map(function($c) use ($standardOptions, $professionalOptions) {
+            // Override options to ensure correct scale for all criteria
+            $options = $c->code === 'professional' ? $professionalOptions : $standardOptions;
+
             return [
                 'id' => $c->code,
                 'name' => $c->name,
-                'penalty' => implode(', ', $penaltyLabels) ?: 'No penalty',
-                'options' => $c->options,
+                'penalty' => 'No penalty',
+                'options' => $options,
             ];
         })->values()->toArray();
     @endphp
