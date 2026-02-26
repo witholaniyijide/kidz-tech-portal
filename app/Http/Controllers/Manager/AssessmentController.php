@@ -81,6 +81,51 @@ class AssessmentController extends Controller
     }
 
     /**
+     * Get students assigned to a tutor with attendance data for a given month.
+     */
+    public function tutorStudents(Request $request, Tutor $tutor)
+    {
+        $month = $request->query('month', date('Y-m'));
+
+        // Parse month to get date range
+        try {
+            $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+            $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        } catch (\Exception $e) {
+            $startDate = Carbon::now()->startOfMonth();
+            $endDate = Carbon::now()->endOfMonth();
+        }
+
+        $students = Student::where('tutor_id', $tutor->id)
+            ->where('status', 'active')
+            ->orderBy('first_name')
+            ->get();
+
+        $result = $students->map(function ($student) use ($tutor, $startDate, $endDate) {
+            // Count approved attendance records for this student with this tutor in the month
+            $classesAttended = \App\Models\AttendanceRecord::where('student_id', $student->id)
+                ->where('tutor_id', $tutor->id)
+                ->where('status', 'approved')
+                ->whereBetween('class_date', [$startDate, $endDate])
+                ->count();
+
+            // Calculate expected classes from student's classes_per_week
+            $classesPerWeek = $student->classes_per_week ?? 0;
+            $weeksInMonth = $startDate->diffInWeeks($endDate) + 1;
+            $totalClasses = $classesPerWeek * $weeksInMonth;
+
+            return [
+                'id' => $student->id,
+                'name' => $student->first_name . ' ' . $student->last_name,
+                'classes_attended' => $classesAttended,
+                'total_classes' => $totalClasses,
+            ];
+        });
+
+        return response()->json(['students' => $result]);
+    }
+
+    /**
      * Store a newly created assessment.
      */
     public function store(Request $request)
@@ -259,16 +304,8 @@ class AssessmentController extends Controller
             }
 
             $validated = $request->validate([
-                'performance_score' => 'nullable|integer|min:0|max:100',
-                'professionalism_rating' => 'nullable|integer|min:1|max:5',
-                'communication_rating' => 'nullable|integer|min:1|max:5',
-                'punctuality_rating' => 'nullable|integer|min:1|max:5',
                 'strengths' => 'nullable|string|max:2000',
                 'weaknesses' => 'nullable|string|max:2000',
-                'recommendations' => 'nullable|string|max:2000',
-                'manager_comment' => 'nullable|string|max:2000',
-                'criteria_assessed' => 'nullable|array',
-                'criteria_ratings' => 'nullable|array',
             ]);
 
             $assessment->update($validated);

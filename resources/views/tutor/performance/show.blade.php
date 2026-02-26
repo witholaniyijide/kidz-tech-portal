@@ -149,6 +149,7 @@
                     </span>
                 @endforeach
             </div>
+            <p class="text-xs text-slate-400 dark:text-slate-500 mt-2">Attendance figures are as of when the assessment was taken ({{ $assessment->assessment_date ? $assessment->assessment_date->format('d M Y') : 'N/A' }}). Classes held after this date are not included.</p>
         </div>
         @endif
 
@@ -213,21 +214,37 @@
             </div>
         </div>
 
+        {{-- Manager Comments --}}
+        @if($assessment->strengths || $assessment->weaknesses)
+        <div class="p-6 border-t border-slate-200 dark:border-slate-700">
+            <h4 class="font-semibold text-slate-800 dark:text-white mb-3">Manager's Comments</h4>
+            <div class="grid md:grid-cols-2 gap-4">
+                @if($assessment->strengths)
+                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                    <h5 class="text-sm font-semibold text-green-800 dark:text-green-300 mb-2">Strengths</h5>
+                    <p class="text-green-700 dark:text-green-200 text-sm whitespace-pre-wrap">{{ $assessment->strengths }}</p>
+                </div>
+                @endif
+                @if($assessment->weaknesses)
+                <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                    <h5 class="text-sm font-semibold text-red-800 dark:text-red-300 mb-2">Areas of Concern</h5>
+                    <p class="text-red-700 dark:text-red-200 text-sm whitespace-pre-wrap">{{ $assessment->weaknesses }}</p>
+                </div>
+                @endif
+            </div>
+        </div>
+        @endif
+
         {{-- Director Comment --}}
         @if($assessment->directorAction && $assessment->directorAction->director_comment)
             <div class="p-6 bg-amber-50 dark:bg-amber-900/20 border-t border-amber-300 dark:border-amber-700">
-                <h4 class="font-semibold text-amber-900 dark:text-amber-300 mb-2">🗒️ Director Comment</h4>
-                <p class="text-amber-800 dark:text-amber-200 italic">"{{ $assessment->directorAction->director_comment }}"</p>
+                <h4 class="font-semibold text-amber-900 dark:text-amber-300 mb-2">Director's Comment</h4>
+                <p class="text-amber-800 dark:text-amber-200 italic whitespace-pre-wrap">"{{ $assessment->directorAction->director_comment }}"</p>
             </div>
         @elseif($assessment->director_comment)
             <div class="p-6 bg-amber-50 dark:bg-amber-900/20 border-t border-amber-300 dark:border-amber-700">
-                <h4 class="font-semibold text-amber-900 dark:text-amber-300 mb-2">🗒️ Director Comment</h4>
-                <p class="text-amber-800 dark:text-amber-200 italic">"{{ $assessment->director_comment }}"</p>
-            </div>
-        @else
-            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700">
-                <h4 class="font-semibold text-slate-600 dark:text-slate-400 mb-2">🗒️ Director Comment</h4>
-                <p class="text-slate-500 dark:text-slate-500 italic">[No comment provided]</p>
+                <h4 class="font-semibold text-amber-900 dark:text-amber-300 mb-2">Director's Comment</h4>
+                <p class="text-amber-800 dark:text-amber-200 italic whitespace-pre-wrap">"{{ $assessment->director_comment }}"</p>
             </div>
         @endif
 

@@ -83,7 +83,7 @@
 
                     {{-- Enhanced Filters for Completed Tab --}}
                     <div x-show="managementTab === 'completed'" class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5">
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Tutor</label>
                                 <select x-model="filterTutor" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg text-sm">
@@ -94,21 +94,8 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Student</label>
-                                <select x-model="filterStudent" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg text-sm">
-                                    <option value="">All Students</option>
-                                    @foreach(\App\Models\Student::orderBy('first_name')->get() as $student)
-                                        <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
                                 <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Month</label>
                                 <input type="month" x-model="filterMonthInput" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Week</label>
-                                <input type="week" x-model="filterWeek" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg text-sm">
                             </div>
                             <div class="flex items-end">
                                 <button @click="exportCSV()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-all text-sm font-medium">
@@ -351,21 +338,12 @@
                     </div>
 
                     {{-- Filter Dropdowns --}}
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Year</label>
                             <select x-model="reportYear" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
                                 <option value="{{ date('Y') }}">{{ date('Y') }}</option>
                                 <option value="{{ date('Y') - 1 }}">{{ date('Y') - 1 }}</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Week</label>
-                            <select x-model="reportWeek" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
-                                <option value="">All Weeks</option>
-                                @for($w = 1; $w <= 52; $w++)
-                                    <option value="{{ $w }}">Week {{ $w }}</option>
-                                @endfor
                             </select>
                         </div>
                         <div>
@@ -377,37 +355,19 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Student</label>
-                            <select x-model="reportStudent" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
-                                <option value="">All Students</option>
-                                @foreach($students ?? [] as $student)
-                                    <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
                     </div>
                 </div>
 
                 {{-- Generate Report Card --}}
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5 mb-6">
                     <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Generate Tutor Report Card</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                         <div>
                             <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Select Tutor</label>
                             <select x-model="generateTutor" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
                                 <option value="">Select Tutor</option>
                                 @foreach($tutors as $tutor)
                                     <option value="{{ $tutor->id }}">{{ $tutor->first_name }} {{ $tutor->last_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Student (Optional)</label>
-                            <select x-model="generateStudent" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
-                                <option value="">All Students</option>
-                                @foreach($students ?? [] as $student)
-                                    <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -427,10 +387,10 @@
 
                 {{-- Assessment History --}}
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5">
-                    <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Assessment History - Finalized Weekly Reports</h3>
+                    <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Assessment History - Finalized Monthly Reports</h3>
 
                     <div class="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                        Showing {{ $assessments->where('status', 'approved-by-director')->count() }} of {{ $stats['completed'] ?? 0 }} weekly assessments
+                        Showing {{ $assessments->where('status', 'approved-by-director')->count() }} of {{ $stats['completed'] ?? 0 }} monthly assessments
                     </div>
 
                     <div class="space-y-3">
@@ -674,9 +634,7 @@
                 
                 filterTutor: '',
                 filterMonth: '',
-                filterStudent: '',
                 filterMonthInput: '',
-                filterWeek: '',
 
                 // Completed assessments data
                 completedAssessments: [
@@ -713,27 +671,9 @@
                             return false;
                         }
 
-                        // Filter by student
-                        if (this.filterStudent && assessment.student_id != this.filterStudent) {
+                        // Filter by month (YYYY-MM format from assessment_month)
+                        if (this.filterMonthInput && assessment.assessment_month !== this.filterMonthInput) {
                             return false;
-                        }
-
-                        // Filter by month (YYYY-MM format)
-                        if (this.filterMonthInput) {
-                            const assessmentDate = new Date(assessment.class_date);
-                            const filterDate = new Date(this.filterMonthInput + '-01');
-                            if (assessmentDate.getFullYear() !== filterDate.getFullYear() ||
-                                assessmentDate.getMonth() !== filterDate.getMonth()) {
-                                return false;
-                            }
-                        }
-
-                        // Filter by week (YYYY-WXX format)
-                        if (this.filterWeek) {
-                            const [filterYear, filterWeek] = this.filterWeek.split('-W');
-                            if (assessment.year != filterYear || assessment.week != filterWeek) {
-                                return false;
-                            }
                         }
 
                         return true;
@@ -743,11 +683,8 @@
                 // Reports tab
                 reportPeriod: 'all',
                 reportYear: '{{ date("Y") }}',
-                reportWeek: '',
                 reportTutor: '',
-                reportStudent: '',
                 generateTutor: '',
-                generateStudent: '',
                 generateFromDate: '',
                 generateToDate: '',
 
@@ -779,9 +716,7 @@
                 clearFilters() {
                     this.filterTutor = '';
                     this.filterMonth = '';
-                    this.filterStudent = '';
                     this.filterMonthInput = '';
-                    this.filterWeek = '';
                 },
                 
                 exportCSV() {
@@ -805,7 +740,6 @@
                         return;
                     }
                     let url = `{{ url('director/assessments') }}?tutor=${this.generateTutor}&format=pdf`;
-                    if (this.generateStudent) url += `&student=${this.generateStudent}`;
                     if (this.generateFromDate) url += `&from=${this.generateFromDate}`;
                     if (this.generateToDate) url += `&to=${this.generateToDate}`;
                     window.open(url, '_blank');
