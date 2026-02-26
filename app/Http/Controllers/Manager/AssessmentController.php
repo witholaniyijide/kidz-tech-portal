@@ -139,7 +139,7 @@ class AssessmentController extends Controller
                 'class_date' => 'nullable|date',
                 'week' => 'nullable|integer|min:1|max:53',
                 'year' => 'nullable|integer',
-                'performance_score' => 'nullable|integer|min:0|max:100',
+                'performance_score' => 'nullable|numeric|min:0|max:100',
                 'professionalism_rating' => 'nullable|integer|min:1|max:5',
                 'communication_rating' => 'nullable|integer|min:1|max:5',
                 'punctuality_rating' => 'nullable|integer|min:1|max:5',

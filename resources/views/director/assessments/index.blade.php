@@ -338,12 +338,21 @@
                     </div>
 
                     {{-- Filter Dropdowns --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Year</label>
                             <select x-model="reportYear" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
                                 <option value="{{ date('Y') }}">{{ date('Y') }}</option>
                                 <option value="{{ date('Y') - 1 }}">{{ date('Y') - 1 }}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Month</label>
+                            <select x-model="reportMonth" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg">
+                                <option value="">All Months</option>
+                                @for($m = 1; $m <= 12; $m++)
+                                    <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                                @endfor
                             </select>
                         </div>
                         <div>
@@ -683,6 +692,7 @@
                 // Reports tab
                 reportPeriod: 'all',
                 reportYear: '{{ date("Y") }}',
+                reportMonth: '',
                 reportTutor: '',
                 generateTutor: '',
                 generateFromDate: '',
