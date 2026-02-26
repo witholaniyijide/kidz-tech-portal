@@ -90,16 +90,18 @@ class NotificationService
             );
         }
 
-        // 3. Notify Admins (in-app + email)
+        // 3. Notify Admins (email only, respect notify_email preference)
         $admins = User::role('admin')->get();
         foreach ($admins as $admin) {
-            $this->sendEmailNotification(
-                $admin->email,
-                'Report Approved by Director',
-                "The report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been approved.",
-                'report_approved',
-                ['report_id' => $report->id, 'student_name' => $report->student->first_name . ' ' . $report->student->last_name]
-            );
+            if (($admin->notify_email ?? true) && $admin->email) {
+                $this->sendEmailNotification(
+                    $admin->email,
+                    'Report Approved by Director',
+                    "The report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been approved.",
+                    'report_approved',
+                    ['report_id' => $report->id, 'student_name' => $report->student->first_name . ' ' . $report->student->last_name]
+                );
+            }
         }
 
         // 4. Notify Parents (in-app + email)
@@ -146,13 +148,15 @@ class NotificationService
 
         $admins = User::role('admin')->get();
         foreach ($admins as $admin) {
-            $this->sendEmailNotification(
-                $admin->email,
-                'New Attendance Submission',
-                "Tutor {$attendance->tutor->first_name} {$attendance->tutor->last_name} has submitted attendance for {$attendance->student->first_name} {$attendance->student->last_name}.",
-                'attendance_submitted',
-                ['attendance_id' => $attendance->id, 'tutor_name' => $attendance->tutor->first_name . ' ' . $attendance->tutor->last_name]
-            );
+            if (($admin->notify_email ?? true) && $admin->email) {
+                $this->sendEmailNotification(
+                    $admin->email,
+                    'New Attendance Submission',
+                    "Tutor {$attendance->tutor->first_name} {$attendance->tutor->last_name} has submitted attendance for {$attendance->student->first_name} {$attendance->student->last_name}.",
+                    'attendance_submitted',
+                    ['attendance_id' => $attendance->id, 'tutor_name' => $attendance->tutor->first_name . ' ' . $attendance->tutor->last_name]
+                );
+            }
         }
     }
 
@@ -311,13 +315,15 @@ class NotificationService
                 case 'admins':
                     $admins = User::role('admin')->get();
                     foreach ($admins as $admin) {
-                        $this->sendEmailNotification(
-                            $admin->email,
-                            $notice->title,
-                            strip_tags($notice->content),
-                            'notice',
-                            ['notice_id' => $notice->id]
-                        );
+                        if (($admin->notify_email ?? true) && $admin->email) {
+                            $this->sendEmailNotification(
+                                $admin->email,
+                                $notice->title,
+                                strip_tags($notice->content),
+                                'notice',
+                                ['notice_id' => $notice->id]
+                            );
+                        }
                     }
                     break;
             }
@@ -343,13 +349,15 @@ class NotificationService
                 );
             }
         } elseif ($recipient->hasRole('director')) {
-            $this->sendEmailNotification(
-                $recipient->email,
-                "Message from {$sender->name}: {$subject}",
-                $message,
-                'message',
-                array_merge($meta, ['sender_id' => $sender->id])
-            );
+            if (($recipient->notify_email ?? true) && $recipient->email) {
+                $this->sendEmailNotification(
+                    $recipient->email,
+                    "Message from {$sender->name}: {$subject}",
+                    $message,
+                    'message',
+                    array_merge($meta, ['sender_id' => $sender->id])
+                );
+            }
         } elseif ($recipient->hasRole('manager')) {
             $this->notifyManager(
                 $recipient,
@@ -376,9 +384,15 @@ class NotificationService
             'meta' => $meta,
         ]);
 
-        // Email notification (if tutor has email)
+        // Email notification (respect notify_email preference via linked User account)
         if ($tutor->email) {
-            $this->sendEmailNotification($tutor->email, $title, $body, $type, $meta);
+            $notifyEmail = true;
+            if ($tutor->user_id) {
+                $notifyEmail = $tutor->user->notify_email ?? true;
+            }
+            if ($notifyEmail) {
+                $this->sendEmailNotification($tutor->email, $title, $body, $type, $meta);
+            }
         }
 
         Log::info("Notification sent to Tutor", ['tutor_id' => $tutor->id, 'type' => $type]);
@@ -424,8 +438,10 @@ class NotificationService
             'read_at' => null,
         ]);
 
-        // Email notification
-        $this->sendEmailNotification($parent->email, $title, $body, $type, $meta);
+        // Email notification (respect notify_email preference)
+        if (($parent->notify_email ?? true) && $parent->email) {
+            $this->sendEmailNotification($parent->email, $title, $body, $type, $meta);
+        }
 
         Log::info("Notification sent to Parent", ['parent_id' => $parent->id, 'student_id' => $student->id, 'type' => $type]);
     }
