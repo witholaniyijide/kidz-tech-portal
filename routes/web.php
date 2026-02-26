@@ -463,6 +463,8 @@ Route::prefix('manager')
             ->name('assessments.destroy');
         Route::post('/assessments/{assessment}/mark-complete', [App\Http\Controllers\Manager\AssessmentController::class, 'markComplete'])
             ->name('assessments.mark-complete');
+        Route::get('/assessments/tutor-students/{tutor}', [App\Http\Controllers\Manager\AssessmentController::class, 'tutorStudents'])
+            ->name('assessments.tutor-students');
 
         // Settings
         Route::get('/settings', [App\Http\Controllers\Manager\ManagerSettingsController::class, 'index'])

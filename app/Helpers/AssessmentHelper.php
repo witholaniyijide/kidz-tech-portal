@@ -6,13 +6,11 @@
 function ratingToPercentage(string $rating): int
 {
     return match ($rating) {
-        'Excellent' => 100,
-        'On Time' => 100,
-        'Good' => 85,
-        'Acceptable' => 65,
-        'Needs Improvement' => 40,
-        'Late' => 40,
-        'Unacceptable' => 20,
+        'Excellent' => 90,
+        'Good' => 70,
+        'Acceptable' => 55,
+        'Needs Improvement' => 20,
+        'Unacceptable' => 0,
         default => 0
     };
 }
@@ -23,10 +21,10 @@ function ratingToPercentage(string $rating): int
 function ratingScore(string $rating): int
 {
     return match ($rating) {
-        'Excellent', 'On Time' => 4,
+        'Excellent' => 4,
         'Good' => 3,
         'Acceptable' => 2,
-        'Needs Improvement', 'Late' => 1,
+        'Needs Improvement' => 1,
         'Unacceptable' => 0,
         default => 0
     };
@@ -66,10 +64,10 @@ function createVisualBar(float $percentage): string
 function getRatingBadgeClass(string $rating): string
 {
     return match ($rating) {
-        'Excellent', 'On Time' => 'rating-excellent',
+        'Excellent' => 'rating-excellent',
         'Good' => 'rating-good',
         'Acceptable' => 'rating-acceptable',
-        'Needs Improvement', 'Late' => 'rating-needs-improvement',
+        'Needs Improvement' => 'rating-needs-improvement',
         'Unacceptable' => 'rating-unacceptable',
         default => 'bg-gray-100 text-gray-800'
     };

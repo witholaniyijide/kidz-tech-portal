@@ -23,63 +23,14 @@
                 @method('PUT')
 
                 {{-- Assessment Info (Read-only) --}}
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                     <div>
                         <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Tutor</label>
                         <p class="text-gray-800 dark:text-white font-medium">{{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Student</label>
-                        <p class="text-gray-800 dark:text-white font-medium">{{ $assessment->student ? $assessment->student->first_name . ' ' . $assessment->student->last_name : 'N/A' }}</p>
-                    </div>
-                    <div>
                         <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Assessment Period</label>
-                        <p class="text-gray-800 dark:text-white font-medium">{{ $assessment->assessment_month }}</p>
-                    </div>
-                </div>
-
-                {{-- Performance Score --}}
-                <div class="mb-6">
-                    <label for="performance_score" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Performance Score (0-100)</label>
-                    <input type="number" name="performance_score" id="performance_score" min="0" max="100"
-                           value="{{ old('performance_score', $assessment->performance_score) }}"
-                           class="w-full md:w-48 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
-                    @error('performance_score')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Ratings --}}
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div>
-                        <label for="professionalism_rating" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Professionalism (1-5)</label>
-                        <select name="professionalism_rating" id="professionalism_rating"
-                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
-                            <option value="">Select...</option>
-                            @for($i = 1; $i <= 5; $i++)
-                                <option value="{{ $i }}" {{ old('professionalism_rating', $assessment->professionalism_rating) == $i ? 'selected' : '' }}>{{ $i }}</option>
-                            @endfor
-                        </select>
-                    </div>
-                    <div>
-                        <label for="communication_rating" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Communication (1-5)</label>
-                        <select name="communication_rating" id="communication_rating"
-                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
-                            <option value="">Select...</option>
-                            @for($i = 1; $i <= 5; $i++)
-                                <option value="{{ $i }}" {{ old('communication_rating', $assessment->communication_rating) == $i ? 'selected' : '' }}>{{ $i }}</option>
-                            @endfor
-                        </select>
-                    </div>
-                    <div>
-                        <label for="punctuality_rating" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Punctuality (1-5)</label>
-                        <select name="punctuality_rating" id="punctuality_rating"
-                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
-                            <option value="">Select...</option>
-                            @for($i = 1; $i <= 5; $i++)
-                                <option value="{{ $i }}" {{ old('punctuality_rating', $assessment->punctuality_rating) == $i ? 'selected' : '' }}>{{ $i }}</option>
-                            @endfor
-                        </select>
+                        <p class="text-gray-800 dark:text-white font-medium">{{ $assessment->assessment_period }}</p>
                     </div>
                 </div>
 
@@ -94,35 +45,13 @@
                     @enderror
                 </div>
 
-                {{-- Weaknesses --}}
+                {{-- Areas of Concern --}}
                 <div class="mb-6">
-                    <label for="weaknesses" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Areas for Improvement</label>
+                    <label for="weaknesses" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Areas of Concern</label>
                     <textarea name="weaknesses" id="weaknesses" rows="4"
                               class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl p-3 focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]"
-                              placeholder="Areas that need improvement...">{{ old('weaknesses', $assessment->weaknesses) }}</textarea>
+                              placeholder="Areas of concern...">{{ old('weaknesses', $assessment->weaknesses) }}</textarea>
                     @error('weaknesses')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Recommendations --}}
-                <div class="mb-6">
-                    <label for="recommendations" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Recommendations</label>
-                    <textarea name="recommendations" id="recommendations" rows="3"
-                              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl p-3 focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]"
-                              placeholder="Any recommendations...">{{ old('recommendations', $assessment->recommendations) }}</textarea>
-                    @error('recommendations')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Manager Comment --}}
-                <div class="mb-6">
-                    <label for="manager_comment" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Manager Comment</label>
-                    <textarea name="manager_comment" id="manager_comment" rows="3"
-                              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl p-3 focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]"
-                              placeholder="Additional notes...">{{ old('manager_comment', $assessment->manager_comment) }}</textarea>
-                    @error('manager_comment')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
