@@ -511,10 +511,33 @@
             // Override options to ensure correct scale for all criteria
             $options = $c->code === 'professional' ? $professionalOptions : $standardOptions;
 
+            // Build penalty label from penalty_rules
+            $penaltyLabel = 'No penalty';
+            $rules = $c->penalty_rules;
+            if (!empty($rules) && is_array($rules)) {
+                $labels = [];
+                foreach ($rules as $rating => $rule) {
+                    if (isset($rule['label'])) {
+                        $labels[] = "{$rating}: {$rule['label']}";
+                    } elseif (isset($rule['amount'])) {
+                        $labels[] = "{$rating}: ₦" . number_format($rule['amount']);
+                    } elseif (isset($rule['halfPay']) && $rule['halfPay']) {
+                        $labels[] = "{$rating}: Half pay deduction";
+                    } elseif (isset($rule['action'])) {
+                        $labels[] = "{$rating}: {$rule['action']}";
+                    } elseif (isset($rule['countThreshold'])) {
+                        $labels[] = "{$rating}: Flagged after {$rule['countThreshold']}x";
+                    }
+                }
+                if (!empty($labels)) {
+                    $penaltyLabel = implode(' | ', $labels);
+                }
+            }
+
             return [
                 'id' => $c->code,
                 'name' => $c->name,
-                'penalty' => 'No penalty',
+                'penalty' => $penaltyLabel,
                 'options' => $options,
             ];
         })->values()->toArray();
