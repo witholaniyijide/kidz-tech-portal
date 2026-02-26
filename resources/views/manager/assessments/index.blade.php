@@ -231,6 +231,7 @@
                             <select x-model="dashFilterStatus" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C]">
                                 <option value="">All Status</option>
                                 <option value="draft">Draft</option>
+                                <option value="submitted">Submitted</option>
                                 <option value="approved-by-manager">Awaiting Director</option>
                             </select>
                         </div>
@@ -247,7 +248,8 @@
                     @forelse($assessments->filter(function ($a) {
                         return in_array($a->status, ['draft', 'submitted', 'approved-by-manager']);
                     }) as $assessment)
-                        <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 border-l-4 {{ $assessment->status === 'draft' ? 'border-l-amber-400' : 'border-l-[#C15F3C]' }}">
+                        <div x-show="(!dashFilterTutor || dashFilterTutor == '{{ $assessment->tutor_id }}') && (!dashFilterStatus || dashFilterStatus === '{{ $assessment->status }}')"
+                             class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 border-l-4 {{ $assessment->status === 'draft' ? 'border-l-amber-400' : 'border-l-[#C15F3C]' }}">
                             <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
                                 <div class="flex-1">
                                     <div class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2 flex-wrap">
@@ -398,7 +400,7 @@
 
                 {{-- Filters --}}
                 <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Tutor</label>
                             <select x-model="completedFilters.tutor" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
@@ -409,21 +411,17 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Student</label>
-                            <select x-model="completedFilters.student" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
-                                <option value="">All Students</option>
-                                @foreach(\App\Models\Student::orderBy('first_name')->get() as $student)
-                                    <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
                             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Month</label>
                             <input type="month" x-model="completedFilters.month" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Week</label>
-                            <input type="week" x-model="completedFilters.week" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
+                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Year</label>
+                            <select x-model="completedFilters.year" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
+                                <option value="">All Years</option>
+                                @for($y = date('Y'); $y >= date('Y') - 2; $y--)
+                                    <option value="{{ $y }}">{{ $y }}</option>
+                                @endfor
+                            </select>
                         </div>
                         <div class="flex items-end">
                             <button @click="clearCompletedFilters()" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all text-sm">
@@ -693,6 +691,7 @@
                 completedFilters: {
                     tutor: '',
                     month: '',
+                    year: '',
                 },
 
                 get filteredCompletedAssessments() {
@@ -703,6 +702,9 @@
                         if (this.completedFilters.month && assessment.assessment_month !== this.completedFilters.month) {
                             return false;
                         }
+                        if (this.completedFilters.year && assessment.year != this.completedFilters.year) {
+                            return false;
+                        }
                         return true;
                     });
                 },
@@ -711,6 +713,7 @@
                     this.completedFilters = {
                         tutor: '',
                         month: '',
+                        year: '',
                     };
                 },
 
