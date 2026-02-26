@@ -176,22 +176,15 @@
                         {{-- Comments Section --}}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Tutor Performance Comments</label>
-                                <textarea x-model="formData.strengths" placeholder="Document tutor's performance, notable observations..."
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Strengths</label>
+                                <textarea x-model="formData.strengths" placeholder="Document tutor's strengths, notable observations..."
                                           class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl p-3 h-32 focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]"></textarea>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Areas for Improvement</label>
-                                <textarea x-model="formData.weaknesses" placeholder="Notes for improvement areas..."
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Areas of Concern</label>
+                                <textarea x-model="formData.weaknesses" placeholder="Notes for areas of concern..."
                                           class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl p-3 h-32 focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]"></textarea>
                             </div>
-                        </div>
-
-                        {{-- Recommendations --}}
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Recommendations</label>
-                            <textarea x-model="formData.recommendations" placeholder="Any recommendations for the tutor..."
-                                      class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl p-3 h-24 focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]"></textarea>
                         </div>
 
                         {{-- Performance Score --}}
