@@ -117,7 +117,7 @@ class ReportReviewController extends Controller
         // Check if report is in submitted status
         if ($report->status !== 'submitted') {
             return redirect()
-                ->route('manager.reports.index')
+                ->route('manager.tutor-reports.index')
                 ->with('error', 'This report cannot be approved at this time.');
         }
 
@@ -138,15 +138,10 @@ class ReportReviewController extends Controller
                 'is_read' => false,
                 'meta' => ['report_id' => $report->id],
             ]);
-
-            // TODO: PHASE 5 - When director module is implemented, add director approval logic here
-            // When director approves (status changes to 'approved-by-director'), send email:
-            // Mail::to($report->tutor->email)->send(new \App\Mail\ReportApprovedMail($report));
-            // Also send to parent: Mail::to($report->student->parent_email)->send(...)
         });
 
         return redirect()
-            ->route('manager.reports.index')
+            ->route('manager.tutor-reports.index')
             ->with('success', 'Report has been approved successfully.');
     }
 
@@ -165,7 +160,7 @@ class ReportReviewController extends Controller
         // Check if report is in submitted status
         if ($report->status !== 'submitted') {
             return redirect()
-                ->route('manager.reports.index')
+                ->route('manager.tutor-reports.index')
                 ->with('error', 'This report cannot be sent back at this time.');
         }
 
@@ -182,7 +177,7 @@ class ReportReviewController extends Controller
         app(NotificationService::class)->notifyReportReturned($report, $validated['manager_comment']);
 
         return redirect()
-            ->route('manager.reports.index')
+            ->route('manager.tutor-reports.index')
             ->with('success', 'Report has been sent back to the tutor for corrections.');
     }
 
