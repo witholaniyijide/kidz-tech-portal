@@ -44,10 +44,18 @@
                                     <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
                                         @switch($notification->type)
                                             @case('assessment_ready')
+                                            @case('assessment')
                                                 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400
                                                 @break
                                             @case('report_submitted')
+                                            @case('report')
                                                 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400
+                                                @break
+                                            @case('attendance')
+                                                bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400
+                                                @break
+                                            @case('message')
+                                                bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400
                                                 @break
                                             @case('notice')
                                                 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400

@@ -10,6 +10,7 @@ use App\Models\Tutor;
 use App\Models\Student;
 use App\Models\DirectorNotification;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -359,29 +360,10 @@ class AssessmentController extends Controller
                     'status' => 'pending_review',
                     'approved_by_manager_at' => now(),
                 ]);
-
-                // Notify all directors
-                $directors = User::whereHas('roles', function($q) {
-                    $q->where('name', 'director');
-                })->get();
-
-                $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'Unknown Tutor';
-                $monthLabel = $assessment->assessment_period;
-
-                foreach ($directors as $director) {
-                    DirectorNotification::create([
-                        'user_id' => $director->id,
-                        'title' => 'Assessment Ready for Review',
-                        'body' => "Assessment for {$tutorName} — {$monthLabel} is pending your review.",
-                        'type' => 'assessment',
-                        'is_read' => false,
-                        'meta' => [
-                            'assessment_id' => $assessment->id,
-                            'link' => route('director.assessments.show', $assessment->id),
-                        ],
-                    ]);
-                }
             });
+
+            // Notify all directors (in-app + email for assessment forwarded)
+            app(NotificationService::class)->notifyDirectorAssessmentForwarded($assessment);
 
             return redirect()
                 ->route('manager.assessments.index')
