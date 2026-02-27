@@ -210,11 +210,10 @@
                                     </svg>
                                 </div>
                             @elseif($course['status'] === 'current')
-                                <div class="mt-2">
-                                    <div class="h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
-                                        <div class="h-1 bg-sky-500 rounded-full" style="width: {{ $course['progress'] }}%"></div>
-                                    </div>
-                                    <p class="text-xs text-center text-sky-600 dark:text-sky-400 mt-1">{{ $course['progress'] }}%</p>
+                                <div class="mt-2 text-center">
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-full bg-sky-500 text-white">
+                                        Current Course
+                                    </span>
                                 </div>
                             @endif
                         </div>

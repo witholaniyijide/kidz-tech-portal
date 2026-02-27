@@ -10,6 +10,7 @@ use App\Models\AttendanceRecord;
 use App\Models\TutorNotification;
 use App\Models\ManagerNotification;
 use App\Models\ParentNotification;
+use App\Models\DirectorNotification;
 use App\Models\Notice;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -349,15 +350,15 @@ class NotificationService
                 );
             }
         } elseif ($recipient->hasRole('director')) {
-            if (($recipient->notify_email ?? true) && $recipient->email) {
-                $this->sendEmailNotification(
-                    $recipient->email,
-                    "Message from {$sender->name}: {$subject}",
-                    $message,
-                    'message',
-                    array_merge($meta, ['sender_id' => $sender->id])
-                );
-            }
+            // In-app + email notification for messages to director (e.g. from parents)
+            $this->notifyDirector(
+                $recipient,
+                "Message from {$sender->name}",
+                $message,
+                'message',
+                array_merge($meta, ['sender_id' => $sender->id, 'subject' => $subject]),
+                true // Send email for parent messages
+            );
         } elseif ($recipient->hasRole('manager')) {
             $this->notifyManager(
                 $recipient,
@@ -444,6 +445,127 @@ class NotificationService
         }
 
         Log::info("Notification sent to Parent", ['parent_id' => $parent->id, 'student_id' => $student->id, 'type' => $type]);
+    }
+
+    /**
+     * Helper: Send notification to Director (in-app + optional email)
+     */
+    protected function notifyDirector(User $director, string $title, string $body, string $type, array $meta = [], bool $sendEmail = false): void
+    {
+        // In-app notification
+        DirectorNotification::create([
+            'user_id' => $director->id,
+            'title' => $title,
+            'body' => $body,
+            'type' => $type,
+            'is_read' => false,
+            'meta' => $meta,
+        ]);
+
+        // Email notification (only for specific notification types)
+        if ($sendEmail && ($director->notify_email ?? true) && $director->email) {
+            $this->sendEmailNotification($director->email, $title, $body, $type, $meta);
+        }
+
+        Log::info("Notification sent to Director", ['director_id' => $director->id, 'type' => $type, 'email_sent' => $sendEmail]);
+    }
+
+    /**
+     * Notify directors when manager approves a report (in-app only)
+     */
+    public function notifyDirectorReportApproved(TutorReport $report): void
+    {
+        $report->load(['student', 'tutor']);
+
+        $studentName = ($report->student->first_name ?? '') . ' ' . ($report->student->last_name ?? '');
+        $title = 'Report Approved by Manager';
+        $body = "The report for {$studentName} ({$report->month} {$report->year}) has been approved by the manager and is awaiting your review.";
+
+        $directors = User::role('director')->get();
+        foreach ($directors as $director) {
+            $this->notifyDirector(
+                $director,
+                $title,
+                $body,
+                'report',
+                ['report_id' => $report->id, 'student_id' => $report->student_id, 'action' => 'approved_by_manager']
+            );
+        }
+    }
+
+    /**
+     * Notify directors when tutor submits attendance (in-app only)
+     */
+    public function notifyDirectorAttendanceSubmitted(AttendanceRecord $attendance): void
+    {
+        $attendance->load(['tutor', 'student']);
+
+        $tutorName = ($attendance->tutor->first_name ?? '') . ' ' . ($attendance->tutor->last_name ?? '');
+        $studentName = ($attendance->student->first_name ?? '') . ' ' . ($attendance->student->last_name ?? '');
+        $title = 'Attendance Submitted';
+        $body = "Tutor {$tutorName} submitted attendance for {$studentName} on {$attendance->class_date->format('M j, Y')}.";
+
+        $directors = User::role('director')->get();
+        foreach ($directors as $director) {
+            $this->notifyDirector(
+                $director,
+                $title,
+                $body,
+                'attendance',
+                ['attendance_id' => $attendance->id, 'action' => 'submitted']
+            );
+        }
+    }
+
+    /**
+     * Notify directors when manager approves attendance (in-app only)
+     */
+    public function notifyDirectorAttendanceApproved(AttendanceRecord $attendance): void
+    {
+        $attendance->load(['tutor', 'student']);
+
+        $studentName = ($attendance->student->first_name ?? '') . ' ' . ($attendance->student->last_name ?? '');
+        $title = 'Attendance Approved';
+        $body = "Attendance for {$studentName} on {$attendance->class_date->format('M j, Y')} has been approved.";
+
+        $directors = User::role('director')->get();
+        foreach ($directors as $director) {
+            $this->notifyDirector(
+                $director,
+                $title,
+                $body,
+                'attendance',
+                ['attendance_id' => $attendance->id, 'action' => 'approved']
+            );
+        }
+    }
+
+    /**
+     * Notify directors when assessment is forwarded by manager (in-app + email)
+     */
+    public function notifyDirectorAssessmentForwarded($assessment): void
+    {
+        $assessment->load(['tutor']);
+
+        $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'Unknown Tutor';
+        $periodLabel = $assessment->assessment_period ?? '';
+        $title = 'Assessment Ready for Review';
+        $body = "Assessment for {$tutorName} — {$periodLabel} is pending your review.";
+
+        $directors = User::role('director')->get();
+        foreach ($directors as $director) {
+            $this->notifyDirector(
+                $director,
+                $title,
+                $body,
+                'assessment',
+                [
+                    'assessment_id' => $assessment->id,
+                    'link' => route('director.assessments.show', $assessment->id),
+                ],
+                true // Send email for assessment forwarded
+            );
+        }
     }
 
     /**

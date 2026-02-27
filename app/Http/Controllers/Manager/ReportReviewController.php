@@ -140,6 +140,9 @@ class ReportReviewController extends Controller
             ]);
         });
 
+        // Notify directors that report was approved by manager (in-app only)
+        app(NotificationService::class)->notifyDirectorReportApproved($report);
+
         return redirect()
             ->route('manager.tutor-reports.index')
             ->with('success', 'Report has been approved successfully.');

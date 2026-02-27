@@ -517,6 +517,10 @@
             if (!empty($rules) && is_array($rules)) {
                 $labels = [];
                 foreach ($rules as $rating => $rule) {
+                    // Skip countThreshold-only rules (internal tracking, not displayed as penalty tags)
+                    if (isset($rule['countThreshold']) && !isset($rule['amount']) && !isset($rule['halfPay'])) {
+                        continue;
+                    }
                     if (isset($rule['label'])) {
                         $labels[] = "Penalty: {$rule['label']}";
                     } elseif (isset($rule['amount'])) {
@@ -525,8 +529,6 @@
                         $labels[] = "Penalty: Half pay deduction";
                     } elseif (isset($rule['action'])) {
                         $labels[] = "Penalty: {$rule['action']}";
-                    } elseif (isset($rule['countThreshold'])) {
-                        $labels[] = "Penalty: Flagged after {$rule['countThreshold']}x";
                     }
                 }
                 if (!empty($labels)) {
