@@ -242,4 +242,57 @@ class ReportReviewController extends Controller
 
         return response()->json(['success' => true, 'text' => $text]);
     }
+
+    /**
+     * Bulk approve multiple submitted reports.
+     */
+    public function bulkApprove(Request $request)
+    {
+        $validated = $request->validate([
+            'report_ids' => 'required|array|min:1',
+            'report_ids.*' => 'exists:tutor_reports,id',
+        ]);
+
+        $reports = TutorReport::whereIn('id', $validated['report_ids'])
+            ->where('status', 'submitted')
+            ->with('student')
+            ->get();
+
+        if ($reports->isEmpty()) {
+            return redirect()->back()->with('error', 'No eligible reports found to approve.');
+        }
+
+        $approvedCount = 0;
+        $notificationService = app(NotificationService::class);
+
+        DB::transaction(function () use ($reports, &$approvedCount) {
+            foreach ($reports as $report) {
+                $report->update([
+                    'status' => 'approved-by-manager',
+                    'manager_comment' => null,
+                    'approved_by_manager_at' => now(),
+                ]);
+
+                \App\Models\TutorNotification::create([
+                    'tutor_id' => $report->tutor_id,
+                    'title' => 'Report Approved by Manager',
+                    'body' => "Your report for {$report->student->fullName()} ({$report->month}) has been approved by the manager and is awaiting director approval.",
+                    'type' => 'system',
+                    'is_read' => false,
+                    'meta' => ['report_id' => $report->id],
+                ]);
+
+                $approvedCount++;
+            }
+        });
+
+        // Notify directors for each approved report
+        foreach ($reports as $report) {
+            $notificationService->notifyDirectorReportApproved($report);
+        }
+
+        return redirect()
+            ->route('manager.tutor-reports.index')
+            ->with('success', "{$approvedCount} report(s) approved successfully.");
+    }
 }

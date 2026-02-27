@@ -19,15 +19,25 @@ class Notice extends Model
         'posted_by',
         'published_at',
         'status',
+        'is_pinned',
+        'pinned_at',
+        'pinned_by',
     ];
 
     protected $casts = [
         'visible_to' => 'array',
         'published_at' => 'datetime',
+        'is_pinned' => 'boolean',
+        'pinned_at' => 'datetime',
     ];
 
     public function author()
     {
         return $this->belongsTo(User::class, 'posted_by');
+    }
+
+    public function pinnedByUser()
+    {
+        return $this->belongsTo(User::class, 'pinned_by');
     }
 }

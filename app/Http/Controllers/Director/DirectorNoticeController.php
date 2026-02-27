@@ -36,7 +36,10 @@ class DirectorNoticeController extends Controller
             $query->where('status', $request->status);
         }
 
-        $notices = $query->orderBy('created_at', 'desc')->paginate(20);
+        $notices = $query->orderBy('is_pinned', 'desc')
+            ->orderBy('pinned_at', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
 
         return view('director.notices.index', compact('notices'));
     }
@@ -151,6 +154,38 @@ class DirectorNoticeController extends Controller
                 ->with('success', 'Notice updated successfully.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', 'Failed to update notice: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Toggle pin status of a notice.
+     */
+    public function togglePin(Notice $notice)
+    {
+        try {
+            $wasPinned = $notice->is_pinned;
+
+            $notice->update([
+                'is_pinned' => !$wasPinned,
+                'pinned_at' => !$wasPinned ? now() : null,
+                'pinned_by' => !$wasPinned ? Auth::id() : null,
+            ]);
+
+            DirectorActivityLog::create([
+                'director_id' => Auth::id(),
+                'action_type' => $wasPinned ? 'notice_unpinned' : 'notice_pinned',
+                'model_type' => 'Notice',
+                'model_id' => $notice->id,
+                'payload' => json_encode(['title' => $notice->title]),
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+
+            $message = $wasPinned ? 'Notice unpinned successfully.' : 'Notice pinned to top successfully.';
+
+            return redirect()->route('director.notices.index')->with('success', $message);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to update pin status: ' . $e->getMessage());
         }
     }
 
