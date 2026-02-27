@@ -518,15 +518,15 @@
                 $labels = [];
                 foreach ($rules as $rating => $rule) {
                     if (isset($rule['label'])) {
-                        $labels[] = "{$rating}: {$rule['label']}";
+                        $labels[] = "Penalty: {$rule['label']}";
                     } elseif (isset($rule['amount'])) {
-                        $labels[] = "{$rating}: ₦" . number_format($rule['amount']);
+                        $labels[] = "Penalty: ₦" . number_format($rule['amount']);
                     } elseif (isset($rule['halfPay']) && $rule['halfPay']) {
-                        $labels[] = "{$rating}: Half pay deduction";
+                        $labels[] = "Penalty: Half pay deduction";
                     } elseif (isset($rule['action'])) {
-                        $labels[] = "{$rating}: {$rule['action']}";
+                        $labels[] = "Penalty: {$rule['action']}";
                     } elseif (isset($rule['countThreshold'])) {
-                        $labels[] = "{$rating}: Flagged after {$rule['countThreshold']}x";
+                        $labels[] = "Penalty: Flagged after {$rule['countThreshold']}x";
                     }
                 }
                 if (!empty($labels)) {
