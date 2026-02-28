@@ -111,11 +111,15 @@ class ParentChildrenController extends Controller
                 $progressPercentage = $student->progressPercentage();
             }
         } catch (\Exception $e) {
-            Log::error('Failed to calculate progress percentage', [
+            Log::error('Explicit progress failed, trying legacy', [
                 'student_id' => $student->id,
                 'error' => $e->getMessage(),
             ]);
-            $progressPercentage = 0;
+            try {
+                $progressPercentage = $student->progressPercentage();
+            } catch (\Exception $e2) {
+                $progressPercentage = 0;
+            }
         }
 
         // Calculate current stage dynamically
@@ -232,22 +236,41 @@ class ParentChildrenController extends Controller
 
         // Check for auto-completion of current course based on attendance
         if ($student->usesExplicitProgression()) {
-            $student->autoCompleteCourseIfReady();
-            // Refresh the student to get updated statuses
-            $student->refresh();
+            try {
+                $student->autoCompleteCourseIfReady();
+                $student->refresh();
+            } catch (\Exception $e) {
+                Log::warning('Auto-complete check failed, continuing with current state', [
+                    'student_id' => $student->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         // Use explicit progression if student has it, otherwise fall back to legacy
+        $curriculumWithStatuses = null;
+        $currentCourseProgress = 0;
+
         if ($student->usesExplicitProgression()) {
-            $curriculumWithStatuses = $student->getExplicitCurriculumWithStatuses();
-        } else {
-            $curriculumWithStatuses = $student->getCurriculumWithStatuses();
+            try {
+                $curriculumWithStatuses = $student->getExplicitCurriculumWithStatuses();
+                $currentCourseProgress = $student->getCurrentCourseProgress();
+            } catch (\Exception $e) {
+                Log::error('Explicit progression failed, falling back to legacy', [
+                    'student_id' => $student->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                // Fall through to legacy below
+                $curriculumWithStatuses = null;
+            }
         }
 
-        // Get attendance-based progress for current course (for explicit system)
-        $currentCourseProgress = $student->usesExplicitProgression()
-            ? $student->getCurrentCourseProgress()
-            : ($student->roadmap_progress ?? 0);
+        // Fall back to legacy system if explicit failed or student uses legacy
+        if ($curriculumWithStatuses === null) {
+            $curriculumWithStatuses = $student->getCurriculumWithStatuses();
+            $currentCourseProgress = $student->roadmap_progress ?? 0;
+        }
 
         $courses = [];
         foreach ($curriculumWithStatuses as $course) {
