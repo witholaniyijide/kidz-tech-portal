@@ -50,10 +50,16 @@
             <!-- Notices List -->
             <div class="space-y-4">
                 @forelse($notices as $notice)
-                <x-ui.glass-card>
+                <x-ui.glass-card class="{{ $notice->is_pinned ? 'ring-2 ring-amber-400 dark:ring-amber-500' : '' }}">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-2">
+                            <div class="flex items-center gap-3 mb-2 flex-wrap">
+                                @if($notice->is_pinned)
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M5 5a2 2 0 012-2h6a2 2 0 012 2v2h2a1 1 0 010 2h-1.382l-.724 7.236A3 3 0 0111.91 19H8.09a3 3 0 01-2.984-2.764L4.382 9H3a1 1 0 110-2h2V5z"/></svg>
+                                        Pinned
+                                    </span>
+                                @endif
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $notice->title }}</h3>
                                 @php
                                     $priorityColors = [
@@ -86,6 +92,12 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 ml-4">
+                            <form action="{{ route('director.notices.toggle-pin', $notice) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="{{ $notice->is_pinned ? 'text-amber-600 hover:text-amber-800 dark:text-amber-400' : 'text-gray-400 hover:text-amber-600 dark:text-gray-500 dark:hover:text-amber-400' }}" title="{{ $notice->is_pinned ? 'Unpin' : 'Pin to top' }}">
+                                    <svg class="w-5 h-5" fill="{{ $notice->is_pinned ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v3a2 2 0 01-2 2h-1l-1 7h-4l-1-7H9a2 2 0 01-2-2V5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 17v4"/></svg>
+                                </button>
+                            </form>
                             <a href="{{ route('director.notices.show', $notice) }}" class="text-[#4F46E5] hover:text-[#3730A3] dark:text-[#818CF8]" title="View">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </a>

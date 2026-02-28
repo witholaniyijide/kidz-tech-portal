@@ -12,6 +12,7 @@ use App\Models\TutorReport;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ParentChildrenController extends Controller
 {
@@ -24,17 +25,30 @@ class ParentChildrenController extends Controller
 
         // Get all visible children with their tutors and progress
         $children = $user->visibleChildren()
-            ->with(['tutor'])
+            ->with(['tutor', 'currentCourse'])
             ->get()
             ->map(function ($child) {
-                // Use appropriate progression system
-                if ($child->usesExplicitProgression()) {
-                    $child->progress_percentage = $child->getExplicitProgressPercentage();
-                } else {
-                    $child->progress_percentage = $child->progressPercentage();
+                try {
+                    // Use appropriate progression system
+                    if ($child->usesExplicitProgression()) {
+                        $child->progress_percentage = $child->getExplicitProgressPercentage();
+                        // Pass current course name for display
+                        $child->current_course_name = $child->currentCourse?->full_name ?? $child->currentCourse?->name;
+                    } else {
+                        $child->progress_percentage = $child->progressPercentage();
+                        $child->current_course_name = null;
+                    }
+                    // Calculate current stage based on course statuses
+                    $child->current_stage = $this->calculateCurrentStage($child);
+                } catch (\Exception $e) {
+                    Log::error('Failed to calculate progress for child', [
+                        'student_id' => $child->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $child->progress_percentage = 0;
+                    $child->current_stage = 1;
+                    $child->current_course_name = null;
                 }
-                // Calculate current stage based on course statuses
-                $child->current_stage = $this->calculateCurrentStage($child);
                 return $child;
             });
 
@@ -90,14 +104,30 @@ class ParentChildrenController extends Controller
         $student->load(['tutor']);
 
         // Get progress percentage using appropriate progression system
-        if ($student->usesExplicitProgression()) {
-            $progressPercentage = $student->getExplicitProgressPercentage();
-        } else {
-            $progressPercentage = $student->progressPercentage();
+        try {
+            if ($student->usesExplicitProgression()) {
+                $progressPercentage = $student->getExplicitProgressPercentage();
+            } else {
+                $progressPercentage = $student->progressPercentage();
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to calculate progress percentage', [
+                'student_id' => $student->id,
+                'error' => $e->getMessage(),
+            ]);
+            $progressPercentage = 0;
         }
 
         // Calculate current stage dynamically
-        $currentStage = $this->calculateCurrentStage($student);
+        try {
+            $currentStage = $this->calculateCurrentStage($student);
+        } catch (\Exception $e) {
+            Log::error('Failed to calculate current stage', [
+                'student_id' => $student->id,
+                'error' => $e->getMessage(),
+            ]);
+            $currentStage = 1;
+        }
 
         // Get all progress milestones
         $milestones = StudentProgress::where('student_id', $student->id)
@@ -111,10 +141,27 @@ class ParentChildrenController extends Controller
             ->get();
 
         // Get curriculum roadmap
-        $curriculumRoadmap = $this->getCurriculumRoadmap($student);
+        try {
+            $curriculumRoadmap = $this->getCurriculumRoadmap($student);
+        } catch (\Exception $e) {
+            Log::error('Failed to load curriculum roadmap', [
+                'student_id' => $student->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            $curriculumRoadmap = [];
+        }
 
         // Format class schedule
-        $classSchedule = $this->formatClassSchedule($student);
+        try {
+            $classSchedule = $this->formatClassSchedule($student);
+        } catch (\Exception $e) {
+            Log::error('Failed to format class schedule', [
+                'student_id' => $student->id,
+                'error' => $e->getMessage(),
+            ]);
+            $classSchedule = [];
+        }
 
         return view('parent.children.show', compact(
             'student',

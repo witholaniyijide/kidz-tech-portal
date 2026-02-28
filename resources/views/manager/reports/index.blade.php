@@ -139,16 +139,37 @@
     </div>
 
     {{-- Reports List --}}
-    <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl overflow-hidden shadow-sm">
+    <div x-data="bulkApproveManager()" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl overflow-hidden shadow-sm">
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Report List</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $reports->total() }} reports found</p>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Report List</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $reports->total() }} reports found</p>
+                </div>
+                <div x-show="selectedIds.length > 0" x-transition class="flex items-center gap-3">
+                    <span class="text-sm text-gray-600 dark:text-gray-400" x-text="selectedIds.length + ' selected'"></span>
+                    <button @click="submitBulkApprove()" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Approve Selected
+                    </button>
+                </div>
+            </div>
         </div>
+
+        <form id="bulkApproveManagerForm" action="{{ route('manager.tutor-reports.bulk-approve') }}" method="POST" class="hidden">
+            @csrf
+            <template x-for="id in selectedIds" :key="id">
+                <input type="hidden" name="report_ids[]" :value="id">
+            </template>
+        </form>
 
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gray-50/80 dark:bg-gray-800/80">
                     <tr>
+                        <th class="px-4 py-3 text-left">
+                            <input type="checkbox" @change="toggleAll($event)" class="w-4 h-4 text-[#C15F3C] rounded focus:ring-[#C15F3C]" :checked="allPendingSelected">
+                        </th>
                         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Student</th>
                         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tutor</th>
                         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Period</th>
@@ -160,6 +181,11 @@
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     @forelse($reports as $report)
                         <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                            <td class="px-4 py-4 whitespace-nowrap">
+                                @if($report->status === 'submitted')
+                                    <input type="checkbox" value="{{ $report->id }}" @change="toggleReport({{ $report->id }})" :checked="selectedIds.includes({{ $report->id }})" class="w-4 h-4 text-[#C15F3C] rounded focus:ring-[#C15F3C]">
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="w-10 h-10 rounded-full bg-gradient-to-r from-[#C15F3C] to-[#DA7756] flex items-center justify-center text-white font-bold">
@@ -234,7 +260,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
+                            <td colspan="7" class="px-6 py-12 text-center">
                                 <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
@@ -253,4 +279,37 @@
             </div>
         @endif
     </div>
+    @push('scripts')
+    <script>
+        function bulkApproveManager() {
+            return {
+                selectedIds: [],
+                pendingIds: @json($reports->where('status', 'submitted')->pluck('id')->values()),
+                get allPendingSelected() {
+                    return this.pendingIds.length > 0 && this.pendingIds.every(id => this.selectedIds.includes(id));
+                },
+                toggleAll(event) {
+                    if (event.target.checked) {
+                        this.selectedIds = [...this.pendingIds];
+                    } else {
+                        this.selectedIds = [];
+                    }
+                },
+                toggleReport(id) {
+                    const idx = this.selectedIds.indexOf(id);
+                    if (idx > -1) {
+                        this.selectedIds.splice(idx, 1);
+                    } else {
+                        this.selectedIds.push(id);
+                    }
+                },
+                submitBulkApprove() {
+                    if (this.selectedIds.length === 0) return;
+                    if (!confirm(`Are you sure you want to approve ${this.selectedIds.length} report(s)? No comments will be added.`)) return;
+                    document.getElementById('bulkApproveManagerForm').submit();
+                }
+            };
+        }
+    </script>
+    @endpush
 </x-manager-layout>

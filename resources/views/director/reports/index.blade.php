@@ -184,11 +184,31 @@
                     @endif
                 </div>
             @else
-                <div class="bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border border-white/10 rounded-2xl shadow-lg overflow-hidden">
+                <div x-data="bulkApproveDirector()" class="bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border border-white/10 rounded-2xl shadow-lg overflow-hidden">
+                    @if($statusFilter === 'pending')
+                        <div x-show="selectedIds.length > 0" x-transition class="px-6 py-3 border-b border-white/10 bg-indigo-500/10 flex items-center justify-between">
+                            <span class="text-sm text-gray-700 dark:text-gray-300" x-text="selectedIds.length + ' report(s) selected'"></span>
+                            <button @click="submitBulkApprove()" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-medium rounded-xl hover:shadow-lg transition-all">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Approve Selected
+                            </button>
+                        </div>
+                        <form id="bulkApproveDirectorForm" action="{{ route('director.reports.bulk-approve') }}" method="POST" class="hidden">
+                            @csrf
+                            <template x-for="id in selectedIds" :key="id">
+                                <input type="hidden" name="report_ids[]" :value="id">
+                            </template>
+                        </form>
+                    @endif
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead>
                                 <tr class="border-b border-white/10">
+                                    @if($statusFilter === 'pending')
+                                        <th class="px-4 py-4 text-left">
+                                            <input type="checkbox" @change="toggleAll($event)" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500" :checked="allSelected">
+                                        </th>
+                                    @endif
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Student</th>
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Tutor</th>
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Month</th>
@@ -205,6 +225,11 @@
                             <tbody class="divide-y divide-white/10">
                                 @foreach($reports as $report)
                                     <tr class="hover:bg-white/10 dark:hover:bg-gray-800/30 transition-colors">
+                                        @if($statusFilter === 'pending')
+                                            <td class="px-4 py-4">
+                                                <input type="checkbox" value="{{ $report->id }}" @change="toggleReport({{ $report->id }})" :checked="selectedIds.includes({{ $report->id }})" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                                            </td>
+                                        @endif
                                         <td class="px-6 py-4">
                                             <div class="flex items-center">
                                                 <div>
@@ -277,4 +302,38 @@
 
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function bulkApproveDirector() {
+            return {
+                selectedIds: [],
+                allIds: @json($statusFilter === 'pending' ? $reports->pluck('id')->values() : []),
+                get allSelected() {
+                    return this.allIds.length > 0 && this.allIds.every(id => this.selectedIds.includes(id));
+                },
+                toggleAll(event) {
+                    if (event.target.checked) {
+                        this.selectedIds = [...this.allIds];
+                    } else {
+                        this.selectedIds = [];
+                    }
+                },
+                toggleReport(id) {
+                    const idx = this.selectedIds.indexOf(id);
+                    if (idx > -1) {
+                        this.selectedIds.splice(idx, 1);
+                    } else {
+                        this.selectedIds.push(id);
+                    }
+                },
+                submitBulkApprove() {
+                    if (this.selectedIds.length === 0) return;
+                    if (!confirm(`Are you sure you want to give FINAL APPROVAL to ${this.selectedIds.length} report(s)? No director comments will be added.`)) return;
+                    document.getElementById('bulkApproveDirectorForm').submit();
+                }
+            };
+        }
+    </script>
+    @endpush
 </x-app-layout>

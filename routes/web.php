@@ -417,6 +417,8 @@ Route::prefix('manager')
             ->name('tutor-reports.show');
         Route::post('/tutor-reports/{report}/approve', [App\Http\Controllers\Manager\ReportReviewController::class, 'approve'])
             ->name('tutor-reports.approve');
+        Route::post('/tutor-reports/bulk-approve', [App\Http\Controllers\Manager\ReportReviewController::class, 'bulkApprove'])
+            ->name('tutor-reports.bulk-approve');
         Route::post('/tutor-reports/{report}/correction', [App\Http\Controllers\Manager\ReportReviewController::class, 'sendBackForCorrection'])
             ->name('tutor-reports.correction');
         Route::get('/tutor-reports/{report}/pdf', [App\Http\Controllers\Manager\ReportReviewController::class, 'exportPdf'])
@@ -522,6 +524,8 @@ Route::prefix('director')
             ->name('reports.update');
         Route::post('/reports/{report}/approve', [App\Http\Controllers\Director\DirectorReportController::class, 'approve'])
             ->name('reports.approve');
+        Route::post('/reports/bulk-approve', [App\Http\Controllers\Director\DirectorReportController::class, 'bulkApprove'])
+            ->name('reports.bulk-approve');
         Route::post('/reports/{report}/reject', [App\Http\Controllers\Director\DirectorReportController::class, 'reject'])
             ->name('reports.reject');
         Route::post('/reports/{report}/comment', [App\Http\Controllers\Director\DirectorReportController::class, 'comment'])
@@ -630,6 +634,8 @@ Route::prefix('director')
         // Director Notices (Full CRUD)
         Route::resource('notices', App\Http\Controllers\Director\DirectorNoticeController::class)
             ->names('notices');
+        Route::post('/notices/{notice}/toggle-pin', [App\Http\Controllers\Director\DirectorNoticeController::class, 'togglePin'])
+            ->name('notices.toggle-pin');
 
         // Director Messages
         Route::get('/messages', [App\Http\Controllers\Director\DirectorMessageController::class, 'index'])

@@ -41,7 +41,11 @@
                                     @foreach(array_slice($child->class_schedule, 0, 2) as $schedule)
                                         <p class="text-xs text-gray-600 dark:text-gray-300">
                                             @if(is_array($schedule))
-                                                {{ $schedule['day'] ?? '' }} {{ isset($schedule['time']) ? \Carbon\Carbon::parse($schedule['time'])->format('g:i A') : '' }}
+                                                {{ $schedule['day'] ?? '' }}
+                                                @if(isset($schedule['time']) && $schedule['time'])
+                                                    @php try { $t = \Carbon\Carbon::parse($schedule['time'])->format('g:i A'); } catch (\Exception $e) { $t = $schedule['time']; } @endphp
+                                                    {{ $t }}
+                                                @endif
                                             @else
                                                 {{ $schedule }}
                                             @endif
@@ -53,16 +57,33 @@
                             @endif
                         </div>
 
-                        <!-- Progress Bar -->
+                        <!-- Progress Display -->
                         <div class="mb-4">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Progress</span>
-                                <span class="text-sm font-bold text-sky-600 dark:text-sky-400">{{ $child->progress_percentage }}%</span>
-                            </div>
-                            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                <div class="h-full bg-parent-gradient rounded-full transition-all duration-500"
-                                     style="width: {{ $child->progress_percentage }}%"></div>
-                            </div>
+                            @if($child->progress_percentage > 0)
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Progress</span>
+                                    <span class="text-sm font-bold text-sky-600 dark:text-sky-400">{{ $child->progress_percentage }}%</span>
+                                </div>
+                                <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-parent-gradient rounded-full transition-all duration-500"
+                                         style="width: {{ $child->progress_percentage }}%"></div>
+                                </div>
+                            @elseif($child->current_course_name ?? null)
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Current Course</span>
+                                </div>
+                                <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300">
+                                    {{ $child->current_course_name }}
+                                </span>
+                            @else
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Progress</span>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">Stage {{ $child->current_stage ?? 1 }} of 12</span>
+                                </div>
+                                <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-parent-gradient rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            @endif
                         </div>
 
                         <!-- View Profile Button -->
