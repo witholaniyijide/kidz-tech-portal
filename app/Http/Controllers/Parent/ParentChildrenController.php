@@ -135,10 +135,18 @@ class ParentChildrenController extends Controller
             ->get();
 
         // Get director-approved reports
-        $reports = $student->approvedReports()
-            ->with(['tutor'])
-            ->take(5)
-            ->get();
+        try {
+            $reports = $student->approvedReports()
+                ->with(['tutor'])
+                ->take(5)
+                ->get();
+        } catch (\Exception $e) {
+            Log::error('Failed to load approved reports', [
+                'student_id' => $student->id,
+                'error' => $e->getMessage(),
+            ]);
+            $reports = collect();
+        }
 
         // Get curriculum roadmap
         try {

@@ -427,10 +427,13 @@ class NotificationService
      */
     protected function notifyParent(User $parent, Student $student, string $title, string $body, string $type, array $meta = []): void
     {
-        // In-app notification - matching existing ParentNotification model structure
+        // In-app notification - set both explicit columns and data JSON
         ParentNotification::create([
             'parent_id' => $parent->id,
+            'student_id' => $student->id,
             'type' => $type,
+            'title' => $title,
+            'message' => $body,
             'data' => array_merge($meta, [
                 'title' => $title,
                 'body' => $body,
