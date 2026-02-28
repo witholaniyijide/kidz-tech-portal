@@ -203,8 +203,8 @@
                                     @forelse($notifications as $notification)
                                         <div class="flex items-start gap-2 px-4 py-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-600 transition">
                                             <a href="{{ route('parent.notifications.index') }}" class="flex-1 min-w-0">
-                                                <div class="font-semibold mb-1">{{ $notification->title ?? 'Notification' }}</div>
-                                                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{{ \Illuminate\Support\Str::limit($notification->body ?? '', 80) }}</div>
+                                                <div class="font-semibold mb-1">{{ $notification->title ?? $notification->data['title'] ?? 'Notification' }}</div>
+                                                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">{{ \Illuminate\Support\Str::limit($notification->message ?? $notification->data['body'] ?? '', 80) }}</div>
                                                 <div class="text-xs text-gray-500 dark:text-gray-400">{{ $notification->created_at->diffForHumans() }}</div>
                                             </a>
                                             <form action="{{ route('parent.notifications.mark-read', $notification) }}" method="POST" class="flex-shrink-0">

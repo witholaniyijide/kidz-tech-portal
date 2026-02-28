@@ -486,7 +486,8 @@ class Student extends Model
 
         // Mark courses from reports as completed or ongoing
         foreach ($progress['completed_courses'] as $courseName) {
-            // Extract level number from course name
+            // Extract level number from course name (ensure string type for preg_match)
+            $courseName = is_string($courseName) ? $courseName : (string) ($courseName ?? '');
             if (preg_match('/Level\s*(\d+)/i', $courseName, $matches)) {
                 $level = (int) $matches[1];
                 $statuses[$level] = 'completed';
@@ -495,7 +496,8 @@ class Student extends Model
 
         // Mark current course as ongoing
         if ($progress['in_progress_course']) {
-            if (preg_match('/Level\s*(\d+)/i', $progress['in_progress_course'], $matches)) {
+            $inProgress = is_string($progress['in_progress_course']) ? $progress['in_progress_course'] : (string) ($progress['in_progress_course'] ?? '');
+            if (preg_match('/Level\s*(\d+)/i', $inProgress, $matches)) {
                 $level = (int) $matches[1];
                 $statuses[$level] = 'ongoing';
             }
