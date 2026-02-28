@@ -101,7 +101,7 @@
                             </div>
                             <div>
                                 <p class="font-medium text-gray-900 dark:text-white">{{ $report->student->fullName() }}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Age {{ $report->student->age }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Age {{ $report->student->age ?? 'N/A' }}</p>
                             </div>
                         </div>
                     </div>
