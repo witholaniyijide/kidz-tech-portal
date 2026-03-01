@@ -31,7 +31,16 @@ class ParentChildrenController extends Controller
                 try {
                     // Use appropriate progression system
                     if ($child->usesExplicitProgression()) {
-                        $child->progress_percentage = $child->getExplicitProgressPercentage();
+                        $completedProgress = $child->getExplicitProgressPercentage();
+                        // Factor in attendance progress on current course
+                        try {
+                            $currentCourseProgress = $child->getCurrentCourseProgress();
+                            $perCourseWeight = 100 / 12;
+                            $currentCourseContribution = ($currentCourseProgress / 100) * $perCourseWeight;
+                            $child->progress_percentage = min(100, (int) ($completedProgress + $currentCourseContribution));
+                        } catch (\Exception $e) {
+                            $child->progress_percentage = $completedProgress;
+                        }
                         // Pass current course name for display
                         $child->current_course_name = $child->currentCourse?->full_name ?? $child->currentCourse?->name;
                     } else {
@@ -106,7 +115,23 @@ class ParentChildrenController extends Controller
         // Get progress percentage using appropriate progression system
         try {
             if ($student->usesExplicitProgression()) {
-                $progressPercentage = $student->getExplicitProgressPercentage();
+                // Get completed courses progress (e.g., 1/12 = 8%)
+                $completedProgress = $student->getExplicitProgressPercentage();
+
+                // Also factor in attendance progress on current course
+                // Each course is worth ~8.3% (100/12), so partial attendance adds partial credit
+                try {
+                    $currentCourseProgress = $student->getCurrentCourseProgress();
+                    $perCourseWeight = 100 / 12;
+                    $currentCourseContribution = ($currentCourseProgress / 100) * $perCourseWeight;
+                    $progressPercentage = min(100, (int) ($completedProgress + $currentCourseContribution));
+                } catch (\Exception $e) {
+                    Log::warning('Attendance progress failed, using completed-only progress', [
+                        'student_id' => $student->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $progressPercentage = $completedProgress;
+                }
             } else {
                 $progressPercentage = $student->progressPercentage();
             }
@@ -252,24 +277,36 @@ class ParentChildrenController extends Controller
         $currentCourseProgress = 0;
 
         if ($student->usesExplicitProgression()) {
+            // Load curriculum and progress independently so one failure doesn't kill the other
             try {
                 $curriculumWithStatuses = $student->getExplicitCurriculumWithStatuses();
-                $currentCourseProgress = $student->getCurrentCourseProgress();
             } catch (\Exception $e) {
-                Log::error('Explicit progression failed, falling back to legacy', [
+                Log::error('Explicit curriculum failed, falling back to legacy', [
                     'student_id' => $student->id,
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
                 ]);
-                // Fall through to legacy below
                 $curriculumWithStatuses = null;
+            }
+
+            try {
+                $currentCourseProgress = $student->getCurrentCourseProgress();
+            } catch (\Exception $e) {
+                Log::warning('Attendance-based progress calculation failed', [
+                    'student_id' => $student->id,
+                    'error' => $e->getMessage(),
+                ]);
+                $currentCourseProgress = $student->roadmap_progress ?? 0;
             }
         }
 
-        // Fall back to legacy system if explicit failed or student uses legacy
+        // Fall back to legacy system if explicit curriculum failed or student uses legacy
         if ($curriculumWithStatuses === null) {
             $curriculumWithStatuses = $student->getCurriculumWithStatuses();
-            $currentCourseProgress = $student->roadmap_progress ?? 0;
+            // Only override progress if we didn't already get it from explicit system
+            if (!$student->usesExplicitProgression()) {
+                $currentCourseProgress = $student->roadmap_progress ?? 0;
+            }
         }
 
         $courses = [];
