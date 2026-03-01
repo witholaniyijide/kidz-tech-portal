@@ -10,6 +10,7 @@ use App\Models\AttendanceRecord;
 use App\Models\TutorNotification;
 use App\Models\ManagerNotification;
 use App\Models\ParentNotification;
+use App\Models\DirectorNotification;
 use App\Models\Notice;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -18,11 +19,14 @@ class NotificationService
 {
     /**
      * Send notification when Tutor submits a report for review
-     * Recipients: Manager
+     * Recipients: Manager (in-app + email)
      */
     public function notifyReportSubmitted(TutorReport $report): void
     {
         $report->load(['tutor', 'student']);
+
+        $tutorName = ($report->tutor->first_name ?? '') . ' ' . ($report->tutor->last_name ?? '');
+        $studentName = ($report->student->first_name ?? '') . ' ' . ($report->student->last_name ?? '');
 
         $managers = User::role('manager')->get();
         foreach ($managers as $manager) {
@@ -100,16 +104,18 @@ class NotificationService
             );
         }
 
-        // 3. Notify Admins (in-app + email)
+        // 3. Notify Admins (email only, respect notify_email preference)
         $admins = User::role('admin')->get();
         foreach ($admins as $admin) {
-            $this->sendEmailNotification(
-                $admin->email,
-                'Report Approved by Director',
-                "The report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been approved.",
-                'report_approved',
-                ['report_id' => $report->id, 'student_name' => $report->student->first_name . ' ' . $report->student->last_name]
-            );
+            if (($admin->notify_email ?? true) && $admin->email) {
+                $this->sendEmailNotification(
+                    $admin->email,
+                    'Report Approved by Director',
+                    "The report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been approved.",
+                    'report_approved',
+                    ['report_id' => $report->id, 'student_name' => $report->student->first_name . ' ' . $report->student->last_name]
+                );
+            }
         }
 
         // 4. Notify Parents (in-app + email)
@@ -156,23 +162,35 @@ class NotificationService
 
         $admins = User::role('admin')->get();
         foreach ($admins as $admin) {
-            $this->sendEmailNotification(
-                $admin->email,
-                'New Attendance Submission',
-                "Tutor {$attendance->tutor->first_name} {$attendance->tutor->last_name} has submitted attendance for {$attendance->student->first_name} {$attendance->student->last_name}.",
-                'attendance_submitted',
-                ['attendance_id' => $attendance->id, 'tutor_name' => $attendance->tutor->first_name . ' ' . $attendance->tutor->last_name]
-            );
+            if (($admin->notify_email ?? true) && $admin->email) {
+                $this->sendEmailNotification(
+                    $admin->email,
+                    'New Attendance Submission',
+                    "Tutor {$attendance->tutor->first_name} {$attendance->tutor->last_name} has submitted attendance for {$attendance->student->first_name} {$attendance->student->last_name}.",
+                    'attendance_submitted',
+                    ['attendance_id' => $attendance->id, 'tutor_name' => $attendance->tutor->first_name . ' ' . $attendance->tutor->last_name]
+                );
+            }
         }
     }
 
     /**
      * Send notification when Director approves assessment
-     * Recipients: Manager
+     * Recipients: Manager (in-app + email)
      */
     public function notifyAssessmentApproved($assessment): void
     {
         $assessment->load(['tutor', 'student']);
+
+        $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'a tutor';
+        $studentName = $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '';
+        $periodLabel = $assessment->assessment_period ?? '';
+
+        $body = "Assessment for tutor {$tutorName}";
+        if ($studentName) {
+            $body .= " (student: {$studentName})";
+        }
+        $body .= " — {$periodLabel} has been approved by the Director.";
 
         $managers = User::role('manager')->get();
         foreach ($managers as $manager) {
@@ -184,6 +202,26 @@ class NotificationService
                 ['assessment_id' => $assessment->id, 'notification_type' => 'assessment_approved']
             );
         }
+    }
+
+    /**
+     * Send email notification when Director deletes an assessment
+     * Recipients: Manager
+     */
+    public function sendAssessmentDeletedEmail(User $manager, string $tutorName, string $period, ?string $reason = null): void
+    {
+        $body = "The assessment for {$tutorName} — {$period} has been deleted by the Director.";
+        if ($reason) {
+            $body .= "\n\nReason: {$reason}";
+        }
+
+        $this->sendEmailNotification(
+            $manager->email,
+            'Assessment Deleted by Director',
+            $body,
+            'assessment_deleted',
+            ['tutor_name' => $tutorName, 'period' => $period]
+        );
     }
 
     /**
@@ -291,13 +329,15 @@ class NotificationService
                 case 'admins':
                     $admins = User::role('admin')->get();
                     foreach ($admins as $admin) {
-                        $this->sendEmailNotification(
-                            $admin->email,
-                            $notice->title,
-                            strip_tags($notice->content),
-                            'notice',
-                            ['notice_id' => $notice->id]
-                        );
+                        if (($admin->notify_email ?? true) && $admin->email) {
+                            $this->sendEmailNotification(
+                                $admin->email,
+                                $notice->title,
+                                strip_tags($notice->content),
+                                'notice',
+                                ['notice_id' => $notice->id]
+                            );
+                        }
                     }
                     break;
             }
@@ -323,12 +363,14 @@ class NotificationService
                 );
             }
         } elseif ($recipient->hasRole('director')) {
-            $this->sendEmailNotification(
-                $recipient->email,
-                "Message from {$sender->name}: {$subject}",
+            // In-app + email notification for messages to director (e.g. from parents)
+            $this->notifyDirector(
+                $recipient,
+                "Message from {$sender->name}",
                 $message,
                 'message',
-                array_merge($meta, ['sender_id' => $sender->id])
+                array_merge($meta, ['sender_id' => $sender->id, 'subject' => $subject]),
+                true // Send email for parent messages
             );
         } elseif ($recipient->hasRole('manager')) {
             $this->notifyManager(
@@ -356,9 +398,15 @@ class NotificationService
             'meta' => $meta,
         ]);
 
-        // Email notification (if tutor has email)
+        // Email notification (respect notify_email preference via linked User account)
         if ($tutor->email) {
-            $this->sendEmailNotification($tutor->email, $title, $body, $type, $meta);
+            $notifyEmail = true;
+            if ($tutor->user_id) {
+                $notifyEmail = $tutor->user->notify_email ?? true;
+            }
+            if ($notifyEmail) {
+                $this->sendEmailNotification($tutor->email, $title, $body, $type, $meta);
+            }
         }
 
         Log::info("Notification sent to Tutor", ['tutor_id' => $tutor->id, 'type' => $type]);
@@ -379,8 +427,10 @@ class NotificationService
             'meta' => $meta,
         ]);
 
-        // Email notification
-        $this->sendEmailNotification($manager->email, $title, $body, $type, $meta);
+        // Email notification (respect notify_email preference)
+        if (($manager->notify_email ?? true) && $manager->email) {
+            $this->sendEmailNotification($manager->email, $title, $body, $type, $meta);
+        }
 
         Log::info("Notification sent to Manager", ['manager_id' => $manager->id, 'type' => $type]);
     }
@@ -390,10 +440,13 @@ class NotificationService
      */
     protected function notifyParent(User $parent, Student $student, string $title, string $body, string $type, array $meta = []): void
     {
-        // In-app notification - matching existing ParentNotification model structure
+        // In-app notification - set both explicit columns and data JSON
         ParentNotification::create([
             'parent_id' => $parent->id,
+            'student_id' => $student->id,
             'type' => $type,
+            'title' => $title,
+            'message' => $body,
             'data' => array_merge($meta, [
                 'title' => $title,
                 'body' => $body,
@@ -402,25 +455,168 @@ class NotificationService
             'read_at' => null,
         ]);
 
-        // Email notification
-        $this->sendEmailNotification($parent->email, $title, $body, $type, $meta);
+        // Email notification (respect notify_email preference)
+        if (($parent->notify_email ?? true) && $parent->email) {
+            $this->sendEmailNotification($parent->email, $title, $body, $type, $meta);
+        }
 
         Log::info("Notification sent to Parent", ['parent_id' => $parent->id, 'student_id' => $student->id, 'type' => $type]);
     }
 
     /**
+     * Helper: Send notification to Director (in-app + optional email)
+     */
+    protected function notifyDirector(User $director, string $title, string $body, string $type, array $meta = [], bool $sendEmail = false): void
+    {
+        // In-app notification
+        DirectorNotification::create([
+            'user_id' => $director->id,
+            'title' => $title,
+            'body' => $body,
+            'type' => $type,
+            'is_read' => false,
+            'meta' => $meta,
+        ]);
+
+        // Email notification (only for specific notification types)
+        if ($sendEmail && ($director->notify_email ?? true) && $director->email) {
+            $this->sendEmailNotification($director->email, $title, $body, $type, $meta);
+        }
+
+        Log::info("Notification sent to Director", ['director_id' => $director->id, 'type' => $type, 'email_sent' => $sendEmail]);
+    }
+
+    /**
+     * Notify directors when manager approves a report (in-app only)
+     */
+    public function notifyDirectorReportApproved(TutorReport $report): void
+    {
+        $report->load(['student', 'tutor']);
+
+        $studentName = ($report->student->first_name ?? '') . ' ' . ($report->student->last_name ?? '');
+        $title = 'Report Approved by Manager';
+        $body = "The report for {$studentName} ({$report->month} {$report->year}) has been approved by the manager and is awaiting your review.";
+
+        $directors = User::role('director')->get();
+        foreach ($directors as $director) {
+            $this->notifyDirector(
+                $director,
+                $title,
+                $body,
+                'report',
+                ['report_id' => $report->id, 'student_id' => $report->student_id, 'action' => 'approved_by_manager']
+            );
+        }
+    }
+
+    /**
+     * Notify directors when tutor submits attendance (in-app only)
+     */
+    public function notifyDirectorAttendanceSubmitted(AttendanceRecord $attendance): void
+    {
+        $attendance->load(['tutor', 'student']);
+
+        $tutorName = ($attendance->tutor->first_name ?? '') . ' ' . ($attendance->tutor->last_name ?? '');
+        $studentName = ($attendance->student->first_name ?? '') . ' ' . ($attendance->student->last_name ?? '');
+        $title = 'Attendance Submitted';
+        $body = "Tutor {$tutorName} submitted attendance for {$studentName} on {$attendance->class_date->format('M j, Y')}.";
+
+        $directors = User::role('director')->get();
+        foreach ($directors as $director) {
+            $this->notifyDirector(
+                $director,
+                $title,
+                $body,
+                'attendance',
+                ['attendance_id' => $attendance->id, 'action' => 'submitted']
+            );
+        }
+    }
+
+    /**
+     * Notify directors when manager approves attendance (in-app only)
+     */
+    public function notifyDirectorAttendanceApproved(AttendanceRecord $attendance): void
+    {
+        $attendance->load(['tutor', 'student']);
+
+        $studentName = ($attendance->student->first_name ?? '') . ' ' . ($attendance->student->last_name ?? '');
+        $title = 'Attendance Approved';
+        $body = "Attendance for {$studentName} on {$attendance->class_date->format('M j, Y')} has been approved.";
+
+        $directors = User::role('director')->get();
+        foreach ($directors as $director) {
+            $this->notifyDirector(
+                $director,
+                $title,
+                $body,
+                'attendance',
+                ['attendance_id' => $attendance->id, 'action' => 'approved']
+            );
+        }
+    }
+
+    /**
+     * Notify directors when assessment is forwarded by manager (in-app + email)
+     */
+    public function notifyDirectorAssessmentForwarded($assessment): void
+    {
+        $assessment->load(['tutor']);
+
+        $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'Unknown Tutor';
+        $periodLabel = $assessment->assessment_period ?? '';
+        $title = 'Assessment Ready for Review';
+        $body = "Assessment for {$tutorName} — {$periodLabel} is pending your review.";
+
+        $directors = User::role('director')->get();
+        foreach ($directors as $director) {
+            $this->notifyDirector(
+                $director,
+                $title,
+                $body,
+                'assessment',
+                [
+                    'assessment_id' => $assessment->id,
+                    'link' => route('director.assessments.show', $assessment->id),
+                ],
+                true // Send email for assessment forwarded
+            );
+        }
+    }
+
+    /**
      * Helper: Send email notification
      */
-    protected function sendEmailNotification(string $email, string $subject, string $body, string $type, array $meta = []): void
+    public function sendEmailNotification(string $email, string $subject, string $body, string $type, array $meta = []): void
     {
         try {
+            // Validate email before attempting to send
+            if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                Log::warning("Skipping email notification: invalid email address", ['email' => $email]);
+                return;
+            }
+
+            // Check if mail is properly configured
+            $fromAddress = config('mail.from.address');
+            if (empty($fromAddress) || $fromAddress === 'hello@example.com') {
+                Log::warning("Email notification skipped: MAIL_FROM_ADDRESS is not configured", [
+                    'email' => $email,
+                    'from' => $fromAddress,
+                    'subject' => $subject,
+                ]);
+                return;
+            }
+
+            $fromName = config('mail.from.name', config('app.name', 'Kidz Tech Coding Club'));
+
             Mail::send('emails.notification', [
                 'subject' => $subject,
                 'body' => $body,
                 'type' => $type,
                 'meta' => $meta,
-            ], function ($message) use ($email, $subject) {
-                $message->to($email)
+            ], function ($message) use ($email, $subject, $fromAddress, $fromName) {
+                $message->from($fromAddress, $fromName)
+                    ->to($email)
                     ->subject($subject);
             });
 
@@ -428,7 +624,12 @@ class NotificationService
         } catch (\Exception $e) {
             Log::error("Failed to send email notification", [
                 'email' => $email,
-                'error' => $e->getMessage()
+                'subject' => $subject,
+                'mailer' => config('mail.default'),
+                'host' => config('mail.mailers.smtp.host'),
+                'port' => config('mail.mailers.smtp.port'),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }

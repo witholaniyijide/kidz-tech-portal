@@ -1,6 +1,6 @@
 <x-parent-layout>
     <x-slot name="title">{{ $student->fullName() }} - {{ $report->month }}</x-slot>
-    <x-slot name="subtitle">Tutor: {{ $report->tutor->fullName() }}</x-slot>
+    <x-slot name="subtitle">Tutor: {{ $report->tutor ? $report->tutor->fullName() : 'Unknown' }}</x-slot>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {{-- Main Content --}}
@@ -13,11 +13,11 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Student</label>
                         <p class="text-gray-900 dark:text-white font-medium">{{ $student->fullName() }}</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Age {{ $student->age }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Age {{ $student->age ?? 'N/A' }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Tutor</label>
-                        <p class="text-gray-900 dark:text-white font-medium">{{ $report->tutor->fullName() }}</p>
+                        <p class="text-gray-900 dark:text-white font-medium">{{ $report->tutor ? $report->tutor->fullName() : 'Unknown' }}</p>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Assigned Tutor</p>
                     </div>
                     <div>

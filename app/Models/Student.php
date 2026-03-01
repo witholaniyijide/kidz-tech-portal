@@ -145,7 +145,7 @@ class Student extends Model
      */
     public function getAgeAttribute()
     {
-        return $this->date_of_birth->age;
+        return $this->date_of_birth ? $this->date_of_birth->age : null;
     }
 
     /**
@@ -368,7 +368,13 @@ class Student extends Model
                 $courses = [];
             }
 
+            // Filter out non-string/empty course values
+            $courses = array_filter(array_map(function ($c) {
+                return is_string($c) && $c !== '' ? $c : null;
+            }, $courses));
+
             if (count($courses) > 0) {
+                $courses = array_values($courses); // Re-index after filtering
                 // If multiple courses in one report, all but the last are completed
                 if (count($courses) > 1) {
                     for ($i = 0; $i < count($courses) - 1; $i++) {
@@ -393,7 +399,7 @@ class Student extends Model
             }
             if (is_array($courses)) {
                 foreach ($courses as $course) {
-                    if (!in_array($course, $allCoursesFromReports)) {
+                    if (is_string($course) && $course !== '' && !in_array($course, $allCoursesFromReports)) {
                         $allCoursesFromReports[] = $course;
                     }
                 }
@@ -486,7 +492,8 @@ class Student extends Model
 
         // Mark courses from reports as completed or ongoing
         foreach ($progress['completed_courses'] as $courseName) {
-            // Extract level number from course name
+            // Extract level number from course name (ensure string type for preg_match)
+            $courseName = is_string($courseName) ? $courseName : (string) ($courseName ?? '');
             if (preg_match('/Level\s*(\d+)/i', $courseName, $matches)) {
                 $level = (int) $matches[1];
                 $statuses[$level] = 'completed';
@@ -495,7 +502,8 @@ class Student extends Model
 
         // Mark current course as ongoing
         if ($progress['in_progress_course']) {
-            if (preg_match('/Level\s*(\d+)/i', $progress['in_progress_course'], $matches)) {
+            $inProgress = is_string($progress['in_progress_course']) ? $progress['in_progress_course'] : (string) ($progress['in_progress_course'] ?? '');
+            if (preg_match('/Level\s*(\d+)/i', $inProgress, $matches)) {
                 $level = (int) $matches[1];
                 $statuses[$level] = 'ongoing';
             }
@@ -739,6 +747,13 @@ class Student extends Model
 
             // Check if any course matches our target
             foreach ($courses as $courseName) {
+                // Ensure string type to prevent TypeError in PHP 8
+                if (!is_string($courseName)) {
+                    $courseName = (string) ($courseName ?? '');
+                }
+                if ($courseName === '') {
+                    continue;
+                }
                 if (str_starts_with($courseName, $coursePrefix)) {
                     $count++;
                     break;

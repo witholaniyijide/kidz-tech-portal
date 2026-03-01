@@ -84,31 +84,26 @@
             <h2 class="text-lg font-semibold mt-1">Tutor Performance Report</h2>
         </div>
 
-        {{-- Tutor/Student Info --}}
+        {{-- Tutor Info --}}
         <div class="p-6 border-b">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                     <span class="text-sm text-gray-500">Tutor Name</span>
                     <p class="font-semibold text-gray-800">{{ $assessment->tutor->first_name }} {{ $assessment->tutor->last_name }}</p>
                 </div>
                 <div>
-                    <span class="text-sm text-gray-500">Student Name</span>
-                    <p class="font-semibold text-gray-800">{{ $assessment->student ? $assessment->student->first_name . ' ' . $assessment->student->last_name : 'N/A' }}</p>
+                    <span class="text-sm text-gray-500">Assessment Period</span>
+                    <p class="font-semibold text-gray-800">{{ $assessment->assessment_period }}</p>
+                    @if($assessment->assessment_date)
+                        <p class="text-xs text-gray-500">Date: {{ $assessment->assessment_date->format('d M Y') }}</p>
+                    @endif
                 </div>
                 <div>
-                    <span class="text-sm text-gray-500">Total Sessions</span>
-                    <p class="font-semibold text-gray-800">{{ $totalSessions }}</p>
+                    <span class="text-sm text-gray-500">Total Penalties</span>
+                    <p class="font-semibold {{ ($assessment->directorAction?->penalty_amount ?? 0) > 0 ? 'text-red-600' : 'text-green-600' }}">
+                        {{ ($assessment->directorAction?->penalty_amount ?? 0) > 0 ? '₦' . number_format($assessment->directorAction->penalty_amount, 2) : 'None' }}
+                    </p>
                 </div>
-                <div>
-                    <span class="text-sm text-gray-500">Report Period</span>
-                    <p class="font-semibold text-gray-800">Week {{ $assessment->week }}, {{ $assessment->year ?? date('Y') }}</p>
-                </div>
-            </div>
-            <div class="mt-4">
-                <span class="text-sm text-gray-500">Total Penalties</span>
-                <p class="font-semibold {{ ($assessment->directorAction?->penalty_amount ?? 0) > 0 ? 'text-red-600' : 'text-green-600' }}">
-                    {{ ($assessment->directorAction?->penalty_amount ?? 0) > 0 ? '₦' . number_format($assessment->directorAction->penalty_amount, 2) : 'None' }}
-                </p>
             </div>
         </div>
 
@@ -162,6 +157,45 @@
                 <span class="text-lg ml-2">({{ $overallInfo['label'] }})</span>
             </div>
         </div>
+
+        {{-- Penalty Deductions --}}
+        @if(($assessment->punctuality_late_count ?? 0) > 0 || ($assessment->video_off_count ?? 0) > 0)
+        <div class="p-6 border-t">
+            <h3 class="text-lg font-semibold text-red-800 mb-3">Penalty Deductions</h3>
+            @if(($assessment->punctuality_late_count ?? 0) > 0)
+            <div class="flex justify-between py-2 border-b border-gray-200">
+                <span class="text-gray-700">Punctuality — {{ $assessment->punctuality_late_count }} late incident(s)</span>
+                <span class="font-medium text-red-600">₦{{ number_format($assessment->punctuality_penalty ?? 0) }}</span>
+            </div>
+            @endif
+            @if(($assessment->video_off_count ?? 0) > 0)
+            <div class="flex justify-between py-2 border-b border-gray-200">
+                <span class="text-gray-700">Video-off — {{ $assessment->video_off_count }} incident(s)</span>
+                <span class="font-medium text-red-600">₦{{ number_format($assessment->video_penalty ?? 0) }}</span>
+            </div>
+            @endif
+            <div class="flex justify-between py-2 font-bold">
+                <span class="text-gray-900">Total Deductions</span>
+                <span class="text-red-600">₦{{ number_format($assessment->total_penalty_deductions ?? 0) }}</span>
+            </div>
+        </div>
+        @endif
+
+        {{-- Student Chips --}}
+        @if($assessment->student_chips && count($assessment->student_chips) > 0)
+        <div class="p-6 border-t">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Students Assigned</h3>
+            <div class="flex flex-wrap gap-2">
+                @foreach($assessment->student_chips as $chip)
+                    <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-sky-100 border border-sky-200 rounded-full text-sm">
+                        <span class="font-medium text-gray-800">{{ $chip['name'] ?? '' }}</span>
+                        <span class="text-gray-500">({{ $chip['classes_attended'] ?? 0 }}/{{ $chip['total_classes'] ?? 0 }})</span>
+                    </span>
+                @endforeach
+            </div>
+            <p class="text-xs text-gray-400 mt-2">Attendance figures are as of when the assessment was taken ({{ $assessment->assessment_date ? $assessment->assessment_date->format('d M Y') : 'N/A' }}). Classes held after this date are not included.</p>
+        </div>
+        @endif
 
         {{-- Strengths & Weaknesses Summary --}}
         <div class="p-6 bg-amber-50 border-t border-amber-200">
@@ -224,16 +258,37 @@
             </div>
         </div>
 
+        {{-- Manager Comments --}}
+        @if($assessment->strengths || $assessment->weaknesses)
+        <div class="p-6 border-t">
+            <h4 class="font-semibold text-gray-800 mb-3">Manager's Comments</h4>
+            <div class="grid md:grid-cols-2 gap-4">
+                @if($assessment->strengths)
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h5 class="text-sm font-semibold text-green-800 mb-2">Strengths</h5>
+                    <p class="text-green-700 text-sm whitespace-pre-wrap">{{ $assessment->strengths }}</p>
+                </div>
+                @endif
+                @if($assessment->weaknesses)
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h5 class="text-sm font-semibold text-red-800 mb-2">Areas of Concern</h5>
+                    <p class="text-red-700 text-sm whitespace-pre-wrap">{{ $assessment->weaknesses }}</p>
+                </div>
+                @endif
+            </div>
+        </div>
+        @endif
+
         {{-- Director Comment --}}
         @if($assessment->directorAction && $assessment->directorAction->director_comment)
             <div class="p-6 bg-amber-50 border-t border-amber-300">
-                <h4 class="font-semibold text-amber-900 mb-2">🗒️ Director Comment</h4>
-                <p class="text-amber-800 italic">"{{ $assessment->directorAction->director_comment }}"</p>
+                <h4 class="font-semibold text-amber-900 mb-2">Director's Comment</h4>
+                <p class="text-amber-800 italic whitespace-pre-wrap">"{{ $assessment->directorAction->director_comment }}"</p>
             </div>
-        @else
-            <div class="p-6 bg-gray-50 border-t">
-                <h4 class="font-semibold text-gray-600 mb-2">🗒️ Director Comment</h4>
-                <p class="text-gray-500 italic">[No comment provided]</p>
+        @elseif($assessment->director_comment)
+            <div class="p-6 bg-amber-50 border-t border-amber-300">
+                <h4 class="font-semibold text-amber-900 mb-2">Director's Comment</h4>
+                <p class="text-amber-800 italic whitespace-pre-wrap">"{{ $assessment->director_comment }}"</p>
             </div>
         @endif
 

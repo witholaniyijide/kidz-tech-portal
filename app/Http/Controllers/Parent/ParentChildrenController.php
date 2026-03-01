@@ -12,6 +12,7 @@ use App\Models\TutorReport;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ParentChildrenController extends Controller
 {
@@ -24,17 +25,39 @@ class ParentChildrenController extends Controller
 
         // Get all visible children with their tutors and progress
         $children = $user->visibleChildren()
-            ->with(['tutor'])
+            ->with(['tutor', 'currentCourse'])
             ->get()
             ->map(function ($child) {
-                // Use appropriate progression system
-                if ($child->usesExplicitProgression()) {
-                    $child->progress_percentage = $child->getExplicitProgressPercentage();
-                } else {
-                    $child->progress_percentage = $child->progressPercentage();
+                try {
+                    // Use appropriate progression system
+                    if ($child->usesExplicitProgression()) {
+                        $completedProgress = $child->getExplicitProgressPercentage();
+                        // Factor in attendance progress on current course
+                        try {
+                            $currentCourseProgress = $child->getCurrentCourseProgress();
+                            $perCourseWeight = 100 / 12;
+                            $currentCourseContribution = ($currentCourseProgress / 100) * $perCourseWeight;
+                            $child->progress_percentage = min(100, (int) ($completedProgress + $currentCourseContribution));
+                        } catch (\Exception $e) {
+                            $child->progress_percentage = $completedProgress;
+                        }
+                        // Pass current course name for display
+                        $child->current_course_name = $child->currentCourse?->full_name ?? $child->currentCourse?->name;
+                    } else {
+                        $child->progress_percentage = $child->progressPercentage();
+                        $child->current_course_name = null;
+                    }
+                    // Calculate current stage based on course statuses
+                    $child->current_stage = $this->calculateCurrentStage($child);
+                } catch (\Exception $e) {
+                    Log::error('Failed to calculate progress for child', [
+                        'student_id' => $child->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $child->progress_percentage = 0;
+                    $child->current_stage = 1;
+                    $child->current_course_name = null;
                 }
-                // Calculate current stage based on course statuses
-                $child->current_stage = $this->calculateCurrentStage($child);
                 return $child;
             });
 
@@ -90,14 +113,50 @@ class ParentChildrenController extends Controller
         $student->load(['tutor']);
 
         // Get progress percentage using appropriate progression system
-        if ($student->usesExplicitProgression()) {
-            $progressPercentage = $student->getExplicitProgressPercentage();
-        } else {
-            $progressPercentage = $student->progressPercentage();
+        try {
+            if ($student->usesExplicitProgression()) {
+                // Get completed courses progress (e.g., 1/12 = 8%)
+                $completedProgress = $student->getExplicitProgressPercentage();
+
+                // Also factor in attendance progress on current course
+                // Each course is worth ~8.3% (100/12), so partial attendance adds partial credit
+                try {
+                    $currentCourseProgress = $student->getCurrentCourseProgress();
+                    $perCourseWeight = 100 / 12;
+                    $currentCourseContribution = ($currentCourseProgress / 100) * $perCourseWeight;
+                    $progressPercentage = min(100, (int) ($completedProgress + $currentCourseContribution));
+                } catch (\Exception $e) {
+                    Log::warning('Attendance progress failed, using completed-only progress', [
+                        'student_id' => $student->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $progressPercentage = $completedProgress;
+                }
+            } else {
+                $progressPercentage = $student->progressPercentage();
+            }
+        } catch (\Exception $e) {
+            Log::error('Explicit progress failed, trying legacy', [
+                'student_id' => $student->id,
+                'error' => $e->getMessage(),
+            ]);
+            try {
+                $progressPercentage = $student->progressPercentage();
+            } catch (\Exception $e2) {
+                $progressPercentage = 0;
+            }
         }
 
         // Calculate current stage dynamically
-        $currentStage = $this->calculateCurrentStage($student);
+        try {
+            $currentStage = $this->calculateCurrentStage($student);
+        } catch (\Exception $e) {
+            Log::error('Failed to calculate current stage', [
+                'student_id' => $student->id,
+                'error' => $e->getMessage(),
+            ]);
+            $currentStage = 1;
+        }
 
         // Get all progress milestones
         $milestones = StudentProgress::where('student_id', $student->id)
@@ -105,16 +164,41 @@ class ParentChildrenController extends Controller
             ->get();
 
         // Get director-approved reports
-        $reports = $student->approvedReports()
-            ->with(['tutor'])
-            ->take(5)
-            ->get();
+        try {
+            $reports = $student->approvedReports()
+                ->with(['tutor'])
+                ->take(5)
+                ->get();
+        } catch (\Exception $e) {
+            Log::error('Failed to load approved reports', [
+                'student_id' => $student->id,
+                'error' => $e->getMessage(),
+            ]);
+            $reports = collect();
+        }
 
         // Get curriculum roadmap
-        $curriculumRoadmap = $this->getCurriculumRoadmap($student);
+        try {
+            $curriculumRoadmap = $this->getCurriculumRoadmap($student);
+        } catch (\Exception $e) {
+            Log::error('Failed to load curriculum roadmap', [
+                'student_id' => $student->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            $curriculumRoadmap = [];
+        }
 
         // Format class schedule
-        $classSchedule = $this->formatClassSchedule($student);
+        try {
+            $classSchedule = $this->formatClassSchedule($student);
+        } catch (\Exception $e) {
+            Log::error('Failed to format class schedule', [
+                'student_id' => $student->id,
+                'error' => $e->getMessage(),
+            ]);
+            $classSchedule = [];
+        }
 
         return view('parent.children.show', compact(
             'student',
@@ -177,22 +261,53 @@ class ParentChildrenController extends Controller
 
         // Check for auto-completion of current course based on attendance
         if ($student->usesExplicitProgression()) {
-            $student->autoCompleteCourseIfReady();
-            // Refresh the student to get updated statuses
-            $student->refresh();
+            try {
+                $student->autoCompleteCourseIfReady();
+                $student->refresh();
+            } catch (\Exception $e) {
+                Log::warning('Auto-complete check failed, continuing with current state', [
+                    'student_id' => $student->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         // Use explicit progression if student has it, otherwise fall back to legacy
+        $curriculumWithStatuses = null;
+        $currentCourseProgress = 0;
+
         if ($student->usesExplicitProgression()) {
-            $curriculumWithStatuses = $student->getExplicitCurriculumWithStatuses();
-        } else {
-            $curriculumWithStatuses = $student->getCurriculumWithStatuses();
+            // Load curriculum and progress independently so one failure doesn't kill the other
+            try {
+                $curriculumWithStatuses = $student->getExplicitCurriculumWithStatuses();
+            } catch (\Exception $e) {
+                Log::error('Explicit curriculum failed, falling back to legacy', [
+                    'student_id' => $student->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                $curriculumWithStatuses = null;
+            }
+
+            try {
+                $currentCourseProgress = $student->getCurrentCourseProgress();
+            } catch (\Exception $e) {
+                Log::warning('Attendance-based progress calculation failed', [
+                    'student_id' => $student->id,
+                    'error' => $e->getMessage(),
+                ]);
+                $currentCourseProgress = $student->roadmap_progress ?? 0;
+            }
         }
 
-        // Get attendance-based progress for current course (for explicit system)
-        $currentCourseProgress = $student->usesExplicitProgression()
-            ? $student->getCurrentCourseProgress()
-            : ($student->roadmap_progress ?? 0);
+        // Fall back to legacy system if explicit curriculum failed or student uses legacy
+        if ($curriculumWithStatuses === null) {
+            $curriculumWithStatuses = $student->getCurriculumWithStatuses();
+            // Only override progress if we didn't already get it from explicit system
+            if (!$student->usesExplicitProgression()) {
+                $currentCourseProgress = $student->roadmap_progress ?? 0;
+            }
+        }
 
         $courses = [];
         foreach ($curriculumWithStatuses as $course) {

@@ -43,11 +43,9 @@ class AssessmentRating extends Model
     {
         return match ($this->rating) {
             'Excellent' => 90,
-            'On Time' => 90,
             'Good' => 70,
             'Acceptable' => 55,
             'Needs Improvement' => 20,
-            'Late' => 20,
             'Unacceptable' => 0,
             default => 0
         };

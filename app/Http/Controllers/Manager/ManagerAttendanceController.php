@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AttendanceRecord;
 use App\Models\Student;
 use App\Models\Tutor;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -288,6 +289,9 @@ class ManagerAttendanceController extends Controller
             }
         });
 
+        // Notify directors about the approved attendance (in-app only)
+        app(NotificationService::class)->notifyDirectorAttendanceApproved($attendance);
+
         if ($wasAutoCompleted) {
             return redirect()->back()->with('success', 'Attendance approved. Student\'s current course has been marked as complete based on attendance count.');
         }
@@ -320,7 +324,9 @@ class ManagerAttendanceController extends Controller
             return redirect()->back()->with('error', 'No records selected.');
         }
 
-        \DB::transaction(function () use ($ids) {
+        $approvedRecords = collect();
+
+        \DB::transaction(function () use ($ids, &$approvedRecords) {
             $records = AttendanceRecord::whereIn('id', $ids)
                 ->where('status', 'pending')
                 ->get();
@@ -336,7 +342,15 @@ class ManagerAttendanceController extends Controller
                     $attendance->student->increment('completed_periods', 1);
                 }
             }
+
+            $approvedRecords = $records;
         });
+
+        // Notify directors about approved attendance records (in-app only)
+        $notificationService = app(NotificationService::class);
+        foreach ($approvedRecords as $attendance) {
+            $notificationService->notifyDirectorAttendanceApproved($attendance);
+        }
 
         return redirect()->back()->with('success', 'Selected attendance records approved successfully.');
     }

@@ -10,6 +10,7 @@ use App\Models\Tutor;
 use App\Models\User;
 use App\Models\ManagerNotification;
 use App\Models\AdminNotification;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -302,7 +303,10 @@ class AttendanceController extends Controller
             ]);
         }
 
-        $message = $isActuallyStandIn 
+        // Notify directors about the submitted attendance (in-app only)
+        app(NotificationService::class)->notifyDirectorAttendanceSubmitted($attendance);
+
+        $message = $isActuallyStandIn
             ? 'Stand-in attendance submitted successfully! Awaiting manager approval.'
             : 'Attendance submitted successfully! Awaiting manager approval.';
 

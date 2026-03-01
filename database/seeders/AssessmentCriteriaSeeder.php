@@ -18,7 +18,9 @@ class AssessmentCriteriaSeeder extends Seeder
                 'name' => 'Punctuality',
                 'description' => 'Measures if the tutor joins sessions on time',
                 'options' => ['Excellent', 'Good', 'Acceptable', 'Needs Improvement'],
-                'penalty_rules' => [],
+                'penalty_rules' => [
+                    'Needs Improvement' => ['amount' => 500, 'perIncident' => true, 'label' => '₦500 per late incident']
+                ],
                 'display_order' => 1,
             ],
             [
@@ -26,7 +28,9 @@ class AssessmentCriteriaSeeder extends Seeder
                 'name' => 'Video-on Etiquette',
                 'description' => 'Measures if the tutor keeps video on during sessions',
                 'options' => ['Excellent', 'Good', 'Acceptable', 'Needs Improvement'],
-                'penalty_rules' => [],
+                'penalty_rules' => [
+                    'Needs Improvement' => ['amount' => 1000, 'perIncident' => true, 'label' => '₦1,000 per video-off incident']
+                ],
                 'display_order' => 2,
             ],
             [

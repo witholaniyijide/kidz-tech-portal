@@ -10,6 +10,7 @@ use App\Models\Tutor;
 use App\Models\Student;
 use App\Models\DirectorNotification;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -81,6 +82,51 @@ class AssessmentController extends Controller
     }
 
     /**
+     * Get students assigned to a tutor with attendance data for a given month.
+     */
+    public function tutorStudents(Request $request, Tutor $tutor)
+    {
+        $month = $request->query('month', date('Y-m'));
+
+        // Parse month to get date range
+        try {
+            $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+            $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        } catch (\Exception $e) {
+            $startDate = Carbon::now()->startOfMonth();
+            $endDate = Carbon::now()->endOfMonth();
+        }
+
+        $students = Student::where('tutor_id', $tutor->id)
+            ->where('status', 'active')
+            ->orderBy('first_name')
+            ->get();
+
+        $result = $students->map(function ($student) use ($tutor, $startDate, $endDate) {
+            // Count approved attendance records for this student with this tutor in the month
+            $classesAttended = \App\Models\AttendanceRecord::where('student_id', $student->id)
+                ->where('tutor_id', $tutor->id)
+                ->where('status', 'approved')
+                ->whereBetween('class_date', [$startDate, $endDate])
+                ->count();
+
+            // Calculate expected classes from student's classes_per_week
+            $classesPerWeek = $student->classes_per_week ?? 0;
+            $weeksInMonth = $startDate->diffInWeeks($endDate) + 1;
+            $totalClasses = $classesPerWeek * $weeksInMonth;
+
+            return [
+                'id' => $student->id,
+                'name' => $student->first_name . ' ' . $student->last_name,
+                'classes_attended' => $classesAttended,
+                'total_classes' => $totalClasses,
+            ];
+        });
+
+        return response()->json(['students' => $result]);
+    }
+
+    /**
      * Store a newly created assessment.
      */
     public function store(Request $request)
@@ -94,7 +140,7 @@ class AssessmentController extends Controller
                 'class_date' => 'nullable|date',
                 'week' => 'nullable|integer|min:1|max:53',
                 'year' => 'nullable|integer',
-                'performance_score' => 'nullable|integer|min:0|max:100',
+                'performance_score' => 'nullable|numeric|min:0|max:100',
                 'professionalism_rating' => 'nullable|integer|min:1|max:5',
                 'communication_rating' => 'nullable|integer|min:1|max:5',
                 'punctuality_rating' => 'nullable|integer|min:1|max:5',
@@ -259,16 +305,8 @@ class AssessmentController extends Controller
             }
 
             $validated = $request->validate([
-                'performance_score' => 'nullable|integer|min:0|max:100',
-                'professionalism_rating' => 'nullable|integer|min:1|max:5',
-                'communication_rating' => 'nullable|integer|min:1|max:5',
-                'punctuality_rating' => 'nullable|integer|min:1|max:5',
                 'strengths' => 'nullable|string|max:2000',
                 'weaknesses' => 'nullable|string|max:2000',
-                'recommendations' => 'nullable|string|max:2000',
-                'manager_comment' => 'nullable|string|max:2000',
-                'criteria_assessed' => 'nullable|array',
-                'criteria_ratings' => 'nullable|array',
             ]);
 
             $assessment->update($validated);
@@ -322,29 +360,10 @@ class AssessmentController extends Controller
                     'status' => 'pending_review',
                     'approved_by_manager_at' => now(),
                 ]);
-
-                // Notify all directors
-                $directors = User::whereHas('roles', function($q) {
-                    $q->where('name', 'director');
-                })->get();
-
-                $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'Unknown Tutor';
-                $monthLabel = $assessment->assessment_period;
-
-                foreach ($directors as $director) {
-                    DirectorNotification::create([
-                        'user_id' => $director->id,
-                        'title' => 'Assessment Ready for Review',
-                        'body' => "Assessment for {$tutorName} — {$monthLabel} is pending your review.",
-                        'type' => 'assessment',
-                        'is_read' => false,
-                        'meta' => [
-                            'assessment_id' => $assessment->id,
-                            'link' => route('director.assessments.show', $assessment->id),
-                        ],
-                    ]);
-                }
             });
+
+            // Notify all directors (in-app + email for assessment forwarded)
+            app(NotificationService::class)->notifyDirectorAssessmentForwarded($assessment);
 
             return redirect()
                 ->route('manager.assessments.index')

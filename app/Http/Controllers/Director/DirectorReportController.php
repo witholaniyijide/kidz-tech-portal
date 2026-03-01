@@ -395,4 +395,44 @@ class DirectorReportController extends Controller
 
         return response()->json(['success' => true, 'text' => $text]);
     }
+
+    /**
+     * Bulk approve multiple reports pending director approval.
+     */
+    public function bulkApprove(Request $request)
+    {
+        $validated = $request->validate([
+            'report_ids' => 'required|array|min:1',
+            'report_ids.*' => 'exists:tutor_reports,id',
+        ]);
+
+        $reports = TutorReport::whereIn('id', $validated['report_ids'])
+            ->where('status', 'approved-by-manager')
+            ->with(['student', 'tutor'])
+            ->get();
+
+        if ($reports->isEmpty()) {
+            return redirect()->back()->with('error', 'No eligible reports found to approve.');
+        }
+
+        $approvedCount = 0;
+
+        foreach ($reports as $report) {
+            try {
+                $this->approvalService->approveTutorReport(
+                    $report,
+                    Auth::user(),
+                    null,
+                    null
+                );
+                $approvedCount++;
+            } catch (\Exception $e) {
+                \Log::error("Failed to bulk approve report {$report->id}: " . $e->getMessage());
+            }
+        }
+
+        return redirect()
+            ->route('director.reports.index')
+            ->with('success', "{$approvedCount} report(s) approved successfully.");
+    }
 }

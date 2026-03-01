@@ -39,15 +39,7 @@
                     <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
                         <div>
                             <h2 class="text-2xl font-semibold text-gray-800 dark:text-white" x-text="editing ? 'Edit Assessment' : 'New Assessment'"></h2>
-                            <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">Split across 3 sessions - you may save partial progress and complete later</p>
-                        </div>
-                        <div class="flex gap-3 items-center">
-                            <label class="text-gray-500 font-medium text-sm">Session</label>
-                            <select x-model="session" class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:border-[#C15F3C] focus:ring-[#C15F3C]">
-                                <option value="1">Session 1</option>
-                                <option value="2">Session 2</option>
-                                <option value="3">Session 3</option>
-                            </select>
+                            <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">Monthly tutor performance assessment</p>
                         </div>
                     </div>
 
@@ -81,23 +73,19 @@
                         </div>
 
                         {{-- Student Chips --}}
-                        <div x-show="formData.tutor_id && tutorStudents.length > 0" x-transition class="mb-6">
-                            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Students assigned to this tutor this month</h3>
-                            <div class="flex flex-wrap gap-2">
+                        <div x-show="formData.tutor_id" x-transition class="mb-6">
+                            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Students assigned to this tutor</h3>
+                            <div x-show="loadingStudents" class="text-sm text-gray-400 italic py-2">Loading attendance data...</div>
+                            <div x-show="!loadingStudents && tutorStudents.length > 0" class="flex flex-wrap gap-2">
                                 <template x-for="student in tutorStudents" :key="student.id">
                                     <div class="flex items-center gap-2 bg-[#C15F3C]/10 dark:bg-[#C15F3C]/20 border border-[#C15F3C]/30 rounded-full px-3 py-1.5">
                                         <span class="text-sm font-medium text-gray-800 dark:text-white" x-text="student.name"></span>
-                                        <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                                            <span>(</span>
-                                            <input type="number" x-model.number="student.classes_attended" min="0" :max="student.total_classes" class="w-8 text-center border-b border-gray-400 bg-transparent text-xs focus:outline-none focus:border-[#C15F3C]">
-                                            <span>/</span>
-                                            <input type="number" x-model.number="student.total_classes" min="0" class="w-8 text-center border-b border-gray-400 bg-transparent text-xs focus:outline-none focus:border-[#C15F3C]">
-                                            <span>)</span>
-                                        </div>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400" x-text="'(' + student.classes_attended + '/' + student.total_classes + ')'"></span>
                                     </div>
                                 </template>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Format: Name (classes attended / total classes this month)</p>
+                            <div x-show="!loadingStudents && formData.tutor_id && tutorStudents.length === 0" class="text-sm text-gray-400 italic py-2">No active students assigned to this tutor</div>
+                            <p class="text-xs text-gray-400 mt-2">Format: Name (approved classes attended / scheduled classes). Attendance data is as of the assessment date.</p>
                         </div>
 
                         {{-- Criteria Selection - 8 criteria --}}
@@ -176,29 +164,28 @@
                         {{-- Comments Section --}}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Tutor Performance Comments</label>
-                                <textarea x-model="formData.strengths" placeholder="Document tutor's performance, notable observations..."
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Strengths</label>
+                                <textarea x-model="formData.strengths" placeholder="Document tutor's strengths, notable observations..."
                                           class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl p-3 h-32 focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]"></textarea>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Areas for Improvement</label>
-                                <textarea x-model="formData.weaknesses" placeholder="Notes for improvement areas..."
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Areas of Concern</label>
+                                <textarea x-model="formData.weaknesses" placeholder="Notes for areas of concern..."
                                           class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl p-3 h-32 focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]"></textarea>
                             </div>
                         </div>
 
-                        {{-- Recommendations --}}
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Recommendations</label>
-                            <textarea x-model="formData.recommendations" placeholder="Any recommendations for the tutor..."
-                                      class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl p-3 h-24 focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]"></textarea>
-                        </div>
-
-                        {{-- Performance Score --}}
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Performance Score (0-100)</label>
-                            <input type="number" x-model="formData.performance_score" min="0" max="100" placeholder="Enter overall score"
-                                   class="w-full md:w-48 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#C15F3C] focus:border-[#C15F3C]">
+                        {{-- Auto-calculated Performance Score --}}
+                        <div class="mb-6" x-show="Object.keys(ratings).length > 0">
+                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Performance Score (auto-calculated)</label>
+                            <div class="flex items-center gap-3">
+                                <span class="text-3xl font-bold" :class="{
+                                    'text-green-600': calculatedScore >= 70,
+                                    'text-amber-600': calculatedScore >= 50 && calculatedScore < 70,
+                                    'text-red-600': calculatedScore < 50
+                                }" x-text="calculatedScore + '%'"></span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400" x-text="'(' + calculatedScoreLabel + ')'"></span>
+                            </div>
                         </div>
 
                         {{-- Action Buttons --}}
@@ -223,22 +210,7 @@
                 <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
                     <div>
                         <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">Dashboard</h2>
-                        <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm" x-text="dashboardWeekDisplay"></p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button @click="changeWeek(-1)" class="p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all">
-                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
-                        <div class="px-4 py-2 bg-gradient-to-r from-[#C15F3C] to-[#DA7756] text-white rounded-lg font-medium min-w-[200px] text-center">
-                            <span x-text="'Week ' + weekView + ' (' + weekDateRange + ')'"></span>
-                        </div>
-                        <button @click="changeWeek(1)" class="p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all">
-                            <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
+                        <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">Monthly tutor assessments overview</p>
                     </div>
                 </div>
 
@@ -259,6 +231,7 @@
                             <select x-model="dashFilterStatus" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C]">
                                 <option value="">All Status</option>
                                 <option value="draft">Draft</option>
+                                <option value="submitted">Submitted</option>
                                 <option value="approved-by-manager">Awaiting Director</option>
                             </select>
                         </div>
@@ -275,7 +248,8 @@
                     @forelse($assessments->filter(function ($a) {
                         return in_array($a->status, ['draft', 'submitted', 'approved-by-manager']);
                     }) as $assessment)
-                        <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 border-l-4 {{ $assessment->status === 'draft' ? 'border-l-amber-400' : 'border-l-[#C15F3C]' }}">
+                        <div x-show="(!dashFilterTutor || dashFilterTutor == '{{ $assessment->tutor_id }}') && (!dashFilterStatus || dashFilterStatus === '{{ $assessment->status }}')"
+                             class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 border-l-4 {{ $assessment->status === 'draft' ? 'border-l-amber-400' : 'border-l-[#C15F3C]' }}">
                             <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
                                 <div class="flex-1">
                                     <div class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2 flex-wrap">
@@ -295,7 +269,10 @@
                                         </div>
                                     @endif
                                     <div class="text-gray-500 dark:text-gray-400 text-sm">
-                                        {{ $assessment->assessment_month }} | Session {{ $assessment->session ?? 1 }}
+                                        {{ $assessment->assessment_period }}
+                                        @if($assessment->assessment_date)
+                                            | {{ $assessment->assessment_date->format('d M Y') }}
+                                        @endif
                                     </div>
                                     @if($assessment->performance_score)
                                         <div class="mt-2 flex items-center gap-2">
@@ -423,7 +400,7 @@
 
                 {{-- Filters --}}
                 <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-sm p-5 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Tutor</label>
                             <select x-model="completedFilters.tutor" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
@@ -434,21 +411,17 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Student</label>
-                            <select x-model="completedFilters.student" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
-                                <option value="">All Students</option>
-                                @foreach(\App\Models\Student::orderBy('first_name')->get() as $student)
-                                    <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
                             <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Month</label>
                             <input type="month" x-model="completedFilters.month" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Week</label>
-                            <input type="week" x-model="completedFilters.week" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
+                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Year</label>
+                            <select x-model="completedFilters.year" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 rounded-lg focus:ring-[#C15F3C] focus:border-[#C15F3C] text-sm">
+                                <option value="">All Years</option>
+                                @for($y = date('Y'); $y >= date('Y') - 2; $y--)
+                                    <option value="{{ $y }}">{{ $y }}</option>
+                                @endfor
+                            </select>
                         </div>
                         <div class="flex items-end">
                             <button @click="clearCompletedFilters()" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all text-sm">
@@ -529,19 +502,45 @@
     </div>
 
     @php
-        // Prepare criteria data for JavaScript (moved out of @json for Blade compatibility)
-        $criteriaForJs = $criteria->map(function($c) {
-            $penaltyLabels = [];
-            foreach ($c->penalty_rules ?? [] as $rating => $rule) {
-                if (isset($rule['label'])) {
-                    $penaltyLabels[] = $rule['label'];
+        // Standard rating options (ensures DB is not stale)
+        $standardOptions = ['Excellent', 'Good', 'Acceptable', 'Needs Improvement'];
+        $professionalOptions = ['Excellent', 'Good', 'Acceptable', 'Needs Improvement', 'Unacceptable'];
+
+        // Prepare criteria data for JavaScript
+        $criteriaForJs = $criteria->map(function($c) use ($standardOptions, $professionalOptions) {
+            // Override options to ensure correct scale for all criteria
+            $options = $c->code === 'professional' ? $professionalOptions : $standardOptions;
+
+            // Build penalty label from penalty_rules
+            $penaltyLabel = 'No penalty';
+            $rules = $c->penalty_rules;
+            if (!empty($rules) && is_array($rules)) {
+                $labels = [];
+                foreach ($rules as $rating => $rule) {
+                    // Skip countThreshold-only rules (internal tracking, not displayed as penalty tags)
+                    if (isset($rule['countThreshold']) && !isset($rule['amount']) && !isset($rule['halfPay'])) {
+                        continue;
+                    }
+                    if (isset($rule['label'])) {
+                        $labels[] = "Penalty: {$rule['label']}";
+                    } elseif (isset($rule['amount'])) {
+                        $labels[] = "Penalty: ₦" . number_format($rule['amount']);
+                    } elseif (isset($rule['halfPay']) && $rule['halfPay']) {
+                        $labels[] = "Penalty: Half pay deduction";
+                    } elseif (isset($rule['action'])) {
+                        $labels[] = "Penalty: {$rule['action']}";
+                    }
+                }
+                if (!empty($labels)) {
+                    $penaltyLabel = implode(' | ', $labels);
                 }
             }
+
             return [
                 'id' => $c->code,
                 'name' => $c->name,
-                'penalty' => implode(', ', $penaltyLabels) ?: 'No penalty',
-                'options' => $c->options,
+                'penalty' => $penaltyLabel,
+                'options' => $options,
             ];
         })->values()->toArray();
     @endphp
@@ -551,13 +550,6 @@
             return {
                 view: 'dashboard',
                 editing: null,
-                session: 1,
-                weekView: {{ date('W') }},
-                weekYear: {{ date('Y') }},
-                weekDateRange: '',
-                dashboardWeekDisplay: '',
-                selectedTutorName: '',
-                weekDisplay: '',
 
                 stats: {
                     total: {{ $stats['total'] }},
@@ -571,14 +563,40 @@
                     assessment_month: new Date().toISOString().slice(0, 7),
                     assessment_date: new Date().toISOString().split('T')[0],
                     year: {{ date('Y') }},
-                    performance_score: '',
                     strengths: '',
                     weaknesses: '',
-                    recommendations: ''
                 },
 
                 tutorStudents: [],
+                loadingStudents: false,
                 incidentCounts: { punctualityLate: 0, videoOff: 0 },
+
+                // Rating-to-percentage mapping (must match AssessmentRating model)
+                ratingPercentages: {
+                    'Excellent': 90,
+                    'Good': 70,
+                    'Acceptable': 55,
+                    'Needs Improvement': 20,
+                    'Unacceptable': 0
+                },
+
+                get calculatedScore() {
+                    const ratedCriteria = Object.keys(this.ratings).filter(k => this.ratings[k]);
+                    if (ratedCriteria.length === 0) return 0;
+                    let total = 0;
+                    ratedCriteria.forEach(k => {
+                        total += this.ratingPercentages[this.ratings[k]] ?? 0;
+                    });
+                    return Math.round((total / ratedCriteria.length) * 10) / 10;
+                },
+
+                get calculatedScoreLabel() {
+                    const s = this.calculatedScore;
+                    if (s >= 90) return 'Excellent';
+                    if (s >= 70) return 'Good';
+                    if (s >= 50) return 'Acceptable';
+                    return 'Needs Improvement';
+                },
 
                 // 8 Assessment Criteria from database
                 criteria: @json($criteriaForJs),
@@ -599,21 +617,50 @@
                     this.criteria.forEach(c => {
                         this.checkedCriteria[c.id] = false;
                     });
-                    this.updateWeekDateRange();
                 },
 
-                loadTutorStudents() {
-                    const students = @json($students ?? []);
+                async loadTutorStudents() {
                     const tutorId = parseInt(this.formData.tutor_id);
                     if (!tutorId) { this.tutorStudents = []; return; }
-                    this.tutorStudents = students
-                        .filter(s => s.tutor_id == tutorId && s.status === 'active')
-                        .map(s => ({
-                            id: s.id,
-                            name: s.first_name + ' ' + s.last_name,
-                            classes_attended: 0,
-                            total_classes: 0
-                        }));
+
+                    this.loadingStudents = true;
+                    try {
+                        const month = this.formData.assessment_month || new Date().toISOString().slice(0, 7);
+                        const response = await fetch(`{{ url('manager/assessments/tutor-students') }}/${tutorId}?month=${month}`, {
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.tutorStudents = data.students || [];
+                        } else {
+                            // Fallback to local student data
+                            const students = @json($students ?? []);
+                            this.tutorStudents = students
+                                .filter(s => s.tutor_id == tutorId && s.status === 'active')
+                                .map(s => ({
+                                    id: s.id,
+                                    name: s.first_name + ' ' + s.last_name,
+                                    classes_attended: 0,
+                                    total_classes: 0
+                                }));
+                        }
+                    } catch (e) {
+                        console.error('Error loading students:', e);
+                        const students = @json($students ?? []);
+                        this.tutorStudents = students
+                            .filter(s => s.tutor_id == tutorId && s.status === 'active')
+                            .map(s => ({
+                                id: s.id,
+                                name: s.first_name + ' ' + s.last_name,
+                                classes_attended: 0,
+                                total_classes: 0
+                            }));
+                    } finally {
+                        this.loadingStudents = false;
+                    }
                 },
 
                 showToast(message, type = 'success') {
@@ -627,10 +674,8 @@
                         assessment_month: new Date().toISOString().slice(0, 7),
                         assessment_date: new Date().toISOString().split('T')[0],
                         year: {{ date('Y') }},
-                        performance_score: '',
                         strengths: '',
                         weaknesses: '',
-                        recommendations: ''
                     };
                     this.tutorStudents = [];
                     this.incidentCounts = { punctualityLate: 0, videoOff: 0 };
@@ -670,41 +715,21 @@
 
                 completedFilters: {
                     tutor: '',
-                    student: '',
                     month: '',
-                    week: '',
+                    year: '',
                 },
 
                 get filteredCompletedAssessments() {
                     return this.completedAssessments.filter(assessment => {
-                        // Filter by tutor
                         if (this.completedFilters.tutor && assessment.tutor_id != this.completedFilters.tutor) {
                             return false;
                         }
-
-                        // Filter by student
-                        if (this.completedFilters.student && assessment.student_id != this.completedFilters.student) {
+                        if (this.completedFilters.month && assessment.assessment_month !== this.completedFilters.month) {
                             return false;
                         }
-
-                        // Filter by month (YYYY-MM format)
-                        if (this.completedFilters.month) {
-                            const assessmentDate = new Date(assessment.class_date);
-                            const filterDate = new Date(this.completedFilters.month + '-01');
-                            if (assessmentDate.getFullYear() !== filterDate.getFullYear() ||
-                                assessmentDate.getMonth() !== filterDate.getMonth()) {
-                                return false;
-                            }
+                        if (this.completedFilters.year && assessment.year != this.completedFilters.year) {
+                            return false;
                         }
-
-                        // Filter by week (YYYY-WXX format)
-                        if (this.completedFilters.week) {
-                            const [filterYear, filterWeek] = this.completedFilters.week.split('-W');
-                            if (assessment.year != filterYear || assessment.week != filterWeek) {
-                                return false;
-                            }
-                        }
-
                         return true;
                     });
                 },
@@ -712,9 +737,8 @@
                 clearCompletedFilters() {
                     this.completedFilters = {
                         tutor: '',
-                        student: '',
                         month: '',
-                        week: '',
+                        year: '',
                     };
                 },
 
@@ -741,6 +765,7 @@
                     try {
                         const payload = {
                             ...this.formData,
+                            performance_score: this.calculatedScore,
                             criteria_assessed: Object.keys(this.checkedCriteria).filter(k => this.checkedCriteria[k]),
                             criteria_ratings: this.ratings,
                             action: action, // 'draft' or 'send'

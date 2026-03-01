@@ -11,6 +11,7 @@ use App\Models\Tutor;
 use App\Models\TutorNotification;
 use App\Models\ManagerNotification;
 use App\Services\DirectorApprovalService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -89,11 +90,6 @@ class DirectorAssessmentController extends Controller
             ->orderBy('year', 'desc')
             ->pluck('year');
 
-        // Get students for filter
-        $students = \App\Models\Student::where('status', 'active')
-            ->orderBy('first_name')
-            ->get();
-
         // Get assessment criteria
         $criteria = AssessmentCriteria::active()->ordered()->get();
 
@@ -116,7 +112,6 @@ class DirectorAssessmentController extends Controller
             'months',
             'years',
             'tutors',
-            'students',
             'criteria',
             'stats',
             'chartData'
@@ -295,6 +290,9 @@ class DirectorAssessmentController extends Controller
                 // Notify tutor
                 $this->notifyTutor($assessment, $validated['penalty_amount'], $validated['director_comment'] ?? null);
 
+                // Notify managers that assessment was approved (in-app + email)
+                app(NotificationService::class)->notifyAssessmentApproved($assessment);
+
                 // Log the action
                 $this->approvalService->logDirectorAction(
                     Auth::user(),
@@ -358,6 +356,9 @@ class DirectorAssessmentController extends Controller
 
                 // Notify tutor
                 $this->notifyTutor($assessment, 0, $validated['director_comment'] ?? null);
+
+                // Notify managers that assessment was approved (in-app + email)
+                app(NotificationService::class)->notifyAssessmentApproved($assessment);
 
                 // Log the action
                 $this->approvalService->logDirectorAction(
@@ -433,6 +434,89 @@ class DirectorAssessmentController extends Controller
                     'link' => route('manager.assessments.show', $assessment->id),
                 ],
             ]);
+        }
+    }
+
+    /**
+     * Delete a submitted (not yet approved) assessment.
+     * This removes it entirely and notifies the manager who created it.
+     */
+    public function destroy(Request $request, TutorAssessment $assessment)
+    {
+        // Authorize
+        $this->authorize('delete', $assessment);
+
+        // Only allow deleting assessments that are NOT yet approved by director
+        if ($assessment->status === 'approved-by-director') {
+            return redirect()
+                ->route('director.assessments.index')
+                ->with('error', 'Cannot delete an assessment that has already been approved by the director.');
+        }
+
+        $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'Unknown Tutor';
+        $monthLabel = $assessment->assessment_period;
+        $managerId = $assessment->manager_id;
+        $assessmentId = $assessment->id;
+
+        try {
+            DB::transaction(function () use ($assessment, $tutorName, $monthLabel, $managerId, $assessmentId, $request) {
+                // Delete associated ratings
+                $assessment->ratings()->delete();
+
+                // Delete associated director action if any
+                if ($assessment->directorAction) {
+                    $assessment->directorAction->delete();
+                }
+
+                // Delete the assessment
+                $assessment->delete();
+
+                // Notify the manager who created this assessment
+                if ($managerId) {
+                    ManagerNotification::create([
+                        'user_id' => $managerId,
+                        'title' => 'Assessment Deleted by Director',
+                        'body' => "The assessment for {$tutorName} — {$monthLabel} has been deleted by the Director." . ($request->input('reason') ? " Reason: " . $request->input('reason') : ''),
+                        'type' => 'assessment',
+                        'is_read' => false,
+                        'meta' => [
+                            'assessment_id' => $assessmentId,
+                            'action' => 'deleted',
+                        ],
+                    ]);
+
+                    // Send email notification to the manager
+                    try {
+                        $manager = \App\Models\User::find($managerId);
+                        if ($manager && $manager->notify_email && $manager->email) {
+                            app(\App\Services\NotificationService::class)->sendAssessmentDeletedEmail(
+                                $manager,
+                                $tutorName,
+                                $monthLabel,
+                                $request->input('reason')
+                            );
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send assessment deleted email: ' . $e->getMessage());
+                    }
+                }
+
+                // Log the action
+                $this->approvalService->logDirectorAction(
+                    Auth::user(),
+                    'deleted_assessment',
+                    TutorAssessment::class,
+                    $assessmentId
+                );
+            });
+
+            return redirect()
+                ->route('director.assessments.index')
+                ->with('success', "Assessment for {$tutorName} — {$monthLabel} has been deleted.");
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to delete assessment: ' . $e->getMessage());
         }
     }
 
