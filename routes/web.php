@@ -427,6 +427,8 @@ Route::prefix('manager')
             ->name('tutor-reports.print');
         Route::get('/tutor-reports/{report}/whatsapp', [App\Http\Controllers\Manager\ReportReviewController::class, 'exportWhatsApp'])
             ->name('tutor-reports.whatsapp');
+        Route::get('/tutor-reports-export', [App\Http\Controllers\Manager\ReportReviewController::class, 'exportExcel'])
+            ->name('tutor-reports.export');
 
         // Notice Board (can create, with restrictions)
         Route::get('/notices', [App\Http\Controllers\Manager\ManagerNoticeController::class, 'index'])
