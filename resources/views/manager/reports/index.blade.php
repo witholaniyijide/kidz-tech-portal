@@ -107,7 +107,9 @@
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                 <select name="status" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#C15F3C] focus:ring-[#C15F3C]">
                     <option value="">All Status</option>
+                    <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
                     <option value="submitted" {{ request('status') == 'submitted' ? 'selected' : '' }}>Pending</option>
+                    <option value="returned" {{ request('status') == 'returned' ? 'selected' : '' }}>Returned</option>
                     <option value="approved-by-manager" {{ request('status') == 'approved-by-manager' ? 'selected' : '' }}>Approved</option>
                     <option value="approved-by-director" {{ request('status') == 'approved-by-director' ? 'selected' : '' }}>Completed</option>
                 </select>
@@ -146,12 +148,25 @@
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Report List</h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400">{{ $reports->total() }} reports found</p>
                 </div>
-                <div x-show="selectedIds.length > 0" x-transition class="flex items-center gap-3">
-                    <span class="text-sm text-gray-600 dark:text-gray-400" x-text="selectedIds.length + ' selected'"></span>
-                    <button @click="submitBulkApprove()" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Approve Selected
-                    </button>
+                <div class="flex items-center gap-3">
+                    {{-- Export Button --}}
+                    <a href="{{ route('manager.tutor-reports.export', request()->query()) }}"
+                       class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-all shadow-md"
+                       title="Export to Excel (includes late submission tracking)">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Export Excel
+                    </a>
+
+                    {{-- Bulk Approve --}}
+                    <div x-show="selectedIds.length > 0" x-transition class="flex items-center gap-3">
+                        <span class="text-sm text-gray-600 dark:text-gray-400" x-text="selectedIds.length + ' selected'"></span>
+                        <button @click="submitBulkApprove()" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Approve Selected
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

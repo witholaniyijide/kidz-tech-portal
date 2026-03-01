@@ -42,7 +42,7 @@ class DirectorApprovalService
             // Ensure relationships are loaded
             $report->loadMissing(['student', 'tutor']);
             $studentName = $report->student
-                ? "{$studentName}"
+                ? "{$report->student->first_name} {$report->student->last_name}"
                 : 'Unknown Student';
 
             return DB::transaction(function () use ($report, $director, $comment, $signature, $studentName) {

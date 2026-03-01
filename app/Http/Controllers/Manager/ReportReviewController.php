@@ -298,4 +298,132 @@ class ReportReviewController extends Controller
             ->route('manager.tutor-reports.index')
             ->with('success', "{$approvedCount} report(s) approved successfully.");
     }
+
+    /**
+     * Export reports data to Excel (CSV format).
+     * Includes submission timing to track late submissions (after 12noon on last day of month).
+     */
+    public function exportExcel(Request $request)
+    {
+        $query = TutorReport::with(['student', 'tutor']);
+
+        // Apply same filters as index
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('tutor_id')) {
+            $query->where('tutor_id', $request->tutor_id);
+        }
+        if ($request->filled('month')) {
+            $query->where('month', $request->month);
+        }
+        if ($request->filled('year')) {
+            $query->where('year', $request->year);
+        }
+
+        $reports = $query->orderBy('submitted_at', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Create CSV content
+        $csvData = [];
+
+        // Header row
+        $csvData[] = [
+            'Student Name',
+            'Tutor Name',
+            'Report Month',
+            'Year',
+            'Submitted At',
+            'Late Submission?',
+            'Manager Approved?',
+            'Manager Approved At',
+            'Director Approved?',
+            'Director Approved At',
+            'Current Status',
+        ];
+
+        foreach ($reports as $report) {
+            $studentName = $report->student
+                ? "{$report->student->first_name} {$report->student->last_name}"
+                : 'Unknown';
+            $tutorName = $report->tutor
+                ? "{$report->tutor->first_name} {$report->tutor->last_name}"
+                : 'Unknown';
+
+            // Determine if submission was late (after 12noon on last day of month)
+            $lateSubmission = 'N/A';
+            if ($report->submitted_at) {
+                $submittedAt = $report->submitted_at;
+                $reportMonth = $report->month; // e.g., "January"
+                $reportYear = $report->year;
+
+                // Parse the month name to get the month number
+                $monthNumber = date('n', strtotime("1 {$reportMonth} {$reportYear}"));
+
+                // Get the last day of the report month
+                $lastDayOfMonth = \Carbon\Carbon::create($reportYear, $monthNumber, 1)->endOfMonth();
+
+                // Deadline is 12:00 PM (noon) on the last day
+                $deadline = $lastDayOfMonth->copy()->setTime(12, 0, 0);
+
+                if ($submittedAt->gt($deadline)) {
+                    $lateSubmission = 'YES - ' . $submittedAt->format('M d, Y g:i A');
+                } else {
+                    $lateSubmission = 'No';
+                }
+            }
+
+            // Manager approval status
+            $managerApproved = in_array($report->status, ['approved-by-manager', 'approved-by-director']) ? 'Yes' : 'No';
+            $managerApprovedAt = $report->approved_by_manager_at
+                ? $report->approved_by_manager_at->format('M d, Y g:i A')
+                : '';
+
+            // Director approval status
+            $directorApproved = $report->status === 'approved-by-director' ? 'Yes' : 'No';
+            $directorApprovedAt = $report->approved_by_director_at
+                ? $report->approved_by_director_at->format('M d, Y g:i A')
+                : '';
+
+            $csvData[] = [
+                $studentName,
+                $tutorName,
+                $report->month,
+                $report->year,
+                $report->submitted_at ? $report->submitted_at->format('M d, Y g:i A') : 'Not submitted',
+                $lateSubmission,
+                $managerApproved,
+                $managerApprovedAt,
+                $directorApproved,
+                $directorApprovedAt,
+                ucfirst(str_replace('-', ' ', $report->status)),
+            ];
+        }
+
+        // Generate filename with current date
+        $filename = 'tutor_reports_' . now()->format('Y-m-d_His') . '.csv';
+
+        // Create CSV response
+        $callback = function() use ($csvData) {
+            $file = fopen('php://output', 'w');
+
+            // Add BOM for Excel UTF-8 compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            foreach ($csvData as $row) {
+                fputcsv($file, $row);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ]);
+    }
 }
