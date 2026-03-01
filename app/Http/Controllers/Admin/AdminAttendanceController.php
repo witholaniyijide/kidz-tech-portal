@@ -166,10 +166,13 @@ class AdminAttendanceController extends Controller
             // Update monthly class schedule count
             $this->updateMonthlyScheduleCount($attendance);
 
+            $studentName = $attendance->student ? $attendance->student->first_name : 'Unknown';
+            $tutorName = $attendance->tutor ? $attendance->tutor->first_name : 'Unknown';
+
             ActivityLog::create([
                 'user_id' => Auth::id(),
                 'action' => 'approved',
-                'description' => "Approved attendance for {$attendance->student->first_name} by {$attendance->tutor->first_name}",
+                'description' => "Approved attendance for {$studentName} by {$tutorName}",
                 'model_type' => AttendanceRecord::class,
                 'model_id' => $attendance->id,
             ]);
@@ -195,10 +198,13 @@ class AdminAttendanceController extends Controller
             // Update monthly class schedule count
             $this->updateMonthlyScheduleCount($attendance);
 
+            $studentName = $attendance->student ? $attendance->student->first_name : 'Unknown';
+            $tutorName = $attendance->tutor ? $attendance->tutor->first_name : 'Unknown';
+
             ActivityLog::create([
                 'user_id' => Auth::id(),
                 'action' => 'marked_late',
-                'description' => "Marked attendance as late submission - {$attendance->student->first_name} by {$attendance->tutor->first_name}",
+                'description' => "Marked attendance as late submission - {$studentName} by {$tutorName}",
                 'model_type' => AttendanceRecord::class,
                 'model_id' => $attendance->id,
             ]);

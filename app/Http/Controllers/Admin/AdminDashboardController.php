@@ -67,7 +67,7 @@ class AdminDashboardController extends Controller
 
             // For To-Do List
             'studentsWithoutTutor' => Student::whereNull('tutor_id')->where('status', 'active')->count(),
-            'pendingReports' => TutorReport::where('status', 'pending')->count(),
+            'pendingReports' => TutorReport::where('status', 'submitted')->count(),
         ];
 
         // Check if schedule is posted

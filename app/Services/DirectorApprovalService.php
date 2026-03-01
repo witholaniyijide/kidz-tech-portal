@@ -39,7 +39,13 @@ class DirectorApprovalService
         ?string $signature = null
     ): bool {
         try {
-            return DB::transaction(function () use ($report, $director, $comment, $signature) {
+            // Ensure relationships are loaded
+            $report->loadMissing(['student', 'tutor']);
+            $studentName = $report->student
+                ? "{$studentName}"
+                : 'Unknown Student';
+
+            return DB::transaction(function () use ($report, $director, $comment, $signature, $studentName) {
                 $previousStatus = $report->status;
 
                 // Update report status and metadata
@@ -77,7 +83,7 @@ class DirectorApprovalService
                 TutorNotification::create([
                     'tutor_id' => $report->tutor_id,
                     'title' => 'Report Approved - Final Approval',
-                    'body' => "Your report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been given final approval by the director.",
+                    'body' => "Your report for {$studentName} ({$report->month}) has been given final approval by the director.",
                     'type' => 'system',
                     'is_read' => false,
                     'meta' => [
@@ -96,7 +102,7 @@ class DirectorApprovalService
                     ManagerNotification::create([
                         'user_id' => $manager->id,
                         'title' => 'Report Approved by Director',
-                        'body' => "The report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been approved by the director.",
+                        'body' => "The report for {$studentName} ({$report->month}) has been approved by the director.",
                         'type' => 'report',
                         'is_read' => false,
                         'meta' => [
@@ -116,7 +122,7 @@ class DirectorApprovalService
                     AdminNotification::create([
                         'user_id' => $admin->id,
                         'title' => 'Report Approved by Director',
-                        'body' => "The report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been approved by the director.",
+                        'body' => "The report for {$studentName} ({$report->month}) has been approved by the director.",
                         'type' => 'report',
                         'is_read' => false,
                         'meta' => [
@@ -171,7 +177,13 @@ class DirectorApprovalService
         ?string $signature = null
     ): bool {
         try {
-            return DB::transaction(function () use ($assessment, $director, $comment, $signature) {
+            // Ensure tutor relationship is loaded
+            $assessment->loadMissing(['tutor']);
+            $tutorName = $assessment->tutor
+                ? "{$tutorName}"
+                : 'Unknown Tutor';
+
+            return DB::transaction(function () use ($assessment, $director, $comment, $signature, $tutorName) {
                 $previousStatus = $assessment->status;
 
                 // Update assessment status and metadata
@@ -226,7 +238,7 @@ class DirectorApprovalService
                     ManagerNotification::create([
                         'user_id' => $manager->id,
                         'title' => 'Assessment Approved by Director',
-                        'body' => "The assessment for tutor {$assessment->tutor->first_name} {$assessment->tutor->last_name} ({$assessment->assessment_month}) has been approved by the director.",
+                        'body' => "The assessment for tutor {$tutorName} ({$assessment->assessment_month}) has been approved by the director.",
                         'type' => 'assessment',
                         'is_read' => false,
                         'meta' => [
@@ -245,7 +257,7 @@ class DirectorApprovalService
                     AdminNotification::create([
                         'user_id' => $admin->id,
                         'title' => 'Assessment Approved by Director',
-                        'body' => "The assessment for tutor {$assessment->tutor->first_name} {$assessment->tutor->last_name} ({$assessment->assessment_month}) has been approved by the director.",
+                        'body' => "The assessment for tutor {$tutorName} ({$assessment->assessment_month}) has been approved by the director.",
                         'type' => 'assessment',
                         'is_read' => false,
                         'meta' => [

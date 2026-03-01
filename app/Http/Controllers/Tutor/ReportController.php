@@ -427,10 +427,11 @@ class ReportController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        if ($report->status !== 'draft') {
+        // Allow deletion of draft and returned reports only
+        if (!in_array($report->status, ['draft', 'returned'])) {
             return redirect()
                 ->route('tutor.reports.index')
-                ->with('error', 'Only draft reports can be deleted.');
+                ->with('error', 'Only draft or returned reports can be deleted.');
         }
 
         $report->delete();

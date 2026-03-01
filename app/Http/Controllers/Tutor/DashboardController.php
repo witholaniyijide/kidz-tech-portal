@@ -45,7 +45,7 @@ class DashboardController extends Controller
                 'draftReportsCount' => $tutor->reports()->where('status', 'draft')->count(),
                 'submittedReportsCount' => $tutor->reports()->where('status', 'submitted')->count(),
                 'submittedThisMonth' => $tutor->reports()
-                    ->whereIn('status', ['submitted', 'approved', 'director_approved'])
+                    ->whereIn('status', ['submitted', 'approved-by-manager', 'approved-by-director'])
                     ->whereMonth('created_at', now()->month)
                     ->whereYear('created_at', now()->year)
                     ->count(),

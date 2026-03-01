@@ -433,7 +433,7 @@ class NotificationService
         // Email notification (respect notify_email preference via linked User account)
         if ($tutor->email) {
             $notifyEmail = true;
-            if ($tutor->user_id) {
+            if ($tutor->user_id && $tutor->user) {
                 $notifyEmail = $tutor->user->notify_email ?? true;
             }
             if ($notifyEmail) {

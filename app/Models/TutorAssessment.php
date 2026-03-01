@@ -141,7 +141,9 @@ class TutorAssessment extends Model
     {
         $averages = [];
         foreach ($this->ratings as $rating) {
-            $averages[$rating->criteria->code] = $rating->percentage;
+            if ($rating->criteria) {
+                $averages[$rating->criteria->code] = $rating->percentage;
+            }
         }
         return $averages;
     }

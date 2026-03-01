@@ -47,8 +47,8 @@ class TutorReportPolicy
      */
     public function update(User $user, TutorReport $report): bool
     {
-        // Only the author can update when status is draft
-        return $report->status === 'draft' && $report->created_by === $user->id;
+        // Only the author can update when status is draft or returned
+        return in_array($report->status, ['draft', 'returned']) && $report->created_by === $user->id;
     }
 
     /**
@@ -56,8 +56,8 @@ class TutorReportPolicy
      */
     public function submit(User $user, TutorReport $report): bool
     {
-        // Only the author can submit when status is draft
-        return $report->status === 'draft' && $report->created_by === $user->id;
+        // Only the author can submit when status is draft or returned (re-submit after correction)
+        return in_array($report->status, ['draft', 'returned']) && $report->created_by === $user->id;
     }
 
     /**
@@ -117,8 +117,8 @@ class TutorReportPolicy
      */
     public function delete(User $user, TutorReport $report): bool
     {
-        // Only author can delete draft reports
-        if ($report->status === 'draft' && $report->created_by === $user->id) {
+        // Only author can delete draft or returned reports
+        if (in_array($report->status, ['draft', 'returned']) && $report->created_by === $user->id) {
             return true;
         }
 

@@ -308,11 +308,11 @@
                             Edit Report
                         </a>
                     @endif
-                    @if($report->status === 'draft')
-                        <form action="{{ route('tutor.reports.destroy', $report) }}" method="POST" onsubmit="return confirm('Delete this draft?')">
+                    @if(in_array($report->status, ['draft', 'returned']))
+                        <form action="{{ route('tutor.reports.destroy', $report) }}" method="POST" onsubmit="return confirm('Delete this {{ $report->status === 'returned' ? 'returned' : 'draft' }} report?')">
                             @csrf @method('DELETE')
                             <button type="submit" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-rose-600 text-white rounded-xl hover:bg-rose-700 transition-colors font-medium">
-                                Delete Draft
+                                Delete {{ $report->status === 'returned' ? 'Report' : 'Draft' }}
                             </button>
                         </form>
                     @endif

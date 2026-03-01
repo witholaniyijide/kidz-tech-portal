@@ -495,7 +495,7 @@ class AnalyticsController extends Controller
                     return $assessment->ratings ?? collect();
                 })
                 ->groupBy(function($rating) {
-                    return $rating->criteria->name ?? 'Unknown';
+                    return $rating->criteria?->name ?? 'Unknown';
                 })
                 ->map(function($ratings, $name) {
                     $ratingValues = $ratings->map(function($r) {

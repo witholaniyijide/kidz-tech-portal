@@ -95,9 +95,9 @@ class StudentProfileService
 
         return [
             'id' => $tutor->id,
-            'full_name' => $tutor->first_name . ' ' . $tutor->last_name,
-            'first_name' => $tutor->first_name,
-            'last_name' => $tutor->last_name,
+            'full_name' => trim(($tutor->first_name ?? '') . ' ' . ($tutor->last_name ?? '')) ?: 'Unknown',
+            'first_name' => $tutor->first_name ?? '',
+            'last_name' => $tutor->last_name ?? '',
             'email' => $tutor->email,
             'phone' => $tutor->phone,
             'profile_photo' => $tutor->profile_photo,
