@@ -59,12 +59,16 @@ class TutorReport extends Model
         // Import metadata
         'imported_from_artifact',
         'artifact_export_date',
+
+        // Returned for correction
+        'returned_at',
     ];
 
     protected $casts = [
         'submitted_at' => 'datetime',
         'approved_by_manager_at' => 'datetime',
         'approved_by_director_at' => 'datetime',
+        'returned_at' => 'datetime',
         'attendance_score' => 'integer',
         'courses' => 'array',
         'skills_mastered' => 'array',
