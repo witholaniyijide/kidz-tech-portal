@@ -59,6 +59,7 @@ class ReportReviewController extends Controller
             'approved' => TutorReport::where('status', 'approved-by-manager')->count(),
             'pending' => TutorReport::where('status', 'submitted')->count(),
             'completed' => TutorReport::where('status', 'approved-by-director')->count(),
+            'returned' => TutorReport::where('status', 'returned')->count(),
         ];
 
         // Get unique months from reports for filter
@@ -130,10 +131,11 @@ class ReportReviewController extends Controller
             ]);
 
             // Create notification for tutor
+            $studentName = $report->student ? $report->student->fullName() : 'Unknown Student';
             \App\Models\TutorNotification::create([
                 'tutor_id' => $report->tutor_id,
                 'title' => 'Report Approved by Manager',
-                'body' => "Your report for {$report->student->fullName()} ({$report->month}) has been approved by the manager and is awaiting director approval.",
+                'body' => "Your report for {$studentName} ({$report->month}) has been approved by the manager and is awaiting director approval.",
                 'type' => 'system',
                 'is_read' => false,
                 'meta' => ['report_id' => $report->id],
@@ -273,10 +275,11 @@ class ReportReviewController extends Controller
                     'approved_by_manager_at' => now(),
                 ]);
 
+                $studentName = $report->student ? $report->student->fullName() : 'Unknown Student';
                 \App\Models\TutorNotification::create([
                     'tutor_id' => $report->tutor_id,
                     'title' => 'Report Approved by Manager',
-                    'body' => "Your report for {$report->student->fullName()} ({$report->month}) has been approved by the manager and is awaiting director approval.",
+                    'body' => "Your report for {$studentName} ({$report->month}) has been approved by the manager and is awaiting director approval.",
                     'type' => 'system',
                     'is_read' => false,
                     'meta' => ['report_id' => $report->id],

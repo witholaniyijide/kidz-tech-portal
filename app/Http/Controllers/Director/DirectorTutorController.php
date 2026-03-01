@@ -188,7 +188,7 @@ class DirectorTutorController extends Controller
         // Get tutor statistics
         $totalStudents = $tutor->students()->count();
         $totalReports = $tutor->reports()->count();
-        $pendingReports = $tutor->reports()->where('status', 'pending')->count();
+        $pendingReports = $tutor->reports()->where('status', 'submitted')->count();
         
         return view('director.tutors.show', compact('tutor', 'totalStudents', 'totalReports', 'pendingReports'));
     }

@@ -43,7 +43,7 @@ class ManagerDashboardController extends Controller
 
                 // Reports stats
                 'totalReports' => TutorReport::count(),
-                'pendingReports' => TutorReport::whereIn('status', ['submitted', 'pending'])->count(),
+                'pendingReports' => TutorReport::where('status', 'submitted')->count(),
                 'managerApprovedReports' => TutorReport::where('status', 'approved-by-manager')->count(),
                 'directorApprovedReports' => TutorReport::where('status', 'approved-by-director')->count(),
 
