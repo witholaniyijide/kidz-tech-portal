@@ -25,15 +25,20 @@ class NotificationService
     {
         $report->load(['tutor', 'student']);
 
-        $tutorName = ($report->tutor->first_name ?? '') . ' ' . ($report->tutor->last_name ?? '');
-        $studentName = ($report->student->first_name ?? '') . ' ' . ($report->student->last_name ?? '');
+        // Safety check: ensure tutor and student exist
+        $tutorName = $report->tutor
+            ? "{$report->tutor->first_name} {$report->tutor->last_name}"
+            : 'Unknown Tutor';
+        $studentName = $report->student
+            ? "{$report->student->first_name} {$report->student->last_name}"
+            : 'Unknown Student';
 
         $managers = User::role('manager')->get();
         foreach ($managers as $manager) {
             $this->notifyManager(
                 $manager,
                 'New Report Submitted',
-                "Tutor {$report->tutor->first_name} {$report->tutor->last_name} has submitted a report for {$report->student->first_name} {$report->student->last_name} ({$report->month} {$report->year}). Please review.",
+                "Tutor {$tutorName} has submitted a report for {$studentName} ({$report->month} {$report->year}). Please review.",
                 'report', // Using valid enum type - semantic type stored in meta
                 ['report_id' => $report->id, 'tutor_id' => $report->tutor_id, 'student_id' => $report->student_id, 'notification_type' => 'report_submitted']
             );
@@ -83,14 +88,21 @@ class NotificationService
     {
         $report->load(['tutor', 'student.guardians']);
 
-        // 1. Notify Tutor (in-app + email)
-        $this->notifyTutor(
-            $report->tutor,
-            'Report Approved by Director',
-            "Your report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been approved by the Director.",
-            'system', // Using valid enum type - semantic type stored in meta
-            ['report_id' => $report->id, 'student_id' => $report->student_id, 'notification_type' => 'report_approved']
-        );
+        // Safety: get student name with fallback
+        $studentName = $report->student
+            ? "{$report->student->first_name} {$report->student->last_name}"
+            : 'Unknown Student';
+
+        // 1. Notify Tutor (in-app + email) - only if tutor exists
+        if ($report->tutor) {
+            $this->notifyTutor(
+                $report->tutor,
+                'Report Approved by Director',
+                "Your report for {$studentName} ({$report->month}) has been approved by the Director.",
+                'system', // Using valid enum type - semantic type stored in meta
+                ['report_id' => $report->id, 'student_id' => $report->student_id, 'notification_type' => 'report_approved']
+            );
+        }
 
         // 2. Notify Managers (in-app + email)
         $managers = User::role('manager')->get();
@@ -98,7 +110,7 @@ class NotificationService
             $this->notifyManager(
                 $manager,
                 'Report Approved',
-                "Report for {$report->student->first_name} {$report->student->last_name} has been approved by the Director.",
+                "Report for {$studentName} has been approved by the Director.",
                 'report', // Using valid enum type - semantic type stored in meta
                 ['report_id' => $report->id, 'notification_type' => 'report_approved']
             );
@@ -111,15 +123,15 @@ class NotificationService
                 $this->sendEmailNotification(
                     $admin->email,
                     'Report Approved by Director',
-                    "The report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been approved.",
+                    "The report for {$studentName} ({$report->month}) has been approved.",
                     'report_approved',
-                    ['report_id' => $report->id, 'student_name' => $report->student->first_name . ' ' . $report->student->last_name]
+                    ['report_id' => $report->id, 'student_name' => $studentName]
                 );
             }
         }
 
-        // 4. Notify Parents (in-app + email)
-        if ($report->student->guardians) {
+        // 4. Notify Parents (in-app + email) - only if student and guardians exist
+        if ($report->student && $report->student->guardians) {
             foreach ($report->student->guardians as $parent) {
                 $this->notifyParent(
                     $parent,
@@ -142,10 +154,14 @@ class NotificationService
         $attendance->load(['tutor', 'student']);
 
         if ($attendance->tutor) {
+            $studentName = $attendance->student
+                ? "{$attendance->student->first_name} {$attendance->student->last_name}"
+                : 'Unknown Student';
+
             $this->notifyTutor(
                 $attendance->tutor,
                 'Attendance Approved',
-                "Your attendance record for {$attendance->student->first_name} {$attendance->student->last_name} on {$attendance->class_date->format('M d, Y')} has been approved.",
+                "Your attendance record for {$studentName} on {$attendance->class_date->format('M d, Y')} has been approved.",
                 'schedule', // Using valid enum type - semantic type stored in meta
                 ['attendance_id' => $attendance->id, 'student_id' => $attendance->student_id, 'notification_type' => 'attendance_approved']
             );
@@ -160,15 +176,23 @@ class NotificationService
     {
         $attendance->load(['tutor', 'student']);
 
+        // Safety: get names with fallbacks
+        $tutorName = $attendance->tutor
+            ? "{$attendance->tutor->first_name} {$attendance->tutor->last_name}"
+            : 'Unknown Tutor';
+        $studentName = $attendance->student
+            ? "{$attendance->student->first_name} {$attendance->student->last_name}"
+            : 'Unknown Student';
+
         $admins = User::role('admin')->get();
         foreach ($admins as $admin) {
             if (($admin->notify_email ?? true) && $admin->email) {
                 $this->sendEmailNotification(
                     $admin->email,
                     'New Attendance Submission',
-                    "Tutor {$attendance->tutor->first_name} {$attendance->tutor->last_name} has submitted attendance for {$attendance->student->first_name} {$attendance->student->last_name}.",
+                    "Tutor {$tutorName} has submitted attendance for {$studentName}.",
                     'attendance_submitted',
-                    ['attendance_id' => $attendance->id, 'tutor_name' => $attendance->tutor->first_name . ' ' . $attendance->tutor->last_name]
+                    ['attendance_id' => $attendance->id, 'tutor_name' => $tutorName]
                 );
             }
         }
@@ -182,22 +206,30 @@ class NotificationService
     {
         $assessment->load(['tutor', 'student']);
 
-        $tutorName = $assessment->tutor ? ($assessment->tutor->first_name . ' ' . $assessment->tutor->last_name) : 'a tutor';
-        $studentName = $assessment->student ? ($assessment->student->first_name . ' ' . $assessment->student->last_name) : '';
+        // Safety: get names with fallbacks
+        $tutorName = $assessment->tutor
+            ? "{$assessment->tutor->first_name} {$assessment->tutor->last_name}"
+            : 'a tutor';
+        $studentName = $assessment->student
+            ? "{$assessment->student->first_name} {$assessment->student->last_name}"
+            : '';
         $periodLabel = $assessment->assessment_period ?? '';
 
         $body = "Assessment for tutor {$tutorName}";
         if ($studentName) {
             $body .= " (student: {$studentName})";
         }
-        $body .= " — {$periodLabel} has been approved by the Director.";
+        if ($periodLabel) {
+            $body .= " — {$periodLabel}";
+        }
+        $body .= " has been approved by the Director.";
 
         $managers = User::role('manager')->get();
         foreach ($managers as $manager) {
             $this->notifyManager(
                 $manager,
                 'Assessment Approved',
-                "Assessment for {$assessment->student->first_name} {$assessment->student->last_name} has been approved by the Director.",
+                $body,
                 'assessment', // Using valid enum type - semantic type stored in meta
                 ['assessment_id' => $assessment->id, 'notification_type' => 'assessment_approved']
             );
