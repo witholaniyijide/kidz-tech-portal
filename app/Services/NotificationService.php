@@ -32,10 +32,10 @@ class NotificationService
         foreach ($managers as $manager) {
             $this->notifyManager(
                 $manager,
-                'Student Report Submitted',
-                "Tutor {$tutorName} has submitted a student report for {$studentName} ({$report->month} {$report->year}). This is time-sensitive — please review at your earliest convenience.",
-                'report_submitted',
-                ['report_id' => $report->id, 'tutor_id' => $report->tutor_id, 'student_id' => $report->student_id]
+                'New Report Submitted',
+                "Tutor {$report->tutor->first_name} {$report->tutor->last_name} has submitted a report for {$report->student->first_name} {$report->student->last_name} ({$report->month} {$report->year}). Please review.",
+                'report', // Using valid enum type - semantic type stored in meta
+                ['report_id' => $report->id, 'tutor_id' => $report->tutor_id, 'student_id' => $report->student_id, 'notification_type' => 'report_submitted']
             );
         }
     }
@@ -70,8 +70,8 @@ class NotificationService
             $report->tutor,
             'Report Returned for Modification',
             $message,
-            'report_returned',
-            ['report_id' => $report->id, 'student_id' => $report->student_id, 'manager_comment' => $managerComment]
+            'alert', // Using valid enum type - semantic type stored in meta
+            ['report_id' => $report->id, 'student_id' => $report->student_id, 'manager_comment' => $managerComment, 'notification_type' => 'report_returned']
         );
     }
 
@@ -88,8 +88,8 @@ class NotificationService
             $report->tutor,
             'Report Approved by Director',
             "Your report for {$report->student->first_name} {$report->student->last_name} ({$report->month}) has been approved by the Director.",
-            'report_approved',
-            ['report_id' => $report->id, 'student_id' => $report->student_id]
+            'system', // Using valid enum type - semantic type stored in meta
+            ['report_id' => $report->id, 'student_id' => $report->student_id, 'notification_type' => 'report_approved']
         );
 
         // 2. Notify Managers (in-app + email)
@@ -99,8 +99,8 @@ class NotificationService
                 $manager,
                 'Report Approved',
                 "Report for {$report->student->first_name} {$report->student->last_name} has been approved by the Director.",
-                'report_approved',
-                ['report_id' => $report->id]
+                'report', // Using valid enum type - semantic type stored in meta
+                ['report_id' => $report->id, 'notification_type' => 'report_approved']
             );
         }
 
@@ -146,8 +146,8 @@ class NotificationService
                 $attendance->tutor,
                 'Attendance Approved',
                 "Your attendance record for {$attendance->student->first_name} {$attendance->student->last_name} on {$attendance->class_date->format('M d, Y')} has been approved.",
-                'attendance_approved',
-                ['attendance_id' => $attendance->id, 'student_id' => $attendance->student_id]
+                'schedule', // Using valid enum type - semantic type stored in meta
+                ['attendance_id' => $attendance->id, 'student_id' => $attendance->student_id, 'notification_type' => 'attendance_approved']
             );
         }
     }
@@ -196,10 +196,10 @@ class NotificationService
         foreach ($managers as $manager) {
             $this->notifyManager(
                 $manager,
-                'Assessment Approved by Director',
-                $body,
-                'assessment_approved',
-                ['assessment_id' => $assessment->id]
+                'Assessment Approved',
+                "Assessment for {$assessment->student->first_name} {$assessment->student->last_name} has been approved by the Director.",
+                'assessment', // Using valid enum type - semantic type stored in meta
+                ['assessment_id' => $assessment->id, 'notification_type' => 'assessment_approved']
             );
         }
     }
