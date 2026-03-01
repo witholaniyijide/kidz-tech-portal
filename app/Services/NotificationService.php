@@ -48,7 +48,20 @@ class NotificationService
     {
         $report->load(['tutor', 'student']);
 
-        $message = "Your report for {$report->student->first_name} {$report->student->last_name} ({$report->month} {$report->year}) has been sent back for modification.";
+        // Safety check: ensure tutor exists
+        if (!$report->tutor) {
+            Log::warning('Cannot notify tutor for returned report - tutor not found', [
+                'report_id' => $report->id,
+                'tutor_id' => $report->tutor_id,
+            ]);
+            return;
+        }
+
+        $studentName = $report->student
+            ? "{$report->student->first_name} {$report->student->last_name}"
+            : 'Unknown Student';
+
+        $message = "Your report for {$studentName} ({$report->month} {$report->year}) has been sent back for modification.";
         if ($managerComment) {
             $message .= " Manager's comment: {$managerComment}";
         }

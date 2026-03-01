@@ -190,6 +190,50 @@ class ReportController extends Controller
                     ->withInput();
             }
 
+            // If submitting directly (not as draft), validate all required sections
+            $status = $validated['status'] ?? 'draft';
+            if ($status === 'submitted') {
+                $issues = [];
+                $skillsMastered = $validated['skills_mastered'] ?? [];
+                $projects = $validated['projects'] ?? [];
+                $areasForImprovement = $validated['areas_for_improvement'] ?? '';
+                $goalsNextMonth = $validated['goals_next_month'] ?? '';
+                $commentsObservation = $validated['comments_observation'] ?? '';
+
+                if (empty($skillsMastered) || count($skillsMastered) === 0) {
+                    $issues[] = 'At least one skill mastered is required';
+                }
+                if (empty($projects) || count($projects) === 0) {
+                    $issues[] = 'At least one project completed is required';
+                } else {
+                    $hasValidProject = false;
+                    foreach ($projects as $project) {
+                        if (!empty($project['title'])) {
+                            $hasValidProject = true;
+                            break;
+                        }
+                    }
+                    if (!$hasValidProject) {
+                        $issues[] = 'At least one project with a title is required';
+                    }
+                }
+                if (empty($areasForImprovement)) {
+                    $issues[] = 'Areas for improvement is required';
+                }
+                if (empty($goalsNextMonth)) {
+                    $issues[] = 'Goals for next month is required';
+                }
+                if (empty($commentsObservation)) {
+                    $issues[] = 'Comments/Observation is required';
+                }
+
+                if (count($issues) > 0) {
+                    return redirect()->back()
+                        ->with('error', 'Please complete all required sections before submitting: ' . implode(', ', $issues))
+                        ->withInput();
+                }
+            }
+
             // Create report
             $report = TutorReport::create([
                 'student_id' => $validated['student_id'],
@@ -420,6 +464,21 @@ class ReportController extends Controller
             $issues = [];
             if (empty($report->skills_mastered) || count($report->skills_mastered) === 0) {
                 $issues[] = 'At least one skill mastered is required';
+            }
+            if (empty($report->projects) || count($report->projects) === 0) {
+                $issues[] = 'At least one project completed is required';
+            } else {
+                // Check if projects have content
+                $hasValidProject = false;
+                foreach ($report->projects as $project) {
+                    if (!empty($project['title'])) {
+                        $hasValidProject = true;
+                        break;
+                    }
+                }
+                if (!$hasValidProject) {
+                    $issues[] = 'At least one project with a title is required';
+                }
             }
             if (empty($report->areas_for_improvement)) {
                 $issues[] = 'Areas for improvement is required';
