@@ -269,6 +269,41 @@ class AdminAttendanceController extends Controller
     }
 
     /**
+     * Bulk delete multiple attendance records permanently.
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'attendance_ids' => 'required|array|min:1',
+            'attendance_ids.*' => 'exists:attendance_records,id',
+        ]);
+
+        $ids = $request->attendance_ids;
+        $deletedCount = 0;
+
+        DB::transaction(function() use ($ids, &$deletedCount) {
+            $attendances = AttendanceRecord::whereIn('id', $ids)->get();
+
+            foreach ($attendances as $attendance) {
+                $attendance->forceDelete();
+                $deletedCount++;
+            }
+
+            if ($deletedCount > 0) {
+                ActivityLog::create([
+                    'user_id' => Auth::id(),
+                    'action' => 'bulk_deleted',
+                    'description' => "Permanently deleted {$deletedCount} attendance records",
+                    'model_type' => AttendanceRecord::class,
+                    'model_id' => null,
+                ]);
+            }
+        });
+
+        return redirect()->back()->with('success', "{$deletedCount} attendance record(s) permanently deleted.");
+    }
+
+    /**
      * Update the monthly class schedule completed count.
      */
     protected function updateMonthlyScheduleCount(AttendanceRecord $attendance)
