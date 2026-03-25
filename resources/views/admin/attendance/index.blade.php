@@ -179,7 +179,50 @@
             </div>
 
             {{-- Attendance Table --}}
-            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden">
+            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden"
+                 x-data="{
+                    selectedIds: [],
+                    selectAll: false,
+                    pendingIds: {{ json_encode($attendances->where('status', 'pending')->pluck('id')->toArray()) }},
+                    toggleAll() {
+                        if (this.selectAll) {
+                            this.selectedIds = [...this.pendingIds];
+                        } else {
+                            this.selectedIds = [];
+                        }
+                    },
+                    toggleOne(id) {
+                        if (this.selectedIds.includes(id)) {
+                            this.selectedIds = this.selectedIds.filter(i => i !== id);
+                        } else {
+                            this.selectedIds.push(id);
+                        }
+                        this.selectAll = this.selectedIds.length === this.pendingIds.length && this.pendingIds.length > 0;
+                    }
+                 }">
+                {{-- Bulk Actions Bar --}}
+                <div x-show="selectedIds.length > 0" x-cloak
+                     class="px-4 py-3 bg-[#423A8E]/10 dark:bg-[#423A8E]/20 border-b border-[#423A8E]/20 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium text-[#423A8E] dark:text-[#00CCCD]">
+                            <span x-text="selectedIds.length"></span> record(s) selected
+                        </span>
+                    </div>
+                    <form action="{{ route('admin.attendance.bulk-approve') }}" method="POST" class="inline">
+                        @csrf
+                        <template x-for="id in selectedIds" :key="id">
+                            <input type="hidden" name="attendance_ids[]" :value="id">
+                        </template>
+                        <button type="submit"
+                                class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Bulk Approve
+                        </button>
+                    </form>
+                </div>
+
                 @if($attendances->isEmpty())
                     <div class="p-12 text-center">
                         <div class="text-6xl mb-4">📋</div>
@@ -191,6 +234,11 @@
                         <table class="w-full">
                             <thead class="bg-gray-50 dark:bg-gray-700/50">
                                 <tr>
+                                    <th class="px-4 py-4 text-left">
+                                        <input type="checkbox" x-model="selectAll" @change="toggleAll()"
+                                               class="w-4 h-4 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E]"
+                                               :disabled="pendingIds.length === 0">
+                                    </th>
                                     <th class="px-4 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Student</th>
                                     <th class="px-4 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Tutor</th>
                                     <th class="px-4 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Class Date</th>
@@ -203,6 +251,14 @@
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @foreach($attendances as $attendance)
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors {{ $attendance->status === 'pending' ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }} {{ ($attendance->is_late || $attendance->is_late_submission) && $attendance->status === 'pending' ? 'border-l-4 border-red-400' : '' }}">
+                                        <td class="px-4 py-4">
+                                            @if($attendance->status === 'pending')
+                                                <input type="checkbox"
+                                                       :checked="selectedIds.includes({{ $attendance->id }})"
+                                                       @change="toggleOne({{ $attendance->id }})"
+                                                       class="w-4 h-4 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E]">
+                                            @endif
+                                        </td>
                                         <td class="px-4 py-4">
                                             <div class="flex items-center">
                                                 <div class="w-8 h-8 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-full flex items-center justify-center text-white font-bold text-xs mr-2">
@@ -379,6 +435,7 @@
 
     @push('styles')
     <style>
+        [x-cloak] { display: none !important; }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
         .animate-float { animation: float 6s ease-in-out infinite; }
     </style>

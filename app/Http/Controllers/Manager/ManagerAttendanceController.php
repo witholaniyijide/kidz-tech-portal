@@ -95,15 +95,15 @@ class ManagerAttendanceController extends Controller
 
                 // Calculate expected monthly classes based on student's schedule
                 $student = $record->student;
-                $expectedMonthlyClasses = 0;
+                $expectedMonthlyClasses = $student
+                    ? $student->getExpectedClassesForMonth(
+                        $record->class_date->year,
+                        $record->class_date->month
+                    )
+                    : 0;
 
-                if ($student->class_schedule && is_array($student->class_schedule)) {
-                    $classesPerWeek = count($student->class_schedule);
-                    $monthStart = Carbon::create($record->class_date->year, $record->class_date->month, 1);
-                    $monthEnd = $monthStart->copy()->endOfMonth();
-                    $weeksInMonth = ceil($monthEnd->diffInDays($monthStart) / 7);
-                    $expectedMonthlyClasses = $classesPerWeek * $weeksInMonth;
-                } else {
+                // Fallback if schedule not available
+                if ($expectedMonthlyClasses === 0) {
                     $expectedMonthlyClasses = AttendanceRecord::where('student_id', $record->student_id)
                         ->where('is_stand_in', false)
                         ->whereYear('class_date', $record->class_date->year)

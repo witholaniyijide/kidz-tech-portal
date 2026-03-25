@@ -86,15 +86,15 @@ class AdminAttendanceController extends Controller
 
                 // Calculate expected monthly classes based on student's schedule
                 $student = $attendance->student;
-                $expectedMonthlyClasses = 0;
+                $expectedMonthlyClasses = $student
+                    ? $student->getExpectedClassesForMonth(
+                        $attendance->class_date->year,
+                        $attendance->class_date->month
+                    )
+                    : 0;
 
-                if ($student->class_schedule && is_array($student->class_schedule)) {
-                    $classesPerWeek = count($student->class_schedule);
-                    $monthStart = Carbon::create($attendance->class_date->year, $attendance->class_date->month, 1);
-                    $monthEnd = $monthStart->copy()->endOfMonth();
-                    $weeksInMonth = ceil($monthEnd->diffInDays($monthStart) / 7);
-                    $expectedMonthlyClasses = $classesPerWeek * $weeksInMonth;
-                } else {
+                // Fallback if schedule not available
+                if ($expectedMonthlyClasses === 0) {
                     $expectedMonthlyClasses = AttendanceRecord::where('student_id', $attendance->student_id)
                         ->where('is_stand_in', false)
                         ->whereYear('class_date', $attendance->class_date->year)
@@ -211,6 +211,50 @@ class AdminAttendanceController extends Controller
         });
 
         return redirect()->back()->with('success', 'Attendance marked as late and approved.');
+    }
+
+    /**
+     * Bulk approve multiple attendance records.
+     */
+    public function bulkApprove(Request $request)
+    {
+        $request->validate([
+            'attendance_ids' => 'required|array|min:1',
+            'attendance_ids.*' => 'exists:attendance_records,id',
+        ]);
+
+        $ids = $request->attendance_ids;
+        $approvedCount = 0;
+
+        DB::transaction(function() use ($ids, &$approvedCount) {
+            $attendances = AttendanceRecord::whereIn('id', $ids)
+                ->where('status', 'pending')
+                ->get();
+
+            foreach ($attendances as $attendance) {
+                $attendance->update([
+                    'status' => 'approved',
+                    'approved_by' => Auth::id(),
+                    'approved_at' => now(),
+                ]);
+
+                // Update monthly class schedule count
+                $this->updateMonthlyScheduleCount($attendance);
+                $approvedCount++;
+            }
+
+            if ($approvedCount > 0) {
+                ActivityLog::create([
+                    'user_id' => Auth::id(),
+                    'action' => 'bulk_approved',
+                    'description' => "Bulk approved {$approvedCount} attendance records",
+                    'model_type' => AttendanceRecord::class,
+                    'model_id' => null,
+                ]);
+            }
+        });
+
+        return redirect()->back()->with('success', "{$approvedCount} attendance record(s) approved successfully.");
     }
 
     /**

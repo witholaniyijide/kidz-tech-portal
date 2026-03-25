@@ -883,4 +883,61 @@ class Student extends Model
     {
         return $this->starting_course_id !== null;
     }
+
+    /**
+     * Calculate the expected number of classes for a specific month based on class_schedule.
+     * Counts actual occurrences of each scheduled day in the month.
+     *
+     * @param int $year
+     * @param int $month
+     * @return int
+     */
+    public function getExpectedClassesForMonth(int $year, int $month): int
+    {
+        if (!$this->class_schedule || !is_array($this->class_schedule)) {
+            return 0;
+        }
+
+        // Map day names to Carbon day constants
+        $dayMap = [
+            'sunday' => 0,
+            'monday' => 1,
+            'tuesday' => 2,
+            'wednesday' => 3,
+            'thursday' => 4,
+            'friday' => 5,
+            'saturday' => 6,
+        ];
+
+        // Get scheduled days (e.g., ['tuesday', 'thursday'])
+        $scheduledDays = [];
+        foreach ($this->class_schedule as $schedule) {
+            if (!empty($schedule['day'])) {
+                $dayName = strtolower(trim($schedule['day']));
+                if (isset($dayMap[$dayName])) {
+                    $scheduledDays[] = $dayMap[$dayName];
+                }
+            }
+        }
+
+        if (empty($scheduledDays)) {
+            return 0;
+        }
+
+        // Count occurrences of each scheduled day in the month
+        $monthStart = \Carbon\Carbon::create($year, $month, 1)->startOfMonth();
+        $monthEnd = $monthStart->copy()->endOfMonth();
+
+        $count = 0;
+        $current = $monthStart->copy();
+
+        while ($current->lte($monthEnd)) {
+            if (in_array($current->dayOfWeek, $scheduledDays)) {
+                $count++;
+            }
+            $current->addDay();
+        }
+
+        return $count;
+    }
 }
