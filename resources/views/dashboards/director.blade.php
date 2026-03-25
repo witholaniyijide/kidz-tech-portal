@@ -274,168 +274,72 @@
                     </div>
                 </div>
 
-                <!-- Today's To-Do List -->
+                <!-- Action Items -->
                 <div
                     class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 dark:border-gray-700/30"
                     role="region"
-                    aria-label="Today's To-Do List"
-                    x-data="{
-                        todos: [],
-                        newTodo: '',
-                        newDate: '',
-                        newTime: '',
-                        init() {
-                            const stored = localStorage.getItem('director_todos');
-                            if (stored) {
-                                try {
-                                    this.todos = JSON.parse(stored);
-                                } catch (e) {
-                                    console.error('Failed to parse stored todos', e);
-                                    this.todos = this.getDefaultTodos();
-                                }
-                            } else {
-                                this.todos = this.getDefaultTodos();
-                                this.saveTodos();
-                            }
-                        },
-                        getDefaultTodos() {
-                            return [
-                                { text: 'Post today\'s schedule', completed: false },
-                                { text: 'Review pending attendance', completed: false },
-                                { text: 'Follow up inactive students', completed: false },
-                                { text: 'Approve tutor submissions', completed: false }
-                            ];
-                        },
-                        toggleTodo(index) {
-                            this.todos[index].completed = !this.todos[index].completed;
-                            this.saveTodos();
-                        },
-                        addTodo() {
-                            if (this.newTodo.trim()) {
-                                this.todos.push({
-                                    text: this.newTodo.trim(),
-                                    date: this.newDate || null,
-                                    time: this.newTime || null,
-                                    completed: false
-                                });
-                                this.newTodo = '';
-                                this.newDate = '';
-                                this.newTime = '';
-                                this.saveTodos();
-                            }
-                        },
-                        removeTodo(index) {
-                            this.todos.splice(index, 1);
-                            this.saveTodos();
-                        },
-                        saveTodos() {
-                            localStorage.setItem('director_todos', JSON.stringify(this.todos));
-                        },
-                        handleKeydown(event, index) {
-                            if (event.key === 'Enter' || event.key === ' ') {
-                                event.preventDefault();
-                                this.toggleTodo(index);
-                            }
-                        },
-                        formatDateTime(date, time) {
-                            if (!date) return '';
-                            const d = new Date(date);
-                            const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                            return time ? `${dateStr} at ${time}` : dateStr;
-                        }
-                    }"
+                    aria-label="Action Items"
                 >
-                    <div class="mb-6">
+                    <div class="mb-4">
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
                             <svg class="w-5 h-5 mr-2 text-[#4F46E5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                             </svg>
-                            Today's To-Do List
+                            Action Items
                         </h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Keep track of your daily tasks</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Pending tasks requiring your attention</p>
                     </div>
 
-                    <div class="space-y-3 mb-6 max-h-64 overflow-y-auto" role="list" aria-label="Task list">
-                        <template x-for="(todo, index) in todos" :key="index">
-                            <div class="flex items-start p-3 rounded-lg bg-white dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 group" role="listitem">
-                                <input
-                                    type="checkbox"
-                                    :id="'todo-' + index"
-                                    x-model="todo.completed"
-                                    @change="saveTodos()"
-                                    @keydown="handleKeydown($event, index)"
-                                    class="mt-0.5 w-5 h-5 text-[#4F46E5] border-gray-300 dark:border-gray-600 rounded focus:ring-[#4F46E5] focus:ring-2 cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-[#4F46E5] focus-visible:ring-offset-2"
-                                    :aria-label="'Mark task as ' + (todo.completed ? 'incomplete' : 'complete')"
-                                >
-                                <label
-                                    :for="'todo-' + index"
-                                    class="flex-1 ml-3 cursor-pointer"
-                                >
-                                    <div class="text-gray-800 dark:text-gray-200 group-hover:text-[#4F46E5] dark:group-hover:text-[#818CF8] transition-colors text-sm" :class="{ 'line-through opacity-50': todo.completed }" x-text="todo.text"></div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5" x-show="todo.date" x-text="formatDateTime(todo.date, todo.time)"></div>
-                                </label>
-                                <button
-                                    type="button"
-                                    @click="removeTodo(index)"
-                                    class="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-600 transition-opacity focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 rounded p-1"
-                                    :aria-label="'Remove task: ' + todo.text"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    <div class="space-y-2 max-h-80 overflow-y-auto" role="list" aria-label="Action items">
+                        @forelse($todos as $todo)
+                            <a href="{{ $todo['link'] }}"
+                               class="flex items-center justify-between p-3 rounded-lg border transition-all duration-200 group
+                                      {{ $todo['completed']
+                                         ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800'
+                                         : 'bg-white dark:bg-slate-800/50 border-gray-200 dark:border-gray-700 hover:border-[#4F46E5] hover:shadow-md' }}">
+                                <div class="flex items-center gap-3">
+                                    @if($todo['completed'])
+                                        <div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </div>
+                                    @else
+                                        <div class="w-6 h-6 rounded-full border-2 border-amber-400 bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
+                                            <span class="w-2 h-2 bg-amber-400 rounded-full"></span>
+                                        </div>
+                                    @endif
+                                    <span class="text-sm {{ $todo['completed'] ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-800 dark:text-gray-200 group-hover:text-[#4F46E5]' }}">
+                                        {{ $todo['text'] }}
+                                    </span>
+                                </div>
+                                @if(!$todo['completed'] && $todo['count'] > 0)
+                                    <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400">
+                                        {{ $todo['count'] }}
+                                    </span>
+                                @elseif($todo['completed'])
+                                    <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Done</span>
+                                @endif
+                            </a>
+                        @empty
+                            <div class="text-center py-8">
+                                <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
-                                </button>
+                                </div>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">All caught up! No pending tasks.</p>
                             </div>
-                        </template>
-
-                        <div x-show="todos.length === 0" class="text-center py-8">
-                            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#818CF8] flex items-center justify-center opacity-50">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                </svg>
-                            </div>
-                            <p class="text-gray-500 dark:text-gray-400 text-sm">No tasks yet. Add one below!</p>
-                        </div>
+                        @endforelse
                     </div>
 
-                    {{-- Add New Todo --}}
-                    <form @submit.prevent="addTodo" class="space-y-3 mb-4">
-                        <input
-                            type="text"
-                            x-model="newTodo"
-                            placeholder="Add a new task..."
-                            class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] dark:bg-slate-800 dark:text-white focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
-                            aria-label="New task input"
-                        >
-                        <input
-                            type="date"
-                            x-model="newDate"
-                            class="w-full px-4 py-2.5 text-sm text-gray-900 bg-white border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
-                            aria-label="Task date"
-                        >
-                        <input
-                            type="time"
-                            x-model="newTime"
-                            class="w-full px-4 py-2.5 text-sm text-gray-900 bg-white border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
-                            aria-label="Task time"
-                        >
-                        <button
-                            type="submit"
-                            class="w-full px-5 py-2.5 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5] focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
-                            aria-label="Add task"
-                        >
-                            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <a href="{{ route('director.calendar.index') }}" class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white font-medium rounded-lg hover:shadow-lg transition-all text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                        </button>
-                    </form>
-
-                    <div class="p-3 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 border border-indigo-200 dark:border-indigo-700">
-                        <p class="text-xs text-gray-700 dark:text-gray-300 flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-[#4F46E5] dark:text-[#818CF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Tasks are saved automatically in your browser
-                        </p>
+                            View Calendar
+                        </a>
                     </div>
                 </div>
             </div>
