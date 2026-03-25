@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Director;
 
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceRecord;
+use App\Models\MonthlyClassSchedule;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\DirectorActivityLog;
@@ -98,16 +99,27 @@ class DirectorAttendanceController extends Controller
                     ->pluck('id')
                     ->toArray();
 
-                // Calculate expected monthly classes based on student's schedule
+                // Calculate expected monthly classes
+                // First check if tutor set up MonthlyClassSchedule for this student/month
                 $student = $record->student;
-                $expectedMonthlyClasses = $student
-                    ? $student->getExpectedClassesForMonth(
+                $expectedMonthlyClasses = 0;
+                $monthlySchedule = MonthlyClassSchedule::where('student_id', $record->student_id)
+                    ->where('year', $record->class_date->year)
+                    ->where('month', $record->class_date->month)
+                    ->first();
+
+                if ($monthlySchedule && $monthlySchedule->total_classes > 0) {
+                    // Use tutor-set monthly schedule
+                    $expectedMonthlyClasses = $monthlySchedule->total_classes;
+                } elseif ($student) {
+                    // Fall back to calculating from student's weekly schedule
+                    $expectedMonthlyClasses = $student->getExpectedClassesForMonth(
                         $record->class_date->year,
                         $record->class_date->month
-                    )
-                    : 0;
+                    );
+                }
 
-                // Fallback if schedule not available
+                // Final fallback: count actual attendance records
                 if ($expectedMonthlyClasses === 0) {
                     $expectedMonthlyClasses = AttendanceRecord::where('student_id', $record->student_id)
                         ->where('is_stand_in', false)

@@ -84,16 +84,27 @@ class AdminAttendanceController extends Controller
                     ->pluck('id')
                     ->toArray();
 
-                // Calculate expected monthly classes based on student's schedule
+                // Calculate expected monthly classes
+                // First check if tutor set up MonthlyClassSchedule for this student/month
                 $student = $attendance->student;
-                $expectedMonthlyClasses = $student
-                    ? $student->getExpectedClassesForMonth(
+                $expectedMonthlyClasses = 0;
+                $monthlySchedule = MonthlyClassSchedule::where('student_id', $attendance->student_id)
+                    ->where('year', $attendance->class_date->year)
+                    ->where('month', $attendance->class_date->month)
+                    ->first();
+
+                if ($monthlySchedule && $monthlySchedule->total_classes > 0) {
+                    // Use tutor-set monthly schedule
+                    $expectedMonthlyClasses = $monthlySchedule->total_classes;
+                } elseif ($student) {
+                    // Fall back to calculating from student's weekly schedule
+                    $expectedMonthlyClasses = $student->getExpectedClassesForMonth(
                         $attendance->class_date->year,
                         $attendance->class_date->month
-                    )
-                    : 0;
+                    );
+                }
 
-                // Fallback if schedule not available
+                // Final fallback: count actual attendance records
                 if ($expectedMonthlyClasses === 0) {
                     $expectedMonthlyClasses = AttendanceRecord::where('student_id', $attendance->student_id)
                         ->where('is_stand_in', false)
