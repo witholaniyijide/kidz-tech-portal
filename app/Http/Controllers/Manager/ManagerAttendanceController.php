@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Manager;
 
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceRecord;
+use App\Models\MonthlyClassSchedule;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Services\NotificationService;
@@ -93,17 +94,28 @@ class ManagerAttendanceController extends Controller
                     ->pluck('id')
                     ->toArray();
 
-                // Calculate expected monthly classes based on student's schedule
+                // Calculate expected monthly classes
+                // First check if tutor set up MonthlyClassSchedule for this student/month
                 $student = $record->student;
                 $expectedMonthlyClasses = 0;
+                $monthlySchedule = MonthlyClassSchedule::where('student_id', $record->student_id)
+                    ->where('year', $record->class_date->year)
+                    ->where('month', $record->class_date->month)
+                    ->first();
 
-                if ($student->class_schedule && is_array($student->class_schedule)) {
-                    $classesPerWeek = count($student->class_schedule);
-                    $monthStart = Carbon::create($record->class_date->year, $record->class_date->month, 1);
-                    $monthEnd = $monthStart->copy()->endOfMonth();
-                    $weeksInMonth = ceil($monthEnd->diffInDays($monthStart) / 7);
-                    $expectedMonthlyClasses = $classesPerWeek * $weeksInMonth;
-                } else {
+                if ($monthlySchedule && $monthlySchedule->total_classes > 0) {
+                    // Use tutor-set monthly schedule
+                    $expectedMonthlyClasses = $monthlySchedule->total_classes;
+                } elseif ($student) {
+                    // Fall back to calculating from student's weekly schedule
+                    $expectedMonthlyClasses = $student->getExpectedClassesForMonth(
+                        $record->class_date->year,
+                        $record->class_date->month
+                    );
+                }
+
+                // Final fallback: count actual attendance records
+                if ($expectedMonthlyClasses === 0) {
                     $expectedMonthlyClasses = AttendanceRecord::where('student_id', $record->student_id)
                         ->where('is_stand_in', false)
                         ->whereYear('class_date', $record->class_date->year)

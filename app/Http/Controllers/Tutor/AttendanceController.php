@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tutor;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tutor\StoreAttendanceRequest;
 use App\Models\AttendanceRecord;
+use App\Models\MonthlyClassSchedule;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\User;
@@ -86,22 +87,27 @@ class AttendanceController extends Controller
                 ->pluck('id')
                 ->toArray();
 
-            // Calculate expected monthly classes based on student's schedule
+            // Calculate expected monthly classes
+            // First check if tutor set up MonthlyClassSchedule for this student/month
             $expectedMonthlyClasses = 0;
+            $monthlySchedule = MonthlyClassSchedule::where('student_id', $attendance->student_id)
+                ->where('year', $attendance->class_date->year)
+                ->where('month', $attendance->class_date->month)
+                ->first();
 
-            if ($student && $student->class_schedule && is_array($student->class_schedule)) {
-                // Count classes per week from student's schedule
-                $classesPerWeek = count($student->class_schedule);
+            if ($monthlySchedule && $monthlySchedule->total_classes > 0) {
+                // Use tutor-set monthly schedule
+                $expectedMonthlyClasses = $monthlySchedule->total_classes;
+            } elseif ($student) {
+                // Fall back to calculating from student's weekly schedule
+                $expectedMonthlyClasses = $student->getExpectedClassesForMonth(
+                    $attendance->class_date->year,
+                    $attendance->class_date->month
+                );
+            }
 
-                // Calculate number of weeks in the month
-                $monthStart = Carbon::create($attendance->class_date->year, $attendance->class_date->month, 1);
-                $monthEnd = $monthStart->copy()->endOfMonth();
-                $weeksInMonth = ceil($monthEnd->diffInDays($monthStart) / 7);
-
-                // Expected classes = classes per week * weeks in month
-                $expectedMonthlyClasses = $classesPerWeek * $weeksInMonth;
-            } else {
-                // Fallback to counting actual non-stand-in attendance records if schedule not available
+            // Final fallback: count actual attendance records
+            if ($expectedMonthlyClasses === 0) {
                 $expectedMonthlyClasses = AttendanceRecord::where('student_id', $attendance->student_id)
                     ->where('is_stand_in', false)
                     ->whereYear('class_date', $attendance->class_date->year)

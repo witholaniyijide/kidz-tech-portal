@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Director;
 
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceRecord;
+use App\Models\MonthlyClassSchedule;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\DirectorActivityLog;
@@ -98,17 +99,28 @@ class DirectorAttendanceController extends Controller
                     ->pluck('id')
                     ->toArray();
 
-                // Calculate expected monthly classes based on student's schedule
+                // Calculate expected monthly classes
+                // First check if tutor set up MonthlyClassSchedule for this student/month
                 $student = $record->student;
                 $expectedMonthlyClasses = 0;
+                $monthlySchedule = MonthlyClassSchedule::where('student_id', $record->student_id)
+                    ->where('year', $record->class_date->year)
+                    ->where('month', $record->class_date->month)
+                    ->first();
 
-                if ($student->class_schedule && is_array($student->class_schedule)) {
-                    $classesPerWeek = count($student->class_schedule);
-                    $monthStart = \Carbon\Carbon::create($record->class_date->year, $record->class_date->month, 1);
-                    $monthEnd = $monthStart->copy()->endOfMonth();
-                    $weeksInMonth = ceil($monthEnd->diffInDays($monthStart) / 7);
-                    $expectedMonthlyClasses = $classesPerWeek * $weeksInMonth;
-                } else {
+                if ($monthlySchedule && $monthlySchedule->total_classes > 0) {
+                    // Use tutor-set monthly schedule
+                    $expectedMonthlyClasses = $monthlySchedule->total_classes;
+                } elseif ($student) {
+                    // Fall back to calculating from student's weekly schedule
+                    $expectedMonthlyClasses = $student->getExpectedClassesForMonth(
+                        $record->class_date->year,
+                        $record->class_date->month
+                    );
+                }
+
+                // Final fallback: count actual attendance records
+                if ($expectedMonthlyClasses === 0) {
                     $expectedMonthlyClasses = AttendanceRecord::where('student_id', $record->student_id)
                         ->where('is_stand_in', false)
                         ->whereYear('class_date', $record->class_date->year)
@@ -370,5 +382,194 @@ class DirectorAttendanceController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to delete attendance: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Display the calendar view for attendance tracking.
+     */
+    public function calendar(Request $request)
+    {
+        $year = (int) $request->get('year', now()->year);
+        $month = (int) $request->get('month', now()->month);
+
+        // Validate year and month
+        if ($month < 1 || $month > 12) {
+            $month = now()->month;
+        }
+        if ($year < 2020 || $year > 2030) {
+            $year = now()->year;
+        }
+
+        $selectedDate = $request->get('date');
+        $tutorFilter = $request->get('tutor_id');
+        $studentFilter = $request->get('student_id');
+        $statusFilter = $request->get('status');
+
+        // Get all students and tutors for filters
+        $students = Student::where('status', 'active')->orderBy('first_name')->get();
+        $tutors = Tutor::where('status', 'active')->orderBy('first_name')->get();
+
+        // Build calendar data
+        $startOfMonth = \Carbon\Carbon::create($year, $month, 1)->startOfMonth();
+        $endOfMonth = $startOfMonth->copy()->endOfMonth();
+        $today = now()->startOfDay();
+
+        // Get actual attendance records for this month
+        $attendanceQuery = AttendanceRecord::with(['student', 'tutor'])
+            ->whereYear('class_date', $year)
+            ->whereMonth('class_date', $month);
+
+        if ($tutorFilter) {
+            $attendanceQuery->where('tutor_id', $tutorFilter);
+        }
+        if ($studentFilter) {
+            $attendanceQuery->where('student_id', $studentFilter);
+        }
+        if ($statusFilter) {
+            $attendanceQuery->where('status', $statusFilter);
+        }
+
+        $attendanceRecords = $attendanceQuery->get()->groupBy(function ($record) {
+            return $record->class_date->format('Y-m-d');
+        });
+
+        // Build potential classes for future dates based on student schedules
+        $potentialClasses = [];
+        $studentQuery = Student::where('status', 'active')
+            ->whereNotNull('class_schedule');
+
+        if ($studentFilter) {
+            $studentQuery->where('id', $studentFilter);
+        }
+        if ($tutorFilter) {
+            $studentQuery->where('tutor_id', $tutorFilter);
+        }
+
+        $studentsWithSchedules = $studentQuery->with('tutor')->get();
+
+        $dayMap = [
+            'sunday' => 0,
+            'monday' => 1,
+            'tuesday' => 2,
+            'wednesday' => 3,
+            'thursday' => 4,
+            'friday' => 5,
+            'saturday' => 6,
+        ];
+
+        $current = $startOfMonth->copy();
+        while ($current->lte($endOfMonth)) {
+            $dateStr = $current->format('Y-m-d');
+            $dayOfWeek = $current->dayOfWeek;
+
+            foreach ($studentsWithSchedules as $student) {
+                if (!$student->class_schedule || !is_array($student->class_schedule)) {
+                    continue;
+                }
+
+                foreach ($student->class_schedule as $schedule) {
+                    if (empty($schedule['day'])) {
+                        continue;
+                    }
+
+                    $scheduleDayNum = $dayMap[strtolower(trim($schedule['day']))] ?? -1;
+                    if ($scheduleDayNum === $dayOfWeek) {
+                        if (!isset($potentialClasses[$dateStr])) {
+                            $potentialClasses[$dateStr] = [];
+                        }
+                        $potentialClasses[$dateStr][] = [
+                            'student' => $student,
+                            'tutor' => $student->tutor,
+                            'time' => $schedule['time'] ?? null,
+                        ];
+                    }
+                }
+            }
+            $current->addDay();
+        }
+
+        // Build calendar grid
+        $calendarDays = [];
+        $current = $startOfMonth->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
+        $endOfCalendar = $endOfMonth->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
+
+        while ($current->lte($endOfCalendar)) {
+            $dateStr = $current->format('Y-m-d');
+            $isCurrentMonth = $current->month === $month;
+            $isPast = $current->lt($today);
+            $isToday = $current->eq($today);
+            $isFuture = $current->gt($today);
+
+            $dayData = [
+                'date' => $current->copy(),
+                'dateStr' => $dateStr,
+                'day' => $current->day,
+                'isCurrentMonth' => $isCurrentMonth,
+                'isPast' => $isPast,
+                'isToday' => $isToday,
+                'isFuture' => $isFuture,
+                'attendance' => $attendanceRecords->get($dateStr, collect()),
+                'potential' => $potentialClasses[$dateStr] ?? [],
+            ];
+
+            // Calculate stats for this day
+            $dayData['approvedCount'] = $dayData['attendance']->where('status', 'approved')->count();
+            $dayData['pendingCount'] = $dayData['attendance']->where('status', 'pending')->count();
+            $dayData['potentialCount'] = count($dayData['potential']);
+
+            $calendarDays[] = $dayData;
+            $current->addDay();
+        }
+
+        // If a specific date is selected, get detailed data
+        $selectedDateData = null;
+        if ($selectedDate) {
+            $selectedCarbon = \Carbon\Carbon::parse($selectedDate);
+            $isPastDate = $selectedCarbon->lt($today);
+
+            $detailQuery = AttendanceRecord::with(['student', 'tutor'])
+                ->whereDate('class_date', $selectedDate);
+
+            if ($tutorFilter) {
+                $detailQuery->where('tutor_id', $tutorFilter);
+            }
+            if ($studentFilter) {
+                $detailQuery->where('student_id', $studentFilter);
+            }
+            if ($statusFilter) {
+                $detailQuery->where('status', $statusFilter);
+            }
+
+            $selectedDateData = [
+                'date' => $selectedCarbon,
+                'isPast' => $isPastDate,
+                'isToday' => $selectedCarbon->eq($today),
+                'isFuture' => $selectedCarbon->gt($today),
+                'attendance' => $detailQuery->get(),
+                'potential' => $potentialClasses[$selectedDate] ?? [],
+            ];
+        }
+
+        // Monthly stats
+        $monthStats = [
+            'totalClasses' => $attendanceRecords->flatten()->count(),
+            'approved' => $attendanceRecords->flatten()->where('status', 'approved')->count(),
+            'pending' => $attendanceRecords->flatten()->where('status', 'pending')->count(),
+            'potentialTotal' => collect($potentialClasses)->flatten(1)->count(),
+        ];
+
+        return view('director.attendance.calendar', compact(
+            'year',
+            'month',
+            'calendarDays',
+            'students',
+            'tutors',
+            'selectedDate',
+            'selectedDateData',
+            'tutorFilter',
+            'studentFilter',
+            'statusFilter',
+            'monthStats'
+        ));
     }
 }

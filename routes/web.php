@@ -93,6 +93,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/attendance/{attendance}', [App\Http\Controllers\Admin\AdminAttendanceController::class, 'show'])->name('attendance.show');
     Route::post('/attendance/{attendance}/approve', [App\Http\Controllers\Admin\AdminAttendanceController::class, 'approve'])->name('attendance.approve');
     Route::post('/attendance/{attendance}/late', [App\Http\Controllers\Admin\AdminAttendanceController::class, 'markLate'])->name('attendance.late');
+    Route::post('/attendance/bulk-approve', [App\Http\Controllers\Admin\AdminAttendanceController::class, 'bulkApprove'])->name('attendance.bulk-approve');
     Route::delete('/attendance/{attendance}', [App\Http\Controllers\Admin\AdminAttendanceController::class, 'destroy'])->name('attendance.destroy');
 
     // Schedules (Full control)
@@ -618,6 +619,10 @@ Route::prefix('director')
             ->name('attendance.destroy');
         Route::post('/attendance/{attendance}/approve', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'approve'])
             ->name('attendance.approve');
+
+        // Director Calendar
+        Route::get('/calendar', [App\Http\Controllers\Director\DirectorAttendanceController::class, 'calendar'])
+            ->name('calendar.index');
 
         // Director Finance
         Route::get('/finance', [App\Http\Controllers\Director\DirectorFinanceController::class, 'index'])

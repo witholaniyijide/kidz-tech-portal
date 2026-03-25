@@ -137,12 +137,23 @@ class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 flex flex-col
         {{-- Attendance --}}
         <a href="{{ route('director.attendance.index') }}"
            class="flex items-center px-3 py-3 md:py-2.5 rounded-xl transition-all duration-200 group no-select
-                  {{ request()->routeIs('director.attendance.*') ? 'bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+                  {{ request()->routeIs('director.attendance.*') && !request()->routeIs('director.calendar.*') ? 'bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
            :title="collapsed ? 'Attendance' : ''">
             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
             </svg>
             <span x-show="!collapsed || window.innerWidth < 768" x-transition class="ml-3 font-medium">Attendance</span>
+        </a>
+
+        {{-- Calendar --}}
+        <a href="{{ route('director.calendar.index') }}"
+           class="flex items-center px-3 py-3 md:py-2.5 rounded-xl transition-all duration-200 group no-select
+                  {{ request()->routeIs('director.calendar.*') ? 'bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white shadow-lg' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white' }}"
+           :title="collapsed ? 'Calendar' : ''">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span x-show="!collapsed || window.innerWidth < 768" x-transition class="ml-3 font-medium">Calendar</span>
         </a>
 
         {{-- Reports --}}
