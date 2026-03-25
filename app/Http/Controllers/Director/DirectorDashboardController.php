@@ -177,18 +177,21 @@ class DirectorDashboardController extends Controller
                   ->orWhere('class_schedule', '');
             })->count();
 
+        // Count today's scheduled classes
+        $todaysClassCount = count($todayClasses);
+
         $todos = [
+            [
+                'text' => "View today's {$todaysClassCount} scheduled class(es)",
+                'completed' => $todaysClassCount == 0,
+                'link' => route('director.calendar.index', ['date' => now()->format('Y-m-d')]),
+                'count' => $todaysClassCount,
+            ],
             [
                 'text' => "Review {$pendingApprovals} pending report(s)",
                 'completed' => $pendingApprovals == 0,
                 'link' => route('director.reports.index'),
                 'count' => $pendingApprovals,
-            ],
-            [
-                'text' => "Approve {$pendingAttendance} attendance record(s)",
-                'completed' => $pendingAttendance == 0,
-                'link' => route('director.attendance.index'),
-                'count' => $pendingAttendance,
             ],
             [
                 'text' => "Review {$pendingAssessments} assessment(s)",

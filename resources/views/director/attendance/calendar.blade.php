@@ -147,6 +147,7 @@
                                 @php
                                     $hasClasses = $day['attendance']->count() > 0 || count($day['potential']) > 0;
                                     $isSelected = $selectedDate === $day['dateStr'];
+                                    $totalClasses = $day['approvedCount'] + $day['pendingCount'] + $day['potentialCount'];
                                 @endphp
                                 <a href="{{ route('director.calendar.index', array_merge(request()->all(), ['date' => $day['dateStr']])) }}"
                                    class="min-h-[100px] p-2 border-b border-r border-gray-200 dark:border-gray-700 transition-colors
@@ -160,33 +161,31 @@
                                         </span>
                                         @if($day['isToday'])
                                             <span class="px-1.5 py-0.5 text-xs bg-indigo-600 text-white rounded">Today</span>
+                                        @elseif($day['isCurrentMonth'] && $totalClasses > 0)
+                                            <span class="px-1.5 py-0.5 text-xs bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded font-medium">{{ $totalClasses }}</span>
                                         @endif
                                     </div>
 
                                     @if($day['isCurrentMonth'] && $hasClasses)
-                                        <div class="space-y-1">
-                                            @if($day['isPast'] || $day['isToday'])
-                                                {{-- Past dates: show actual classes --}}
-                                                @if($day['approvedCount'] > 0)
-                                                    <div class="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
-                                                        <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
-                                                        {{ $day['approvedCount'] }} approved
-                                                    </div>
-                                                @endif
-                                                @if($day['pendingCount'] > 0)
-                                                    <div class="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
-                                                        <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
-                                                        {{ $day['pendingCount'] }} pending
-                                                    </div>
-                                                @endif
-                                            @else
-                                                {{-- Future dates: show potential classes --}}
-                                                @if($day['potentialCount'] > 0)
-                                                    <div class="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
-                                                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                                        {{ $day['potentialCount'] }} scheduled
-                                                    </div>
-                                                @endif
+                                        <div class="space-y-0.5">
+                                            {{-- Always show all three statuses if they have values --}}
+                                            @if($day['approvedCount'] > 0)
+                                                <div class="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+                                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                                                    {{ $day['approvedCount'] }} completed
+                                                </div>
+                                            @endif
+                                            @if($day['pendingCount'] > 0)
+                                                <div class="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+                                                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span>
+                                                    {{ $day['pendingCount'] }} pending
+                                                </div>
+                                            @endif
+                                            @if($day['potentialCount'] > 0)
+                                                <div class="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                                                    <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                                                    {{ $day['potentialCount'] }} scheduled
+                                                </div>
                                             @endif
                                         </div>
                                     @endif
@@ -199,7 +198,7 @@
                     <div class="mt-4 flex flex-wrap gap-4 text-sm">
                         <div class="flex items-center gap-2">
                             <span class="w-3 h-3 bg-emerald-500 rounded-full"></span>
-                            <span class="text-gray-600 dark:text-gray-400">Approved attendance</span>
+                            <span class="text-gray-600 dark:text-gray-400">Completed (approved)</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="w-3 h-3 bg-amber-500 rounded-full"></span>
@@ -207,15 +206,29 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
-                            <span class="text-gray-600 dark:text-gray-400">Scheduled (future)</span>
+                            <span class="text-gray-600 dark:text-gray-400">Scheduled (upcoming)</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Selected Date Details -->
-                <div class="lg:col-span-1">
+                <div class="lg:col-span-1" x-data="{
+                    showModal: false,
+                    modalData: null,
+                    openModal(data) {
+                        this.modalData = data;
+                        this.showModal = true;
+                    }
+                }">
                     <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 sticky top-4">
                         @if($selectedDateData)
+                            @php
+                                $totalAttendance = $selectedDateData['attendance']->count();
+                                $totalPotential = count($selectedDateData['potential']);
+                                $totalClasses = $totalAttendance + $totalPotential;
+                                $approvedCount = $selectedDateData['attendance']->where('status', 'approved')->count();
+                                $pendingCount = $selectedDateData['attendance']->where('status', 'pending')->count();
+                            @endphp
                             <div class="p-4 border-b border-gray-200 dark:border-gray-700">
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                                     {{ $selectedDateData['date']->format('l, F j, Y') }}
@@ -229,77 +242,99 @@
                                         In {{ $selectedDateData['date']->diffForHumans() }}
                                     @endif
                                 </p>
+                                {{-- Summary stats --}}
+                                <div class="flex flex-wrap gap-2 mt-3">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                        {{ $totalClasses }} total
+                                    </span>
+                                    @if($approvedCount > 0)
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                                            {{ $approvedCount }} completed
+                                        </span>
+                                    @endif
+                                    @if($pendingCount > 0)
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                                            {{ $pendingCount }} pending
+                                        </span>
+                                    @endif
+                                    @if($totalPotential > 0)
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                            {{ $totalPotential }} scheduled
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
 
                             <div class="p-4 max-h-[500px] overflow-y-auto">
-                                @if($selectedDateData['isPast'] || $selectedDateData['isToday'])
-                                    {{-- Past/Today: Show actual attendance records --}}
-                                    @if($selectedDateData['attendance']->isEmpty())
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No classes recorded for this date.</p>
-                                    @else
-                                        <div class="space-y-3">
-                                            @foreach($selectedDateData['attendance'] as $record)
-                                                <a href="{{ route('director.attendance.show', $record) }}"
-                                                   class="block p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                                    <div class="flex items-start justify-between">
-                                                        <div>
-                                                            <div class="font-medium text-gray-900 dark:text-white">
-                                                                {{ $record->student->first_name ?? 'Unknown' }} {{ $record->student->last_name ?? '' }}
-                                                            </div>
-                                                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                                Tutor: {{ $record->tutor->first_name ?? 'Unknown' }} {{ $record->tutor->last_name ?? '' }}
-                                                            </div>
-                                                            @if($record->class_time)
-                                                                <div class="text-xs text-gray-400 mt-1">
-                                                                    {{ \Carbon\Carbon::parse($record->class_time)->format('g:i A') }}
-                                                                    @if($record->duration_minutes)
-                                                                        ({{ $record->duration_minutes }} mins)
-                                                                    @endif
-                                                                </div>
-                                                            @endif
+                                @if($totalClasses === 0)
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No classes for this date.</p>
+                                @else
+                                    <div class="space-y-2">
+                                        {{-- Attendance Records --}}
+                                        @foreach($selectedDateData['attendance'] as $record)
+                                            <button type="button"
+                                                @click="openModal({
+                                                    id: {{ $record->id }},
+                                                    student: '{{ addslashes(($record->student->first_name ?? 'Unknown') . ' ' . ($record->student->last_name ?? '')) }}',
+                                                    tutor: '{{ addslashes(($record->tutor->first_name ?? 'Unknown') . ' ' . ($record->tutor->last_name ?? '')) }}',
+                                                    status: '{{ $record->status }}',
+                                                    time: '{{ $record->class_time ? \Carbon\Carbon::parse($record->class_time)->format('g:i A') : 'N/A' }}',
+                                                    duration: '{{ $record->duration_minutes ?? 'N/A' }}',
+                                                    topic: '{{ addslashes($record->topic ?? '') }}',
+                                                    courses: {{ json_encode($record->courses_covered ?? []) }},
+                                                    notes: '{{ addslashes($record->notes ?? '') }}',
+                                                    submittedAt: '{{ $record->created_at->format('M j, Y g:i A') }}',
+                                                    isLate: {{ $record->is_late ? 'true' : 'false' }},
+                                                    type: 'attendance'
+                                                })"
+                                                class="w-full text-left p-3 rounded-lg transition-colors
+                                                    {{ $record->status === 'approved'
+                                                        ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
+                                                        : 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/50 hover:bg-amber-100 dark:hover:bg-amber-900/30' }}">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <div class="font-medium text-gray-900 dark:text-white text-sm">
+                                                            {{ $record->student->first_name ?? 'Unknown' }} {{ $record->student->last_name ?? '' }}
                                                         </div>
+                                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                            {{ $record->tutor->first_name ?? 'Unknown' }} {{ $record->tutor->last_name ?? '' }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center gap-1">
+                                                        @if($record->is_late)
+                                                            <span class="px-1.5 py-0.5 text-xs font-medium rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Late</span>
+                                                        @endif
                                                         <span class="px-2 py-1 text-xs font-medium rounded-full
                                                             {{ $record->status === 'approved' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' }}">
-                                                            {{ ucfirst($record->status) }}
-                                                        </span>
-                                                    </div>
-                                                    @if($record->topic)
-                                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">{{ $record->topic }}</p>
-                                                    @endif
-                                                </a>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                @else
-                                    {{-- Future: Show potential classes --}}
-                                    @if(empty($selectedDateData['potential']))
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No classes scheduled for this date.</p>
-                                    @else
-                                        <div class="space-y-3">
-                                            @foreach($selectedDateData['potential'] as $potential)
-                                                <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200/50 dark:border-blue-800/50">
-                                                    <div class="flex items-start justify-between">
-                                                        <div>
-                                                            <div class="font-medium text-gray-900 dark:text-white">
-                                                                {{ $potential['student']->first_name }} {{ $potential['student']->last_name }}
-                                                            </div>
-                                                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                                Tutor: {{ $potential['tutor']->first_name ?? 'Unassigned' }} {{ $potential['tutor']->last_name ?? '' }}
-                                                            </div>
-                                                            @if($potential['time'])
-                                                                <div class="text-xs text-gray-400 mt-1">
-                                                                    Scheduled: {{ $potential['time'] }}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                                                            Scheduled
+                                                            {{ $record->status === 'approved' ? 'Completed' : 'Pending' }}
                                                         </span>
                                                     </div>
                                                 </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
+                                            </button>
+                                        @endforeach
+
+                                        {{-- Scheduled Classes --}}
+                                        @foreach($selectedDateData['potential'] as $potential)
+                                            <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200/50 dark:border-blue-800/50">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <div class="font-medium text-gray-900 dark:text-white text-sm">
+                                                            {{ $potential['student']->first_name }} {{ $potential['student']->last_name }}
+                                                        </div>
+                                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                            {{ $potential['tutor']->first_name ?? 'Unassigned' }} {{ $potential['tutor']->last_name ?? '' }}
+                                                            @if($potential['time'])
+                                                                <span class="ml-1">@ {{ $potential['time'] }}</span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                                        Scheduled
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 @endif
                             </div>
                         @else
@@ -311,6 +346,110 @@
                             </div>
                         @endif
                     </div>
+
+                    {{-- Attendance Detail Modal --}}
+                    <div x-show="showModal" x-cloak
+                         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                         @keydown.escape.window="showModal = false">
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto"
+                             @click.outside="showModal = false">
+                            {{-- Modal Header --}}
+                            <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Attendance Details</h3>
+                                <button @click="showModal = false" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {{-- Modal Content --}}
+                            <div class="p-4 space-y-4" x-show="modalData">
+                                {{-- Status Badge --}}
+                                <div class="flex items-center gap-2">
+                                    <template x-if="modalData?.status === 'approved'">
+                                        <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                                            Completed
+                                        </span>
+                                    </template>
+                                    <template x-if="modalData?.status === 'pending'">
+                                        <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                                            Pending Approval
+                                        </span>
+                                    </template>
+                                    <template x-if="modalData?.isLate">
+                                        <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                            Late Submission
+                                        </span>
+                                    </template>
+                                </div>
+
+                                {{-- Student & Tutor Info --}}
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Student</label>
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white" x-text="modalData?.student"></p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tutor</label>
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white" x-text="modalData?.tutor"></p>
+                                    </div>
+                                </div>
+
+                                {{-- Time & Duration --}}
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Class Time</label>
+                                        <p class="text-sm text-gray-900 dark:text-white" x-text="modalData?.time"></p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Duration</label>
+                                        <p class="text-sm text-gray-900 dark:text-white" x-text="modalData?.duration + ' mins'"></p>
+                                    </div>
+                                </div>
+
+                                {{-- Topic --}}
+                                <div x-show="modalData?.topic">
+                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Topic</label>
+                                    <p class="text-sm text-gray-900 dark:text-white" x-text="modalData?.topic"></p>
+                                </div>
+
+                                {{-- Courses Covered --}}
+                                <div x-show="modalData?.courses?.length > 0">
+                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Courses Covered</label>
+                                    <div class="flex flex-wrap gap-1">
+                                        <template x-for="course in modalData?.courses" :key="course">
+                                            <span class="px-2 py-1 text-xs bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 rounded" x-text="course"></span>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                {{-- Notes --}}
+                                <div x-show="modalData?.notes">
+                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Notes</label>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3" x-text="modalData?.notes"></p>
+                                </div>
+
+                                {{-- Submitted At --}}
+                                <div class="pt-3 border-t border-gray-200 dark:border-gray-700">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        Submitted: <span x-text="modalData?.submittedAt"></span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            {{-- Modal Footer --}}
+                            <div class="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 rounded-b-2xl">
+                                <button @click="showModal = false" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                    Close
+                                </button>
+                                <a :href="'{{ route('director.attendance.index') }}/' + modalData?.id"
+                                   class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors">
+                                    View Full Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -319,6 +458,7 @@
 
     @push('styles')
     <style>
+        [x-cloak] { display: none !important; }
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;

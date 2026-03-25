@@ -183,10 +183,13 @@
                  x-data="{
                     selectedIds: [],
                     selectAll: false,
+                    allIds: {{ json_encode($attendances->pluck('id')->toArray()) }},
                     pendingIds: {{ json_encode($attendances->where('status', 'pending')->pluck('id')->toArray()) }},
+                    showApproveModal: false,
+                    showDeleteModal: false,
                     toggleAll() {
                         if (this.selectAll) {
-                            this.selectedIds = [...this.pendingIds];
+                            this.selectedIds = [...this.allIds];
                         } else {
                             this.selectedIds = [];
                         }
@@ -197,7 +200,10 @@
                         } else {
                             this.selectedIds.push(id);
                         }
-                        this.selectAll = this.selectedIds.length === this.pendingIds.length && this.pendingIds.length > 0;
+                        this.selectAll = this.selectedIds.length === this.allIds.length && this.allIds.length > 0;
+                    },
+                    getSelectedPendingCount() {
+                        return this.selectedIds.filter(id => this.pendingIds.includes(id)).length;
                     }
                  }">
                 {{-- Bulk Actions Bar --}}
@@ -208,19 +214,111 @@
                             <span x-text="selectedIds.length"></span> record(s) selected
                         </span>
                     </div>
-                    <form action="{{ route('admin.attendance.bulk-approve') }}" method="POST" class="inline">
-                        @csrf
-                        <template x-for="id in selectedIds" :key="id">
-                            <input type="hidden" name="attendance_ids[]" :value="id">
-                        </template>
-                        <button type="submit"
+                    <div class="flex items-center gap-2">
+                        {{-- Bulk Approve Button --}}
+                        <button type="button"
+                                @click="showApproveModal = true"
+                                x-show="getSelectedPendingCount() > 0"
                                 class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                            Bulk Approve
+                            Bulk Approve (<span x-text="getSelectedPendingCount()"></span>)
                         </button>
-                    </form>
+                        {{-- Bulk Delete Button --}}
+                        <button type="button"
+                                @click="showDeleteModal = true"
+                                class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            Bulk Delete (<span x-text="selectedIds.length"></span>)
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Bulk Approve Confirmation Modal --}}
+                <div x-show="showApproveModal" x-cloak
+                     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                     @keydown.escape.window="showApproveModal = false">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6"
+                         @click.outside="showApproveModal = false">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Confirm Bulk Approve</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">This action cannot be undone</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 dark:text-gray-300 mb-6">
+                            Are you sure you want to approve <span class="font-bold text-emerald-600" x-text="getSelectedPendingCount()"></span> pending attendance record(s)?
+                        </p>
+                        <div class="flex justify-end gap-3">
+                            <button type="button" @click="showApproveModal = false"
+                                    class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                Cancel
+                            </button>
+                            <form action="{{ route('admin.attendance.bulk-approve') }}" method="POST" class="inline">
+                                @csrf
+                                <template x-for="id in selectedIds.filter(id => pendingIds.includes(id))" :key="id">
+                                    <input type="hidden" name="attendance_ids[]" :value="id">
+                                </template>
+                                <button type="submit"
+                                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors">
+                                    Yes, Approve All
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Bulk Delete Confirmation Modal --}}
+                <div x-show="showDeleteModal" x-cloak
+                     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                     @keydown.escape.window="showDeleteModal = false">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6"
+                         @click.outside="showDeleteModal = false">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Confirm Permanent Delete</h3>
+                                <p class="text-sm text-red-500">This action is irreversible!</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4">
+                            Are you sure you want to <span class="font-bold text-red-600">permanently delete</span> <span class="font-bold" x-text="selectedIds.length"></span> attendance record(s)?
+                        </p>
+                        <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg mb-6">
+                            <p class="text-sm text-red-700 dark:text-red-400">
+                                <strong>Warning:</strong> This will permanently remove these records from the database. They cannot be recovered.
+                            </p>
+                        </div>
+                        <div class="flex justify-end gap-3">
+                            <button type="button" @click="showDeleteModal = false"
+                                    class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                Cancel
+                            </button>
+                            <form action="{{ route('admin.attendance.bulk-delete') }}" method="POST" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <template x-for="id in selectedIds" :key="id">
+                                    <input type="hidden" name="attendance_ids[]" :value="id">
+                                </template>
+                                <button type="submit"
+                                        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
+                                    Yes, Delete Permanently
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
                 @if($attendances->isEmpty())
@@ -237,7 +335,7 @@
                                     <th class="px-4 py-4 text-left">
                                         <input type="checkbox" x-model="selectAll" @change="toggleAll()"
                                                class="w-4 h-4 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E]"
-                                               :disabled="pendingIds.length === 0">
+                                               :disabled="allIds.length === 0">
                                     </th>
                                     <th class="px-4 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Student</th>
                                     <th class="px-4 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Tutor</th>
@@ -252,12 +350,10 @@
                                 @foreach($attendances as $attendance)
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors {{ $attendance->status === 'pending' ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }} {{ ($attendance->is_late || $attendance->is_late_submission) && $attendance->status === 'pending' ? 'border-l-4 border-red-400' : '' }}">
                                         <td class="px-4 py-4">
-                                            @if($attendance->status === 'pending')
-                                                <input type="checkbox"
-                                                       :checked="selectedIds.includes({{ $attendance->id }})"
-                                                       @change="toggleOne({{ $attendance->id }})"
-                                                       class="w-4 h-4 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E]">
-                                            @endif
+                                            <input type="checkbox"
+                                                   :checked="selectedIds.includes({{ $attendance->id }})"
+                                                   @change="toggleOne({{ $attendance->id }})"
+                                                   class="w-4 h-4 text-[#423A8E] border-gray-300 rounded focus:ring-[#423A8E]">
                                         </td>
                                         <td class="px-4 py-4">
                                             <div class="flex items-center">
