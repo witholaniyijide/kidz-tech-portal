@@ -296,9 +296,18 @@ class Student extends Model
 
     /**
      * Get the student's progress percentage
+     *
+     * This method intelligently selects the best progress calculation method:
+     * 1. If using explicit progression system (starting_course_id set), uses explicit completed courses
+     * 2. Falls back to course statuses from reports for legacy students
      */
     public function progressPercentage()
     {
+        // If using explicit progression system, use explicit progress calculation
+        if ($this->usesExplicitProgression()) {
+            return $this->getExplicitProgressPercentage();
+        }
+
         // Get course statuses which accounts for starting_course_level
         $courseStatuses = $this->calculateCourseStatuses();
 
