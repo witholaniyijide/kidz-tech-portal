@@ -70,6 +70,15 @@
                                 <option value="withdrawn" {{ request('status') == 'withdrawn' ? 'selected' : '' }}>Withdrawn</option>
                             </select>
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort By</label>
+                            <select name="sort" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                <option value="created_desc" {{ request('sort') == 'created_desc' || !request('sort') ? 'selected' : '' }}>Newest First</option>
+                                <option value="created_asc" {{ request('sort') == 'created_asc' ? 'selected' : '' }}>Oldest First</option>
+                                <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name (A-Z)</option>
+                                <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name (Z-A)</option>
+                            </select>
+                        </div>
                         <div class="flex items-end gap-2">
                             <button type="submit" class="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-lg hover:from-[#3730A3] hover:to-[#4F46E5] transition-all">
                                 Filter
@@ -105,7 +114,9 @@
                                                 {{ strtoupper(substr($student->first_name, 0, 1) . substr($student->last_name, 0, 1)) }}
                                             </div>
                                             <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $student->first_name }} {{ $student->last_name }}</div>
+                                                <a href="{{ route('director.students.show', $student) }}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-[#4F46E5] dark:hover:text-[#818CF8] transition-colors">
+                                                    {{ $student->first_name }} {{ $student->last_name }}
+                                                </a>
                                             </div>
                                         </div>
                                     </td>

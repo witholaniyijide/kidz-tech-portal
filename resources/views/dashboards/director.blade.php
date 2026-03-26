@@ -94,10 +94,15 @@
                             @foreach($todayClasses as $index => $class)
                                 @php
                                     $isRescheduled = isset($class['is_rescheduled']) && $class['is_rescheduled'];
+                                    try {
+                                        $formattedTime = \Carbon\Carbon::parse($class['time'])->format('g:i A');
+                                    } catch (\Exception $e) {
+                                        $formattedTime = $class['time'];
+                                    }
                                 @endphp
                                 <div class="flex items-center p-3 rounded-lg transition-colors cursor-pointer {{ $isRescheduled ? 'bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-300 dark:border-amber-700/50 hover:bg-amber-100 dark:hover:bg-amber-900/30' : 'bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
                                      @click="openModal({
-                                         time: '{{ $class['time'] }}',
+                                         time: '{{ $formattedTime }}',
                                          student: '{{ $class['student'] }}',
                                          tutor: '{{ $class['tutor'] }}',
                                          level: '{{ $class['level'] ?? 'Not specified' }}',
@@ -107,11 +112,7 @@
                                      })">
                                     <div class="w-16 text-center">
                                         @php
-                                            try {
-                                                $formattedTime = \Carbon\Carbon::parse($class['time'])->format('g:i A');
-                                            } catch (\Exception $e) {
-                                                $formattedTime = $class['time'];
-                                            }
+                                            // Already formatted above
                                         @endphp
                                         <span class="text-sm font-bold {{ $isRescheduled ? 'text-amber-600 dark:text-amber-400' : 'text-[#4F46E5] dark:text-[#818CF8]' }}">{{ $formattedTime }}</span>
                                     </div>

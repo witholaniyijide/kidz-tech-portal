@@ -52,7 +52,25 @@ class DirectorStudentController extends Controller
         $inactiveStudents = Student::where('status', 'inactive')->count();
         $graduatedStudents = Student::whereIn('status', ['graduated', 'withdrawn'])->count();
 
-        $students = $query->orderBy('created_at', 'desc')->paginate(20);
+        // Handle sorting
+        $sort = $request->get('sort', 'created_desc');
+        switch ($sort) {
+            case 'name_asc':
+                $query->orderBy('first_name', 'asc')->orderBy('last_name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('first_name', 'desc')->orderBy('last_name', 'desc');
+                break;
+            case 'created_asc':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'created_desc':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        $students = $query->paginate(20);
 
         return view('director.students.index', compact(
             'students',
@@ -182,9 +200,23 @@ class DirectorStudentController extends Controller
      */
     public function show(Student $student)
     {
-        $student->load(['tutor', 'parent', 'guardians', 'attendanceRecords', 'reports']);
-        
-        return view('director.students.show', compact('student'));
+        $student->load(['tutor', 'parent', 'guardians', 'attendanceRecords', 'reports', 'currentCourse', 'completedCourses', 'startingCourse']);
+
+        // Calculate progress percentage (same as parent portal sees)
+        if ($student->usesExplicitProgression()) {
+            $progressPercentage = $student->getExplicitProgressPercentage();
+        } else {
+            $progressPercentage = $student->progressPercentage();
+        }
+
+        // Get recent reports (approved by director)
+        $recentReports = \App\Models\TutorReport::where('student_id', $student->id)
+            ->whereIn('status', ['approved-by-director', 'approved-by-manager', 'submitted'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('director.students.show', compact('student', 'progressPercentage', 'recentReports'));
     }
 
     /**
