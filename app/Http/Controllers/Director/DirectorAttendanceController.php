@@ -386,6 +386,7 @@ class DirectorAttendanceController extends Controller
 
     /**
      * Display the calendar view for attendance tracking.
+     * Shows classes as: Completed (scheduled + approved), Pending (scheduled + pending attendance), Not Taken (scheduled + no attendance)
      */
     public function calendar(Request $request)
     {
@@ -414,27 +415,33 @@ class DirectorAttendanceController extends Controller
         $endOfMonth = $startOfMonth->copy()->endOfMonth();
         $today = now()->startOfDay();
 
-        // Get actual attendance records for this month
-        $attendanceQuery = AttendanceRecord::with(['student', 'tutor'])
+        // Get actual attendance records for this month (without status filter for cross-referencing)
+        $allAttendanceQuery = AttendanceRecord::with(['student', 'tutor'])
             ->whereYear('class_date', $year)
             ->whereMonth('class_date', $month);
 
         if ($tutorFilter) {
-            $attendanceQuery->where('tutor_id', $tutorFilter);
+            $allAttendanceQuery->where('tutor_id', $tutorFilter);
         }
         if ($studentFilter) {
-            $attendanceQuery->where('student_id', $studentFilter);
-        }
-        if ($statusFilter) {
-            $attendanceQuery->where('status', $statusFilter);
+            $allAttendanceQuery->where('student_id', $studentFilter);
         }
 
-        $attendanceRecords = $attendanceQuery->get()->groupBy(function ($record) {
+        $allAttendanceRecords = $allAttendanceQuery->get();
+
+        // Group attendance by date and student for cross-referencing
+        $attendanceByDateStudent = [];
+        foreach ($allAttendanceRecords as $record) {
+            $key = $record->class_date->format('Y-m-d') . '_' . $record->student_id;
+            $attendanceByDateStudent[$key] = $record;
+        }
+
+        $attendanceRecords = $allAttendanceRecords->groupBy(function ($record) {
             return $record->class_date->format('Y-m-d');
         });
 
-        // Build potential classes for future dates based on student schedules
-        $potentialClasses = [];
+        // Build scheduled classes based on student schedules
+        $scheduledClasses = [];
         $studentQuery = Student::where('status', 'active')
             ->whereNotNull('class_schedule');
 
@@ -474,13 +481,26 @@ class DirectorAttendanceController extends Controller
 
                     $scheduleDayNum = $dayMap[strtolower(trim($schedule['day']))] ?? -1;
                     if ($scheduleDayNum === $dayOfWeek) {
-                        if (!isset($potentialClasses[$dateStr])) {
-                            $potentialClasses[$dateStr] = [];
+                        if (!isset($scheduledClasses[$dateStr])) {
+                            $scheduledClasses[$dateStr] = [];
                         }
-                        $potentialClasses[$dateStr][] = [
+
+                        // Check if there's an attendance record for this student on this date
+                        $attendanceKey = $dateStr . '_' . $student->id;
+                        $attendanceRecord = $attendanceByDateStudent[$attendanceKey] ?? null;
+
+                        // Determine status: completed, pending, or not_taken
+                        $classStatus = 'not_taken';
+                        if ($attendanceRecord) {
+                            $classStatus = $attendanceRecord->status === 'approved' ? 'completed' : 'pending';
+                        }
+
+                        $scheduledClasses[$dateStr][] = [
                             'student' => $student,
                             'tutor' => $student->tutor,
                             'time' => $schedule['time'] ?? null,
+                            'status' => $classStatus,
+                            'attendance' => $attendanceRecord,
                         ];
                     }
                 }
@@ -500,6 +520,23 @@ class DirectorAttendanceController extends Controller
             $isToday = $current->eq($today);
             $isFuture = $current->gt($today);
 
+            $dayScheduledClasses = $scheduledClasses[$dateStr] ?? [];
+
+            // Apply status filter if set
+            if ($statusFilter) {
+                $dayScheduledClasses = array_filter($dayScheduledClasses, function($class) use ($statusFilter) {
+                    if ($statusFilter === 'approved') return $class['status'] === 'completed';
+                    if ($statusFilter === 'pending') return $class['status'] === 'pending';
+                    if ($statusFilter === 'not_taken') return $class['status'] === 'not_taken';
+                    return true;
+                });
+            }
+
+            // Calculate counts by status
+            $completedCount = count(array_filter($dayScheduledClasses, fn($c) => $c['status'] === 'completed'));
+            $pendingCount = count(array_filter($dayScheduledClasses, fn($c) => $c['status'] === 'pending'));
+            $notTakenCount = count(array_filter($dayScheduledClasses, fn($c) => $c['status'] === 'not_taken'));
+
             $dayData = [
                 'date' => $current->copy(),
                 'dateStr' => $dateStr,
@@ -508,14 +545,11 @@ class DirectorAttendanceController extends Controller
                 'isPast' => $isPast,
                 'isToday' => $isToday,
                 'isFuture' => $isFuture,
-                'attendance' => $attendanceRecords->get($dateStr, collect()),
-                'potential' => $potentialClasses[$dateStr] ?? [],
+                'scheduledClasses' => $dayScheduledClasses,
+                'completedCount' => $completedCount,
+                'pendingCount' => $pendingCount,
+                'notTakenCount' => $notTakenCount,
             ];
-
-            // Calculate stats for this day
-            $dayData['approvedCount'] = $dayData['attendance']->where('status', 'approved')->count();
-            $dayData['pendingCount'] = $dayData['attendance']->where('status', 'pending')->count();
-            $dayData['potentialCount'] = count($dayData['potential']);
 
             $calendarDays[] = $dayData;
             $current->addDay();
@@ -527,17 +561,16 @@ class DirectorAttendanceController extends Controller
             $selectedCarbon = \Carbon\Carbon::parse($selectedDate);
             $isPastDate = $selectedCarbon->lt($today);
 
-            $detailQuery = AttendanceRecord::with(['student', 'tutor'])
-                ->whereDate('class_date', $selectedDate);
+            $dayScheduledClasses = $scheduledClasses[$selectedDate] ?? [];
 
-            if ($tutorFilter) {
-                $detailQuery->where('tutor_id', $tutorFilter);
-            }
-            if ($studentFilter) {
-                $detailQuery->where('student_id', $studentFilter);
-            }
+            // Apply status filter if set
             if ($statusFilter) {
-                $detailQuery->where('status', $statusFilter);
+                $dayScheduledClasses = array_filter($dayScheduledClasses, function($class) use ($statusFilter) {
+                    if ($statusFilter === 'approved') return $class['status'] === 'completed';
+                    if ($statusFilter === 'pending') return $class['status'] === 'pending';
+                    if ($statusFilter === 'not_taken') return $class['status'] === 'not_taken';
+                    return true;
+                });
             }
 
             $selectedDateData = [
@@ -545,17 +578,17 @@ class DirectorAttendanceController extends Controller
                 'isPast' => $isPastDate,
                 'isToday' => $selectedCarbon->eq($today),
                 'isFuture' => $selectedCarbon->gt($today),
-                'attendance' => $detailQuery->get(),
-                'potential' => $potentialClasses[$selectedDate] ?? [],
+                'scheduledClasses' => array_values($dayScheduledClasses),
             ];
         }
 
-        // Monthly stats
+        // Monthly stats - calculate from all scheduled classes
+        $allScheduledFlat = collect($scheduledClasses)->flatten(1);
         $monthStats = [
-            'totalClasses' => $attendanceRecords->flatten()->count(),
-            'approved' => $attendanceRecords->flatten()->where('status', 'approved')->count(),
-            'pending' => $attendanceRecords->flatten()->where('status', 'pending')->count(),
-            'potentialTotal' => collect($potentialClasses)->flatten(1)->count(),
+            'totalScheduled' => $allScheduledFlat->count(),
+            'completed' => $allScheduledFlat->where('status', 'completed')->count(),
+            'pending' => $allScheduledFlat->where('status', 'pending')->count(),
+            'notTaken' => $allScheduledFlat->where('status', 'not_taken')->count(),
         ];
 
         return view('director.attendance.calendar', compact(

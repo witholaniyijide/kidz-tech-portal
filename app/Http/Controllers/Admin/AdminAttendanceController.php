@@ -285,7 +285,7 @@ class AdminAttendanceController extends Controller
             $attendances = AttendanceRecord::whereIn('id', $ids)->get();
 
             foreach ($attendances as $attendance) {
-                $attendance->forceDelete();
+                $attendance->delete();
                 $deletedCount++;
             }
 
