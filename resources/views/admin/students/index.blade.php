@@ -136,9 +136,9 @@
                                                     {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
                                                 </div>
                                                 <div>
-                                                    <div class="font-semibold text-gray-900 dark:text-white">
+                                                    <a href="{{ route('admin.students.show', $student) }}" class="font-semibold text-gray-900 dark:text-white hover:text-[#00CCCD] dark:hover:text-[#00CCCD] transition-colors">
                                                         {{ $student->first_name }} {{ $student->other_name }} {{ $student->last_name }}
-                                                    </div>
+                                                    </a>
                                                     @if($student->student_id)
                                                         <div class="text-sm text-gray-500 dark:text-gray-400">{{ $student->student_id }}</div>
                                                     @endif

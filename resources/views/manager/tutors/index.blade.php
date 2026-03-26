@@ -138,9 +138,9 @@
                                         {{ strtoupper(substr($tutor->first_name, 0, 1)) }}{{ strtoupper(substr($tutor->last_name, 0, 1)) }}
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        <a href="{{ route('manager.tutors.show', $tutor) }}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-[#C15F3C] dark:hover:text-[#DA7756] transition-colors">
                                             {{ $tutor->first_name }} {{ $tutor->last_name }}
-                                        </div>
+                                        </a>
                                         <div class="text-sm text-gray-500 dark:text-gray-400">
                                             {{ $tutor->email ?? 'No email' }}
                                         </div>
