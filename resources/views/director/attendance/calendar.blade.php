@@ -301,7 +301,7 @@
                                                             <div class="text-xs text-gray-500 dark:text-gray-400">
                                                                 {{ $class['tutor']->first_name ?? 'Unassigned' }} {{ $class['tutor']->last_name ?? '' }}
                                                                 @if($class['time'])
-                                                                    <span class="ml-1">@ {{ $class['time'] }}</span>
+                                                                    <span class="ml-1">@ {{ \Carbon\Carbon::parse($class['time'])->format('g:i A') }}</span>
                                                                 @endif
                                                             </div>
                                                         </div>
@@ -327,7 +327,7 @@
                                                             <div class="text-xs text-gray-500 dark:text-gray-400">
                                                                 {{ $class['tutor']->first_name ?? 'Unassigned' }} {{ $class['tutor']->last_name ?? '' }}
                                                                 @if($class['time'])
-                                                                    <span class="ml-1">@ {{ $class['time'] }}</span>
+                                                                    <span class="ml-1">@ {{ \Carbon\Carbon::parse($class['time'])->format('g:i A') }}</span>
                                                                 @endif
                                                             </div>
                                                         </div>

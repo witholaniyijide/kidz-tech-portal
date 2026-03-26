@@ -200,6 +200,150 @@
                 </div>
             </div>
 
+            {{-- Progress & Reports (Director View - Same as Parent Portal) --}}
+            <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
+                <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+                    <h3 class="text-base sm:text-lg font-semibold flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        Progress & Reports (Parent Portal View)
+                    </h3>
+                    <p class="text-xs text-emerald-100 mt-1">This is what parents see on their portal</p>
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        {{-- Overall Progress --}}
+                        <div class="text-center p-4 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl">
+                            <div class="relative w-24 h-24 mx-auto mb-3">
+                                <svg class="w-24 h-24 transform -rotate-90">
+                                    <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="none"
+                                            class="text-gray-200 dark:text-gray-700"/>
+                                    <circle cx="48" cy="48" r="40" stroke="url(#director-progress-gradient)" stroke-width="8" fill="none"
+                                            stroke-linecap="round"
+                                            stroke-dasharray="{{ 251.2 * $progressPercentage / 100 }} 251.2"/>
+                                    <defs>
+                                        <linearGradient id="director-progress-gradient">
+                                            <stop offset="0%" stop-color="#10b981"/>
+                                            <stop offset="100%" stop-color="#14b8a6"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-gray-800 dark:text-white">{{ $progressPercentage }}%</span>
+                                </div>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Overall Progress</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {{ $student->completedCourses?->count() ?? 0 }} of 12 courses completed
+                            </p>
+                        </div>
+
+                        {{-- Current Level --}}
+                        <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl">
+                            <div class="w-16 h-16 mx-auto mb-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                                <span class="text-2xl font-bold text-white">
+                                    @if($student->currentCourse)
+                                        {{ $student->currentCourse->level }}
+                                    @elseif($student->current_level)
+                                        {{ $student->current_level }}
+                                    @else
+                                        -
+                                    @endif
+                                </span>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Current Level</p>
+                            @if($student->currentCourse)
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $student->currentCourse->name }}</p>
+                            @endif
+                        </div>
+
+                        {{-- Starting Level --}}
+                        <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl">
+                            <div class="w-16 h-16 mx-auto mb-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                                <span class="text-2xl font-bold text-white">
+                                    @if($student->startingCourse)
+                                        {{ $student->startingCourse->level }}
+                                    @elseif($student->starting_course_level)
+                                        {{ $student->starting_course_level }}
+                                    @else
+                                        1
+                                    @endif
+                                </span>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Starting Level</p>
+                            @if($student->startingCourse)
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $student->startingCourse->name }}</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Recent Reports --}}
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-4 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Recent Reports
+                        </h4>
+                        @if($recentReports && $recentReports->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($recentReports as $report)
+                                    <a href="{{ route('director.reports.show', $report) }}" class="block p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="font-medium text-gray-900 dark:text-white text-sm">
+                                                    {{ $report->month }} {{ $report->year }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                    @if($report->courses_covered)
+                                                        @php
+                                                            $courses = is_array($report->courses_covered) ? $report->courses_covered : json_decode($report->courses_covered, true);
+                                                        @endphp
+                                                        Courses: {{ is_array($courses) ? implode(', ', array_slice($courses, 0, 3)) : $report->courses_covered }}
+                                                        @if(is_array($courses) && count($courses) > 3)
+                                                            +{{ count($courses) - 3 }} more
+                                                        @endif
+                                                    @else
+                                                        No courses listed
+                                                    @endif
+                                                </p>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                @if($report->performance_rating)
+                                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                                        {{ $report->performance_rating }}/5
+                                                    </span>
+                                                @endif
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full
+                                                    @if($report->status === 'approved-by-director') bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400
+                                                    @elseif($report->status === 'approved-by-manager') bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400
+                                                    @else bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400
+                                                    @endif">
+                                                    {{ ucwords(str_replace('-', ' ', $report->status)) }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                            <div class="mt-4 text-center">
+                                <a href="{{ route('director.reports.index', ['student_id' => $student->id]) }}" class="text-sm text-[#423A8E] dark:text-[#00CCCD] hover:underline">
+                                    View All Reports
+                                </a>
+                            </div>
+                        @else
+                            <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                                <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <p class="text-sm">No reports submitted yet</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
             {{-- Parent Info --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow mb-6 overflow-hidden">
                 <div class="px-4 sm:px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white">
