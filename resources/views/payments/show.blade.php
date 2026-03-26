@@ -89,7 +89,7 @@
                         <div>
                             <h3 class="text-sm font-medium text-gray-500">Recorded By</h3>
                             <p class="mt-1 text-gray-900">{{ $payment->recordedBy->name }}</p>
-                            <p class="text-xs text-gray-500">{{ $payment->created_at->format('M d, Y H:i A') }}</p>
+                            <p class="text-xs text-gray-500">{{ $payment->created_at->format('M d, Y g:i A') }}</p>
                         </div>
 
                     </div>

@@ -491,7 +491,7 @@ class AdminScheduleController extends Controller
 
                 // Format time nicely
                 try {
-                    $time = Carbon::parse($time)->format('g:ia');
+                    $time = Carbon::parse($time)->format('g:i A');
                 } catch (\Exception $e) {
                     // Keep original time if parsing fails
                 }
@@ -511,7 +511,7 @@ class AdminScheduleController extends Controller
 
                 // Format time nicely
                 try {
-                    $time = Carbon::parse($time)->format('g:ia');
+                    $time = Carbon::parse($time)->format('g:i A');
                 } catch (\Exception $e) {
                     // Keep original time if parsing fails
                 }

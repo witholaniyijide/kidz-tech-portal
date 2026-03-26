@@ -55,7 +55,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500 dark:text-gray-400">Created</p>
-                            <p class="font-medium text-gray-900 dark:text-white">{{ $notice->created_at->format('M d, Y H:i') }}</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ $notice->created_at->format('M d, Y g:i A') }}</p>
                         </div>
                         <div>
                             <p class="text-gray-500 dark:text-gray-400">Visible To</p>
@@ -64,7 +64,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500 dark:text-gray-400">Last Updated</p>
-                            <p class="font-medium text-gray-900 dark:text-white">{{ $notice->updated_at->format('M d, Y H:i') }}</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ $notice->updated_at->format('M d, Y g:i A') }}</p>
                         </div>
                     </div>
                 </div>

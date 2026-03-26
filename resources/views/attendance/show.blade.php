@@ -58,7 +58,7 @@
                         <div>
                             <h3 class="text-sm font-medium text-gray-500">Submitted By</h3>
                             <p class="mt-1 text-gray-900">{{ $attendance->submittedBy->name }}</p>
-                            <p class="text-xs text-gray-500">{{ $attendance->created_at->format('M d, Y H:i A') }}</p>
+                            <p class="text-xs text-gray-500">{{ $attendance->created_at->format('M d, Y g:i A') }}</p>
                         </div>
                         <div>
                             <h3 class="text-sm font-medium text-gray-500">Approval Status</h3>
@@ -73,7 +73,7 @@
                             </p>
                             @if($attendance->approvedBy)
                                 <p class="text-xs text-gray-500 mt-1">
-                                    By {{ $attendance->approvedBy->name }} on {{ $attendance->approved_at->format('M d, Y H:i A') }}
+                                    By {{ $attendance->approvedBy->name }} on {{ $attendance->approved_at->format('M d, Y g:i A') }}
                                 </p>
                             @endif
                         </div>

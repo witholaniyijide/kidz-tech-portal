@@ -91,8 +91,8 @@ class TutorAvailability extends Model
      */
     public function getTimeRangeAttribute()
     {
-        $start = Carbon::parse($this->start_time)->format('g:ia');
-        $end = Carbon::parse($this->end_time)->format('g:ia');
+        $start = Carbon::parse($this->start_time)->format('g:i A');
+        $end = Carbon::parse($this->end_time)->format('g:i A');
         return "{$start} - {$end}";
     }
 

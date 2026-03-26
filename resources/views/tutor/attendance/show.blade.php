@@ -74,13 +74,15 @@
                     </div>
                     <div>
                         <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-                            {{ $attendance->student->first_name }} {{ $attendance->student->last_name }}
+                            <a href="{{ route('tutor.students.show', $attendance->student) }}" class="hover:text-[#423A8E] dark:hover:text-[#00CCCD] transition-colors">
+                                {{ $attendance->student->first_name }} {{ $attendance->student->last_name }}
+                            </a>
                         </h3>
                         <div class="flex items-center gap-2 mt-1">
                             @if(isset($isStandIn) && $isStandIn)
                                 <span class="px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded">Stand-in</span>
                                 @if($attendance->student->tutor)
-                                    <span class="text-sm text-slate-500">Assigned to: {{ $attendance->student->tutor->first_name }} {{ $attendance->student->tutor->last_name }}</span>
+                                    <span class="text-sm text-slate-500">Assigned to: <a href="{{ route('tutor.tutors.show', $attendance->student->tutor) }}" class="hover:text-[#423A8E] dark:hover:text-[#00CCCD] transition-colors">{{ $attendance->student->tutor->first_name }} {{ $attendance->student->tutor->last_name }}</a></span>
                                 @endif
                             @else
                                 <span class="text-sm text-slate-500">Your student</span>
