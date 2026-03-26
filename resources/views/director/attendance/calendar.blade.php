@@ -24,20 +24,20 @@
             <!-- Stats Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-gray-200/50 dark:border-gray-700/50">
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $monthStats['totalClasses'] }}</div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">Classes Held</div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $monthStats['totalScheduled'] }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Total Scheduled</div>
                 </div>
                 <div class="bg-emerald-50 dark:bg-emerald-900/30 rounded-xl p-4 shadow-sm border border-emerald-200/50 dark:border-emerald-700/50">
-                    <div class="text-2xl font-bold text-emerald-600">{{ $monthStats['approved'] }}</div>
-                    <div class="text-sm text-emerald-700 dark:text-emerald-400">Approved</div>
+                    <div class="text-2xl font-bold text-emerald-600">{{ $monthStats['completed'] }}</div>
+                    <div class="text-sm text-emerald-700 dark:text-emerald-400">Completed</div>
                 </div>
                 <div class="bg-amber-50 dark:bg-amber-900/30 rounded-xl p-4 shadow-sm border border-amber-200/50 dark:border-amber-700/50">
                     <div class="text-2xl font-bold text-amber-600">{{ $monthStats['pending'] }}</div>
                     <div class="text-sm text-amber-700 dark:text-amber-400">Pending</div>
                 </div>
-                <div class="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4 shadow-sm border border-blue-200/50 dark:border-blue-700/50">
-                    <div class="text-2xl font-bold text-blue-600">{{ $monthStats['potentialTotal'] }}</div>
-                    <div class="text-sm text-blue-700 dark:text-blue-400">Scheduled Classes</div>
+                <div class="bg-red-50 dark:bg-red-900/30 rounded-xl p-4 shadow-sm border border-red-200/50 dark:border-red-700/50">
+                    <div class="text-2xl font-bold text-red-600">{{ $monthStats['notTaken'] }}</div>
+                    <div class="text-sm text-red-700 dark:text-red-400">Not Taken</div>
                 </div>
             </div>
 
@@ -103,12 +103,13 @@
                         </select>
                     </div>
 
-                    <div class="w-32">
+                    <div class="w-36">
                         <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Status</label>
                         <select name="status" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500">
                             <option value="">All</option>
-                            <option value="approved" {{ $statusFilter === 'approved' ? 'selected' : '' }}>Approved</option>
+                            <option value="approved" {{ $statusFilter === 'approved' ? 'selected' : '' }}>Completed</option>
                             <option value="pending" {{ $statusFilter === 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="not_taken" {{ $statusFilter === 'not_taken' ? 'selected' : '' }}>Not Taken</option>
                         </select>
                     </div>
 
@@ -145,9 +146,9 @@
                         <div class="grid grid-cols-7">
                             @foreach($calendarDays as $day)
                                 @php
-                                    $hasClasses = $day['attendance']->count() > 0 || count($day['potential']) > 0;
+                                    $hasClasses = count($day['scheduledClasses']) > 0;
                                     $isSelected = $selectedDate === $day['dateStr'];
-                                    $totalClasses = $day['approvedCount'] + $day['pendingCount'] + $day['potentialCount'];
+                                    $totalClasses = $day['completedCount'] + $day['pendingCount'] + $day['notTakenCount'];
                                 @endphp
                                 <a href="{{ route('director.calendar.index', array_merge(request()->all(), ['date' => $day['dateStr']])) }}"
                                    class="min-h-[100px] p-2 border-b border-r border-gray-200 dark:border-gray-700 transition-colors
@@ -168,11 +169,10 @@
 
                                     @if($day['isCurrentMonth'] && $hasClasses)
                                         <div class="space-y-0.5">
-                                            {{-- Always show all three statuses if they have values --}}
-                                            @if($day['approvedCount'] > 0)
+                                            @if($day['completedCount'] > 0)
                                                 <div class="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
                                                     <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-                                                    {{ $day['approvedCount'] }} completed
+                                                    {{ $day['completedCount'] }} completed
                                                 </div>
                                             @endif
                                             @if($day['pendingCount'] > 0)
@@ -181,10 +181,10 @@
                                                     {{ $day['pendingCount'] }} pending
                                                 </div>
                                             @endif
-                                            @if($day['potentialCount'] > 0)
-                                                <div class="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
-                                                    <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                                                    {{ $day['potentialCount'] }} scheduled
+                                            @if($day['notTakenCount'] > 0)
+                                                <div class="flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+                                                    <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+                                                    {{ $day['notTakenCount'] }} not taken
                                                 </div>
                                             @endif
                                         </div>
@@ -198,15 +198,15 @@
                     <div class="mt-4 flex flex-wrap gap-4 text-sm">
                         <div class="flex items-center gap-2">
                             <span class="w-3 h-3 bg-emerald-500 rounded-full"></span>
-                            <span class="text-gray-600 dark:text-gray-400">Completed (approved)</span>
+                            <span class="text-gray-600 dark:text-gray-400">Completed (attendance approved)</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="w-3 h-3 bg-amber-500 rounded-full"></span>
-                            <span class="text-gray-600 dark:text-gray-400">Pending approval</span>
+                            <span class="text-gray-600 dark:text-gray-400">Pending (attendance awaiting approval)</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
-                            <span class="text-gray-600 dark:text-gray-400">Scheduled (upcoming)</span>
+                            <span class="w-3 h-3 bg-red-500 rounded-full"></span>
+                            <span class="text-gray-600 dark:text-gray-400">Not Taken (no attendance submitted)</span>
                         </div>
                     </div>
                 </div>
@@ -223,11 +223,11 @@
                     <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 sticky top-4">
                         @if($selectedDateData)
                             @php
-                                $totalAttendance = $selectedDateData['attendance']->count();
-                                $totalPotential = count($selectedDateData['potential']);
-                                $totalClasses = $totalAttendance + $totalPotential;
-                                $approvedCount = $selectedDateData['attendance']->where('status', 'approved')->count();
-                                $pendingCount = $selectedDateData['attendance']->where('status', 'pending')->count();
+                                $scheduledClasses = $selectedDateData['scheduledClasses'];
+                                $totalClasses = count($scheduledClasses);
+                                $completedCount = count(array_filter($scheduledClasses, fn($c) => $c['status'] === 'completed'));
+                                $pendingCount = count(array_filter($scheduledClasses, fn($c) => $c['status'] === 'pending'));
+                                $notTakenCount = count(array_filter($scheduledClasses, fn($c) => $c['status'] === 'not_taken'));
                             @endphp
                             <div class="p-4 border-b border-gray-200 dark:border-gray-700">
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -245,11 +245,11 @@
                                 {{-- Summary stats --}}
                                 <div class="flex flex-wrap gap-2 mt-3">
                                     <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                                        {{ $totalClasses }} total
+                                        {{ $totalClasses }} scheduled
                                     </span>
-                                    @if($approvedCount > 0)
+                                    @if($completedCount > 0)
                                         <span class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                                            {{ $approvedCount }} completed
+                                            {{ $completedCount }} completed
                                         </span>
                                     @endif
                                     @if($pendingCount > 0)
@@ -257,9 +257,9 @@
                                             {{ $pendingCount }} pending
                                         </span>
                                     @endif
-                                    @if($totalPotential > 0)
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                                            {{ $totalPotential }} scheduled
+                                    @if($notTakenCount > 0)
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                            {{ $notTakenCount }} not taken
                                         </span>
                                     @endif
                                 </div>
@@ -267,72 +267,76 @@
 
                             <div class="p-4 max-h-[500px] overflow-y-auto">
                                 @if($totalClasses === 0)
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No classes for this date.</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No classes scheduled for this date.</p>
                                 @else
                                     <div class="space-y-2">
-                                        {{-- Attendance Records --}}
-                                        @foreach($selectedDateData['attendance'] as $record)
-                                            <button type="button"
-                                                @click="openModal({
-                                                    id: {{ $record->id }},
-                                                    student: '{{ addslashes(($record->student->first_name ?? 'Unknown') . ' ' . ($record->student->last_name ?? '')) }}',
-                                                    tutor: '{{ addslashes(($record->tutor->first_name ?? 'Unknown') . ' ' . ($record->tutor->last_name ?? '')) }}',
-                                                    status: '{{ $record->status }}',
-                                                    time: '{{ $record->class_time ? \Carbon\Carbon::parse($record->class_time)->format('g:i A') : 'N/A' }}',
-                                                    duration: '{{ $record->duration_minutes ?? 'N/A' }}',
-                                                    topic: '{{ addslashes($record->topic ?? '') }}',
-                                                    courses: {{ json_encode($record->courses_covered ?? []) }},
-                                                    notes: '{{ addslashes($record->notes ?? '') }}',
-                                                    submittedAt: '{{ $record->created_at->format('M j, Y g:i A') }}',
-                                                    isLate: {{ $record->is_late ? 'true' : 'false' }},
-                                                    type: 'attendance'
-                                                })"
-                                                class="w-full text-left p-3 rounded-lg transition-colors
-                                                    {{ $record->status === 'approved'
-                                                        ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
-                                                        : 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/50 hover:bg-amber-100 dark:hover:bg-amber-900/30' }}">
-                                                <div class="flex items-start justify-between">
-                                                    <div>
-                                                        <div class="font-medium text-gray-900 dark:text-white text-sm">
-                                                            {{ $record->student->first_name ?? 'Unknown' }} {{ $record->student->last_name ?? '' }}
+                                        @foreach($scheduledClasses as $class)
+                                            @if($class['status'] === 'completed' || $class['status'] === 'pending')
+                                                {{-- Class with attendance record - clickable for details --}}
+                                                @php $record = $class['attendance']; @endphp
+                                                <button type="button"
+                                                    @click="openModal({
+                                                        id: {{ $record->id }},
+                                                        student: '{{ addslashes(($class['student']->first_name ?? 'Unknown') . ' ' . ($class['student']->last_name ?? '')) }}',
+                                                        tutor: '{{ addslashes(($class['tutor']->first_name ?? 'Unknown') . ' ' . ($class['tutor']->last_name ?? '')) }}',
+                                                        status: '{{ $record->status }}',
+                                                        time: '{{ $record->class_time ? \Carbon\Carbon::parse($record->class_time)->format('g:i A') : ($class['time'] ?? 'N/A') }}',
+                                                        duration: '{{ $record->duration_minutes ?? 'N/A' }}',
+                                                        topic: '{{ addslashes($record->topic ?? '') }}',
+                                                        courses: {{ json_encode($record->courses_covered ?? []) }},
+                                                        notes: '{{ addslashes($record->notes ?? '') }}',
+                                                        submittedAt: '{{ $record->created_at->format('M j, Y g:i A') }}',
+                                                        isLate: {{ $record->is_late ? 'true' : 'false' }},
+                                                        type: 'attendance'
+                                                    })"
+                                                    class="w-full text-left p-3 rounded-lg transition-colors
+                                                        {{ $class['status'] === 'completed'
+                                                            ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/50 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
+                                                            : 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/50 hover:bg-amber-100 dark:hover:bg-amber-900/30' }}">
+                                                    <div class="flex items-start justify-between">
+                                                        <div>
+                                                            <div class="font-medium text-gray-900 dark:text-white text-sm">
+                                                                {{ $class['student']->first_name ?? 'Unknown' }} {{ $class['student']->last_name ?? '' }}
+                                                            </div>
+                                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                                {{ $class['tutor']->first_name ?? 'Unassigned' }} {{ $class['tutor']->last_name ?? '' }}
+                                                                @if($class['time'])
+                                                                    <span class="ml-1">@ {{ $class['time'] }}</span>
+                                                                @endif
+                                                            </div>
                                                         </div>
-                                                        <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                            {{ $record->tutor->first_name ?? 'Unknown' }} {{ $record->tutor->last_name ?? '' }}
+                                                        <div class="flex items-center gap-1">
+                                                            @if($record->is_late)
+                                                                <span class="px-1.5 py-0.5 text-xs font-medium rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Late</span>
+                                                            @endif
+                                                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                                                {{ $class['status'] === 'completed' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' }}">
+                                                                {{ $class['status'] === 'completed' ? 'Completed' : 'Pending' }}
+                                                            </span>
                                                         </div>
                                                     </div>
-                                                    <div class="flex items-center gap-1">
-                                                        @if($record->is_late)
-                                                            <span class="px-1.5 py-0.5 text-xs font-medium rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Late</span>
-                                                        @endif
-                                                        <span class="px-2 py-1 text-xs font-medium rounded-full
-                                                            {{ $record->status === 'approved' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' }}">
-                                                            {{ $record->status === 'approved' ? 'Completed' : 'Pending' }}
+                                                </button>
+                                            @else
+                                                {{-- Not Taken - no attendance record --}}
+                                                <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200/50 dark:border-red-800/50">
+                                                    <div class="flex items-start justify-between">
+                                                        <div>
+                                                            <div class="font-medium text-gray-900 dark:text-white text-sm">
+                                                                {{ $class['student']->first_name }} {{ $class['student']->last_name }}
+                                                            </div>
+                                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                                {{ $class['tutor']->first_name ?? 'Unassigned' }} {{ $class['tutor']->last_name ?? '' }}
+                                                                @if($class['time'])
+                                                                    <span class="ml-1">@ {{ $class['time'] }}</span>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                                            Not Taken
                                                         </span>
                                                     </div>
                                                 </div>
-                                            </button>
-                                        @endforeach
-
-                                        {{-- Scheduled Classes --}}
-                                        @foreach($selectedDateData['potential'] as $potential)
-                                            <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200/50 dark:border-blue-800/50">
-                                                <div class="flex items-start justify-between">
-                                                    <div>
-                                                        <div class="font-medium text-gray-900 dark:text-white text-sm">
-                                                            {{ $potential['student']->first_name }} {{ $potential['student']->last_name }}
-                                                        </div>
-                                                        <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                            {{ $potential['tutor']->first_name ?? 'Unassigned' }} {{ $potential['tutor']->last_name ?? '' }}
-                                                            @if($potential['time'])
-                                                                <span class="ml-1">@ {{ $potential['time'] }}</span>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                                                        Scheduled
-                                                    </span>
-                                                </div>
-                                            </div>
+                                            @endif
                                         @endforeach
                                     </div>
                                 @endif
