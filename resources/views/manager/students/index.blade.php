@@ -138,9 +138,9 @@
                                         {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        <a href="{{ route('manager.students.show', $student) }}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-[#C15F3C] dark:hover:text-[#DA7756] transition-colors">
                                             {{ $student->first_name }} {{ $student->last_name }}
-                                        </div>
+                                        </a>
                                     </div>
                                 </div>
                             </td>

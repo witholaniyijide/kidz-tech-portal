@@ -55,7 +55,7 @@
                                     <p class="text-sm text-gray-600 dark:text-gray-400">{{ $class['course'] }}</p>
                                 </div>
                                 <div class="text-right">
-                                    <span class="text-sm font-medium text-amber-600 dark:text-amber-400">{{ $class['time'] }}</span>
+                                    <span class="text-sm font-medium text-amber-600 dark:text-amber-400">{{ isset($class['time']) && $class['time'] !== 'TBD' ? \Carbon\Carbon::parse($class['time'])->format('g:i A') : 'TBD' }}</span>
                                     @if(!$isNigeriaTimezone && isset($class['time_ng']) && $class['time_ng'] !== 'TBD')
                                         <p class="text-xs text-gray-400">({{ $class['time_ng'] }} NG)</p>
                                     @endif
@@ -118,7 +118,7 @@
                                                 <span class="font-medium text-gray-900 dark:text-white">{{ $class['student']->first_name }}</span>
                                             </div>
                                             <div class="text-right">
-                                                <span class="text-sm font-semibold text-[#F5A623]">{{ $class['time'] }}</span>
+                                                <span class="text-sm font-semibold text-[#F5A623]">{{ isset($class['time']) && $class['time'] !== 'TBD' ? \Carbon\Carbon::parse($class['time'])->format('g:i A') : 'TBD' }}</span>
                                                 @if(!$isNigeriaTimezone && isset($class['time_ng']) && $class['time_ng'] !== 'TBD')
                                                     <p class="text-xs text-gray-400">({{ $class['time_ng'] }} NG)</p>
                                                 @endif

@@ -144,7 +144,7 @@
                                         </div>
                                         <div class="flex items-center gap-3">
                                             <div class="text-right">
-                                                <div class="font-semibold text-gray-700 dark:text-gray-300">{{ $item['time'] }}</div>
+                                                <div class="font-semibold text-gray-700 dark:text-gray-300">{{ isset($item['time']) ? \Carbon\Carbon::parse($item['time'])->format('g:i A') : 'TBD' }}</div>
                                                 @if($item['status'] === 'completed')
                                                     <span class="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full">Completed</span>
                                                 @elseif($item['status'] === 'in_progress')

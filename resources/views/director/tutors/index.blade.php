@@ -108,7 +108,9 @@
                                                 </div>
                                             @endif
                                             <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $tutor->first_name }} {{ $tutor->last_name }}</div>
+                                                <a href="{{ route('director.tutors.show', $tutor) }}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-[#4F46E5] dark:hover:text-[#818CF8] transition-colors">
+                                                    {{ $tutor->first_name }} {{ $tutor->last_name }}
+                                                </a>
                                                 <div class="text-sm text-gray-500 dark:text-gray-400">{{ $tutor->occupation ?? 'Tutor' }}</div>
                                             </div>
                                         </div>

@@ -138,9 +138,9 @@
                                                     </div>
                                                 @endif
                                                 <div>
-                                                    <div class="font-semibold text-gray-900 dark:text-white">
+                                                    <a href="{{ route('admin.tutors.show', $tutor) }}" class="font-semibold text-gray-900 dark:text-white hover:text-[#00CCCD] dark:hover:text-[#00CCCD] transition-colors">
                                                         {{ $tutor->first_name }} {{ $tutor->last_name }}
-                                                    </div>
+                                                    </a>
                                                     <div class="text-sm text-gray-500 dark:text-gray-400">{{ $tutor->occupation ?? 'Tutor' }}</div>
                                                 </div>
                                             </div>
