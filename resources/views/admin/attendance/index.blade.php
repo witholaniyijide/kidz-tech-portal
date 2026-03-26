@@ -114,67 +114,71 @@
 
             {{-- Filters --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl p-5 shadow mb-6">
-                <form method="GET" class="flex flex-wrap items-end gap-4">
-                    <div class="w-36">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <select name="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
-                            <option value="">All</option>
-                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
-                        </select>
+                <form method="GET" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                            <select name="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                                <option value="">All</option>
+                                <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Month</label>
+                            <select name="month" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                                <option value="">All Months</option>
+                                @for($m = 1; $m <= 12; $m++)
+                                    @php $monthValue = now()->year . '-' . str_pad($m, 2, '0', STR_PAD_LEFT); @endphp
+                                    <option value="{{ $monthValue }}" {{ request('month') === $monthValue ? 'selected' : '' }}>
+                                        {{ date('F Y', strtotime($monthValue . '-01')) }}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class Date</label>
+                            <input type="date" name="date" value="{{ request('date') }}"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tutor</label>
+                            <select name="tutor_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                                <option value="">All Tutors</option>
+                                @foreach($tutors as $tutor)
+                                    <option value="{{ $tutor->id }}" {{ request('tutor_id') == $tutor->id ? 'selected' : '' }}>
+                                        {{ $tutor->first_name }} {{ $tutor->last_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student</label>
+                            <select name="student_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                                <option value="">All Students</option>
+                                @foreach($students as $student)
+                                    <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
+                                        {{ $student->first_name }} {{ $student->last_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                    <div class="w-40">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Month</label>
-                        <select name="month" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
-                            <option value="">All Months</option>
-                            @for($m = 1; $m <= 12; $m++)
-                                @php $monthValue = now()->year . '-' . str_pad($m, 2, '0', STR_PAD_LEFT); @endphp
-                                <option value="{{ $monthValue }}" {{ request('month') === $monthValue ? 'selected' : '' }}>
-                                    {{ date('F Y', strtotime($monthValue . '-01')) }}
-                                </option>
-                            @endfor
-                        </select>
+                    <div class="flex flex-wrap items-center gap-4 pt-2">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" name="late_only" id="late_only" value="1" {{ request('late_only') ? 'checked' : '' }}
+                                   class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                            <label for="late_only" class="text-sm text-gray-700 dark:text-gray-300">Late Only</label>
+                        </div>
+                        <button type="submit" class="px-4 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E] transition-colors">
+                            Filter
+                        </button>
+                        @if(request()->hasAny(['status', 'month', 'date', 'tutor_id', 'student_id', 'late_only']))
+                            <a href="{{ route('admin.attendance.index') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                                Clear
+                            </a>
+                        @endif
                     </div>
-                    <div class="w-40">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class Date</label>
-                        <input type="date" name="date" value="{{ request('date') }}"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
-                    </div>
-                    <div class="w-44">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tutor</label>
-                        <select name="tutor_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
-                            <option value="">All Tutors</option>
-                            @foreach($tutors as $tutor)
-                                <option value="{{ $tutor->id }}" {{ request('tutor_id') == $tutor->id ? 'selected' : '' }}>
-                                    {{ $tutor->first_name }} {{ $tutor->last_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="w-44">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student</label>
-                        <select name="student_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
-                            <option value="">All Students</option>
-                            @foreach($students as $student)
-                                <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
-                                    {{ $student->first_name }} {{ $student->last_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" name="late_only" id="late_only" value="1" {{ request('late_only') ? 'checked' : '' }}
-                               class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
-                        <label for="late_only" class="text-sm text-gray-700 dark:text-gray-300">Late Only</label>
-                    </div>
-                    <button type="submit" class="px-4 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E] transition-colors">
-                        Filter
-                    </button>
-                    @if(request()->hasAny(['status', 'month', 'date', 'tutor_id', 'student_id', 'late_only']))
-                        <a href="{{ route('admin.attendance.index') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                            Clear
-                        </a>
-                    @endif
                 </form>
             </div>
 
@@ -208,31 +212,31 @@
                  }">
                 {{-- Bulk Actions Bar --}}
                 <div x-show="selectedIds.length > 0" x-cloak
-                     class="px-4 py-3 bg-[#423A8E]/10 dark:bg-[#423A8E]/20 border-b border-[#423A8E]/20 flex items-center justify-between">
+                     class="px-4 py-3 bg-[#423A8E]/10 dark:bg-[#423A8E]/20 border-b border-[#423A8E]/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div class="flex items-center gap-2">
                         <span class="text-sm font-medium text-[#423A8E] dark:text-[#00CCCD]">
                             <span x-text="selectedIds.length"></span> record(s) selected
                         </span>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                         {{-- Bulk Approve Button --}}
                         <button type="button"
                                 @click="showApproveModal = true"
                                 x-show="getSelectedPendingCount() > 0"
-                                class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors flex-1 sm:flex-none">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                            Bulk Approve (<span x-text="getSelectedPendingCount()"></span>)
+                            <span class="hidden xs:inline">Bulk</span> Approve (<span x-text="getSelectedPendingCount()"></span>)
                         </button>
                         {{-- Bulk Delete Button --}}
                         <button type="button"
                                 @click="showDeleteModal = true"
-                                class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                class="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors flex-1 sm:flex-none">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                             </svg>
-                            Bulk Delete (<span x-text="selectedIds.length"></span>)
+                            <span class="hidden xs:inline">Bulk</span> Delete (<span x-text="selectedIds.length"></span>)
                         </button>
                     </div>
                 </div>
@@ -361,7 +365,7 @@
                                                     {{ strtoupper(substr($attendance->student->first_name ?? 'U', 0, 1)) }}
                                                 </div>
                                                 <div>
-                                                    <span class="font-medium text-gray-900 dark:text-white">{{ $attendance->student->first_name ?? 'Unknown' }} {{ $attendance->student->last_name ?? '' }}</span>
+                                                    <a href="{{ $attendance->student ? route('admin.students.show', $attendance->student) : '#' }}" class="font-medium text-gray-900 dark:text-white hover:text-[#423A8E] dark:hover:text-[#00CCCD] transition-colors">{{ $attendance->student->first_name ?? 'Unknown' }} {{ $attendance->student->last_name ?? '' }}</a>
                                                     @if($attendance->is_stand_in)
                                                         <span class="ml-1 px-1.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded">Stand-in</span>
                                                     @endif
@@ -379,8 +383,8 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                            {{ $attendance->tutor->first_name ?? 'Unknown' }} {{ $attendance->tutor->last_name ?? '' }}
+                                        <td class="px-4 py-4 text-sm">
+                                            <a href="{{ $attendance->tutor ? route('admin.tutors.show', $attendance->tutor) : '#' }}" class="text-gray-600 dark:text-gray-400 hover:text-[#423A8E] dark:hover:text-[#00CCCD] transition-colors">{{ $attendance->tutor->first_name ?? 'Unknown' }} {{ $attendance->tutor->last_name ?? '' }}</a>
                                         </td>
                                         <td class="px-4 py-4">
                                             <div class="text-sm text-gray-900 dark:text-white">{{ $attendance->class_date?->format('M j, Y') }}</div>

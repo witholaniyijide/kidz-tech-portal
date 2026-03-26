@@ -17,7 +17,9 @@
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                            {{ $attendance->student->first_name ?? 'N/A' }} {{ $attendance->student->last_name ?? '' }}
+                            <a href="{{ route('manager.students.show', $attendance->student) }}" class="hover:text-[#423A8E] dark:hover:text-[#00CCCD] transition-colors">
+                                {{ $attendance->student->first_name ?? 'N/A' }} {{ $attendance->student->last_name ?? '' }}
+                            </a>
                         </h1>
                         <p class="text-gray-500 dark:text-gray-400">Student ID: {{ $attendance->student->student_id ?? 'N/A' }}</p>
                     </div>
@@ -93,7 +95,9 @@
                     </div>
                     <div>
                         <p class="font-semibold text-gray-900 dark:text-white">
-                            {{ $attendance->tutor->first_name ?? 'N/A' }} {{ $attendance->tutor->last_name ?? '' }}
+                            <a href="{{ route('manager.tutors.show', $attendance->tutor) }}" class="hover:text-[#423A8E] dark:hover:text-[#00CCCD] transition-colors">
+                                {{ $attendance->tutor->first_name ?? 'N/A' }} {{ $attendance->tutor->last_name ?? '' }}
+                            </a>
                         </p>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Tutor</p>
                     </div>

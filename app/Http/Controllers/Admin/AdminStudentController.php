@@ -52,7 +52,20 @@ class AdminStudentController extends Controller
             });
         }
 
-        $students = $query->orderBy('created_at', 'desc')->paginate(20);
+        // Sorting
+        $sortBy = $request->get('sort', 'created_at');
+        $sortDir = $request->get('dir', 'desc');
+
+        // Validate sort parameters
+        $allowedSorts = ['first_name', 'last_name', 'created_at'];
+        if (!in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'created_at';
+        }
+        if (!in_array($sortDir, ['asc', 'desc'])) {
+            $sortDir = 'desc';
+        }
+
+        $students = $query->orderBy($sortBy, $sortDir)->paginate(20)->withQueryString();
 
         // Statistics
         $stats = [
@@ -63,7 +76,7 @@ class AdminStudentController extends Controller
             'withdrawn' => Student::where('status', 'withdrawn')->count(),
         ];
 
-        return view('admin.students.index', compact('students', 'stats'));
+        return view('admin.students.index', compact('students', 'stats', 'sortBy', 'sortDir'));
     }
 
     /**

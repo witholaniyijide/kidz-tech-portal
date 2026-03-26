@@ -26,8 +26,8 @@
             <!-- Filter Section -->
             <x-ui.glass-card class="mb-8">
                 <!-- Action Buttons Row -->
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex space-x-3">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div class="flex flex-wrap gap-2">
                         <button onclick="document.getElementById('incomeModal').classList.remove('hidden')" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                             Add Income
@@ -43,30 +43,32 @@
                     </a>
                 </div>
                 <!-- Filter Form -->
-                <form method="GET" action="{{ route('director.finance.index') }}" class="flex flex-wrap gap-4 items-end">
-                    <div class="flex-1 min-w-[150px]">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Description or reference..." class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                    </div>
-                    <div class="w-36">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
-                        <select name="type" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                            <option value="">All</option>
-                            <option value="income" {{ request('type') == 'income' ? 'selected' : '' }}>Income</option>
-                            <option value="expense" {{ request('type') == 'expense' ? 'selected' : '' }}>Expense</option>
-                        </select>
-                    </div>
-                    <div class="w-36">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From Date</label>
-                        <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                    </div>
-                    <div class="w-36">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To Date</label>
-                        <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                    </div>
-                    <div class="flex gap-2">
-                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-lg hover:from-[#3730A3] hover:to-[#4F46E5] transition-all">Filter</button>
-                        <a href="{{ route('director.finance.index') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-all">Reset</a>
+                <form method="GET" action="{{ route('director.finance.index') }}" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div class="sm:col-span-2 lg:col-span-1">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Description or reference..." class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                            <select name="type" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                <option value="">All</option>
+                                <option value="income" {{ request('type') == 'income' ? 'selected' : '' }}>Income</option>
+                                <option value="expense" {{ request('type') == 'expense' ? 'selected' : '' }}>Expense</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From Date</label>
+                            <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To Date</label>
+                            <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button type="submit" class="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-lg hover:from-[#3730A3] hover:to-[#4F46E5] transition-all">Filter</button>
+                            <a href="{{ route('director.finance.index') }}" class="flex-1 sm:flex-none px-4 py-2 text-center bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-all">Reset</a>
+                        </div>
                     </div>
                 </form>
             </x-ui.glass-card>

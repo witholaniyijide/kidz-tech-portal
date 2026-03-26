@@ -39,44 +39,48 @@
 
             {{-- Filters --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl p-5 shadow mb-6">
-                <form method="GET" class="flex flex-wrap items-end gap-4">
-                    <div class="w-52">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tutor</label>
-                        <select name="tutor_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
-                            <option value="">All Tutors</option>
-                            @foreach($tutors as $tutor)
-                                <option value="{{ $tutor->id }}" {{ request('tutor_id') == $tutor->id ? 'selected' : '' }}>
-                                    {{ $tutor->first_name }} {{ $tutor->last_name }}
-                                </option>
-                            @endforeach
-                        </select>
+                <form method="GET" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tutor</label>
+                            <select name="tutor_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                                <option value="">All Tutors</option>
+                                @foreach($tutors as $tutor)
+                                    <option value="{{ $tutor->id }}" {{ request('tutor_id') == $tutor->id ? 'selected' : '' }}>
+                                        {{ $tutor->first_name }} {{ $tutor->last_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Month</label>
+                            <select name="month" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                                <option value="">All Months</option>
+                                @foreach($months as $month)
+                                    <option value="{{ $month }}" {{ request('month') === $month ? 'selected' : '' }}>{{ $month }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
+                            <select name="year" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                                <option value="">All</option>
+                                @foreach($years ?? [] as $year)
+                                    <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button type="submit" class="flex-1 sm:flex-none px-4 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E] transition-colors">
+                                Filter
+                            </button>
+                            @if(request()->hasAny(['tutor_id', 'month', 'year']))
+                                <a href="{{ route('admin.assessments.index') }}" class="flex-1 sm:flex-none px-4 py-2 text-center bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                                    Clear
+                                </a>
+                            @endif
+                        </div>
                     </div>
-                    <div class="w-44">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Month</label>
-                        <select name="month" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
-                            <option value="">All Months</option>
-                            @foreach($months as $month)
-                                <option value="{{ $month }}" {{ request('month') === $month ? 'selected' : '' }}>{{ $month }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="w-28">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
-                        <select name="year" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
-                            <option value="">All</option>
-                            @foreach($years ?? [] as $year)
-                                <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>{{ $year }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <button type="submit" class="px-4 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E] transition-colors">
-                        Filter
-                    </button>
-                    @if(request()->hasAny(['tutor_id', 'month', 'year']))
-                        <a href="{{ route('admin.assessments.index') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                            Clear
-                        </a>
-                    @endif
                 </form>
             </div>
 

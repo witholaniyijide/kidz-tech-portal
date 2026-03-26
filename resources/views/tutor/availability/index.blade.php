@@ -109,11 +109,11 @@
                                                     <!-- Time Inputs -->
                                                     <div class="flex items-center gap-2">
                                                         <span class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300">
-                                                            {{ \Carbon\Carbon::parse($slot->start_time)->format('g:ia') }}
+                                                            {{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }}
                                                         </span>
                                                         <span class="text-slate-400">-</span>
                                                         <span class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300">
-                                                            {{ \Carbon\Carbon::parse($slot->end_time)->format('g:ia') }}
+                                                            {{ \Carbon\Carbon::parse($slot->end_time)->format('g:i A') }}
                                                         </span>
                                                     </div>
                                                     
@@ -145,7 +145,7 @@
                                                         </button>
                                                     </div>
                                                 @else
-                                                    <span class="text-slate-500 italic">Unavailable: {{ \Carbon\Carbon::parse($slot->start_time)->format('g:ia') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('g:ia') }}</span>
+                                                    <span class="text-slate-500 italic">Unavailable: {{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('g:i A') }}</span>
                                                     <form action="{{ route('tutor.availability.destroy', $slot) }}" method="POST" class="inline">
                                                         @csrf
                                                         @method('DELETE')
@@ -169,7 +169,7 @@
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                                 </svg>
-                                                {{ $class['student_name'] ?? 'Student' }} @ {{ isset($class['class_time']) ? \Carbon\Carbon::parse($class['class_time'])->format('g:ia') : 'TBD' }}
+                                                {{ $class['student_name'] ?? 'Student' }} @ {{ isset($class['class_time']) ? \Carbon\Carbon::parse($class['class_time'])->format('g:i A') : 'TBD' }}
                                             </span>
                                         @endforeach
                                         @if($dayClasses->count() > 3)
@@ -255,7 +255,7 @@
                                                 {{ ucfirst($slot->type) }}
                                             </span>
                                             <span class="text-sm text-slate-700 dark:text-slate-300">
-                                                {{ \Carbon\Carbon::parse($slot->start_time)->format('g:ia') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('g:ia') }}
+                                                {{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('g:i A') }}
                                             </span>
                                             <form action="{{ route('tutor.availability.destroy', $slot) }}" method="POST" class="inline opacity-0 group-hover:opacity-100 transition-opacity">
                                                 @csrf

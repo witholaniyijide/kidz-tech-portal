@@ -22,11 +22,19 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Student</p>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $attendance->student->first_name ?? 'N/A' }} {{ $attendance->student->last_name ?? '' }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">
+                            <a href="{{ route('director.students.show', $attendance->student) }}" class="hover:text-[#423A8E] dark:hover:text-[#00CCCD] transition-colors">
+                                {{ $attendance->student->first_name ?? 'N/A' }} {{ $attendance->student->last_name ?? '' }}
+                            </a>
+                        </p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Tutor</p>
-                        <p class="font-medium text-gray-900 dark:text-white">{{ $attendance->tutor->first_name ?? 'N/A' }} {{ $attendance->tutor->last_name ?? '' }}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">
+                            <a href="{{ route('director.tutors.show', $attendance->tutor) }}" class="hover:text-[#423A8E] dark:hover:text-[#00CCCD] transition-colors">
+                                {{ $attendance->tutor->first_name ?? 'N/A' }} {{ $attendance->tutor->last_name ?? '' }}
+                            </a>
+                        </p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Class Date</p>
@@ -106,7 +114,7 @@
                 @if($attendance->approved_at)
                 <div class="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                     <p class="text-sm text-green-800 dark:text-green-200">
-                        <strong>Approved:</strong> {{ \Carbon\Carbon::parse($attendance->approved_at)->format('M d, Y H:i') }}
+                        <strong>Approved:</strong> {{ \Carbon\Carbon::parse($attendance->approved_at)->format('M d, Y g:i A') }}
                         @if($attendance->approval_comment)
                         <br><strong>Comment:</strong> {{ $attendance->approval_comment }}
                         @endif

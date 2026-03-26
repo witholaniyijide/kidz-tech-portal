@@ -12,8 +12,10 @@ use App\Models\Payment;
 use App\Models\TutorAssessment;
 use App\Models\DirectorActivityLog;
 use App\Models\Notice;
+use App\Models\DirectorTodo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class DirectorDashboardController extends Controller
 {
@@ -269,6 +271,16 @@ class DirectorDashboardController extends Controller
         // Today's Birthdays
         $todaysBirthdays = $this->getTodaysBirthdays();
 
+        // Custom Director To-Do List
+        $directorTodos = [];
+        if (Schema::hasTable('director_todos')) {
+            $directorTodos = DirectorTodo::where('user_id', \Illuminate\Support\Facades\Auth::id())
+                ->orderBy('completed')
+                ->orderByRaw("FIELD(priority, 'high', 'medium', 'low')")
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
         $data = [
             'totalStudents' => $totalStudents,
             'activeStudents' => $activeStudents,
@@ -290,12 +302,93 @@ class DirectorDashboardController extends Controller
             'schedulePosted' => $schedulePosted,
             'schedulePostedAt' => $schedulePostedAt,
             'todos' => $todos,
+            'directorTodos' => $directorTodos,
             'recentActivities' => $recentActivities,
             'notices' => $notices,
             'todaysBirthdays' => $todaysBirthdays,
         ];
 
         return view('dashboards.director', $data);
+    }
+
+    /**
+     * Store a new director todo.
+     */
+    public function storeTodo(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
+        ]);
+
+        DirectorTodo::create([
+            'user_id' => \Illuminate\Support\Facades\Auth::id(),
+            'title' => $request->title,
+            'description' => $request->description,
+            'priority' => $request->priority,
+            'due_date' => $request->due_date,
+        ]);
+
+        return redirect()->route('director.dashboard')->with('success', 'To-do item added successfully!');
+    }
+
+    /**
+     * Update a director todo.
+     */
+    public function updateTodo(Request $request, DirectorTodo $todo)
+    {
+        if ($todo->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $todo->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'priority' => $request->priority,
+            'due_date' => $request->due_date,
+        ]);
+
+        return redirect()->route('director.dashboard')->with('success', 'To-do item updated successfully!');
+    }
+
+    /**
+     * Toggle todo completion status.
+     */
+    public function toggleTodo(DirectorTodo $todo)
+    {
+        if ($todo->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            abort(403);
+        }
+
+        $todo->update([
+            'completed' => !$todo->completed,
+            'completed_at' => !$todo->completed ? now() : null,
+        ]);
+
+        return redirect()->route('director.dashboard')->with('success', $todo->completed ? 'To-do marked as complete!' : 'To-do marked as incomplete!');
+    }
+
+    /**
+     * Delete a director todo.
+     */
+    public function deleteTodo(DirectorTodo $todo)
+    {
+        if ($todo->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            abort(403);
+        }
+
+        $todo->delete();
+
+        return redirect()->route('director.dashboard')->with('success', 'To-do item deleted!');
     }
 
     /**

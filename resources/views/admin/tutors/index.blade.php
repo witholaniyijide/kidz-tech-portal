@@ -53,30 +53,49 @@
 
             {{-- Filters --}}
             <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl p-5 shadow mb-6">
-                <form method="GET" class="flex flex-wrap items-end gap-4">
-                    <div class="flex-1 min-w-[200px]">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Name or email..."
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                <form method="GET" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="sm:col-span-2 lg:col-span-1">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Name or email..."
+                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                            <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                                <option value="">All Status</option>
+                                <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+                                <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                <option value="on_leave" {{ request('status') === 'on_leave' ? 'selected' : '' }}>On Leave</option>
+                                <option value="resigned" {{ request('status') === 'resigned' ? 'selected' : '' }}>Resigned</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort By</label>
+                            <select name="sort" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                                <option value="created_at" {{ ($sortBy ?? 'created_at') === 'created_at' ? 'selected' : '' }}>Date Added</option>
+                                <option value="first_name" {{ ($sortBy ?? '') === 'first_name' ? 'selected' : '' }}>First Name (A-Z)</option>
+                                <option value="last_name" {{ ($sortBy ?? '') === 'last_name' ? 'selected' : '' }}>Last Name (A-Z)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Order</label>
+                            <select name="dir" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
+                                <option value="asc" {{ ($sortDir ?? 'desc') === 'asc' ? 'selected' : '' }}>A-Z / Oldest</option>
+                                <option value="desc" {{ ($sortDir ?? 'desc') === 'desc' ? 'selected' : '' }}>Z-A / Newest</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="w-40">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-[#423A8E]">
-                            <option value="">All Status</option>
-                            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
-                            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                            <option value="on_leave" {{ request('status') === 'on_leave' ? 'selected' : '' }}>On Leave</option>
-                            <option value="resigned" {{ request('status') === 'resigned' ? 'selected' : '' }}>Resigned</option>
-                        </select>
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <button type="submit" class="px-5 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E] transition-colors">
+                            Filter
+                        </button>
+                        @if(request()->hasAny(['search', 'status', 'sort', 'dir']))
+                            <a href="{{ route('admin.tutors.index') }}" class="px-5 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                                Clear
+                            </a>
+                        @endif
                     </div>
-                    <button type="submit" class="px-5 py-2 bg-[#423A8E] text-white rounded-lg hover:bg-[#423A8E] transition-colors">
-                        Filter
-                    </button>
-                    @if(request()->hasAny(['search', 'status']))
-                        <a href="{{ route('admin.tutors.index') }}" class="px-5 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                            Clear
-                        </a>
-                    @endif
                 </form>
             </div>
 

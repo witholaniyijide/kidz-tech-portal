@@ -67,32 +67,36 @@
 
         <!-- Filters -->
         <div class="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
-            <form method="GET" class="flex flex-wrap items-center gap-4">
+            <form method="GET" class="space-y-4 sm:space-y-0">
                 <input type="hidden" name="tab" value="{{ $tab }}">
-                
-                <div class="flex items-center gap-2">
-                    <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Month:</label>
-                    <input type="month" name="month" value="{{ $month }}" 
-                           class="px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-wrap md:items-center gap-4">
+                    <div class="w-full sm:w-auto">
+                        <label class="block sm:inline text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 sm:mb-0 sm:mr-2">Month:</label>
+                        <input type="month" name="month" value="{{ $month }}"
+                               class="w-full sm:w-auto px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                    </div>
+
+                    <div class="w-full sm:w-auto">
+                        <label class="block sm:inline text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 sm:mb-0 sm:mr-2">Status:</label>
+                        <select name="status" class="w-full sm:w-auto px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
+                            <option value="">All Status</option>
+                            <option value="pending" {{ $status === 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="approved" {{ $status === 'approved' ? 'selected' : '' }}>Approved</option>
+                            <option value="rejected" {{ $status === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                        </select>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                        <button type="submit" class="flex-1 sm:flex-none px-4 py-2 bg-[#7978E9] text-white text-sm font-medium rounded-lg hover:bg-[#3D43E0] transition-colors">
+                            Filter
+                        </button>
+
+                        <a href="{{ route('tutor.attendance.index', ['tab' => $tab]) }}" class="flex-1 sm:flex-none px-4 py-2 text-center text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+                            Reset
+                        </a>
+                    </div>
                 </div>
-                
-                <div class="flex items-center gap-2">
-                    <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Status:</label>
-                    <select name="status" class="px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-[#7978E9] focus:border-transparent">
-                        <option value="">All Status</option>
-                        <option value="pending" {{ $status === 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="approved" {{ $status === 'approved' ? 'selected' : '' }}>Approved</option>
-                        <option value="rejected" {{ $status === 'rejected' ? 'selected' : '' }}>Rejected</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="px-4 py-2 bg-[#7978E9] text-white text-sm font-medium rounded-lg hover:bg-[#3D43E0] transition-colors">
-                    Filter
-                </button>
-                
-                <a href="{{ route('tutor.attendance.index', ['tab' => $tab]) }}" class="px-4 py-2 text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
-                    Reset
-                </a>
             </form>
         </div>
 
@@ -155,7 +159,9 @@
                                     <div>
                                         <div class="flex items-center gap-2 flex-wrap">
                                             <h4 class="font-semibold text-slate-900 dark:text-white">
-                                                {{ $attendance->student->first_name }} {{ $attendance->student->last_name }}
+                                                <a href="{{ route('tutor.students.show', $attendance->student) }}" class="hover:text-[#423A8E] dark:hover:text-[#00CCCD] transition-colors" onclick="event.stopPropagation();">
+                                                    {{ $attendance->student->first_name }} {{ $attendance->student->last_name }}
+                                                </a>
                                             </h4>
                                             @if($attendance->is_stand_in ?? ($tab === 'stand-in'))
                                                 <span class="px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded">Stand-in</span>
