@@ -57,8 +57,8 @@ class ParentReportReadyMail extends Mailable implements ShouldQueue
      */
     public function attachments(): array
     {
-        // Generate PDF with full report for parent
-        $pdf = Pdf::loadView('tutor.reports.pdf', ['report' => $this->report]);
+        // Generate PDF with parent-specific report view (excludes internal metrics like overall progress)
+        $pdf = Pdf::loadView('parent.reports.pdf', ['report' => $this->report]);
 
         $filename = 'progress_report_' . $this->report->student->first_name . '_' . $this->report->month . '.pdf';
 
