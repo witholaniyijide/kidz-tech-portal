@@ -710,6 +710,8 @@ Route::prefix('tutor')
             ->name('attendance.show');
         Route::post('/attendance/check-duplicate', [App\Http\Controllers\Tutor\AttendanceController::class, 'checkDuplicate'])
             ->name('attendance.check-duplicate');
+        Route::post('/attendance/check-schedule', [App\Http\Controllers\Tutor\AttendanceController::class, 'checkSchedule'])
+            ->name('attendance.check-schedule');
 
         // Performance (Assessments - view only, Director-approved)
         Route::get('/performance', [App\Http\Controllers\Tutor\PerformanceController::class, 'index'])

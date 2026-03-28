@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tutor;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tutor\StoreAttendanceRequest;
 use App\Models\AttendanceRecord;
+use App\Models\DailyClassSchedule;
 use App\Models\MonthlyClassSchedule;
 use App\Models\Student;
 use App\Models\Tutor;
@@ -229,14 +230,82 @@ class AttendanceController extends Controller
             abort(403, 'You can only submit attendance for your assigned students.');
         }
 
-        // Determine if submission is late
-        // Policy: Tutor has 6-hour grace period after class ends
-        // Class end time = class_date + class_time + duration_minutes
-        // Deadline = class end time + 6 hours
         $classDate = Carbon::parse($request->class_date);
         $classTime = $request->class_time ?? '18:00'; // Default to 6pm if no time provided
         $durationMinutes = $request->duration_minutes ?? 60;
 
+        // Build the full class datetime
+        $classDateTime = Carbon::parse($request->class_date . ' ' . $classTime);
+
+        // VALIDATION 1: Cannot submit attendance before the class time
+        // The class must have already started (or be in progress) to submit attendance
+        if (now()->lt($classDateTime)) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'You cannot submit attendance before the class time. The class is scheduled for ' . $classDateTime->format('M j, Y \a\t g:i A') . '. Please wait until the class has started.');
+        }
+
+        // VALIDATION 2: Check if there's a scheduled class for this student on this date
+        // Skip this validation if user explicitly confirmed (force_submit flag)
+        if (!$request->boolean('force_submit', false)) {
+            $dayName = $classDate->format('l');
+            $hasSchedule = false;
+
+            // Check DailyClassSchedule for this date
+            $dailySchedule = DailyClassSchedule::where('schedule_date', $classDate->toDateString())
+                ->where('status', 'posted')
+                ->first();
+
+            if ($dailySchedule) {
+                // Check regular classes
+                if ($dailySchedule->classes) {
+                    foreach ($dailySchedule->classes as $class) {
+                        if (isset($class['student_id']) && $class['student_id'] == $student->id) {
+                            $hasSchedule = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Check rescheduled classes
+                if (!$hasSchedule && $dailySchedule->rescheduled_classes) {
+                    foreach ($dailySchedule->rescheduled_classes as $class) {
+                        if (isset($class['student_id']) && $class['student_id'] == $student->id) {
+                            $hasSchedule = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Also check student's weekly class_schedule
+            if (!$hasSchedule && $student->class_schedule && is_array($student->class_schedule)) {
+                foreach ($student->class_schedule as $schedule) {
+                    if (isset($schedule['day']) && $schedule['day'] === $dayName) {
+                        $hasSchedule = true;
+                        break;
+                    }
+                }
+            }
+
+            // If no schedule found, show warning but allow override
+            if (!$hasSchedule) {
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('schedule_warning', [
+                        'message' => "No scheduled class found for {$student->first_name} {$student->last_name} on {$dayName}, {$classDate->format('M j, Y')}. If you believe this is correct (e.g., make-up class, special arrangement), please confirm to proceed.",
+                        'student_name' => $student->first_name . ' ' . $student->last_name,
+                        'date' => $classDate->format('l, M j, Y'),
+                    ]);
+            }
+        }
+
+        // Determine if submission is late
+        // Policy: Tutor has 6-hour grace period after class ends
+        // Class end time = class_date + class_time + duration_minutes
+        // Deadline = class end time + 6 hours
         $classEndTime = Carbon::parse($request->class_date . ' ' . $classTime)
             ->addMinutes($durationMinutes);
         $deadline = $classEndTime->copy()->addHours(6);
@@ -349,6 +418,7 @@ class AttendanceController extends Controller
 
     /**
      * Check for duplicate attendance records.
+     * Enhanced to check time, topic, and courses for exact duplicates.
      */
     public function checkDuplicate(Request $request)
     {
@@ -362,40 +432,171 @@ class AttendanceController extends Controller
             'student_id' => 'required|exists:students,id',
             'class_date' => 'required|date',
             'class_time' => 'nullable|string',
+            'topic' => 'nullable|string',
+            'courses_covered' => 'nullable|array',
         ]);
 
         $student = Student::find($request->student_id);
 
         // Check for existing attendance on the same date
-        $query = AttendanceRecord::where('student_id', $request->student_id)
-            ->whereDate('class_date', $request->class_date);
-
-        // If time is provided, also check for same time (within 30 min window)
-        $duplicates = $query->get();
+        $duplicates = AttendanceRecord::where('student_id', $request->student_id)
+            ->whereDate('class_date', $request->class_date)
+            ->get();
 
         if ($duplicates->isEmpty()) {
             return response()->json([
                 'has_duplicate' => false,
+                'has_exact_duplicate' => false,
             ]);
         }
 
+        // Check for exact duplicate (same time, topic, and courses)
+        $exactDuplicate = null;
+        $requestedTime = $request->class_time;
+        $requestedTopic = $request->topic;
+        $requestedCourses = $request->courses_covered ?? [];
+
+        foreach ($duplicates as $record) {
+            $recordTime = $record->class_time ? Carbon::parse($record->class_time)->format('H:i') : null;
+            $timesMatch = $requestedTime && $recordTime && $requestedTime === $recordTime;
+
+            $topicsMatch = $requestedTopic && $record->topic &&
+                           strtolower(trim($requestedTopic)) === strtolower(trim($record->topic));
+
+            $recordCourses = $record->courses_covered ?? [];
+            sort($requestedCourses);
+            sort($recordCourses);
+            $coursesMatch = !empty($requestedCourses) && !empty($recordCourses) &&
+                           $requestedCourses == $recordCourses;
+
+            // If time, topic, and courses all match, it's an exact duplicate
+            if ($timesMatch && $topicsMatch && $coursesMatch) {
+                $exactDuplicate = $record;
+                break;
+            }
+        }
+
         // Format the duplicates for display
-        $duplicateInfo = $duplicates->map(function ($record) {
+        $duplicateInfo = $duplicates->map(function ($record) use ($requestedTime, $requestedTopic, $requestedCourses) {
+            $recordTime = $record->class_time ? Carbon::parse($record->class_time)->format('H:i') : null;
+            $timesMatch = $requestedTime && $recordTime && $requestedTime === $recordTime;
+
+            $topicsMatch = $requestedTopic && $record->topic &&
+                           strtolower(trim($requestedTopic)) === strtolower(trim($record->topic));
+
+            $recordCourses = $record->courses_covered ?? [];
+            $sortedRequested = $requestedCourses;
+            $sortedRecord = $recordCourses;
+            sort($sortedRequested);
+            sort($sortedRecord);
+            $coursesMatch = !empty($sortedRequested) && !empty($sortedRecord) &&
+                           $sortedRequested == $sortedRecord;
+
             return [
                 'id' => $record->id,
-                'time' => $record->class_time ? \Carbon\Carbon::parse($record->class_time)->format('g:i A') : 'N/A',
+                'time' => $record->class_time ? Carbon::parse($record->class_time)->format('g:i A') : 'N/A',
+                'topic' => $record->topic ?? 'N/A',
+                'courses' => $record->courses_covered ? implode(', ', $record->courses_covered) : 'N/A',
                 'status' => ucfirst($record->status),
                 'tutor' => $record->tutor ? $record->tutor->first_name . ' ' . $record->tutor->last_name : 'Unknown',
                 'submitted_at' => $record->created_at->format('M j, Y g:i A'),
+                'time_matches' => $timesMatch,
+                'topic_matches' => $topicsMatch,
+                'courses_match' => $coursesMatch,
+                'is_exact_match' => $timesMatch && $topicsMatch && $coursesMatch,
             ];
         });
 
         return response()->json([
             'has_duplicate' => true,
+            'has_exact_duplicate' => $exactDuplicate !== null,
             'count' => $duplicates->count(),
             'student_name' => $student->first_name . ' ' . $student->last_name,
-            'date' => \Carbon\Carbon::parse($request->class_date)->format('l, M j, Y'),
+            'date' => Carbon::parse($request->class_date)->format('l, M j, Y'),
             'duplicates' => $duplicateInfo,
+        ]);
+    }
+
+    /**
+     * Check if a student has a scheduled class on the given date.
+     * Returns schedule info or null if no schedule exists.
+     */
+    public function checkSchedule(Request $request)
+    {
+        $tutor = Auth::user()->tutor;
+
+        if (!$tutor) {
+            return response()->json(['error' => 'No tutor profile'], 403);
+        }
+
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'class_date' => 'required|date',
+        ]);
+
+        $student = Student::find($request->student_id);
+        $classDate = Carbon::parse($request->class_date);
+        $dayName = $classDate->format('l');
+
+        // Check 1: Is there a posted DailyClassSchedule for this date with this student?
+        $dailySchedule = DailyClassSchedule::where('schedule_date', $classDate->toDateString())
+            ->where('status', 'posted')
+            ->first();
+
+        $scheduledInDaily = false;
+        $scheduledTime = null;
+        $isRescheduled = false;
+
+        if ($dailySchedule) {
+            // Check regular classes
+            if ($dailySchedule->classes) {
+                foreach ($dailySchedule->classes as $class) {
+                    if (isset($class['student_id']) && $class['student_id'] == $student->id) {
+                        $scheduledInDaily = true;
+                        $scheduledTime = $class['time'] ?? null;
+                        break;
+                    }
+                }
+            }
+
+            // Check rescheduled classes
+            if (!$scheduledInDaily && $dailySchedule->rescheduled_classes) {
+                foreach ($dailySchedule->rescheduled_classes as $class) {
+                    if (isset($class['student_id']) && $class['student_id'] == $student->id) {
+                        $scheduledInDaily = true;
+                        $scheduledTime = $class['time'] ?? null;
+                        $isRescheduled = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Check 2: Does the student have this day in their weekly class_schedule?
+        $scheduledInWeekly = false;
+        $weeklyScheduleTime = null;
+
+        if ($student->class_schedule && is_array($student->class_schedule)) {
+            foreach ($student->class_schedule as $schedule) {
+                if (isset($schedule['day']) && $schedule['day'] === $dayName) {
+                    $scheduledInWeekly = true;
+                    $weeklyScheduleTime = $schedule['time'] ?? null;
+                    break;
+                }
+            }
+        }
+
+        $hasSchedule = $scheduledInDaily || $scheduledInWeekly;
+        $time = $scheduledTime ?? $weeklyScheduleTime;
+
+        return response()->json([
+            'has_schedule' => $hasSchedule,
+            'scheduled_in_daily' => $scheduledInDaily,
+            'scheduled_in_weekly' => $scheduledInWeekly,
+            'is_rescheduled' => $isRescheduled,
+            'scheduled_time' => $time,
+            'day_name' => $dayName,
+            'student_name' => $student->first_name . ' ' . $student->last_name,
         ]);
     }
 }
