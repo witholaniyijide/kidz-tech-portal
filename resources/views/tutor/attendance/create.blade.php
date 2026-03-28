@@ -3,12 +3,12 @@
 <div id="duplicateModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <!-- Modal Header -->
-        <div class="px-6 py-4 bg-amber-500 rounded-t-2xl">
+        <div id="duplicateModalHeader" class="px-6 py-4 bg-amber-500 rounded-t-2xl">
             <div class="flex items-center gap-3">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
-                <h3 class="text-lg font-semibold text-white">Duplicate Attendance Warning</h3>
+                <h3 id="duplicateModalTitle" class="text-lg font-semibold text-white">Duplicate Attendance Warning</h3>
             </div>
         </div>
 
@@ -17,6 +17,20 @@
             <p class="text-slate-700 dark:text-slate-300 mb-4">
                 You have already submitted attendance for <strong id="duplicateStudentName" class="text-slate-900 dark:text-white"></strong> on <strong id="duplicateDate" class="text-slate-900 dark:text-white"></strong>.
             </p>
+
+            <div id="exactDuplicateWarning" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-4">
+                <div class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <div>
+                        <h4 class="font-semibold text-red-800 dark:text-red-300">Exact Duplicate Detected!</h4>
+                        <p class="text-sm text-red-700 dark:text-red-400 mt-1">
+                            The same time, topic, and course(s) match a previous submission. This appears to be a duplicate entry.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
             <div id="duplicateDetails" class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 mb-4">
                 <p class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Previous submission(s):</p>
@@ -39,6 +53,100 @@
             <button type="button" onclick="submitAnyway()"
                     class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors">
                 Yes, Submit Anyway
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Warning Modal -->
+<div id="scheduleWarningModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 bg-blue-500 rounded-t-2xl">
+            <div class="flex items-center gap-3">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-white">No Scheduled Class Found</h3>
+            </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+            <p class="text-slate-700 dark:text-slate-300 mb-4">
+                There is no scheduled class found for <strong id="scheduleStudentName" class="text-slate-900 dark:text-white"></strong> on <strong id="scheduleDate" class="text-slate-900 dark:text-white"></strong>.
+            </p>
+
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-4">
+                <div class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div>
+                        <p class="text-sm text-blue-700 dark:text-blue-400">
+                            If this is a make-up class, rescheduled class, or special arrangement, you can proceed by confirming below.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-sm text-slate-600 dark:text-slate-400">
+                Are you sure you want to submit attendance for this unscheduled class?
+            </p>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-3 rounded-b-2xl">
+            <button type="button" onclick="closeScheduleWarningModal()"
+                    class="px-5 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition-colors">
+                Cancel
+            </button>
+            <button type="button" onclick="submitWithForce()"
+                    class="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-semibold transition-colors">
+                Yes, Submit Anyway
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Early Submission Error Modal -->
+<div id="earlySubmissionModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 bg-red-500 rounded-t-2xl">
+            <div class="flex items-center gap-3">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-white">Cannot Submit Early</h3>
+            </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+            <p class="text-slate-700 dark:text-slate-300 mb-4">
+                You cannot submit attendance before the class has started.
+            </p>
+
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-4">
+                <p class="text-sm text-red-700 dark:text-red-400">
+                    <strong>Class Time:</strong> <span id="earlySubmissionClassTime"></span>
+                </p>
+                <p class="text-sm text-red-700 dark:text-red-400 mt-1">
+                    <strong>Current Time:</strong> <span id="earlySubmissionCurrentTime"></span>
+                </p>
+            </div>
+
+            <p class="text-sm text-slate-600 dark:text-slate-400">
+                Please wait until after the class starts to submit attendance.
+            </p>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-3 rounded-b-2xl">
+            <button type="button" onclick="closeEarlySubmissionModal()"
+                    class="px-5 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-xl font-semibold transition-colors">
+                Understood
             </button>
         </div>
     </div>
@@ -101,11 +209,51 @@
         </div>
     @endif
 
+    <!-- Error/Warning Messages from Server -->
+    @if(session('error'))
+        <div class="max-w-3xl mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+            <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <div>
+                    <h4 class="font-semibold text-red-800 dark:text-red-300">Error</h4>
+                    <p class="text-sm text-red-700 dark:text-red-400 mt-1">{{ session('error') }}</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(session('schedule_warning'))
+        <div id="scheduleWarningBanner" class="max-w-3xl mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+            <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <div class="flex-1">
+                    <h4 class="font-semibold text-blue-800 dark:text-blue-300">No Scheduled Class Found</h4>
+                    <p class="text-sm text-blue-700 dark:text-blue-400 mt-1">{{ session('schedule_warning.message') }}</p>
+                    <div class="mt-3 flex items-center gap-3">
+                        <button type="button" onclick="submitWithForceFromBanner()"
+                                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg font-semibold transition-colors">
+                            Yes, Submit Anyway
+                        </button>
+                        <a href="{{ route('tutor.attendance.create', $isStandIn ? ['standin' => 1] : []) }}"
+                           class="px-4 py-2 text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 text-sm font-medium transition-colors">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Attendance Form -->
     <div class="max-w-3xl">
         <form id="attendanceForm" action="{{ route('tutor.attendance.store') }}" method="POST" class="glass-card rounded-2xl shadow-lg overflow-hidden" onsubmit="return handleFormSubmit(event)">
             @csrf
             <input type="hidden" name="is_stand_in" value="{{ $isStandIn ? '1' : '0' }}">
+            <input type="hidden" name="force_submit" id="force_submit" value="0">
 
             <!-- Header -->
             <div class="px-6 py-4 {{ $isStandIn ? 'bg-gradient-to-r from-[#7978E9] to-[#98BDFF]' : 'bg-gradient-to-r from-[#4B49AC] to-[#7978E9]' }}">
@@ -510,6 +658,7 @@
 @push('scripts')
 <script>
     let skipDuplicateCheck = false;
+    let skipScheduleCheck = false;
 
     function setDuration(minutes) {
         document.getElementById('duration_minutes').value = minutes;
@@ -529,11 +678,28 @@
         }
     });
 
-    // Handle form submission with duplicate check
+    // Get selected courses from checkboxes
+    function getSelectedCourses() {
+        const checkboxes = document.querySelectorAll('input[name="courses_covered[]"]:checked');
+        return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    // Check if class time is in the future (early submission)
+    function isEarlySubmission(classDate, classTime) {
+        if (!classDate || !classTime) return false;
+
+        const classDateTime = new Date(classDate + 'T' + classTime);
+        const now = new Date();
+
+        return now < classDateTime;
+    }
+
+    // Handle form submission with all validations
     async function handleFormSubmit(event) {
         // If we already checked and user confirmed, allow submission
-        if (skipDuplicateCheck) {
+        if (skipDuplicateCheck && skipScheduleCheck) {
             skipDuplicateCheck = false;
+            skipScheduleCheck = false;
             return true;
         }
 
@@ -542,6 +708,8 @@
         const studentId = document.getElementById('student_id').value;
         const classDate = document.getElementById('class_date').value;
         const classTime = document.querySelector('input[name="class_time"]').value;
+        const topic = document.getElementById('topic').value;
+        const courses = getSelectedCourses();
 
         if (!studentId || !classDate) {
             // Let the form validation handle missing fields
@@ -549,36 +717,45 @@
             return false;
         }
 
-        try {
-            const response = await fetch('{{ route("tutor.attendance.check-duplicate") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    student_id: studentId,
-                    class_date: classDate,
-                    class_time: classTime
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.has_duplicate) {
-                showDuplicateModal(data);
-                return false;
-            } else {
-                // No duplicates, submit the form
-                document.getElementById('attendanceForm').submit();
-            }
-        } catch (error) {
-            console.error('Error checking for duplicates:', error);
-            // On error, allow submission anyway
-            document.getElementById('attendanceForm').submit();
+        // Check 1: Early submission (client-side)
+        if (isEarlySubmission(classDate, classTime)) {
+            showEarlySubmissionModal(classDate, classTime);
+            return false;
         }
 
+        // Check 2: Duplicate check
+        if (!skipDuplicateCheck) {
+            try {
+                const response = await fetch('{{ route("tutor.attendance.check-duplicate") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        student_id: studentId,
+                        class_date: classDate,
+                        class_time: classTime,
+                        topic: topic,
+                        courses_covered: courses
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.has_duplicate) {
+                    showDuplicateModal(data);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error checking for duplicates:', error);
+                // Continue to next check on error
+            }
+        }
+
+        // All checks passed (or skipped), submit the form
+        document.getElementById('attendanceForm').submit();
         return false;
     }
 
@@ -586,22 +763,57 @@
         document.getElementById('duplicateStudentName').textContent = data.student_name;
         document.getElementById('duplicateDate').textContent = data.date;
 
+        // Show exact duplicate warning if applicable
+        const exactDuplicateWarning = document.getElementById('exactDuplicateWarning');
+        const modalHeader = document.getElementById('duplicateModalHeader');
+        const modalTitle = document.getElementById('duplicateModalTitle');
+
+        if (data.has_exact_duplicate) {
+            exactDuplicateWarning.classList.remove('hidden');
+            modalHeader.classList.remove('bg-amber-500');
+            modalHeader.classList.add('bg-red-500');
+            modalTitle.textContent = 'Exact Duplicate Detected!';
+        } else {
+            exactDuplicateWarning.classList.add('hidden');
+            modalHeader.classList.remove('bg-red-500');
+            modalHeader.classList.add('bg-amber-500');
+            modalTitle.textContent = 'Duplicate Attendance Warning';
+        }
+
         const listEl = document.getElementById('duplicateList');
         listEl.innerHTML = '';
 
         data.duplicates.forEach(dup => {
             const item = document.createElement('div');
-            item.className = 'flex items-center justify-between p-2 bg-white dark:bg-slate-600 rounded-lg text-sm';
+            item.className = 'p-3 bg-white dark:bg-slate-600 rounded-lg text-sm space-y-2';
+
+            // Build match indicators
+            let matchIndicators = '';
+            if (dup.is_exact_match) {
+                matchIndicators = '<span class="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-full">EXACT MATCH</span>';
+            } else {
+                if (dup.time_matches) matchIndicators += '<span class="px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full">Same Time</span> ';
+                if (dup.topic_matches) matchIndicators += '<span class="px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full">Same Topic</span> ';
+                if (dup.courses_match) matchIndicators += '<span class="px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full">Same Courses</span>';
+            }
+
             item.innerHTML = `
-                <div>
-                    <span class="font-medium text-slate-900 dark:text-white">${dup.time}</span>
-                    <span class="text-slate-500 dark:text-slate-400">by ${dup.tutor}</span>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="font-medium text-slate-900 dark:text-white">${dup.time}</span>
+                        <span class="text-slate-500 dark:text-slate-400">by ${dup.tutor}</span>
+                    </div>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium ${
+                        dup.status === 'Pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                        dup.status === 'Approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                    }">${dup.status}</span>
                 </div>
-                <span class="px-2 py-1 rounded-full text-xs font-medium ${
-                    dup.status === 'Pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
-                    dup.status === 'Approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                }">${dup.status}</span>
+                <div class="text-xs text-slate-600 dark:text-slate-400">
+                    <div><strong>Topic:</strong> ${dup.topic}</div>
+                    <div><strong>Course(s):</strong> ${dup.courses}</div>
+                </div>
+                ${matchIndicators ? '<div class="flex flex-wrap gap-1">' + matchIndicators + '</div>' : ''}
             `;
             listEl.appendChild(item);
         });
@@ -620,13 +832,83 @@
     function submitAnyway() {
         closeDuplicateModal();
         skipDuplicateCheck = true;
+        skipScheduleCheck = true;
         document.getElementById('attendanceForm').submit();
     }
 
-    // Close modal on escape key
+    // Schedule warning modal functions
+    function showScheduleWarningModal(studentName, date) {
+        document.getElementById('scheduleStudentName').textContent = studentName;
+        document.getElementById('scheduleDate').textContent = date;
+
+        const modal = document.getElementById('scheduleWarningModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeScheduleWarningModal() {
+        const modal = document.getElementById('scheduleWarningModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function submitWithForce() {
+        closeScheduleWarningModal();
+        document.getElementById('force_submit').value = '1';
+        skipDuplicateCheck = true;
+        skipScheduleCheck = true;
+        document.getElementById('attendanceForm').submit();
+    }
+
+    // Submit with force from banner (server-side validation failed)
+    function submitWithForceFromBanner() {
+        document.getElementById('force_submit').value = '1';
+        skipDuplicateCheck = true;
+        skipScheduleCheck = true;
+        document.getElementById('attendanceForm').submit();
+    }
+
+    // Early submission modal functions
+    function showEarlySubmissionModal(classDate, classTime) {
+        const classDateTime = new Date(classDate + 'T' + classTime);
+        const now = new Date();
+
+        document.getElementById('earlySubmissionClassTime').textContent = classDateTime.toLocaleString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        document.getElementById('earlySubmissionCurrentTime').textContent = now.toLocaleString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+
+        const modal = document.getElementById('earlySubmissionModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeEarlySubmissionModal() {
+        const modal = document.getElementById('earlySubmissionModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    // Close modals on escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeDuplicateModal();
+            closeScheduleWarningModal();
+            closeEarlySubmissionModal();
         }
     });
 
