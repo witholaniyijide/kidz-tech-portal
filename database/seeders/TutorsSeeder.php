@@ -19,7 +19,7 @@ class TutorsSeeder extends Seeder
             [
                 'first_name' => 'David',
                 'last_name' => 'Okonkwo',
-                'email' => 'david.okonkwo@kidztech.com',
+                'email' => 'david.okonkwo@example.com',
                 'phone' => '08045678901',
                 'date_of_birth' => '1990-05-14',
                 'gender' => 'male',
@@ -35,7 +35,7 @@ class TutorsSeeder extends Seeder
             [
                 'first_name' => 'Chioma',
                 'last_name' => 'Adebayo',
-                'email' => 'chioma.adebayo@kidztech.com',
+                'email' => 'chioma.adebayo@example.com',
                 'phone' => '08056789012',
                 'date_of_birth' => '1992-08-25',
                 'gender' => 'female',
@@ -51,7 +51,7 @@ class TutorsSeeder extends Seeder
             [
                 'first_name' => 'Emmanuel',
                 'last_name' => 'Johnson',
-                'email' => 'emmanuel.johnson@kidztech.com',
+                'email' => 'emmanuel.johnson@example.com',
                 'phone' => '08067890123',
                 'date_of_birth' => '1988-11-30',
                 'gender' => 'male',
@@ -67,7 +67,7 @@ class TutorsSeeder extends Seeder
             [
                 'first_name' => 'Blessing',
                 'last_name' => 'Okoro',
-                'email' => 'blessing.okoro@kidztech.com',
+                'email' => 'blessing.okoro@example.com',
                 'phone' => '08078901234',
                 'date_of_birth' => '1994-02-18',
                 'gender' => 'female',
@@ -83,7 +83,7 @@ class TutorsSeeder extends Seeder
             [
                 'first_name' => 'Ibrahim',
                 'last_name' => 'Musa',
-                'email' => 'ibrahim.musa@kidztech.com',
+                'email' => 'ibrahim.musa@example.com',
                 'phone' => '08089012345',
                 'date_of_birth' => '1991-09-05',
                 'gender' => 'male',
