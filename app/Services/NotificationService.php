@@ -81,6 +81,69 @@ class NotificationService
     }
 
     /**
+     * Send notification when Director rejects/returns a report
+     * Recipients: Tutor AND Manager (since manager had already approved)
+     */
+    public function notifyReportRejectedByDirector(TutorReport $report, string $directorComment = ''): void
+    {
+        $report->load(['tutor', 'student']);
+
+        // Safety check: ensure tutor exists
+        if (!$report->tutor) {
+            Log::warning('Cannot notify tutor for director-rejected report - tutor not found', [
+                'report_id' => $report->id,
+                'tutor_id' => $report->tutor_id,
+            ]);
+            return;
+        }
+
+        $studentName = $report->student
+            ? "{$report->student->first_name} {$report->student->last_name}"
+            : 'Unknown Student';
+
+        // 1. Notify Tutor
+        $tutorMessage = "Your report for {$studentName} ({$report->month} {$report->year}) has been returned by the Director for revision.";
+        if ($directorComment) {
+            $tutorMessage .= " Director's comment: {$directorComment}";
+        }
+
+        $this->notifyTutor(
+            $report->tutor,
+            'Report Returned by Director',
+            $tutorMessage,
+            'alert',
+            [
+                'report_id' => $report->id,
+                'student_id' => $report->student_id,
+                'director_comment' => $directorComment,
+                'notification_type' => 'report_rejected_by_director'
+            ]
+        );
+
+        // 2. Notify all Managers (since they had approved it before)
+        $managerMessage = "The report for {$studentName} ({$report->month} {$report->year}) has been returned by the Director for revision.";
+        if ($directorComment) {
+            $managerMessage .= " Director's comment: {$directorComment}";
+        }
+
+        $managers = User::role('manager')->get();
+        foreach ($managers as $manager) {
+            $this->notifyManager(
+                $manager,
+                'Report Returned by Director',
+                $managerMessage,
+                'alert',
+                [
+                    'report_id' => $report->id,
+                    'student_id' => $report->student_id,
+                    'director_comment' => $directorComment,
+                    'notification_type' => 'report_rejected_by_director'
+                ]
+            );
+        }
+    }
+
+    /**
      * Send notification when Director approves a report
      * Recipients: Tutor, Manager, Admin, Parent
      */

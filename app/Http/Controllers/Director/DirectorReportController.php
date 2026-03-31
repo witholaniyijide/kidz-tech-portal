@@ -8,6 +8,7 @@ use App\Models\Tutor;
 use App\Models\Student;
 use App\Models\TutorReportComment;
 use App\Services\DirectorApprovalService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -245,12 +246,15 @@ class DirectorReportController extends Controller
         ]);
 
         try {
-            // Update report status
+            // Update report status to draft with returned_at timestamp
+            // This allows the tutor to edit while tracking that it was returned
             $report->update([
-                'status' => 'returned',
+                'status' => 'draft',
                 'director_comment' => $validated['director_comment'],
                 'director_reviewed_at' => now(),
                 'director_id' => Auth::id(),
+                'returned_at' => now(),
+                'returned_by' => 'director',
             ]);
 
             // Log the action
@@ -261,9 +265,15 @@ class DirectorReportController extends Controller
                 $report->id
             );
 
+            // Notify tutor and manager
+            app(NotificationService::class)->notifyReportRejectedByDirector(
+                $report,
+                $validated['director_comment']
+            );
+
             return redirect()
                 ->route('director.reports.index')
-                ->with('success', 'Report has been rejected and returned to the tutor for revision.');
+                ->with('success', 'Report has been returned to the tutor for revision. Tutor and manager have been notified.');
         } catch (\Exception $e) {
             return redirect()
                 ->back()

@@ -62,6 +62,7 @@ class TutorReport extends Model
 
         // Returned for correction
         'returned_at',
+        'returned_by',
     ];
 
     protected $casts = [
