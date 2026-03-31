@@ -500,6 +500,8 @@ class ReportController extends Controller
             $report->update([
                 'status' => 'submitted',
                 'submitted_at' => now(),
+                'returned_at' => null,
+                'returned_by' => null,
             ]);
 
             try {
