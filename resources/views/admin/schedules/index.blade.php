@@ -373,9 +373,39 @@
                     try {
                         const response = await fetch('{{ route("admin.schedules.whatsapp", ["date" => $selectedDate->toDateString()]) }}');
                         const data = await response.json();
-                        await navigator.clipboard.writeText(data.format);
-                        this.copied = true;
-                        setTimeout(() => this.copied = false, 2000);
+                        const text = data.format;
+
+                        // Try modern Clipboard API first (requires HTTPS)
+                        if (navigator.clipboard && window.isSecureContext) {
+                            try {
+                                await navigator.clipboard.writeText(text);
+                                this.copied = true;
+                                setTimeout(() => this.copied = false, 2000);
+                                return;
+                            } catch (error) {
+                                console.error('Clipboard API failed:', error);
+                            }
+                        }
+
+                        // Fallback for HTTP sites or older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        textArea.style.position = 'fixed';
+                        textArea.style.left = '-9999px';
+                        textArea.style.top = '-9999px';
+                        document.body.appendChild(textArea);
+                        textArea.focus();
+                        textArea.select();
+
+                        const successful = document.execCommand('copy');
+                        document.body.removeChild(textArea);
+
+                        if (successful) {
+                            this.copied = true;
+                            setTimeout(() => this.copied = false, 2000);
+                        } else {
+                            alert('Failed to copy. Please select the text and copy manually (Ctrl+C).');
+                        }
                     } catch (error) {
                         console.error('Failed to copy:', error);
                         alert('Failed to copy to clipboard');

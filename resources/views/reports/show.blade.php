@@ -180,7 +180,7 @@
     </div>
 
     <script>
-        function copyForWhatsApp() {
+        async function copyForWhatsApp() {
             const text = `*Kidz Tech Coding Club: Monthly Progress Report*
 
 *Student:* {{ $report->student->full_name }}
@@ -208,11 +208,40 @@
 *6. Comments/Observation:*
 {{ $report->comments }}`;
 
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Report copied to clipboard! You can now paste it in WhatsApp.');
-            }).catch(() => {
-                alert('Failed to copy. Please try again.');
-            });
+            // Try modern Clipboard API first (requires HTTPS)
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    alert('Report copied to clipboard! You can now paste it in WhatsApp.');
+                    return;
+                } catch (error) {
+                    console.error('Clipboard API failed:', error);
+                }
+            }
+
+            // Fallback for HTTP sites or older browsers
+            try {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                textArea.style.top = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textArea);
+
+                if (successful) {
+                    alert('Report copied to clipboard! You can now paste it in WhatsApp.');
+                } else {
+                    alert('Failed to copy. Please select the text and copy manually (Ctrl+C).');
+                }
+            } catch (error) {
+                console.error('Fallback copy failed:', error);
+                alert('Failed to copy. Please select the text and copy manually (Ctrl+C).');
+            }
         }
     </script>
 
