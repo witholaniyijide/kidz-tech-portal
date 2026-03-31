@@ -34,6 +34,123 @@
                 </div>
             </div>
 
+            {{-- Stats Cards --}}
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+                {{-- Total Reports --}}
+                <div class="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Reports</p>
+                            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $stats['total'] ?? 0 }}</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-[#4F46E5] to-[#818CF8] p-3 rounded-xl">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Manager Pending --}}
+                <div class="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Manager Queue</p>
+                            <p class="text-3xl font-bold text-orange-600 dark:text-orange-400">{{ $stats['manager_pending'] ?? 0 }}</p>
+                        </div>
+                        <div class="bg-orange-100 dark:bg-orange-900/30 p-3 rounded-xl">
+                            <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Awaiting Director Approval --}}
+                <div class="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Your Queue</p>
+                            <p class="text-3xl font-bold text-amber-600 dark:text-amber-400">{{ $stats['pending'] ?? 0 }}</p>
+                        </div>
+                        <div class="bg-amber-100 dark:bg-amber-900/30 p-3 rounded-xl">
+                            <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Completed (Director Approved) --}}
+                <div class="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Completed</p>
+                            <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{{ $stats['approved'] ?? 0 }}</p>
+                        </div>
+                        <div class="bg-emerald-100 dark:bg-emerald-900/30 p-3 rounded-xl">
+                            <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Late Submissions --}}
+                <div class="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Late Submissions</p>
+                            <p class="text-3xl font-bold text-red-600 dark:text-red-400">{{ $stats['late_submissions'] ?? 0 }}</p>
+                        </div>
+                        <div class="bg-red-100 dark:bg-red-900/30 p-3 rounded-xl">
+                            <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Awaiting Reports --}}
+                <div class="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Not Submitted</p>
+                            <p class="text-3xl font-bold text-purple-600 dark:text-purple-400">{{ $stats['awaiting_reports'] ?? 0 }}</p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">{{ $currentMonth ?? now()->format('F') }}</p>
+                        </div>
+                        <div class="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-xl">
+                            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Tab Navigation --}}
+            <div x-data="{ activeTab: 'reports' }" class="mb-6">
+                <div class="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/10 rounded-2xl p-1 inline-flex shadow-sm mb-6">
+                    <button @click="activeTab = 'reports'"
+                            :class="activeTab === 'reports' ? 'bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white shadow-lg' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
+                            class="px-6 py-2 rounded-xl font-medium transition-all">
+                        Reports List
+                    </button>
+                    <button @click="activeTab = 'analytics'"
+                            :class="activeTab === 'analytics' ? 'bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white shadow-lg' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
+                            class="px-6 py-2 rounded-xl font-medium transition-all">
+                        Analytics
+                    </button>
+                    <button @click="activeTab = 'students'"
+                            :class="activeTab === 'students' ? 'bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white shadow-lg' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
+                            class="px-6 py-2 rounded-xl font-medium transition-all">
+                        Students Overview
+                    </button>
+                </div>
+
+            {{-- Reports List Tab --}}
+            <div x-show="activeTab === 'reports'" x-transition>
+
             {{-- Status Tabs --}}
             <div class="mb-6">
                 <div class="flex gap-2">
@@ -98,7 +215,14 @@
             {{-- Filters --}}
             <div class="bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-lg mb-8">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filters</h3>
-                <form method="GET" action="{{ route('director.reports.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <form method="GET" action="{{ route('director.reports.index') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    {{-- Search by Student Name --}}
+                    <div>
+                        <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Student Name</label>
+                        <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Search student..."
+                               class="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent">
+                    </div>
+
                     {{-- Month Filter --}}
                     <div>
                         <label for="month" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Month</label>
@@ -152,7 +276,7 @@
                     </div>
 
                     {{-- Filter Buttons --}}
-                    <div class="md:col-span-4 flex gap-3">
+                    <div class="md:col-span-5 flex gap-3">
                         <button type="submit" class="px-6 py-3 bg-gradient-to-r from-[#4F46E5] to-[#818CF8] text-white rounded-xl hover:shadow-lg transform hover:-translate-y-1 transition-all font-medium flex items-center">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -299,6 +423,308 @@
                     {{ $reports->appends(request()->query())->links() }}
                 </div>
             @endif
+
+            </div>{{-- End Reports List Tab --}}
+
+            {{-- Analytics Tab --}}
+            <div x-show="activeTab === 'analytics'" x-transition>
+                <div class="space-y-6">
+                    {{-- Monthly Breakdown --}}
+                    <div class="bg-white/30 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-lg">
+                        <div class="p-6 border-b border-white/10">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Monthly Report Summary</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Breakdown of reports by month with approval counts</p>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50/30 dark:bg-gray-800/30">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Month/Year</th>
+                                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Total</th>
+                                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Draft</th>
+                                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Pending</th>
+                                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Manager Approved</th>
+                                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Completed</th>
+                                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Returned</th>
+                                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Approval Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/10">
+                                    @forelse($monthlyAnalytics ?? [] as $monthly)
+                                        @php
+                                            $approvalRate = $monthly->total > 0 ? round((($monthly->approved_by_manager + $monthly->completed) / $monthly->total) * 100) : 0;
+                                        @endphp
+                                        <tr class="hover:bg-white/10 dark:hover:bg-gray-800/30 transition-colors">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $monthly->month }}</span>
+                                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ $monthly->year }}</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <span class="px-2 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-full">{{ $monthly->total }}</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ $monthly->draft }}</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                @if($monthly->pending > 0)
+                                                    <span class="px-2 py-1 text-sm font-medium text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30 rounded-full">{{ $monthly->pending }}</span>
+                                                @else
+                                                    <span class="text-sm text-gray-400">0</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                @if($monthly->approved_by_manager > 0)
+                                                    <span class="px-2 py-1 text-sm font-medium text-blue-800 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 rounded-full">{{ $monthly->approved_by_manager }}</span>
+                                                @else
+                                                    <span class="text-sm text-gray-400">0</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                @if($monthly->completed > 0)
+                                                    <span class="px-2 py-1 text-sm font-medium text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">{{ $monthly->completed }}</span>
+                                                @else
+                                                    <span class="text-sm text-gray-400">0</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                @if($monthly->returned > 0)
+                                                    <span class="px-2 py-1 text-sm font-medium text-red-800 dark:text-red-300 bg-red-100 dark:bg-red-900/30 rounded-full">{{ $monthly->returned }}</span>
+                                                @else
+                                                    <span class="text-sm text-gray-400">0</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <div class="flex items-center justify-center gap-2">
+                                                    <div class="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                                        <div class="h-2 rounded-full {{ $approvalRate >= 80 ? 'bg-emerald-500' : ($approvalRate >= 50 ? 'bg-amber-500' : 'bg-red-500') }}" style="width: {{ $approvalRate }}%"></div>
+                                                    </div>
+                                                    <span class="text-sm font-medium {{ $approvalRate >= 80 ? 'text-emerald-600 dark:text-emerald-400' : ($approvalRate >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400') }}">{{ $approvalRate }}%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                                No monthly data available
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {{-- Reports Awaiting Submission for Current Month --}}
+                    <div class="bg-white/30 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-lg">
+                        <div class="p-6 border-b border-white/10">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Reports Yet to be Submitted</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Students without a submitted report for {{ $currentMonth ?? now()->format('F') }} {{ $currentYear ?? now()->format('Y') }}</p>
+                                </div>
+                                <span class="px-3 py-1 text-sm font-semibold text-purple-800 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+                                    {{ count($studentsAwaitingReports ?? []) }} students
+                                </span>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50/30 dark:bg-gray-800/30">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Student</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Tutor</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/10">
+                                    @forelse($studentsAwaitingReports ?? [] as $student)
+                                        <tr class="hover:bg-white/10 dark:hover:bg-gray-800/30 transition-colors">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                                                        {{ strtoupper(substr($student->first_name ?? 'S', 0, 1)) }}{{ strtoupper(substr($student->last_name ?? '', 0, 1)) }}
+                                                    </div>
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                            {{ $student->first_name }} {{ $student->last_name }}
+                                                        </div>
+                                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                            {{ $student->student_id ?? 'N/A' }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                @if($student->tutor)
+                                                    <span class="text-sm text-gray-600 dark:text-gray-400">
+                                                        {{ $student->tutor->first_name }} {{ $student->tutor->last_name }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-sm text-gray-400 italic">No tutor assigned</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 py-1 text-xs rounded-full font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                                                    Not Submitted
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="3" class="px-6 py-12 text-center">
+                                                <svg class="w-12 h-12 mx-auto text-emerald-300 dark:text-emerald-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <p class="text-emerald-600 dark:text-emerald-400 font-medium">All students have submitted reports!</p>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>{{-- End Analytics Tab --}}
+
+            {{-- Students Overview Tab --}}
+            <div x-show="activeTab === 'students'" x-transition>
+                <div class="bg-white/30 dark:bg-gray-900/30 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-lg">
+                    <div class="p-6 border-b border-white/10">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Student-Tutor Report Overview</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Complete overview of each student's report status with their assigned tutor</p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50/30 dark:bg-gray-800/30">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Student</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Tutor</th>
+                                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Total Reports</th>
+                                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Pending</th>
+                                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Approved</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Latest Submission</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Latest Status</th>
+                                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Late?</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/10">
+                                @forelse($studentTutorReports ?? [] as $student)
+                                    <tr class="hover:bg-white/10 dark:hover:bg-gray-800/30 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-[#4F46E5] to-[#818CF8] flex items-center justify-center text-white font-bold">
+                                                    {{ strtoupper(substr($student->first_name ?? 'S', 0, 1)) }}{{ strtoupper(substr($student->last_name ?? '', 0, 1)) }}
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                        {{ $student->first_name }} {{ $student->last_name }}
+                                                    </div>
+                                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                        {{ $student->student_id ?? 'N/A' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if($student->tutor)
+                                                <div class="flex items-center">
+                                                    <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-medium text-xs">
+                                                        {{ strtoupper(substr($student->tutor->first_name ?? 'T', 0, 1)) }}{{ strtoupper(substr($student->tutor->last_name ?? '', 0, 1)) }}
+                                                    </div>
+                                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                                                        {{ $student->tutor->first_name }} {{ $student->tutor->last_name }}
+                                                    </span>
+                                                </div>
+                                            @else
+                                                <span class="text-sm text-gray-400 italic">No tutor assigned</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <span class="px-2 py-1 text-sm font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-full">
+                                                {{ $student->total_reports ?? 0 }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            @if(($student->pending_reports ?? 0) > 0)
+                                                <span class="px-2 py-1 text-sm font-medium text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30 rounded-full">
+                                                    {{ $student->pending_reports }}
+                                                </span>
+                                            @else
+                                                <span class="text-sm text-gray-400">0</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            @if(($student->approved_reports ?? 0) > 0)
+                                                <span class="px-2 py-1 text-sm font-medium text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
+                                                    {{ $student->approved_reports }}
+                                                </span>
+                                            @else
+                                                <span class="text-sm text-gray-400">0</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if($student->latest_submitted_at)
+                                                <div>
+                                                    <span class="text-sm text-gray-900 dark:text-white">{{ $student->latest_submitted_at->format('M d, Y') }}</span>
+                                                    <br><span class="text-xs text-gray-500 dark:text-gray-400">{{ $student->latest_month }}</span>
+                                                </div>
+                                            @else
+                                                <span class="text-sm text-gray-400 italic">No submissions</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if($student->latest_status)
+                                                <span class="px-2 py-1 text-xs rounded-full font-medium
+                                                    @if($student->latest_status === 'submitted') bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300
+                                                    @elseif($student->latest_status === 'approved-by-manager') bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300
+                                                    @elseif($student->latest_status === 'approved-by-director') bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300
+                                                    @elseif($student->latest_status === 'draft') bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
+                                                    @else bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
+                                                    @endif">
+                                                    @if($student->latest_status === 'submitted')
+                                                        Pending
+                                                    @elseif($student->latest_status === 'approved-by-manager')
+                                                        Manager Approved
+                                                    @elseif($student->latest_status === 'approved-by-director')
+                                                        Completed
+                                                    @else
+                                                        {{ ucfirst(str_replace('-', ' ', $student->latest_status)) }}
+                                                    @endif
+                                                </span>
+                                            @else
+                                                <span class="text-sm text-gray-400">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            @if($student->is_late_submission ?? false)
+                                                <span class="px-2 py-1 text-xs rounded-full font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                                                    Late
+                                                </span>
+                                            @elseif($student->latest_submitted_at)
+                                                <span class="text-emerald-500">
+                                                    <svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </span>
+                                            @else
+                                                <span class="text-sm text-gray-400">-</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                            No students found
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>{{-- End Students Overview Tab --}}
+
+            </div>{{-- End Tab Navigation x-data wrapper --}}
 
         </div>
     </div>
