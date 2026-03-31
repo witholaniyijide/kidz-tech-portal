@@ -84,13 +84,103 @@ class ReportReviewController extends Controller
             ->orderBy('first_name')
             ->get();
 
+        // Analytics data - Monthly breakdown with totals
+        $monthlyAnalytics = TutorReport::select(
+                'month',
+                'year',
+                DB::raw('COUNT(*) as total'),
+                DB::raw("SUM(CASE WHEN status = 'submitted' THEN 1 ELSE 0 END) as pending"),
+                DB::raw("SUM(CASE WHEN status = 'approved-by-manager' THEN 1 ELSE 0 END) as approved_by_manager"),
+                DB::raw("SUM(CASE WHEN status = 'approved-by-director' THEN 1 ELSE 0 END) as completed"),
+                DB::raw("SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) as draft"),
+                DB::raw("SUM(CASE WHEN status = 'returned' THEN 1 ELSE 0 END) as returned")
+            )
+            ->groupBy('month', 'year')
+            ->orderBy('year', 'desc')
+            ->orderByRaw("FIELD(month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
+            ->get();
+
+        // Student-Tutor report overview with late submission tracking
+        $studentTutorReports = Student::where('status', 'active')
+            ->with(['tutor:id,first_name,last_name'])
+            ->withCount([
+                'tutorReports as total_reports',
+                'tutorReports as pending_reports' => function ($q) {
+                    $q->where('status', 'submitted');
+                },
+                'tutorReports as approved_reports' => function ($q) {
+                    $q->whereIn('status', ['approved-by-manager', 'approved-by-director']);
+                },
+            ])
+            ->orderBy('first_name')
+            ->get()
+            ->map(function ($student) {
+                // Get latest report for this student
+                $latestReport = TutorReport::where('student_id', $student->id)
+                    ->orderBy('submitted_at', 'desc')
+                    ->first();
+
+                $student->latest_report = $latestReport;
+                $student->latest_submitted_at = $latestReport?->submitted_at;
+                $student->latest_status = $latestReport?->status;
+                $student->latest_month = $latestReport ? ($latestReport->month . ' ' . $latestReport->year) : null;
+
+                // Check if latest report is late
+                $student->is_late_submission = false;
+                if ($latestReport && $latestReport->submitted_at) {
+                    $reportMonth = $latestReport->month;
+                    $reportYear = $latestReport->year;
+                    $monthNumber = date('n', strtotime("1 {$reportMonth} {$reportYear}"));
+                    $lastDayOfMonth = \Carbon\Carbon::create($reportYear, $monthNumber, 1)->endOfMonth();
+                    $deadline = $lastDayOfMonth->copy()->setTime(12, 0, 0);
+                    $student->is_late_submission = $latestReport->submitted_at->gt($deadline);
+                }
+
+                return $student;
+            });
+
+        // Count late submissions
+        $lateSubmissionsCount = TutorReport::whereNotNull('submitted_at')
+            ->get()
+            ->filter(function ($report) {
+                if (!$report->submitted_at || !$report->month || !$report->year) {
+                    return false;
+                }
+                $monthNumber = date('n', strtotime("1 {$report->month} {$report->year}"));
+                $lastDayOfMonth = \Carbon\Carbon::create($report->year, $monthNumber, 1)->endOfMonth();
+                $deadline = $lastDayOfMonth->copy()->setTime(12, 0, 0);
+                return $report->submitted_at->gt($deadline);
+            })
+            ->count();
+
+        // Students awaiting reports (no report submitted for current month)
+        $currentMonth = now()->format('F');
+        $currentYear = now()->format('Y');
+        $studentsAwaitingReports = Student::where('status', 'active')
+            ->whereDoesntHave('tutorReports', function ($q) use ($currentMonth, $currentYear) {
+                $q->where('month', $currentMonth)
+                  ->where('year', $currentYear)
+                  ->whereIn('status', ['submitted', 'approved-by-manager', 'approved-by-director']);
+            })
+            ->with('tutor:id,first_name,last_name')
+            ->get();
+
+        // Add late submissions count to stats
+        $stats['late_submissions'] = $lateSubmissionsCount;
+        $stats['awaiting_reports'] = $studentsAwaitingReports->count();
+
         return view('manager.reports.index', compact(
             'reports',
             'stats',
             'months',
             'years',
             'tutors',
-            'students'
+            'students',
+            'monthlyAnalytics',
+            'studentTutorReports',
+            'studentsAwaitingReports',
+            'currentMonth',
+            'currentYear'
         ));
     }
 
