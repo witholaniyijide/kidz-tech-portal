@@ -31,17 +31,49 @@
     x-data="{
         showToast: false,
         toastMessage: '',
-        copyToWhatsApp() {
+        async copyToWhatsApp() {
             const scheduleText = this.getScheduleText();
-            navigator.clipboard.writeText(scheduleText).then(() => {
-                this.toastMessage = 'Schedule copied to clipboard!';
+
+            // Try modern Clipboard API first (requires HTTPS)
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(scheduleText);
+                    this.toastMessage = 'Schedule copied to clipboard!';
+                    this.showToast = true;
+                    setTimeout(() => { this.showToast = false; }, 3000);
+                    return;
+                } catch (error) {
+                    console.error('Clipboard API failed:', error);
+                }
+            }
+
+            // Fallback for HTTP sites or older browsers
+            try {
+                const textArea = document.createElement('textarea');
+                textArea.value = scheduleText;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                textArea.style.top = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textArea);
+
+                if (successful) {
+                    this.toastMessage = 'Schedule copied to clipboard!';
+                } else {
+                    this.toastMessage = 'Failed to copy. Please try again.';
+                }
                 this.showToast = true;
                 setTimeout(() => { this.showToast = false; }, 3000);
-            }).catch(() => {
+            } catch (error) {
+                console.error('Fallback copy failed:', error);
                 this.toastMessage = 'Failed to copy. Please try again.';
                 this.showToast = true;
                 setTimeout(() => { this.showToast = false; }, 3000);
-            });
+            }
         },
         getScheduleText() {
             let text = '*Coding Classes Scheduled for Today – {{ now()->format('l, F j, Y') }}*\\n\\n';
