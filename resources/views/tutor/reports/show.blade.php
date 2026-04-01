@@ -259,7 +259,24 @@
                             <p class="font-medium text-slate-900 dark:text-white">{{ $report->created_at->format('M d, Y g:i A') }}</p>
                         </div>
                     </div>
-                    @if($report->submitted_at)
+                    @if($report->first_submitted_at)
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400">First Submitted</p>
+                            <p class="font-medium text-slate-900 dark:text-white">{{ $report->first_submitted_at->format('M d, Y g:i A') }}</p>
+                        </div>
+                    </div>
+                    @endif
+                    @if($report->submitted_at && $report->first_submitted_at && $report->submitted_at->ne($report->first_submitted_at))
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 bg-amber-500 rounded-full"></div>
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400">Resubmitted</p>
+                            <p class="font-medium text-slate-900 dark:text-white">{{ $report->submitted_at->format('M d, Y g:i A') }}</p>
+                        </div>
+                    </div>
+                    @elseif($report->submitted_at && !$report->first_submitted_at)
                     <div class="flex items-center gap-3">
                         <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
                         <div>

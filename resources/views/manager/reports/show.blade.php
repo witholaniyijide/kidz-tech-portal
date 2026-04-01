@@ -51,6 +51,11 @@
                         <p class="text-gray-900 dark:text-white">
                             {{ $report->submitted_at ? $report->submitted_at->format('M d, Y g:i A') : 'N/A' }}
                         </p>
+                        @if($report->first_submitted_at && $report->submitted_at && $report->first_submitted_at->ne($report->submitted_at))
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                First submitted: {{ $report->first_submitted_at->format('M d, Y g:i A') }}
+                            </p>
+                        @endif
                     </div>
                 </div>
             </div>

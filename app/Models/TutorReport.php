@@ -53,6 +53,7 @@ class TutorReport extends Model
         'director_comment',
         'director_signature',
         'submitted_at',
+        'first_submitted_at',
         'approved_by_manager_at',
         'approved_by_director_at',
         
@@ -67,6 +68,7 @@ class TutorReport extends Model
 
     protected $casts = [
         'submitted_at' => 'datetime',
+        'first_submitted_at' => 'datetime',
         'approved_by_manager_at' => 'datetime',
         'approved_by_director_at' => 'datetime',
         'returned_at' => 'datetime',

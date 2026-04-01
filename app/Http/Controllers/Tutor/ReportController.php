@@ -262,7 +262,10 @@ class ReportController extends Controller
 
             // If submitted, update timestamp and notify
             if ($report->status === 'submitted') {
-                $report->update(['submitted_at' => now()]);
+                $report->update([
+                    'submitted_at' => now(),
+                    'first_submitted_at' => now(),
+                ]);
 
                 try {
                     TutorNotification::create([
@@ -505,13 +508,20 @@ class ReportController extends Controller
                     ->with('error', 'Please complete all required sections before submitting: ' . implode(', ', $issues));
             }
 
-            $report->update([
+            $updateData = [
                 'status' => 'submitted',
                 'submitted_at' => now(),
                 'returned_at' => null,
                 'returned_by' => null,
                 'approved_by_manager_at' => null,
-            ]);
+            ];
+
+            // Only set first_submitted_at if this is the first submission
+            if (!$report->first_submitted_at) {
+                $updateData['first_submitted_at'] = now();
+            }
+
+            $report->update($updateData);
 
             try {
                 TutorNotification::create([
