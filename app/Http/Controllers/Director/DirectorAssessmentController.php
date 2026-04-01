@@ -408,7 +408,7 @@ class DirectorAssessmentController extends Controller
             $body .= "\n\nDirector's comment: " . $comment;
         }
 
-        // Create tutor notification
+        // Create tutor notification (in-app)
         TutorNotification::create([
             'tutor_id' => $assessment->tutor_id,
             'title' => $title,
@@ -420,6 +420,24 @@ class DirectorAssessmentController extends Controller
                 'penalty_amount' => $penaltyAmount,
             ],
         ]);
+
+        // Send email notification to tutor
+        if ($assessment->tutor && $assessment->tutor->email) {
+            $tutor = $assessment->tutor;
+            $notifyEmail = true;
+            if ($tutor->user_id && $tutor->user) {
+                $notifyEmail = $tutor->user->notify_email ?? true;
+            }
+            if ($notifyEmail) {
+                app(NotificationService::class)->sendEmailNotification(
+                    $tutor->email,
+                    $title,
+                    $body,
+                    'assessment',
+                    ['assessment_id' => $assessment->id, 'penalty_amount' => $penaltyAmount]
+                );
+            }
+        }
 
         // Notify manager who created the assessment
         if ($assessment->manager_id) {

@@ -171,16 +171,16 @@
                 {!! nl2br(e($body)) !!}
             </div>
             
-            <a href="{{ config('app.url') }}/dashboard" class="cta-button">
+            <a href="{{ secure_url('/dashboard') }}" class="cta-button">
                 View in Portal
             </a>
         </div>
-        
+
         <div class="footer">
             <p>This is an automated notification from Kidz Tech Coding Club.</p>
             <p>
-                <a href="{{ config('app.url') }}">Visit Portal</a> |
-                <a href="{{ config('app.url') }}/settings">Notification Settings</a>
+                <a href="{{ secure_url('/') }}">Visit Portal</a> |
+                <a href="{{ secure_url('/settings') }}">Notification Settings</a>
             </p>
             <p style="margin-top: 15px;">&copy; {{ date('Y') }} Kidz Tech Coding Club. All rights reserved.</p>
         </div>

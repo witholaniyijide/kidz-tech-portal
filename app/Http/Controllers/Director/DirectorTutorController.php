@@ -128,7 +128,7 @@ class DirectorTutorController extends Controller
             $emailSent = false;
             if ($user && $tutor && !empty($user->email)) {
                 try {
-                    $loginUrl = config('app.url') . '/login';
+                    $loginUrl = secure_url('/login');
                     Mail::to($user->email)->send(new TutorAccountWelcomeMail(
                         user: $user,
                         tutor: $tutor,
