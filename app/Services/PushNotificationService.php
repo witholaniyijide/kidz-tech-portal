@@ -233,7 +233,7 @@ class PushNotificationService
                         'badge' => '/images/favicon.png',
                     ],
                     'fcm_options' => [
-                        'link' => config('app.url') . '/dashboard',
+                        'link' => secure_url('/dashboard'),
                     ],
                 ];
             }

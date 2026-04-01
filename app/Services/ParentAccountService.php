@@ -196,7 +196,7 @@ class ParentAccountService
                 return;
             }
 
-            $loginUrl = config('app.url') . '/login';
+            $loginUrl = secure_url('/login');
 
             Mail::to($user->email)->send(new ParentAccountWelcomeMail(
                 parent: $user,
