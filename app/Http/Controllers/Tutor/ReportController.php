@@ -510,6 +510,7 @@ class ReportController extends Controller
                 'submitted_at' => now(),
                 'returned_at' => null,
                 'returned_by' => null,
+                'approved_by_manager_at' => null,
             ]);
 
             try {

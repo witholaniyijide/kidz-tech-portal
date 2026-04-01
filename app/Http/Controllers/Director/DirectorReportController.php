@@ -432,15 +432,17 @@ class DirectorReportController extends Controller
         ]);
 
         try {
-            // Update report status to draft with returned_at timestamp
-            // This allows the tutor to edit while tracking that it was returned
+            // Update report status to 'returned' with returned_at timestamp
+            // This allows the tutor to edit while tracking that it was returned by director
+            // Also clear approved_by_manager_at to properly reset the workflow
             $report->update([
-                'status' => 'draft',
+                'status' => 'returned',
                 'director_comment' => $validated['director_comment'],
                 'director_reviewed_at' => now(),
                 'director_id' => Auth::id(),
                 'returned_at' => now(),
                 'returned_by' => 'director',
+                'approved_by_manager_at' => null,
             ]);
 
             // Log the action
