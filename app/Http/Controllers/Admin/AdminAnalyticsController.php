@@ -79,15 +79,15 @@ class AdminAnalyticsController extends Controller
             ->orderBy('month')
             ->get();
 
-        // Students per tutor
-        $studentsPerTutor = Tutor::withCount('students')
+        // Students per tutor (active students only)
+        $studentsPerTutor = Tutor::withCount(['students' => fn($q) => $q->where('status', 'active')])
             ->where('status', 'active')
             ->orderBy('students_count', 'desc')
             ->take(10)
             ->get();
 
-        // Tutor load (students per tutor)
-        $tutorLoad = Tutor::withCount('students')
+        // Tutor load (active students per tutor)
+        $tutorLoad = Tutor::withCount(['students' => fn($q) => $q->where('status', 'active')])
             ->where('status', 'active')
             ->get()
             ->map(function($tutor) {
@@ -174,8 +174,8 @@ class AdminAnalyticsController extends Controller
             'avg_students' => $activeTutors > 0 ? round($activeStudents / $activeTutors, 1) : 0,
         ];
 
-        // Tutor workloads (students per tutor)
-        $tutorWorkloads = Tutor::withCount('students')
+        // Tutor workloads (active students per tutor)
+        $tutorWorkloads = Tutor::withCount(['students' => fn($q) => $q->where('status', 'active')])
             ->where('status', 'active')
             ->orderBy('students_count', 'desc')
             ->get();

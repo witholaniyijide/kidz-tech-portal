@@ -51,7 +51,7 @@ class AdminDashboardController extends Controller
             'graduatedStudents' => Student::where('status', 'graduated')->count(),
             'withdrawnStudents' => Student::where('status', 'withdrawn')->count(),
 
-            'totalTutors' => Tutor::count(),
+            'totalTutors' => Tutor::where('status', '!=', 'resigned')->count(),
             'activeTutors' => Tutor::where('status', 'active')->count(),
             'inactiveTutors' => Tutor::where('status', 'inactive')->count(),
             'onLeaveTutors' => Tutor::where('status', 'on_leave')->count(),
@@ -95,8 +95,8 @@ class AdminDashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Recent Tutors (last 5 added)
-        $recentTutors = Tutor::withCount('students')
+        // Recent Tutors (last 5 added) - count only active students
+        $recentTutors = Tutor::withCount(['students' => fn($q) => $q->where('status', 'active')])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();

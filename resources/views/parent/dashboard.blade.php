@@ -21,17 +21,29 @@
                                        ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20'
                                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-sky-300' }}">
                             <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 rounded-xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center text-lg font-bold text-gray-900 dark:text-white">
+                                <div class="w-12 h-12 rounded-xl {{ $child->is_inactive ? 'bg-gray-200 dark:bg-gray-700' : 'bg-sky-100 dark:bg-sky-900/30' }} flex items-center justify-center text-lg font-bold text-gray-900 dark:text-white">
                                     {{ substr($child->first_name, 0, 1) }}
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="font-semibold text-gray-800 dark:text-white truncate">{{ $child->first_name }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Stage {{ $child->current_stage ?? 1 }} of 12</p>
+                                    <div class="flex items-center gap-2">
+                                        <p class="font-semibold text-gray-800 dark:text-white truncate">{{ $child->first_name }}</p>
+                                        @if($child->is_inactive)
+                                            <span class="px-1.5 py-0.5 text-[10px] font-medium bg-gray-500 text-white rounded">Inactive</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        @if($child->is_inactive)
+                                            Past records only
+                                        @else
+                                            Stage {{ $child->current_stage ?? 1 }} of 12
+                                        @endif
+                                    </p>
                                 </div>
                                 @if($selectedChild->id === $child->id)
                                     <span class="px-2 py-1 text-xs font-medium bg-sky-500 text-white rounded-full">Selected</span>
                                 @endif
                             </div>
+                            @if(!$child->is_inactive)
                             <div class="mt-3">
                                 <div class="flex items-center justify-between text-xs mb-1">
                                     <span class="text-gray-500 dark:text-gray-400">Progress</span>
@@ -41,6 +53,7 @@
                                     <div class="h-full bg-sky-500 rounded-full transition-all" style="width: {{ $childProgress }}%"></div>
                                 </div>
                             </div>
+                            @endif
                             <div class="mt-3 flex gap-2">
                                 <a href="{{ route('parent.children.show', $child) }}" onclick="event.stopPropagation()"
                                    class="flex-1 px-3 py-1.5 text-xs font-medium text-center rounded-lg border border-sky-500 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-colors">
@@ -57,24 +70,46 @@
             </div>
         @endif
 
+        <!-- Inactive Student Notice -->
+        @if($isSelectedChildInactive)
+        <div class="glass-card rounded-2xl p-4 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-semibold text-amber-800 dark:text-amber-200">{{ $selectedChild->first_name }}'s enrollment is currently inactive</p>
+                    <p class="text-sm text-amber-600 dark:text-amber-400">You can view past reports and performance history. Contact admin to reactivate enrollment.</p>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Hero Section -->
         <div class="glass-card rounded-2xl p-6 hover-lift">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <!-- Child Info -->
                 <div class="flex items-center space-x-4">
-                    <div class="w-20 h-20 rounded-2xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center shadow-xl overflow-hidden">
+                    <div class="w-20 h-20 rounded-2xl {{ $isSelectedChildInactive ? 'bg-gray-200 dark:bg-gray-700' : 'bg-sky-100 dark:bg-sky-900/30' }} flex items-center justify-center shadow-xl overflow-hidden">
                         @if($selectedChild->profile_photo)
                             <img src="{{ asset('storage/' . $selectedChild->profile_photo) }}"
                                  alt="{{ $selectedChild->full_name }}"
-                                 class="w-full h-full object-cover">
+                                 class="w-full h-full object-cover {{ $isSelectedChildInactive ? 'opacity-60' : '' }}">
                         @else
                             <span class="text-3xl font-heading font-bold text-gray-900 dark:text-white">{{ substr($selectedChild->first_name, 0, 1) }}</span>
                         @endif
                     </div>
                     <div>
-                        <h2 class="text-2xl font-heading font-bold text-gray-800 dark:text-white">
-                            {{ $selectedChild->full_name }}
-                        </h2>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-2xl font-heading font-bold text-gray-800 dark:text-white">
+                                {{ $selectedChild->full_name }}
+                            </h2>
+                            @if($isSelectedChildInactive)
+                                <span class="px-2 py-0.5 text-xs font-medium bg-gray-500 text-white rounded">Inactive</span>
+                            @endif
+                        </div>
                         <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">
                             @if($selectedChild->tutor)
                                 Tutor: {{ $selectedChild->tutor->first_name }} {{ $selectedChild->tutor->last_name }}
@@ -85,7 +120,8 @@
                     </div>
                 </div>
 
-                <!-- Class Schedule -->
+                <!-- Class Schedule - Only show for active students -->
+                @if(!$isSelectedChildInactive)
                 <div class="bg-sky-50 dark:bg-sky-900/30 rounded-xl p-4">
                     <h4 class="text-sm font-semibold text-sky-700 dark:text-sky-400 mb-2">Weekly Schedule <span class="text-xs font-normal">(NG Time)</span></h4>
                     @if($selectedChild->class_schedule && is_array($selectedChild->class_schedule) && count($selectedChild->class_schedule) > 0)
@@ -104,11 +140,33 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400">No schedule set</p>
                     @endif
                 </div>
+                @else
+                <!-- Quick Links for Inactive Students -->
+                <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-4">
+                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">View Past Records</h4>
+                    <div class="flex flex-col gap-2">
+                        <a href="{{ route('parent.reports.index', ['child' => $selectedChild->id]) }}"
+                           class="text-sm text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Past Reports
+                        </a>
+                        <a href="{{ route('parent.performance.index', ['student_id' => $selectedChild->id]) }}"
+                           class="text-sm text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            Performance History
+                        </a>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
 
         <!-- Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 {{ $isSelectedChildInactive ? 'md:grid-cols-3' : 'md:grid-cols-4' }} gap-4">
             <!-- Overall Progress -->
             <div class="glass-card rounded-2xl p-5 hover-lift">
                 <div class="flex items-center justify-between mb-3">
@@ -119,7 +177,7 @@
                     </div>
                 </div>
                 <p class="text-3xl font-heading font-bold text-gray-800 dark:text-white">{{ $overallProgress }}%</p>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Overall Progress</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $isSelectedChildInactive ? 'Final Progress' : 'Overall Progress' }}</p>
             </div>
 
             <!-- Milestones Completed -->
@@ -154,7 +212,8 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">Last Monthly Report</p>
             </div>
 
-            <!-- Next Milestone -->
+            <!-- Next Milestone - Only show for active students -->
+            @if(!$isSelectedChildInactive)
             <div class="glass-card rounded-2xl p-5 hover-lift">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
@@ -172,9 +231,11 @@
                 </p>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Next Milestone</p>
             </div>
+            @endif
         </div>
 
-        <!-- Curriculum Roadmap -->
+        <!-- Curriculum Roadmap - Only show for active students -->
+        @if(!$isSelectedChildInactive)
         <div class="glass-card rounded-2xl p-6">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-heading font-bold text-gray-800 dark:text-white">{{ $selectedChild->first_name }}'s Curriculum Roadmap</h3>
@@ -221,6 +282,7 @@
                 @endforeach
             </div>
         </div>
+        @endif
 
         <!-- Two Column Layout -->
         <div class="grid md:grid-cols-2 gap-6">

@@ -50,10 +50,47 @@ class DirectorAttendanceController extends Controller
                     $query->whereMonth('class_date', $lastMonth->month)
                           ->whereYear('class_date', $lastMonth->year);
                     break;
+                case 'custom':
+                    // Custom date range with start and end dates
+                    if ($request->filled('start_date') && $request->filled('end_date')) {
+                        $query->whereBetween('class_date', [
+                            $request->start_date,
+                            $request->end_date
+                        ]);
+                    } elseif ($request->filled('start_date')) {
+                        $query->whereDate('class_date', '>=', $request->start_date);
+                    } elseif ($request->filled('end_date')) {
+                        $query->whereDate('class_date', '<=', $request->end_date);
+                    }
+                    break;
+            }
+        } elseif ($request->filled('start_date') || $request->filled('end_date')) {
+            // Custom date range without preset selection
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereBetween('class_date', [
+                    $request->start_date,
+                    $request->end_date
+                ]);
+            } elseif ($request->filled('start_date')) {
+                $query->whereDate('class_date', '>=', $request->start_date);
+            } elseif ($request->filled('end_date')) {
+                $query->whereDate('class_date', '<=', $request->end_date);
             }
         } elseif ($request->filled('date')) {
             // Filter by specific date (only if no date_range preset selected)
             $query->whereDate('class_date', $request->date);
+        }
+
+        // Filter by late submission
+        if ($request->filled('late_submission')) {
+            if ($request->late_submission === 'late_only') {
+                $query->where('is_late_submission', true);
+            } elseif ($request->late_submission === 'on_time') {
+                $query->where(function ($q) {
+                    $q->where('is_late_submission', false)
+                      ->orWhereNull('is_late_submission');
+                });
+            }
         }
 
         // Filter by approval status
