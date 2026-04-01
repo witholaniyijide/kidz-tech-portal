@@ -32,6 +32,7 @@ class Tutor extends Model
         'account_number',
         'account_name',
         'status',
+        'resigned_at',
         'hourly_rate',
         'qualifications',
         'specialization',
@@ -43,6 +44,7 @@ class Tutor extends Model
         'date_of_birth' => 'date',
         'hire_date' => 'date',
         'hourly_rate' => 'decimal:2',
+        'resigned_at' => 'datetime',
     ];
 
     public function students()
@@ -117,9 +119,36 @@ class Tutor extends Model
         return "{$this->first_name} {$this->last_name}";
     }
 
+    /**
+     * Get count of active students only
+     */
     public function studentCount()
     {
-        return $this->students()->count();
+        return $this->students()->where('status', 'active')->count();
+    }
+
+    /**
+     * Get count of inactive students
+     */
+    public function inactiveStudentCount()
+    {
+        return $this->students()->where('status', 'inactive')->count();
+    }
+
+    /**
+     * Get active students relationship
+     */
+    public function activeStudents()
+    {
+        return $this->hasMany(Student::class)->where('status', 'active');
+    }
+
+    /**
+     * Get inactive students relationship
+     */
+    public function inactiveStudents()
+    {
+        return $this->hasMany(Student::class)->where('status', 'inactive');
     }
 
     public function scopeActive($query)
@@ -130,5 +159,34 @@ class Tutor extends Model
     public function scopeOnLeave($query)
     {
         return $query->where('status', 'on_leave');
+    }
+
+    public function scopeResigned($query)
+    {
+        return $query->where('status', 'resigned');
+    }
+
+    /**
+     * Scope to exclude resigned tutors from counts
+     */
+    public function scopeNotResigned($query)
+    {
+        return $query->where('status', '!=', 'resigned');
+    }
+
+    /**
+     * Check if tutor is resigned and access should be restricted (3 days after resignation)
+     */
+    public function isAccessRestricted(): bool
+    {
+        if ($this->status !== 'resigned') {
+            return false;
+        }
+
+        if (!$this->resigned_at) {
+            return false;
+        }
+
+        return $this->resigned_at->diffInDays(now()) >= 3;
     }
 }

@@ -36,7 +36,8 @@ class AdminTutorController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Tutor::withCount('students');
+        // Count only active students (inactive students excluded from count)
+        $query = Tutor::withCount(['students' => fn($q) => $q->where('status', 'active')]);
 
         // Filter by status
         if ($request->filled('status')) {
@@ -66,12 +67,16 @@ class AdminTutorController extends Controller
             $sortDir = 'desc';
         }
 
-        $tutors = $query->orderBy($sortBy, $sortDir)->paginate(20)->withQueryString();
+        // Order so resigned tutors appear at the end
+        $tutors = $query->orderByRaw("FIELD(status, 'active', 'inactive', 'on_leave', 'resigned')")
+            ->orderBy($sortBy, $sortDir)
+            ->paginate(20)
+            ->withQueryString();
 
-        // Statistics
+        // Statistics (total excludes resigned tutors)
         try {
             $stats = [
-                'total' => Tutor::count(),
+                'total' => Tutor::where('status', '!=', 'resigned')->count(),
                 'active' => Tutor::where('status', 'active')->count(),
                 'inactive' => Tutor::where('status', 'inactive')->count(),
                 'on_leave' => Tutor::where('status', 'on_leave')->count(),
@@ -80,7 +85,7 @@ class AdminTutorController extends Controller
         } catch (\Exception $e) {
             // Fallback if 'resigned' status doesn't exist yet (migration not run)
             $stats = [
-                'total' => Tutor::count(),
+                'total' => Tutor::where('status', '!=', 'resigned')->count(),
                 'active' => Tutor::where('status', 'active')->count(),
                 'inactive' => Tutor::where('status', 'inactive')->count(),
                 'on_leave' => Tutor::where('status', 'on_leave')->count(),
@@ -319,7 +324,10 @@ class AdminTutorController extends Controller
             'status' => 'required|in:active,inactive,on_leave,resigned',
         ]);
 
-        DB::transaction(function() use ($tutor, $validated, $request) {
+        $previousStatus = $tutor->status;
+        $studentsUnassigned = 0;
+
+        DB::transaction(function() use ($tutor, $validated, $request, $previousStatus, &$studentsUnassigned) {
             // Handle profile photo upload
             if ($request->hasFile('profile_photo')) {
                 // Delete old photo if exists
@@ -327,6 +335,18 @@ class AdminTutorController extends Controller
                     Storage::disk('public')->delete($tutor->profile_photo);
                 }
                 $validated['profile_photo'] = $request->file('profile_photo')->store('tutors/photos', 'public');
+            }
+
+            // If status is changing to resigned, set resigned_at and unassign students
+            if ($validated['status'] === 'resigned' && $previousStatus !== 'resigned') {
+                $validated['resigned_at'] = now();
+                $studentsUnassigned = $tutor->students()->count();
+                $tutor->students()->update(['tutor_id' => null]);
+            }
+
+            // If status is changing FROM resigned to something else, clear resigned_at
+            if ($validated['status'] !== 'resigned' && $previousStatus === 'resigned') {
+                $validated['resigned_at'] = null;
             }
 
             $tutor->update($validated);

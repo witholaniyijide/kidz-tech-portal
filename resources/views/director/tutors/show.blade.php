@@ -60,8 +60,11 @@
                     </span>
                 </div>
                 <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow">
-                    <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Students</div>
-                    <div class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{{ $tutor->students->count() }}</div>
+                    <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Active Students</div>
+                    <div class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{{ $totalStudents }}</div>
+                    @if($totalInactiveStudents > 0)
+                        <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">+{{ $totalInactiveStudents }} inactive</div>
+                    @endif
                 </div>
                 <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow">
                     <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Classes</div>
@@ -208,15 +211,15 @@
                 </div>
             </div>
 
-            {{-- Assigned Students --}}
-            @if($tutor->students && $tutor->students->count() > 0)
-                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden">
+            {{-- Active Students --}}
+            @if($activeStudents && $activeStudents->count() > 0)
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden mb-6">
                     <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Assigned Students ({{ $tutor->students->count() }})</h3>
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Active Students ({{ $activeStudents->count() }})</h3>
                     </div>
                     <div class="p-4 sm:p-6">
                         <div class="space-y-3 sm:space-y-4">
-                            @foreach($tutor->students as $student)
+                            @foreach($activeStudents as $student)
                                 <div class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 sm:p-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                     <div class="flex items-start gap-3 sm:gap-4">
                                         <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#00CCCD] to-[#00CCCD] rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
@@ -282,6 +285,41 @@
                                                 @if(!$student->class_link && !$student->google_classroom_link)
                                                     <span class="text-[10px] sm:text-xs text-gray-400 italic">No links set</span>
                                                 @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Inactive Students --}}
+            @if($inactiveStudents && $inactiveStudents->count() > 0)
+                <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-white/20 rounded-2xl shadow overflow-hidden">
+                    <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-700/50">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-600 dark:text-gray-400">Inactive Students ({{ $inactiveStudents->count() }})</h3>
+                    </div>
+                    <div class="p-4 sm:p-6">
+                        <div class="space-y-3 sm:space-y-4">
+                            @foreach($inactiveStudents as $student)
+                                <div class="bg-gray-100 dark:bg-gray-700/30 rounded-xl p-3 sm:p-4 opacity-75">
+                                    <div class="flex items-start gap-3 sm:gap-4">
+                                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
+                                            {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 mb-2">
+                                                <a href="{{ route('director.students.show', $student) }}" class="font-semibold text-gray-600 dark:text-gray-400 hover:text-[#423A8E] dark:hover:text-[#00CCCD] text-sm sm:text-base">
+                                                    {{ $student->first_name }} {{ $student->last_name }}
+                                                </a>
+                                                <span class="px-2 py-0.5 text-xs font-medium rounded-full self-start bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300">
+                                                    Inactive
+                                                </span>
+                                            </div>
+                                            <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-500">
+                                                Last active: {{ $student->updated_at?->diffForHumans() ?? 'Unknown' }}
                                             </div>
                                         </div>
                                     </div>

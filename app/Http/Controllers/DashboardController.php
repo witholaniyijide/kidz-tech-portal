@@ -148,8 +148,8 @@ class DashboardController extends Controller
             })
             ->toArray();
 
-        // Recent tutors with student count
-        $recentTutorsData = Tutor::withCount('students')
+        // Recent tutors with active student count (inactive students excluded)
+        $recentTutorsData = Tutor::withCount(['students' => fn($q) => $q->where('status', 'active')])
             ->latest()
             ->take(3)
             ->get()
@@ -211,10 +211,10 @@ class DashboardController extends Controller
 
     private function directorDashboard()
     {
-        // Core stats - dynamic
+        // Core stats - dynamic (exclude resigned tutors from total)
         $totalStudents = Student::count();
         $activeStudents = Student::where('status', 'active')->count();
-        $totalTutors = Tutor::count();
+        $totalTutors = Tutor::where('status', '!=', 'resigned')->count();
         $activeTutors = Tutor::where('status', 'active')->count();
         
         $currentMonth = Carbon::now()->format('F');
@@ -401,10 +401,12 @@ class DashboardController extends Controller
             ]);
         }
 
-        // Notices for the notice board
+        // Notices for the notice board (limit to 4, prioritize pinned)
         $notices = \App\Models\Notice::where('status', 'published')
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('pinned_at', 'desc')
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->take(4)
             ->get();
 
         $data = [

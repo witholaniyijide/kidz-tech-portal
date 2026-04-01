@@ -21,10 +21,10 @@ class DirectorDashboardController extends Controller
 {
     public function index()
     {
-        // Core stats - dynamic
+        // Core stats - dynamic (exclude resigned tutors from total count)
         $totalStudents = Student::count();
         $activeStudents = Student::where('status', 'active')->count();
-        $totalTutors = Tutor::count();
+        $totalTutors = Tutor::where('status', '!=', 'resigned')->count();
         $activeTutors = Tutor::where('status', 'active')->count();
 
         $currentMonth = Carbon::now()->format('F');
@@ -262,10 +262,12 @@ class DirectorDashboardController extends Controller
             ]);
         }
 
-        // Notices for the notice board
+        // Notices for the notice board (limit to 4, prioritize pinned)
         $notices = Notice::where('status', 'published')
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('pinned_at', 'desc')
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->take(4)
             ->get();
 
         // Today's Birthdays

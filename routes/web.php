@@ -686,7 +686,7 @@ Route::prefix('director')
 
 // Tutor Portal Routes
 Route::prefix('tutor')
-    ->middleware(['auth', 'verified', 'role:tutor'])
+    ->middleware(['auth', 'verified', 'role:tutor', 'tutor.not_resigned'])
     ->name('tutor.')
     ->group(function () {
         // Dashboard

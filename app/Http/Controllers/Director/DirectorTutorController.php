@@ -22,7 +22,7 @@ class DirectorTutorController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Tutor::with(['user', 'students']);
+        $query = Tutor::with(['user', 'students' => fn($q) => $q->where('status', 'active')]);
 
         // Filter by search (name, email, tutor_id)
         if ($request->filled('search')) {
@@ -40,13 +40,16 @@ class DirectorTutorController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Get counts for cards
-        $totalTutors = Tutor::count();
+        // Get counts for cards (exclude resigned from total)
+        $totalTutors = Tutor::where('status', '!=', 'resigned')->count();
         $activeTutors = Tutor::where('status', 'active')->count();
         $inactiveTutors = Tutor::where('status', 'inactive')->count();
         $resignedTutors = Tutor::where('status', 'resigned')->count();
 
-        $tutors = $query->orderBy('created_at', 'desc')->paginate(20);
+        // Order so resigned tutors appear at the end
+        $tutors = $query->orderByRaw("FIELD(status, 'active', 'inactive', 'on_leave', 'resigned')")
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
 
         return view('director.tutors.index', compact(
             'tutors',
@@ -184,13 +187,24 @@ class DirectorTutorController extends Controller
     public function show(Tutor $tutor)
     {
         $tutor->load(['user', 'students', 'reports', 'availabilities']);
-        
-        // Get tutor statistics
-        $totalStudents = $tutor->students()->count();
+
+        // Get tutor statistics - separate active and inactive students
+        $activeStudents = $tutor->students()->where('status', 'active')->get();
+        $inactiveStudents = $tutor->students()->where('status', 'inactive')->get();
+        $totalStudents = $activeStudents->count(); // Only count active students
+        $totalInactiveStudents = $inactiveStudents->count();
         $totalReports = $tutor->reports()->count();
         $pendingReports = $tutor->reports()->where('status', 'submitted')->count();
-        
-        return view('director.tutors.show', compact('tutor', 'totalStudents', 'totalReports', 'pendingReports'));
+
+        return view('director.tutors.show', compact(
+            'tutor',
+            'totalStudents',
+            'totalInactiveStudents',
+            'activeStudents',
+            'inactiveStudents',
+            'totalReports',
+            'pendingReports'
+        ));
     }
 
     /**
@@ -228,6 +242,21 @@ class DirectorTutorController extends Controller
 
         DB::beginTransaction();
         try {
+            $previousStatus = $tutor->status;
+
+            // If status is changing to resigned, set resigned_at and unassign students
+            if ($validated['status'] === 'resigned' && $previousStatus !== 'resigned') {
+                $validated['resigned_at'] = now();
+
+                // Unassign all students from this tutor
+                $tutor->students()->update(['tutor_id' => null]);
+            }
+
+            // If status is changing FROM resigned to something else, clear resigned_at
+            if ($validated['status'] !== 'resigned' && $previousStatus === 'resigned') {
+                $validated['resigned_at'] = null;
+            }
+
             $tutor->update($validated);
 
             // Update linked user if exists
@@ -240,8 +269,14 @@ class DirectorTutorController extends Controller
 
             DB::commit();
 
+            $successMessage = 'Tutor updated successfully.';
+            if ($validated['status'] === 'resigned' && $previousStatus !== 'resigned') {
+                $studentsUnassigned = $tutor->students()->count();
+                $successMessage .= " Tutor has been marked as resigned and all {$studentsUnassigned} student(s) have been unassigned.";
+            }
+
             return redirect()->route('director.tutors.index')
-                ->with('success', 'Tutor updated successfully.');
+                ->with('success', $successMessage);
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', 'Failed to update tutor: ' . $e->getMessage());

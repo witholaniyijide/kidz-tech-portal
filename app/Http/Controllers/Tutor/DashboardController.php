@@ -199,12 +199,14 @@ class DashboardController extends Controller
         // Classes today count
         $classesTodayCount = $todayClasses->count();
 
-        // Get recent notices (visible to tutors)
+        // Get recent notices (visible to tutors) - limit to 4, prioritize pinned
         $recentNotices = Notice::where('status', 'published')
             ->whereJsonContains('visible_to', 'tutor')
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('pinned_at', 'desc')
             ->orderByRaw("FIELD(priority, 'urgent', 'high', 'normal', 'low')")
             ->orderBy('published_at', 'desc')
-            ->take(3)
+            ->take(4)
             ->get();
 
         // Get custom todos for this tutor

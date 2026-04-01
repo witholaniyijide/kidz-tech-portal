@@ -31,8 +31,8 @@ class ManagerDashboardController extends Controller
                 'graduatedStudents' => Student::where('status', 'graduated')->count(),
                 'withdrawnStudents' => Student::where('status', 'withdrawn')->count(),
 
-                // Tutor stats
-                'totalTutors' => Tutor::count(),
+                // Tutor stats (exclude resigned from total)
+                'totalTutors' => Tutor::where('status', '!=', 'resigned')->count(),
                 'activeTutors' => Tutor::where('status', 'active')->count(),
                 'inactiveTutors' => Tutor::where('status', 'inactive')->count(),
                 'onLeaveTutors' => Tutor::where('status', 'on_leave')->count(),
@@ -79,14 +79,16 @@ class ManagerDashboardController extends Controller
             ->limit(10)
             ->get();
 
-        // Get recent notices (visible to managers)
+        // Get recent notices (visible to managers) - limit to 4, prioritize pinned
         $notices = Notice::where('status', 'published')
             ->where(function($query) {
                 $query->whereJsonContains('visible_to', 'manager')
                       ->orWhereJsonContains('visible_to', 'all');
             })
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('pinned_at', 'desc')
             ->orderBy('published_at', 'desc')
-            ->limit(5)
+            ->limit(4)
             ->get();
 
         // Today's Birthdays
