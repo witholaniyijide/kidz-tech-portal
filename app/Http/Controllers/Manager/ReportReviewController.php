@@ -425,7 +425,8 @@ class ReportReviewController extends Controller
             'Tutor Name',
             'Report Month',
             'Year',
-            'Submitted At',
+            'First Submitted At',
+            'Last Submitted At',
             'Late Submission?',
             'Manager Approved?',
             'Manager Approved At',
@@ -443,9 +444,10 @@ class ReportReviewController extends Controller
                 : 'Unknown';
 
             // Determine if submission was late (after 12noon on last day of month)
+            // Use first_submitted_at (original submission) to determine lateness, not resubmission time
             $lateSubmission = 'N/A';
-            if ($report->submitted_at) {
-                $submittedAt = $report->submitted_at;
+            $checkTime = $report->first_submitted_at ?? $report->submitted_at;
+            if ($checkTime) {
                 $reportMonth = $report->month; // e.g., "January"
                 $reportYear = $report->year;
 
@@ -458,8 +460,8 @@ class ReportReviewController extends Controller
                 // Deadline is 12:00 PM (noon) on the last day
                 $deadline = $lastDayOfMonth->copy()->setTime(12, 0, 0);
 
-                if ($submittedAt->gt($deadline)) {
-                    $lateSubmission = 'YES - ' . $submittedAt->format('M d, Y g:i A');
+                if ($checkTime->gt($deadline)) {
+                    $lateSubmission = 'YES - ' . $checkTime->format('M d, Y g:i A');
                 } else {
                     $lateSubmission = 'No';
                 }
@@ -482,6 +484,7 @@ class ReportReviewController extends Controller
                 $tutorName,
                 $report->month,
                 $report->year,
+                $report->first_submitted_at ? $report->first_submitted_at->format('M d, Y g:i A') : ($report->submitted_at ? $report->submitted_at->format('M d, Y g:i A') : 'Not submitted'),
                 $report->submitted_at ? $report->submitted_at->format('M d, Y g:i A') : 'Not submitted',
                 $lateSubmission,
                 $managerApproved,
