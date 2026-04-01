@@ -35,12 +35,12 @@
                     </a>
                 @endif
 
-                @if($report->status === 'draft')
+                @if($report->canEdit())
                     <form action="{{ route('tutor.reports.submit', $report) }}" method="POST" onsubmit="return confirm('Submit for review?')">
                         @csrf
                         <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#4B49AC] to-[#7978E9] text-white font-semibold rounded-xl hover:opacity-90 transition-all">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Submit
+                            {{ $report->isReturned() ? 'Resubmit' : 'Submit' }}
                         </button>
                     </form>
                 @endif
