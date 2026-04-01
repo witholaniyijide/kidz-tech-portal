@@ -24,6 +24,8 @@ class ParentDashboardController extends Controller
             ->map(function ($child) {
                 // Calculate current stage based on curriculum progress
                 $child->current_stage = $this->calculateCurrentStage($child);
+                // Mark if child is inactive (parent gets limited access)
+                $child->is_inactive = $child->status === 'inactive';
                 return $child;
             });
 
@@ -98,6 +100,9 @@ class ParentDashboardController extends Controller
         // Curriculum roadmap (12 courses)
         $curriculumRoadmap = $this->getCurriculumRoadmap($selectedChild);
 
+        // Check if selected child is inactive (limited access: only past reports/performance)
+        $isSelectedChildInactive = $selectedChild->status === 'inactive';
+
         return view('parent.dashboard', compact(
             'children',
             'selectedChild',
@@ -107,7 +112,8 @@ class ParentDashboardController extends Controller
             'lastReport',
             'nextMilestone',
             'unreadNotifications',
-            'curriculumRoadmap'
+            'curriculumRoadmap',
+            'isSelectedChildInactive'
         ));
     }
 

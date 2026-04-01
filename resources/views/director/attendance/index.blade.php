@@ -27,21 +27,26 @@
             <!-- Filter Section -->
             <x-ui.glass-card class="mb-8">
                 <form method="GET" action="{{ route('director.attendance.index') }}" class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Range</label>
-                            <select name="date_range" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
-                                <option value="">Custom</option>
+                            <select name="date_range" id="date_range_select" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                <option value="">All Time</option>
                                 <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
                                 <option value="this_week" {{ request('date_range') == 'this_week' ? 'selected' : '' }}>This Week</option>
                                 <option value="this_month" {{ request('date_range') == 'this_month' ? 'selected' : '' }}>This Month</option>
                                 <option value="last_week" {{ request('date_range') == 'last_week' ? 'selected' : '' }}>Last Week</option>
                                 <option value="last_month" {{ request('date_range') == 'last_month' ? 'selected' : '' }}>Last Month</option>
+                                <option value="custom" {{ request('date_range') == 'custom' || (request('start_date') || request('end_date')) ? 'selected' : '' }}>Custom Range</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
-                            <input type="date" name="date" value="{{ request('date') }}" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                        <div id="start_date_container" class="{{ request('date_range') == 'custom' || request('start_date') || request('end_date') ? '' : 'hidden' }}">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From Date</label>
+                            <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                        </div>
+                        <div id="end_date_container" class="{{ request('date_range') == 'custom' || request('start_date') || request('end_date') ? '' : 'hidden' }}">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To Date</label>
+                            <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
@@ -50,6 +55,14 @@
                                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                                 <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
                                 <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Late Submission</label>
+                            <select name="late_submission" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5]">
+                                <option value="">All</option>
+                                <option value="late_only" {{ request('late_submission') == 'late_only' ? 'selected' : '' }}>Late Only</option>
+                                <option value="on_time" {{ request('late_submission') == 'on_time' ? 'selected' : '' }}>On Time Only</option>
                             </select>
                         </div>
                         <div>
@@ -77,6 +90,16 @@
                     </div>
                 </form>
             </x-ui.glass-card>
+
+            <script>
+                document.getElementById('date_range_select').addEventListener('change', function() {
+                    const customContainers = ['start_date_container', 'end_date_container'];
+                    const isCustom = this.value === 'custom';
+                    customContainers.forEach(id => {
+                        document.getElementById(id).classList.toggle('hidden', !isCustom);
+                    });
+                });
+            </script>
 
             <!-- Today's Attendance -->
             @if($todayAttendance->count() > 0)
