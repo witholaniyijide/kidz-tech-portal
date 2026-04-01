@@ -139,25 +139,55 @@ class DirectorReportController extends Controller
             ->orderByRaw("FIELD(month, 'December', 'November', 'October', 'September', 'August', 'July', 'June', 'May', 'April', 'March', 'February', 'January')")
             ->get();
 
+        // Get filter month/year for student overview
+        $overviewMonth = $request->get('overview_month');
+        $overviewYear = $request->get('overview_year');
+
         // Student-Tutor report overview with late submission tracking
         $studentTutorReports = Student::where('status', 'active')
             ->with(['tutor:id,first_name,last_name'])
             ->withCount([
                 'tutorReports as total_reports',
-                'tutorReports as pending_reports' => function ($q) {
+                'tutorReports as pending_reports' => function ($q) use ($overviewMonth, $overviewYear) {
                     $q->whereIn('status', ['submitted', 'approved-by-manager']);
+                    if ($overviewMonth) {
+                        $q->where('month', $overviewMonth);
+                    }
+                    if ($overviewYear) {
+                        $q->where('year', $overviewYear);
+                    }
                 },
-                'tutorReports as approved_reports' => function ($q) {
+                'tutorReports as approved_reports' => function ($q) use ($overviewMonth, $overviewYear) {
                     $q->where('status', 'approved-by-director');
+                    if ($overviewMonth) {
+                        $q->where('month', $overviewMonth);
+                    }
+                    if ($overviewYear) {
+                        $q->where('year', $overviewYear);
+                    }
+                },
+                'tutorReports as manager_approved_reports' => function ($q) use ($overviewMonth, $overviewYear) {
+                    $q->where('status', 'approved-by-manager');
+                    if ($overviewMonth) {
+                        $q->where('month', $overviewMonth);
+                    }
+                    if ($overviewYear) {
+                        $q->where('year', $overviewYear);
+                    }
                 },
             ])
             ->orderBy('first_name')
             ->get()
-            ->map(function ($student) {
-                // Get latest report for this student
-                $latestReport = TutorReport::where('student_id', $student->id)
-                    ->orderBy('submitted_at', 'desc')
-                    ->first();
+            ->map(function ($student) use ($overviewMonth, $overviewYear) {
+                // Get latest report for this student (optionally filtered by month/year)
+                $latestReportQuery = TutorReport::where('student_id', $student->id);
+                if ($overviewMonth) {
+                    $latestReportQuery->where('month', $overviewMonth);
+                }
+                if ($overviewYear) {
+                    $latestReportQuery->where('year', $overviewYear);
+                }
+                $latestReport = $latestReportQuery->orderBy('submitted_at', 'desc')->first();
 
                 $student->latest_report = $latestReport;
                 $student->latest_submitted_at = $latestReport?->submitted_at;
@@ -192,21 +222,60 @@ class DirectorReportController extends Controller
             })
             ->count();
 
-        // Students awaiting reports (no report submitted for current month)
+        // Analytics filter - defaults to current month
+        $analyticsMonth = $request->get('analytics_month', now()->format('F'));
+        $analyticsYear = $request->get('analytics_year', now()->format('Y'));
         $currentMonth = now()->format('F');
         $currentYear = now()->format('Y');
+
+        // Students awaiting reports (no report submitted for selected month)
         $studentsAwaitingReports = Student::where('status', 'active')
-            ->whereDoesntHave('tutorReports', function ($q) use ($currentMonth, $currentYear) {
-                $q->where('month', $currentMonth)
-                  ->where('year', $currentYear)
+            ->whereDoesntHave('tutorReports', function ($q) use ($analyticsMonth, $analyticsYear) {
+                $q->where('month', $analyticsMonth)
+                  ->where('year', $analyticsYear)
                   ->whereIn('status', ['submitted', 'approved-by-manager', 'approved-by-director']);
             })
             ->with('tutor:id,first_name,last_name')
             ->get();
 
+        // Late submissions for selected month
+        $lateSubmissionsForMonth = TutorReport::whereNotNull('submitted_at')
+            ->where('month', $analyticsMonth)
+            ->where('year', $analyticsYear)
+            ->with(['student', 'tutor'])
+            ->get()
+            ->filter(function ($report) {
+                if (!$report->submitted_at || !$report->month || !$report->year) {
+                    return false;
+                }
+                $monthNumber = date('n', strtotime("1 {$report->month} {$report->year}"));
+                $lastDayOfMonth = \Carbon\Carbon::create($report->year, $monthNumber, 1)->endOfMonth();
+                $deadline = $lastDayOfMonth->copy()->setTime(12, 0, 0);
+                return $report->submitted_at->gt($deadline);
+            });
+
+        // Completed (Director approved) reports for selected month
+        $completedReportsForMonth = TutorReport::where('status', 'approved-by-director')
+            ->where('month', $analyticsMonth)
+            ->where('year', $analyticsYear)
+            ->with(['student', 'tutor'])
+            ->orderBy('approved_by_director_at', 'desc')
+            ->get();
+
+        // Manager approved reports for selected month
+        $managerApprovedForMonth = TutorReport::where('status', 'approved-by-manager')
+            ->where('month', $analyticsMonth)
+            ->where('year', $analyticsYear)
+            ->with(['student', 'tutor'])
+            ->orderBy('approved_by_manager_at', 'desc')
+            ->get();
+
         // Add late submissions count to stats
         $stats['late_submissions'] = $lateSubmissionsCount;
         $stats['awaiting_reports'] = $studentsAwaitingReports->count();
+        $stats['late_submissions_month'] = $lateSubmissionsForMonth->count();
+        $stats['completed_month'] = $completedReportsForMonth->count();
+        $stats['manager_approved_month'] = $managerApprovedForMonth->count();
 
         return view('director.reports.index', compact(
             'reports',
@@ -222,7 +291,14 @@ class DirectorReportController extends Controller
             'studentTutorReports',
             'studentsAwaitingReports',
             'currentMonth',
-            'currentYear'
+            'currentYear',
+            'analyticsMonth',
+            'analyticsYear',
+            'lateSubmissionsForMonth',
+            'completedReportsForMonth',
+            'managerApprovedForMonth',
+            'overviewMonth',
+            'overviewYear'
         ));
     }
 
