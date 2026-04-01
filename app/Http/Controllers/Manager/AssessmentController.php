@@ -204,7 +204,7 @@ class AssessmentController extends Controller
                 $validated['criteria_ratings'] = $criteriaRatings;
             }
 
-            DB::transaction(function () use ($validated, $criteriaRatings) {
+            $assessment = DB::transaction(function () use ($validated, $criteriaRatings) {
                 $assessment = TutorAssessment::create($validated);
 
                 // Create individual rating records
@@ -226,7 +226,14 @@ class AssessmentController extends Controller
                         \Log::warning('Could not create assessment ratings: ' . $e->getMessage());
                     }
                 }
+
+                return $assessment;
             });
+
+            // Notify directors when assessment is sent directly for review
+            if ($action === 'send') {
+                app(NotificationService::class)->notifyDirectorAssessmentForwarded($assessment);
+            }
 
             if ($request->wantsJson()) {
                 return response()->json(['success' => true, 'message' => 'Assessment created successfully.']);

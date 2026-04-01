@@ -131,8 +131,8 @@ class ManagerReportsController extends Controller
             'revision_notes' => 'required|string|max:1000',
         ]);
 
-        // Update status to draft and add revision notes
-        $report->status = 'draft';
+        // Update status to returned and add revision notes
+        $report->status = 'returned';
 
         $currentComments = $report->comments ?? '';
         $revisionNote = "\n\n--- Manager Requested Changes (" . Carbon::now()->format('Y-m-d H:i') . ") ---\n" . $request->revision_notes;

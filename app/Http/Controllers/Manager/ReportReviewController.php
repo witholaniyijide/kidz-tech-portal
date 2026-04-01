@@ -259,10 +259,10 @@ class ReportReviewController extends Controller
                 ->with('error', 'This report cannot be sent back at this time.');
         }
 
-        // Update the report - set status to draft with returned tracking
+        // Update the report - set status to returned with tracking
         DB::transaction(function () use ($report, $validated) {
             $report->update([
-                'status' => 'draft',
+                'status' => 'returned',
                 'manager_comment' => $validated['manager_comment'],
                 'returned_at' => now(),
                 'returned_by' => 'manager',

@@ -227,6 +227,11 @@ class ReportController extends Controller
                     $issues[] = 'Comments/Observation is required';
                 }
 
+                $newSkills = $validated['new_skills'] ?? [];
+                if (empty($newSkills) || count($newSkills) === 0) {
+                    $issues[] = 'At least one new skill is required';
+                }
+
                 if (count($issues) > 0) {
                     return redirect()->back()
                         ->with('error', 'Please complete all required sections before submitting: ' . implode(', ', $issues))
@@ -489,6 +494,9 @@ class ReportController extends Controller
             }
             if (empty($report->comments_observation)) {
                 $issues[] = 'Comments/Observation is required';
+            }
+            if (empty($report->new_skills) || count($report->new_skills) === 0) {
+                $issues[] = 'At least one new skill is required';
             }
 
             if (count($issues) > 0) {
