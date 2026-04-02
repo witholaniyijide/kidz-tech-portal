@@ -559,29 +559,65 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {{-- Top Performers --}}
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-5">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                            <span class="text-2xl">🏆</span>
-                            Top Performers
-                        </h3>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                                <span class="text-2xl">🏆</span>
+                                Top Performers
+                            </h3>
+                            <select x-model="topPerformersMonth"
+                                    class="text-sm px-3 py-1.5 bg-gray-100 dark:bg-gray-700 border-0 rounded-lg text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-sky-500">
+                                <option value="">All Time</option>
+                                @foreach($months as $month)
+                                    <option value="{{ $month }}">{{ $month }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="space-y-3">
                             @php
-                                $topPerformers = $assessments->where('status', 'approved-by-director')
-                                    ->sortByDesc('performance_score')
-                                    ->take(3);
+                                $allApprovedAssessments = $assessments->where('status', 'approved-by-director');
                             @endphp
-                            @forelse($topPerformers as $assessment)
-                                <div class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/30 rounded-lg">
-                                    <div>
-                                        <div class="font-medium text-gray-800 dark:text-white">{{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}</div>
-                                        <div class="text-xs text-gray-600 dark:text-gray-400">{{ $assessment->assessment_month }}</div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xl font-bold text-emerald-600">{{ $assessment->performance_score ?? 0 }}%</div>
-                                    </div>
+                            <template x-if="topPerformersMonth === ''">
+                                <div class="space-y-3">
+                                    @php
+                                        $topPerformers = $allApprovedAssessments->sortByDesc('performance_score')->take(3);
+                                    @endphp
+                                    @forelse($topPerformers as $assessment)
+                                        <div class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/30 rounded-lg">
+                                            <div>
+                                                <div class="font-medium text-gray-800 dark:text-white">{{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}</div>
+                                                <div class="text-xs text-gray-600 dark:text-gray-400">{{ $assessment->assessment_month }}</div>
+                                            </div>
+                                            <div class="text-right">
+                                                <div class="text-xl font-bold text-emerald-600">{{ $assessment->performance_score ?? 0 }}%</div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="text-center py-4 text-gray-500">No data yet</div>
+                                    @endforelse
                                 </div>
-                            @empty
-                                <div class="text-center py-4 text-gray-500">No data yet</div>
-                            @endforelse
+                            </template>
+                            @foreach($months as $month)
+                            <template x-if="topPerformersMonth === '{{ $month }}'">
+                                <div class="space-y-3">
+                                    @php
+                                        $monthTopPerformers = $allApprovedAssessments->where('assessment_month', $month)->sortByDesc('performance_score')->take(3);
+                                    @endphp
+                                    @forelse($monthTopPerformers as $assessment)
+                                        <div class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/30 rounded-lg">
+                                            <div>
+                                                <div class="font-medium text-gray-800 dark:text-white">{{ $assessment->tutor->first_name ?? 'Unknown' }} {{ $assessment->tutor->last_name ?? '' }}</div>
+                                                <div class="text-xs text-gray-600 dark:text-gray-400">{{ $assessment->assessment_month }}</div>
+                                            </div>
+                                            <div class="text-right">
+                                                <div class="text-xl font-bold text-emerald-600">{{ $assessment->performance_score ?? 0 }}%</div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="text-center py-4 text-gray-500">No data for {{ $month }}</div>
+                                    @endforelse
+                                </div>
+                            </template>
+                            @endforeach
                         </div>
                     </div>
 
@@ -654,6 +690,7 @@
                 filterTutor: '',
                 filterMonth: '',
                 filterMonthInput: '',
+                topPerformersMonth: '',
 
                 // Completed assessments data
                 completedAssessments: [
@@ -717,14 +754,21 @@
                 charts: {},
 
                 init() {
+                    // Initialize charts on page load if analytics view is active
+                    if (this.view === 'analytics') {
+                        this.$nextTick(() => this.initCharts());
+                    }
+
                     this.$watch('view', (value) => {
                         if (value === 'analytics') {
                             this.$nextTick(() => this.initCharts());
                         }
                     });
-                    
+
                     this.$watch('selectedChart', () => {
-                        this.$nextTick(() => this.initCharts());
+                        if (this.view === 'analytics') {
+                            this.$nextTick(() => this.initCharts());
+                        }
                     });
                 },
                 
@@ -775,160 +819,184 @@
 
                     const chartData = @json($chartData ?? []);
 
+                    // Reset all no-data overlays first
+                    ['noDataOverview', 'noDataTutors', 'noDataCriteria'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.add('hidden');
+                    });
+
                     // Performance Trend Chart
                     if (this.selectedChart === 'overview') {
                         const ctx = document.getElementById('performanceTrendChart');
+                        const noDataEl = document.getElementById('noDataOverview');
                         if (ctx) {
                             // Check if we have actual data
-                            const hasData = chartData.months && chartData.months.length > 0 && chartData.scores && chartData.scores.length > 0;
+                            const hasData = chartData && chartData.months && chartData.months.length > 0 && chartData.scores && chartData.scores.length > 0;
 
                             if (!hasData) {
-                                document.getElementById('noDataOverview').classList.remove('hidden');
+                                if (noDataEl) noDataEl.classList.remove('hidden');
                                 ctx.style.display = 'none';
-                                return;
                             } else {
-                                document.getElementById('noDataOverview').classList.add('hidden');
+                                if (noDataEl) noDataEl.classList.add('hidden');
                                 ctx.style.display = 'block';
-                            }
 
-                            this.charts.performance = new Chart(ctx, {
-                                type: 'line',
-                                data: {
-                                    labels: chartData.months,
-                                    datasets: [{
-                                        label: 'Average Score',
-                                        data: chartData.scores,
-                                        borderColor: '#0ea5e9',
-                                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
-                                        fill: true,
-                                        tension: 0.4
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        title: {
-                                            display: true,
-                                            text: 'Performance Trend Over Time',
-                                            font: { size: 16, weight: 'bold' }
+                                try {
+                                    this.charts.performance = new Chart(ctx, {
+                                        type: 'line',
+                                        data: {
+                                            labels: chartData.months,
+                                            datasets: [{
+                                                label: 'Average Score',
+                                                data: chartData.scores,
+                                                borderColor: '#0ea5e9',
+                                                backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                                                fill: true,
+                                                tension: 0.4
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Performance Trend Over Time',
+                                                    font: { size: 16, weight: 'bold' }
+                                                }
+                                            },
+                                            scales: {
+                                                y: {
+                                                    beginAtZero: true,
+                                                    max: 100
+                                                }
+                                            }
                                         }
-                                    },
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true,
-                                            max: 100
-                                        }
-                                    }
+                                    });
+                                } catch (e) {
+                                    console.error('Error creating performance chart:', e);
+                                    if (noDataEl) noDataEl.classList.remove('hidden');
+                                    ctx.style.display = 'none';
                                 }
-                            });
+                            }
                         }
                     }
 
                     // Tutor Comparison Chart
                     if (this.selectedChart === 'tutors') {
                         const ctx = document.getElementById('tutorComparisonChart');
+                        const noDataEl = document.getElementById('noDataTutors');
                         if (ctx) {
-                            const hasData = chartData.tutorNames && chartData.tutorNames.length > 0 && chartData.tutorScores && chartData.tutorScores.length > 0;
+                            const hasData = chartData && chartData.tutorNames && chartData.tutorNames.length > 0 && chartData.tutorScores && chartData.tutorScores.length > 0;
 
                             if (!hasData) {
-                                document.getElementById('noDataTutors').classList.remove('hidden');
+                                if (noDataEl) noDataEl.classList.remove('hidden');
                                 ctx.style.display = 'none';
-                                return;
                             } else {
-                                document.getElementById('noDataTutors').classList.add('hidden');
+                                if (noDataEl) noDataEl.classList.add('hidden');
                                 ctx.style.display = 'block';
-                            }
 
-                            this.charts.tutors = new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: chartData.tutorNames,
-                                    datasets: [{
-                                        label: 'Average Score',
-                                        data: chartData.tutorScores,
-                                        backgroundColor: [
-                                            '#10b981', '#0ea5e9', '#8b5cf6', '#f59e0b', '#ef4444',
-                                            '#06b6d4', '#ec4899', '#14b8a6', '#f97316', '#6366f1'
-                                        ]
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        title: {
-                                            display: true,
-                                            text: 'Tutor Performance Comparison',
-                                            font: { size: 16, weight: 'bold' }
+                                try {
+                                    this.charts.tutors = new Chart(ctx, {
+                                        type: 'bar',
+                                        data: {
+                                            labels: chartData.tutorNames,
+                                            datasets: [{
+                                                label: 'Average Score',
+                                                data: chartData.tutorScores,
+                                                backgroundColor: [
+                                                    '#10b981', '#0ea5e9', '#8b5cf6', '#f59e0b', '#ef4444',
+                                                    '#06b6d4', '#ec4899', '#14b8a6', '#f97316', '#6366f1'
+                                                ]
+                                            }]
                                         },
-                                        legend: { display: false }
-                                    },
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true,
-                                            max: 100
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Tutor Performance Comparison',
+                                                    font: { size: 16, weight: 'bold' }
+                                                },
+                                                legend: { display: false }
+                                            },
+                                            scales: {
+                                                y: {
+                                                    beginAtZero: true,
+                                                    max: 100
+                                                }
+                                            }
                                         }
-                                    }
+                                    });
+                                } catch (e) {
+                                    console.error('Error creating tutor comparison chart:', e);
+                                    if (noDataEl) noDataEl.classList.remove('hidden');
+                                    ctx.style.display = 'none';
                                 }
-                            });
+                            }
                         }
                     }
 
                     // Criteria Breakdown Chart
                     if (this.selectedChart === 'criteria') {
                         const ctx = document.getElementById('criteriaChart');
+                        const noDataEl = document.getElementById('noDataCriteria');
                         if (ctx) {
-                            const hasData = chartData.criteriaNames && chartData.criteriaNames.length > 0 && chartData.criteriaScores && chartData.criteriaScores.length > 0;
+                            const hasData = chartData && chartData.criteriaNames && chartData.criteriaNames.length > 0 && chartData.criteriaScores && chartData.criteriaScores.length > 0;
 
                             if (!hasData) {
-                                document.getElementById('noDataCriteria').classList.remove('hidden');
+                                if (noDataEl) noDataEl.classList.remove('hidden');
                                 ctx.style.display = 'none';
-                                return;
                             } else {
-                                document.getElementById('noDataCriteria').classList.add('hidden');
+                                if (noDataEl) noDataEl.classList.add('hidden');
                                 ctx.style.display = 'block';
-                            }
 
-                            const criteriaLabels = chartData.criteriaNames;
-                            const criteriaColors = ['#10b981', '#0ea5e9', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#14b8a6'];
-                            this.charts.criteria = new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: criteriaLabels,
-                                    datasets: [{
-                                        label: 'Average Rating (out of 5)',
-                                        data: chartData.criteriaScores,
-                                        backgroundColor: criteriaColors.slice(0, criteriaLabels.length),
-                                        borderWidth: 1,
-                                        borderRadius: 4
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    indexAxis: 'y',
-                                    plugins: {
-                                        title: {
-                                            display: true,
-                                            text: 'Average Score by Criterion',
-                                            font: { size: 16, weight: 'bold' }
+                                try {
+                                    const criteriaLabels = chartData.criteriaNames;
+                                    const criteriaColors = ['#10b981', '#0ea5e9', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#14b8a6'];
+                                    this.charts.criteria = new Chart(ctx, {
+                                        type: 'bar',
+                                        data: {
+                                            labels: criteriaLabels,
+                                            datasets: [{
+                                                label: 'Average Rating (out of 5)',
+                                                data: chartData.criteriaScores,
+                                                backgroundColor: criteriaColors.slice(0, criteriaLabels.length),
+                                                borderWidth: 1,
+                                                borderRadius: 4
+                                            }]
                                         },
-                                        legend: {
-                                            display: false
-                                        }
-                                    },
-                                    scales: {
-                                        x: {
-                                            beginAtZero: true,
-                                            max: 5,
-                                            ticks: {
-                                                stepSize: 1
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            indexAxis: 'y',
+                                            plugins: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Average Score by Criterion',
+                                                    font: { size: 16, weight: 'bold' }
+                                                },
+                                                legend: {
+                                                    display: false
+                                                }
+                                            },
+                                            scales: {
+                                                x: {
+                                                    beginAtZero: true,
+                                                    max: 5,
+                                                    ticks: {
+                                                        stepSize: 1
+                                                    }
+                                                }
                                             }
                                         }
-                                    }
+                                    });
+                                } catch (e) {
+                                    console.error('Error creating criteria chart:', e);
+                                    if (noDataEl) noDataEl.classList.remove('hidden');
+                                    ctx.style.display = 'none';
                                 }
-                            });
+                            }
                         }
                     }
                 }

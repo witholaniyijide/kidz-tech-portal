@@ -487,9 +487,13 @@ class AnalyticsController extends Controller
                 ->orderByRaw('MIN(performance_score) DESC')
                 ->get();
 
-            // Criteria breakdown - average scores by criteria
+            // Criteria breakdown - average scores by criteria (filtered by year for consistency)
             $criteriaBreakdown = TutorAssessment::with('ratings.criteria')
                 ->where('status', 'approved-by-director')
+                ->where(function($query) use ($year) {
+                    $query->whereYear('class_date', $year)
+                          ->orWhere('year', $year);
+                })
                 ->get()
                 ->flatMap(function($assessment) {
                     return $assessment->ratings ?? collect();
