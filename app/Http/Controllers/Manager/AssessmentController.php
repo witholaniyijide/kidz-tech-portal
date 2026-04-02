@@ -352,14 +352,25 @@ class AssessmentController extends Controller
                     ->with('error', 'Only draft assessments can be marked complete.');
             }
 
-            // Verify all selected criteria have ratings
+            // Verify ALL active criteria have ratings
             $criteriaRatings = $assessment->criteria_ratings ?? [];
             $criteriaAssessed = $assessment->criteria_assessed ?? [];
 
-            if (empty($criteriaAssessed)) {
+            // Get total count of active criteria
+            $totalActiveCriteria = AssessmentCriteria::active()->count();
+            $ratedCriteriaCount = count($criteriaRatings);
+
+            if (empty($criteriaAssessed) || $ratedCriteriaCount === 0) {
                 return redirect()
                     ->route('manager.assessments.edit', $assessment)
-                    ->with('error', 'Please select and rate at least one criteria before marking complete.');
+                    ->with('error', 'Please rate all criteria before submitting to director.');
+            }
+
+            if ($ratedCriteriaCount < $totalActiveCriteria) {
+                $missingCount = $totalActiveCriteria - $ratedCriteriaCount;
+                return redirect()
+                    ->route('manager.assessments.edit', $assessment)
+                    ->with('error', "All criteria must be assessed before submission. You have {$ratedCriteriaCount} of {$totalActiveCriteria} criteria rated ({$missingCount} missing).");
             }
 
             DB::transaction(function () use ($assessment) {
